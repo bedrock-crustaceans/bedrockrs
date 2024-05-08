@@ -1,0 +1,29 @@
+[package]
+name = "protocol"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bedrock_core = { path = "../bedrock_core" }
+serialize = { path = "../serialize" }
+serialize_derive = { path = "../serialize_derive" }
+
+byteorder = "1.5"
+varint-rs = "2.2"
+jsonwebtoken = "9.3"
+ring = { version = "0.17" }
+rand = "0.8"
+base64 = "0.22.1"
+serde_json = "1.0"
+rak-rs = { version = "0.3", default-features = false, features = ["async_tokio", "mcpe"] }
+tokio = { version = "1", features = ["full"] }
+
+flate2 = "1.0"
+snap = "1.1"
+
+num-traits = "0.2.19"
+num-derive = "0.4.2"
+
+x509-cert = "0.2.5"
