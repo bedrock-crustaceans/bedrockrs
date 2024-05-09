@@ -1,8 +1,7 @@
 use bedrock_core::types::*;
-use serialize_derive::{MCProtoDeserialize, MCProtoSerialize};
-
 use serialize::proto::de::MCProtoDeserialize;
 use serialize::proto::ser::MCProtoSerialize;
+use serialize_derive::{MCProtoDeserialize, MCProtoSerialize};
 
 use crate::types::connection_request::ConnectionRequestType;
 

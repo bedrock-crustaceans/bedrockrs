@@ -2,7 +2,6 @@ use std::collections::BTreeMap;
 use std::io::Cursor;
 
 use serde_json::Value;
-
 use serialize::error::{DeserilizationError, SerilizationError};
 use serialize::proto::de::MCProtoDeserialize;
 use serialize::proto::ser::MCProtoSerialize;

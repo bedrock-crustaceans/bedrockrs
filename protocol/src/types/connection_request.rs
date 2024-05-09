@@ -7,11 +7,10 @@ use byteorder::LittleEndian;
 use byteorder::ReadBytesExt;
 use jsonwebtoken::{DecodingKey, Validation};
 use serde_json::Value;
-use varint_rs::VarintReader;
-
 use serialize::error::{DeserilizationError, SerilizationError};
 use serialize::proto::de::MCProtoDeserialize;
 use serialize::proto::ser::MCProtoSerialize;
+use varint_rs::VarintReader;
 
 #[derive(Debug)]
 pub struct ConnectionRequestType {

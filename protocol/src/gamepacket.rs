@@ -1,11 +1,10 @@
 use std::io::{Cursor, Write};
 
 use num_traits::FromPrimitive;
-use varint_rs::{VarintReader, VarintWriter};
-
 use serialize::error::{DeserilizationError, SerilizationError};
 use serialize::proto::de::MCProtoDeserialize;
 use serialize::proto::ser::MCProtoSerialize;
+use varint_rs::{VarintReader, VarintWriter};
 
 use crate::info::GamePacketID;
 use crate::packets::client_cache_status::ClientCacheStatusPacket;
@@ -675,19 +674,17 @@ impl GamePacket {
 
         // Read the gamepacket ID
         let gamepacket_id: GamePacketID = match cursor.read_u64_varint() {
-            Ok(v) => { match GamePacketID::from_u64(v) {
-                    Some(pk) => pk,
-                    None => return Err(DeserilizationError::InvalidGamepacketID),
-            }}
+            Ok(v) => match GamePacketID::from_u64(v) {
+                Some(pk) => pk,
+                None => return Err(DeserilizationError::InvalidGamepacketID),
+            },
             Err(_) => return Err(DeserilizationError::ReadIOError),
         };
 
         match gamepacket_id {
             GamePacketID::LoginID => Ok(GamePacket::Login(de_packet!(cursor, LoginPacket))),
             GamePacketID::PlayStatusID => {
-                Ok(GamePacket::PlayStatus(
-                    de_packet!(cursor, PlayStatusPacket),
-                ))
+                Ok(GamePacket::PlayStatus(de_packet!(cursor, PlayStatusPacket)))
             }
             GamePacketID::ServerToClientHandshakeID => Ok(GamePacket::ServerToClientHandshake(
                 de_packet!(cursor, HandshakeServerToClientPacket),
@@ -698,15 +695,19 @@ impl GamePacket {
             GamePacketID::DisconnectID => {
                 unimplemented!()
             }
-            GamePacketID::ResourcePacksInfoID => Ok(GamePacket::ResourcePacksInfo(
-                de_packet!(cursor, ResourcePacksInfoPacket),
-            )),
+            GamePacketID::ResourcePacksInfoID => Ok(GamePacket::ResourcePacksInfo(de_packet!(
+                cursor,
+                ResourcePacksInfoPacket
+            ))),
             GamePacketID::ResourcePackStackID => {
                 unimplemented!()
             }
-            GamePacketID::ResourcePackClientResponseID => Ok(GamePacket::ResourcePackClientResponse(
-                de_packet!(cursor, ResourcePacksResponsePacket),
-            )),
+            GamePacketID::ResourcePackClientResponseID => {
+                Ok(GamePacket::ResourcePackClientResponse(de_packet!(
+                    cursor,
+                    ResourcePacksResponsePacket
+                )))
+            }
             GamePacketID::TextID => {
                 unimplemented!()
             }
@@ -1052,9 +1053,10 @@ impl GamePacket {
             GamePacketID::VideoStreamConnectID => {
                 unimplemented!()
             }
-            GamePacketID::ClientCacheStatusID => Ok(GamePacket::ClientCacheStatus(
-                de_packet!(cursor, ClientCacheStatusPacket),
-            )),
+            GamePacketID::ClientCacheStatusID => Ok(GamePacket::ClientCacheStatus(de_packet!(
+                cursor,
+                ClientCacheStatusPacket
+            ))),
             GamePacketID::OnScreenTextureAnimationID => {
                 unimplemented!()
             }
