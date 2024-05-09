@@ -12,3 +12,7 @@ protocol = { path = "protocol" }
 
 serialize = { path = "serialize" }
 serialize_derive = { path = "serialize_derive" }
+
+packs = { path = "packs" }
+
+world = { path = "world" }
