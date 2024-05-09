@@ -8,11 +8,14 @@ use serialize::proto::de::MCProtoDeserialize;
 use serialize::proto::ser::MCProtoSerialize;
 
 use crate::info::GamePacketID;
+use crate::packets::client_cache_status::ClientCacheStatusPacket;
 use crate::packets::handshake_server_to_client::HandshakeServerToClientPacket;
 use crate::packets::login::LoginPacket;
 use crate::packets::network_settings::NetworkSettingsPacket;
 use crate::packets::network_settings_request::NetworkSettingsRequestPacket;
 use crate::packets::play_status::PlayStatusPacket;
+use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
+use crate::packets::resource_packs_response::ResourcePacksResponsePacket;
 
 #[repr(u64)]
 #[derive(Debug)]
@@ -22,9 +25,9 @@ pub enum GamePacket {
     ServerToClientHandshake(HandshakeServerToClientPacket),
     ClientToServerHandshake(),
     Disconnect(),
-    ResourcePacksInfo(),
+    ResourcePacksInfo(ResourcePacksInfoPacket),
     ResourcePackStack(),
-    ResourcePackClientResponse(),
+    ResourcePackClientResponse(ResourcePacksResponsePacket),
     Text(),
     SetTime(),
     StartGame(),
@@ -140,7 +143,7 @@ pub enum GamePacket {
     LevelEventGeneric(),
     LecternUpdate(),
     VideoStreamConnect(),
-    ClientCacheStatus(),
+    ClientCacheStatus(ClientCacheStatusPacket),
     OnScreenTextureAnimation(),
     MapCreateLockedCopy(),
     StructureTemplateDataExportRequest(),
@@ -233,14 +236,14 @@ impl GamePacket {
             GamePacket::Disconnect() => {
                 unimplemented!()
             }
-            GamePacket::ResourcePacksInfo() => {
-                unimplemented!()
+            GamePacket::ResourcePacksInfo(pk) => {
+                ser_packet!(buf, GamePacketID::ResourcePacksInfoID, pk)
             }
             GamePacket::ResourcePackStack() => {
                 unimplemented!()
             }
-            GamePacket::ResourcePackClientResponse() => {
-                unimplemented!()
+            GamePacket::ResourcePackClientResponse(pk) => {
+                ser_packet!(buf, GamePacketID::ResourcePackClientResponseID, pk)
             }
             GamePacket::Text() => {
                 unimplemented!()
@@ -587,8 +590,8 @@ impl GamePacket {
             GamePacket::VideoStreamConnect() => {
                 unimplemented!()
             }
-            GamePacket::ClientCacheStatus() => {
-                unimplemented!()
+            GamePacket::ClientCacheStatus(pk) => {
+                ser_packet!(buf, GamePacketID::ClientCacheStatusID, pk)
             }
             GamePacket::OnScreenTextureAnimation() => {
                 unimplemented!()
@@ -695,15 +698,15 @@ impl GamePacket {
             GamePacketID::DisconnectID => {
                 unimplemented!()
             }
-            GamePacketID::ResourcePacksInfoID => {
-                unimplemented!()
-            }
+            GamePacketID::ResourcePacksInfoID => Ok(GamePacket::ResourcePacksInfo(
+                de_packet!(cursor, ResourcePacksInfoPacket),
+            )),
             GamePacketID::ResourcePackStackID => {
                 unimplemented!()
             }
-            GamePacketID::ResourcePackClientResponseID => {
-                unimplemented!()
-            }
+            GamePacketID::ResourcePackClientResponseID => Ok(GamePacket::ResourcePackClientResponse(
+                de_packet!(cursor, ResourcePacksResponsePacket),
+            )),
             GamePacketID::TextID => {
                 unimplemented!()
             }
@@ -1049,9 +1052,9 @@ impl GamePacket {
             GamePacketID::VideoStreamConnectID => {
                 unimplemented!()
             }
-            GamePacketID::ClientCacheStatusID => {
-                unimplemented!()
-            }
+            GamePacketID::ClientCacheStatusID => Ok(GamePacket::ClientCacheStatus(
+                de_packet!(cursor, ClientCacheStatusPacket),
+            )),
             GamePacketID::OnScreenTextureAnimationID => {
                 unimplemented!()
             }

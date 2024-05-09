@@ -1,3 +1,4 @@
+use std::future::Future;
 use bedrock_core::types::u16le;
 
 use crate::compression::{CompressionMethod, CompressionMethods};
@@ -5,10 +6,11 @@ use crate::compression::none::NoCompression;
 use crate::compression::snappy::SnappyCompression;
 use crate::compression::zlib::ZlibCompression;
 use crate::conn::Connection;
-use crate::error::LoginError;
+use crate::error::{ConnectionError, LoginError};
 use crate::gamepacket::GamePacket;
 use crate::packets::network_settings::NetworkSettingsPacket;
 use crate::packets::play_status::PlayStatusPacket;
+use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
 use crate::types::play_status::PlayStatusType;
 
 pub struct LoginServerSideOptions {
@@ -81,7 +83,7 @@ pub async fn handle_login_server_side(
     connection.set_compression_method(Some(options.compression));
 
     // Receive Login
-    let gamepackets = match connection.recv_gamepackets().await {
+    let login = match connection.recv_gamepackets().await {
         Ok(v) => v,
         Err(e) => {
             println!("{:?}", e);
@@ -89,24 +91,16 @@ pub async fn handle_login_server_side(
         }
     };
 
-    println!("LOGING #1");
-
     // If too many or no packets were send the error
-    if gamepackets.len() > 1 || gamepackets.len() < 1 {
+    if login.len() > 1 || login.len() < 1 {
         return Err(LoginError::PacketMissmatch);
     }
 
-    println!("LOGING #2");
-
     // Get the clients protocol version
-    let login_pk = match &gamepackets[0] {
+    let login_pk = match &login[0] {
         GamePacket::Login(pk) => pk,
         _ => return Err(LoginError::PacketMissmatch),
     };
-
-    println!("LOGIN #3 {:#?}", login_pk);
-
-    println!("LOGIN");
 
     // If encryption is enabled send the
     if options.encryption {
@@ -123,8 +117,32 @@ pub async fn handle_login_server_side(
 
     println!("PLAY STATUS LOGIN");
 
+    // Sent the Resource Packs Info packet with the needed data
+    // TODO: Make this useful
+    match connection.send_gamepackets(vec![GamePacket::ResourcePacksInfo(ResourcePacksInfoPacket{
+        resource_pack_required: false,
+        has_addon_packs: false,
+        has_scripts: false,
+        force_server_packs_enabled: false,
+        behavior_packs: vec![],
+        resource_packs: vec![],
+        cdn_urls: vec![],
+    })]).await {
+        Ok(_) => {},
+        Err(e) => { return Err(LoginError::ConnError(e)) },
+    }
 
+    // Receive Client Cache Status
+    let cache_status_pk = match connection.recv_gamepackets().await {
+        Ok(v) => { v }
+        Err(e) => { return Err(LoginError::ConnError(e)) }
+    };
 
+    // Receive Resource Packs Response
+    match connection.recv_gamepackets().await {
+        Ok(v) => { println!("PK: {v:#?}") }
+        Err(e) => { return Err(LoginError::ConnError(e)) }
+    }
 
     Ok(())
 }
