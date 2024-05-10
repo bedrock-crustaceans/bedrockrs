@@ -22,8 +22,8 @@ pub struct ResourcePacksInfoPacket {
 
 impl MCProtoSerialize for ResourcePacksInfoPacket {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         // Serialize resource_pack_required as a bool
         match self.resource_pack_required.proto_serialize(buf) {
@@ -89,18 +89,10 @@ impl MCProtoSerialize for ResourcePacksInfoPacket {
 
 impl MCProtoDeserialize for ResourcePacksInfoPacket {
     fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         // TODO: Add this
-        Ok(Self {
-            resource_pack_required: false,
-            has_addon_packs: false,
-            has_scripts: false,
-            force_server_packs_enabled: false,
-            behavior_packs: vec![],
-            resource_packs: vec![],
-            cdn_urls: vec![],
-        })
+        todo!()
     }
 }

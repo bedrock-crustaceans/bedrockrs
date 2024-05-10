@@ -29,21 +29,21 @@ pub enum PlayStatusType {
 
 impl MCProtoSerialize for PlayStatusType {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         i32be(match self.to_i32() {
             None => return Err(SerilizationError::WriteIOError),
             Some(v) => v,
         })
-        .proto_serialize(buf)
+            .proto_serialize(buf)
     }
 }
 
 impl MCProtoDeserialize for PlayStatusType {
     fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match i32be::proto_deserialize(cursor) {
             Ok(v) => match PlayStatusType::from_i32(v.0) {

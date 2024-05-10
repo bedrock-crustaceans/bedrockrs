@@ -10,8 +10,8 @@ pub struct PackURL {
 
 impl MCProtoSerialize for PackURL {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         let uuid_version = format!("{}_{}", self.uuid, self.version);
 

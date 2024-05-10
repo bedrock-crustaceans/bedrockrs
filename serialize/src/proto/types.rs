@@ -1,5 +1,8 @@
+use std::f32;
 use std::io::{Cursor, Read, Write};
 
+use bedrock_core::types::i32le;
+use bedrock_core::vec::{Vec2, Vec2f, Vec3, Vec3f};
 use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
 use varint_rs::{VarintReader, VarintWriter};
 
@@ -10,8 +13,8 @@ use crate::proto::ser::MCProtoSerialize;
 // i8
 impl MCProtoSerialize for i8 {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_i8(*self) {
             Ok(_) => Ok(()),
@@ -22,8 +25,8 @@ impl MCProtoSerialize for i8 {
 
 impl MCProtoDeserialize for i8 {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_i8() {
             Ok(v) => Ok(v),
@@ -35,8 +38,8 @@ impl MCProtoDeserialize for i8 {
 // u8
 impl MCProtoSerialize for u8 {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_u8(*self) {
             Ok(_) => Ok(()),
@@ -47,8 +50,8 @@ impl MCProtoSerialize for u8 {
 
 impl MCProtoDeserialize for u8 {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_u8() {
             Ok(v) => Ok(v),
@@ -60,8 +63,8 @@ impl MCProtoDeserialize for u8 {
 // i16
 impl MCProtoSerialize for bedrock_core::types::i16le {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_i16::<LittleEndian>(self.0) {
             Ok(_) => Ok(()),
@@ -72,8 +75,8 @@ impl MCProtoSerialize for bedrock_core::types::i16le {
 
 impl MCProtoDeserialize for bedrock_core::types::i16le {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_i16::<LittleEndian>() {
             Ok(v) => Ok(Self(v)),
@@ -84,8 +87,8 @@ impl MCProtoDeserialize for bedrock_core::types::i16le {
 
 impl MCProtoSerialize for bedrock_core::types::i16be {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_i16::<BigEndian>(self.0) {
             Ok(_) => Ok(()),
@@ -96,8 +99,8 @@ impl MCProtoSerialize for bedrock_core::types::i16be {
 
 impl MCProtoDeserialize for bedrock_core::types::i16be {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_i16::<BigEndian>() {
             Ok(v) => Ok(Self(v)),
@@ -109,8 +112,8 @@ impl MCProtoDeserialize for bedrock_core::types::i16be {
 // u16
 impl MCProtoSerialize for bedrock_core::types::u16le {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_u16::<LittleEndian>(self.0) {
             Ok(_) => Ok(()),
@@ -121,8 +124,8 @@ impl MCProtoSerialize for bedrock_core::types::u16le {
 
 impl MCProtoDeserialize for bedrock_core::types::u16le {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_u16::<LittleEndian>() {
             Ok(v) => Ok(Self(v)),
@@ -133,8 +136,8 @@ impl MCProtoDeserialize for bedrock_core::types::u16le {
 
 impl MCProtoSerialize for bedrock_core::types::u16be {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_u16::<BigEndian>(self.0) {
             Ok(_) => Ok(()),
@@ -145,8 +148,8 @@ impl MCProtoSerialize for bedrock_core::types::u16be {
 
 impl MCProtoDeserialize for bedrock_core::types::u16be {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_u16::<BigEndian>() {
             Ok(v) => Ok(Self(v)),
@@ -159,8 +162,8 @@ impl MCProtoDeserialize for bedrock_core::types::u16be {
 
 impl MCProtoSerialize for bedrock_core::types::i32le {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_i32::<LittleEndian>(self.0) {
             Ok(_) => Ok(()),
@@ -171,8 +174,8 @@ impl MCProtoSerialize for bedrock_core::types::i32le {
 
 impl MCProtoDeserialize for bedrock_core::types::i32le {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_i32::<LittleEndian>() {
             Ok(v) => Ok(Self(v)),
@@ -183,8 +186,8 @@ impl MCProtoDeserialize for bedrock_core::types::i32le {
 
 impl MCProtoSerialize for bedrock_core::types::i32be {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_i32::<BigEndian>(self.0) {
             Ok(_) => Ok(()),
@@ -195,8 +198,8 @@ impl MCProtoSerialize for bedrock_core::types::i32be {
 
 impl MCProtoDeserialize for bedrock_core::types::i32be {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_i32::<BigEndian>() {
             Ok(v) => Ok(Self(v)),
@@ -209,8 +212,8 @@ impl MCProtoDeserialize for bedrock_core::types::i32be {
 
 impl MCProtoSerialize for bedrock_core::types::u32le {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_u32::<LittleEndian>(self.0) {
             Ok(_) => Ok(()),
@@ -221,8 +224,8 @@ impl MCProtoSerialize for bedrock_core::types::u32le {
 
 impl MCProtoDeserialize for bedrock_core::types::u32le {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_u32::<LittleEndian>() {
             Ok(v) => Ok(Self(v)),
@@ -233,8 +236,8 @@ impl MCProtoDeserialize for bedrock_core::types::u32le {
 
 impl MCProtoSerialize for bedrock_core::types::u32be {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_u32::<BigEndian>(self.0) {
             Ok(_) => Ok(()),
@@ -245,8 +248,8 @@ impl MCProtoSerialize for bedrock_core::types::u32be {
 
 impl MCProtoDeserialize for bedrock_core::types::u32be {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_u32::<BigEndian>() {
             Ok(v) => Ok(Self(v)),
@@ -259,8 +262,8 @@ impl MCProtoDeserialize for bedrock_core::types::u32be {
 
 impl MCProtoSerialize for bedrock_core::types::i64le {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_i64::<LittleEndian>(self.0) {
             Ok(_) => Ok(()),
@@ -271,8 +274,8 @@ impl MCProtoSerialize for bedrock_core::types::i64le {
 
 impl MCProtoDeserialize for bedrock_core::types::i64le {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_i64::<LittleEndian>() {
             Ok(v) => Ok(Self(v)),
@@ -283,8 +286,8 @@ impl MCProtoDeserialize for bedrock_core::types::i64le {
 
 impl MCProtoSerialize for bedrock_core::types::i64be {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_i64::<BigEndian>(self.0) {
             Ok(_) => Ok(()),
@@ -295,8 +298,8 @@ impl MCProtoSerialize for bedrock_core::types::i64be {
 
 impl MCProtoDeserialize for bedrock_core::types::i64be {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_i64::<BigEndian>() {
             Ok(v) => Ok(Self(v)),
@@ -309,8 +312,8 @@ impl MCProtoDeserialize for bedrock_core::types::i64be {
 
 impl MCProtoSerialize for bedrock_core::types::u64le {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_u64::<LittleEndian>(self.0) {
             Ok(_) => Ok(()),
@@ -321,8 +324,8 @@ impl MCProtoSerialize for bedrock_core::types::u64le {
 
 impl MCProtoDeserialize for bedrock_core::types::u64le {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_u64::<LittleEndian>() {
             Ok(v) => Ok(Self(v)),
@@ -335,8 +338,8 @@ impl MCProtoDeserialize for bedrock_core::types::u64le {
 
 impl MCProtoSerialize for bedrock_core::types::i128le {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_i128::<LittleEndian>(self.0) {
             Ok(_) => Ok(()),
@@ -347,8 +350,8 @@ impl MCProtoSerialize for bedrock_core::types::i128le {
 
 impl MCProtoDeserialize for bedrock_core::types::i128le {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_i128::<LittleEndian>() {
             Ok(v) => Ok(Self(v)),
@@ -359,8 +362,8 @@ impl MCProtoDeserialize for bedrock_core::types::i128le {
 
 impl MCProtoSerialize for bedrock_core::types::i128be {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_i128::<BigEndian>(self.0) {
             Ok(_) => Ok(()),
@@ -371,8 +374,8 @@ impl MCProtoSerialize for bedrock_core::types::i128be {
 
 impl MCProtoDeserialize for bedrock_core::types::i128be {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_i128::<BigEndian>() {
             Ok(v) => Ok(Self(v)),
@@ -385,8 +388,8 @@ impl MCProtoDeserialize for bedrock_core::types::i128be {
 
 impl MCProtoSerialize for bedrock_core::types::u128le {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_u128::<LittleEndian>(self.0) {
             Ok(_) => Ok(()),
@@ -397,8 +400,8 @@ impl MCProtoSerialize for bedrock_core::types::u128le {
 
 impl MCProtoDeserialize for bedrock_core::types::u128le {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_u128::<LittleEndian>() {
             Ok(v) => Ok(Self(v)),
@@ -409,8 +412,8 @@ impl MCProtoDeserialize for bedrock_core::types::u128le {
 
 impl MCProtoSerialize for bedrock_core::types::u128be {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_u128::<BigEndian>(self.0) {
             Ok(_) => Ok(()),
@@ -421,8 +424,8 @@ impl MCProtoSerialize for bedrock_core::types::u128be {
 
 impl MCProtoDeserialize for bedrock_core::types::u128be {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_u128::<BigEndian>() {
             Ok(v) => Ok(Self(v)),
@@ -435,8 +438,8 @@ impl MCProtoDeserialize for bedrock_core::types::u128be {
 
 impl MCProtoSerialize for f32 {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_f32::<LittleEndian>(*self) {
             Ok(_) => Ok(()),
@@ -447,8 +450,8 @@ impl MCProtoSerialize for f32 {
 
 impl MCProtoDeserialize for f32 {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_f32::<LittleEndian>() {
             Ok(v) => Ok(v),
@@ -461,8 +464,8 @@ impl MCProtoDeserialize for f32 {
 
 impl MCProtoSerialize for f64 {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_f64::<LittleEndian>(*self) {
             Ok(_) => Ok(()),
@@ -473,8 +476,8 @@ impl MCProtoSerialize for f64 {
 
 impl MCProtoDeserialize for f64 {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_f64::<LittleEndian>() {
             Ok(v) => Ok(v),
@@ -487,8 +490,8 @@ impl MCProtoDeserialize for f64 {
 
 impl MCProtoSerialize for bedrock_core::types::uvar32 {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_u32_varint(self.0) {
             Ok(_) => Ok(()),
@@ -499,8 +502,8 @@ impl MCProtoSerialize for bedrock_core::types::uvar32 {
 
 impl MCProtoDeserialize for bedrock_core::types::uvar32 {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_u32_varint() {
             Ok(v) => Ok(Self(v)),
@@ -513,8 +516,8 @@ impl MCProtoDeserialize for bedrock_core::types::uvar32 {
 
 impl MCProtoSerialize for bedrock_core::types::ivar32 {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_i32_varint(self.0) {
             Ok(_) => Ok(()),
@@ -525,8 +528,8 @@ impl MCProtoSerialize for bedrock_core::types::ivar32 {
 
 impl MCProtoDeserialize for bedrock_core::types::ivar32 {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         return Ok(Self(match data.read_i32_varint() {
             Ok(v) => v,
@@ -539,8 +542,8 @@ impl MCProtoDeserialize for bedrock_core::types::ivar32 {
 
 impl MCProtoSerialize for bedrock_core::types::uvar64 {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_u64_varint(self.0) {
             Ok(_) => {}
@@ -553,8 +556,8 @@ impl MCProtoSerialize for bedrock_core::types::uvar64 {
 
 impl MCProtoDeserialize for bedrock_core::types::uvar64 {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         return Ok(Self(match data.read_u64_varint() {
             Ok(v) => v,
@@ -567,8 +570,8 @@ impl MCProtoDeserialize for bedrock_core::types::uvar64 {
 
 impl MCProtoSerialize for bedrock_core::types::ivar64 {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_i64_varint(self.0) {
             Ok(_) => Ok(()),
@@ -579,8 +582,8 @@ impl MCProtoSerialize for bedrock_core::types::ivar64 {
 
 impl MCProtoDeserialize for bedrock_core::types::ivar64 {
     fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match data.read_i64_varint() {
             Ok(v) => Ok(Self(v)),
@@ -593,8 +596,8 @@ impl MCProtoDeserialize for bedrock_core::types::ivar64 {
 
 impl MCProtoSerialize for bool {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match self {
             true => match buf.write_u8(1) {
@@ -611,8 +614,8 @@ impl MCProtoSerialize for bool {
 
 impl MCProtoDeserialize for bool {
     fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         // a bool is represented as a byte
         return match cursor.read_u8() {
@@ -633,8 +636,8 @@ impl MCProtoDeserialize for bool {
 
 impl MCProtoSerialize for String {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_u64_varint(self.len() as u64) {
             Ok(_) => {}
@@ -652,8 +655,8 @@ impl MCProtoSerialize for String {
 
 impl MCProtoDeserialize for String {
     fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         let len = match cursor.read_u64_varint() {
             Ok(v) => v,
@@ -682,8 +685,8 @@ impl MCProtoDeserialize for String {
 
 impl<T: MCProtoSerialize> MCProtoSerialize for Vec<T> {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match buf.write_u64_varint(self.len() as u64) {
             Ok(_) => {}
@@ -701,12 +704,32 @@ impl<T: MCProtoSerialize> MCProtoSerialize for Vec<T> {
     }
 }
 
+impl<T: MCProtoDeserialize> MCProtoDeserialize for Vec<T> {
+    fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError> where Self: Sized {
+        let len = match cursor.read_u64_varint() {
+            Ok(v) => {v}
+            Err(_) => { return Err(DeserilizationError::ReadIOError) }
+        };
+
+        let mut array = vec![];
+
+        for _ in 0..len {
+            array.push(match T::proto_deserialize(cursor) {
+                Ok(v) => {v}
+                Err(e) => { return Err(e) }
+            })
+        };
+
+        Ok(array)
+    }
+}
+
 // option
 
 impl<T: MCProtoSerialize> MCProtoSerialize for Option<T> {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match self {
             None => match false.proto_serialize(buf) {
@@ -730,8 +753,8 @@ impl<T: MCProtoSerialize> MCProtoSerialize for Option<T> {
 
 impl<T: MCProtoDeserialize> MCProtoDeserialize for Option<T> {
     fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match bool::proto_deserialize(cursor) {
             Ok(v) => match v {
@@ -743,5 +766,147 @@ impl<T: MCProtoDeserialize> MCProtoDeserialize for Option<T> {
             },
             Err(e) => Err(e),
         }
+    }
+}
+
+impl MCProtoSerialize for Vec2 {
+    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError> where Self: Sized {
+        match self.x.proto_serialize(buf) {
+            Ok(_) => {}
+            Err(e) => { return Err(e) }
+        }
+
+        match self.z.proto_serialize(buf) {
+            Ok(_) => {}
+            Err(e) => { return Err(e) }
+        }
+
+         Ok(())
+    }
+}
+
+impl MCProtoDeserialize for Vec2 {
+    fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError> where Self: Sized {
+        Ok(Self{
+            x: match i32le::proto_deserialize(cursor) {
+                Ok(v) => { v }
+                Err(e) => { return Err(e) }
+            },
+            z: match i32le::proto_deserialize(cursor) {
+                Ok(v) => { v }
+                Err(e) => { return Err(e) }
+            },
+        })
+    }
+}
+
+impl MCProtoSerialize for Vec2f {
+    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError> where Self: Sized {
+        match self.x.proto_serialize(buf) {
+            Ok(_) => {}
+            Err(e) => { return Err(e) }
+        }
+
+        match self.z.proto_serialize(buf) {
+            Ok(_) => {}
+            Err(e) => { return Err(e) }
+        }
+
+        Ok(())
+    }
+}
+
+impl MCProtoDeserialize for Vec2f {
+    fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError> where Self: Sized {
+        Ok(Self{
+            x: match f32::proto_deserialize(cursor) {
+                Ok(v) => { v }
+                Err(e) => { return Err(e) }
+            },
+            z: match f32::proto_deserialize(cursor) {
+                Ok(v) => { v }
+                Err(e) => { return Err(e) }
+            },
+        })
+    }
+}
+
+impl MCProtoSerialize for Vec3 {
+    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError> where Self: Sized {
+        match self.x.proto_serialize(buf) {
+            Ok(_) => {}
+            Err(e) => { return Err(e) }
+        }
+
+        match self.y.proto_serialize(buf) {
+            Ok(_) => {}
+            Err(e) => { return Err(e) }
+        }
+
+        match self.z.proto_serialize(buf) {
+            Ok(_) => {}
+            Err(e) => { return Err(e) }
+        }
+
+        Ok(())
+    }
+}
+
+impl MCProtoDeserialize for Vec3 {
+    fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError> where Self: Sized {
+        Ok(Self{
+            x: match i32le::proto_deserialize(cursor) {
+                Ok(v) => { v }
+                Err(e) => { return Err(e) }
+            },
+            y: match i32le::proto_deserialize(cursor) {
+                Ok(v) => { v }
+                Err(e) => { return Err(e) }
+            },
+            z: match i32le::proto_deserialize(cursor) {
+                Ok(v) => { v }
+                Err(e) => { return Err(e) }
+            },
+        })
+    }
+}
+
+impl MCProtoSerialize for Vec3f {
+    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError> where Self: Sized {
+        match self.x.proto_serialize(buf) {
+            Ok(_) => {}
+            Err(e) => { return Err(e) }
+        }
+
+        match self.y.proto_serialize(buf) {
+            Ok(_) => {}
+            Err(e) => { return Err(e) }
+        }
+
+        match self.z.proto_serialize(buf) {
+            Ok(_) => {}
+            Err(e) => { return Err(e) }
+        }
+
+        Ok(())
+    }
+}
+
+impl MCProtoDeserialize for Vec3f {
+    fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError> where Self: Sized {
+        Ok(Self{
+            x: match f32::proto_deserialize(cursor) {
+                Ok(v) => { v }
+                Err(e) => { return Err(e) }
+            },
+            y: match f32::proto_deserialize(cursor) {
+                Ok(v) => { v }
+                Err(e) => { return Err(e) }
+            },
+            z: match f32::proto_deserialize(cursor) {
+                Ok(v) => { v }
+                Err(e) => { return Err(e) }
+            },
+        })
     }
 }

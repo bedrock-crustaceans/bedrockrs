@@ -6,7 +6,7 @@ use crate::error::SerilizationError;
 /// ### Example:
 /// ```
 /// use byteorder::WriteBytesExt;
-/// use serialize::ser::MCProtoSerialize;
+/// use serialize::proto::ser::MCProtoSerialize;
 ///
 /// struct myType {
 ///     my_data: i32,
@@ -16,7 +16,7 @@ use crate::error::SerilizationError;
 ///     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError> where Self: Sized {
 ///         // use the byteorder to simplu write it to the buffer
 ///         // this error should be actually handled
-///         buf.write_i32(*self).unwrap();
+///         buf.write_i32(self.my_data).unwrap();
 ///         Ok(())
 ///     }
 /// }
@@ -26,6 +26,6 @@ pub trait MCProtoSerialize {
     /// proto_serialize is a trait function that has the own type and
     /// a buffer that the type should serialize itself into.
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized;
+        where
+            Self: Sized;
 }

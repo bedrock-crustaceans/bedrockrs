@@ -1,3 +1,1 @@
-pub struct ResourcePack {
-
-}
+pub struct ResourcePack {}

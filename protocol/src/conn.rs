@@ -3,10 +3,10 @@ use std::io::{Cursor, Write};
 use byteorder::{ReadBytesExt, WriteBytesExt};
 use rak_rs::connection::Connection as RakConnection;
 
+use crate::compression::{CompressionMethod, CompressionMethods};
 use crate::compression::none::NoCompression;
 use crate::compression::snappy::SnappyCompression;
 use crate::compression::zlib::ZlibCompression;
-use crate::compression::{CompressionMethod, CompressionMethods};
 use crate::encryption::Encryption;
 use crate::error::ConnectionError;
 use crate::gamepacket::GamePacket;
@@ -175,15 +175,15 @@ impl Connection {
                             })
                     }
                     CompressionMethods::Snappy(_) => {
-                        return Err(ConnectionError::WrongCompressionMethod)
+                        return Err(ConnectionError::WrongCompressionMethod);
                     }
                     CompressionMethods::None => {
-                        return Err(ConnectionError::WrongCompressionMethod)
+                        return Err(ConnectionError::WrongCompressionMethod);
                     }
                 },
                 SnappyCompression::ID_u8 => match compression {
                     CompressionMethods::Zlib(_) => {
-                        return Err(ConnectionError::WrongCompressionMethod)
+                        return Err(ConnectionError::WrongCompressionMethod);
                     }
                     CompressionMethods::Snappy(snappy) => {
                         data = Cursor::new(
@@ -194,7 +194,7 @@ impl Connection {
                         )
                     }
                     CompressionMethods::None => {
-                        return Err(ConnectionError::WrongCompressionMethod)
+                        return Err(ConnectionError::WrongCompressionMethod);
                     }
                 },
                 NoCompression::ID_u8 => {}

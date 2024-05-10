@@ -17,8 +17,8 @@ pub struct ResourcePacksResponsePacket {
 
 impl MCProtoSerialize for ResourcePacksResponsePacket {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match self.response.proto_serialize(buf) {
             Ok(_) => {}
@@ -43,8 +43,8 @@ impl MCProtoSerialize for ResourcePacksResponsePacket {
 
 impl MCProtoDeserialize for ResourcePacksResponsePacket {
     fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, DeserilizationError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         // Read the Response
         let response = match ResourcePacksResponseStatus::proto_deserialize(cursor) {

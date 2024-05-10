@@ -1,6 +1,6 @@
 use bytes::BufMut;
-use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{parse_macro_input, DeriveInput};
+use quote::{quote, TokenStreamExt, ToTokens};
+use syn::{DeriveInput, parse_macro_input};
 
 use crate::proto::de::proto_build_de;
 use crate::proto::ser::proto_build_ser;
