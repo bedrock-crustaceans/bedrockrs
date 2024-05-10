@@ -15,6 +15,7 @@ use crate::packets::network_settings_request::NetworkSettingsRequestPacket;
 use crate::packets::play_status::PlayStatusPacket;
 use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
 use crate::packets::resource_packs_response::ResourcePacksResponsePacket;
+use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
 
 #[repr(u64)]
 #[derive(Debug)]
@@ -25,7 +26,7 @@ pub enum GamePacket {
     ClientToServerHandshake(),
     Disconnect(),
     ResourcePacksInfo(ResourcePacksInfoPacket),
-    ResourcePackStack(),
+    ResourcePackStack(ResourcePacksStackPacket),
     ResourcePackClientResponse(ResourcePacksResponsePacket),
     Text(),
     SetTime(),
@@ -238,8 +239,8 @@ impl GamePacket {
             GamePacket::ResourcePacksInfo(pk) => {
                 ser_packet!(buf, GamePacketID::ResourcePacksInfoID, pk)
             }
-            GamePacket::ResourcePackStack() => {
-                unimplemented!()
+            GamePacket::ResourcePackStack(pk) => {
+                ser_packet!(buf, GamePacketID::ResourcePackStackID, pk)
             }
             GamePacket::ResourcePackClientResponse(pk) => {
                 ser_packet!(buf, GamePacketID::ResourcePackClientResponseID, pk)
@@ -700,7 +701,10 @@ impl GamePacket {
                 ResourcePacksInfoPacket
             ))),
             GamePacketID::ResourcePackStackID => {
-                unimplemented!()
+                Ok(GamePacket::ResourcePackStack(de_packet!(
+                    cursor,
+                    ResourcePacksStackPacket
+                )))
             }
             GamePacketID::ResourcePackClientResponseID => {
                 Ok(GamePacket::ResourcePackClientResponse(de_packet!(

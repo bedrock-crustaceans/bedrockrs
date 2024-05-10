@@ -1,15 +1,18 @@
 use bedrock_core::types::u16le;
 
+use crate::compression::{CompressionMethod, CompressionMethods};
 use crate::compression::none::NoCompression;
 use crate::compression::snappy::SnappyCompression;
 use crate::compression::zlib::ZlibCompression;
-use crate::compression::{CompressionMethod, CompressionMethods};
 use crate::conn::Connection;
 use crate::error::LoginError;
 use crate::gamepacket::GamePacket;
 use crate::packets::network_settings::NetworkSettingsPacket;
 use crate::packets::play_status::PlayStatusPacket;
 use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
+use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
+use crate::types::base_game_version::BaseGameVersion;
+use crate::types::experiments::Experiments;
 use crate::types::play_status::PlayStatusType;
 
 pub struct LoginServerSideOptions {
@@ -21,6 +24,10 @@ pub struct LoginServerSideOptions {
     /// process should continue, might cause problems when the login process
     /// differs in the different protocol versions
     pub allowed_proto_versions: Vec<i32>,
+}
+
+pub struct LoginServerSideResult {
+    pub supports_cache: bool,
 }
 
 pub async fn handle_login_server_side(
@@ -85,8 +92,7 @@ pub async fn handle_login_server_side(
     let login = match connection.recv_gamepackets().await {
         Ok(v) => v,
         Err(e) => {
-            println!("{:?}", e);
-            return Err(LoginError::PacketMissmatch);
+            return Err(LoginError::ConnError(e));
         }
     };
 
@@ -100,6 +106,8 @@ pub async fn handle_login_server_side(
         GamePacket::Login(pk) => pk,
         _ => return Err(LoginError::PacketMissmatch),
     };
+
+    println!("LOGIN");
 
     // If encryption is enabled send the
     if options.encryption {
@@ -139,19 +147,55 @@ pub async fn handle_login_server_side(
         Err(e) => return Err(LoginError::ConnError(e)),
     }
 
+    println!("RESOURCE PACKS INFO");
+
     // Receive Client Cache Status
+    // TODO: Check for cache status
     let cache_status_pk = match connection.recv_gamepackets().await {
         Ok(v) => v,
         Err(e) => return Err(LoginError::ConnError(e)),
     };
 
+    println!("CLIENT CACHE STATUS");
+
     // Receive Resource Packs Response
-    match connection.recv_gamepackets().await {
+    // TODO: Check this for success
+    let rp_response = match connection.recv_gamepackets().await {
         Ok(v) => {
-            println!("PK: {v:#?}")
+            v
         }
         Err(e) => return Err(LoginError::ConnError(e)),
-    }
+    };
+
+    println!("RESOURCE PACKS RESPONSE");
+
+    match connection.send_gamepackets(vec![GamePacket::ResourcePackStack(ResourcePacksStackPacket {
+        texture_pack_required: false,
+        addons: vec![],
+        texture_packs: vec![],
+        base_game_version: BaseGameVersion(String::from("1.20.70")),
+        experiments: Experiments {
+            experiments: vec![],
+            ever_toggled: false,
+        },
+        include_editor_packs: false,
+    })]).await {
+        Ok(_) => {}
+        Err(e) => { return Err(LoginError::ConnError(e)); }
+    };
+
+    println!("RESOURCE PACKS STACK");
+
+    // Receive Resource Packs Response
+    // TODO: Check this for success
+    let rp_response = match connection.recv_gamepackets().await {
+        Ok(v) => {
+            v
+        }
+        Err(e) => return Err(LoginError::ConnError(e)),
+    };
+
+    println!("RESOURCE PACKS RESPONSE");
 
     Ok(())
 }
