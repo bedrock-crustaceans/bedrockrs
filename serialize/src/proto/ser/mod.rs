@@ -26,6 +26,6 @@ pub trait MCProtoSerialize {
     /// proto_serialize is a trait function that has the own type and
     /// a buffer that the type should serialize itself into.
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), SerilizationError>
-        where
-            Self: Sized;
+    where
+        Self: Sized;
 }

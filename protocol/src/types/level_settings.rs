@@ -1,3 +1,1 @@
-pub struct LevelSettings {
-
-}
+pub struct LevelSettings {}

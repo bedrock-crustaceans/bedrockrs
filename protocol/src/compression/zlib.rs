@@ -1,8 +1,8 @@
 use std::io::prelude::*;
 use std::io::Write;
 
-use flate2::Compression;
 use flate2::write::DeflateDecoder;
+use flate2::Compression;
 
 use crate::compression::CompressionMethod;
 use crate::error::CompressionError;

@@ -1,9 +1,9 @@
 use bedrock_core::types::u16le;
 
-use crate::compression::{CompressionMethod, CompressionMethods};
 use crate::compression::none::NoCompression;
 use crate::compression::snappy::SnappyCompression;
 use crate::compression::zlib::ZlibCompression;
+use crate::compression::{CompressionMethod, CompressionMethods};
 use crate::conn::Connection;
 use crate::error::LoginError;
 use crate::gamepacket::GamePacket;
@@ -161,27 +161,32 @@ pub async fn handle_login_server_side(
     // Receive Resource Packs Response
     // TODO: Check this for success
     let rp_response = match connection.recv_gamepackets().await {
-        Ok(v) => {
-            v
-        }
+        Ok(v) => v,
         Err(e) => return Err(LoginError::ConnError(e)),
     };
 
     println!("RESOURCE PACKS RESPONSE");
 
-    match connection.send_gamepackets(vec![GamePacket::ResourcePackStack(ResourcePacksStackPacket {
-        texture_pack_required: false,
-        addons: vec![],
-        texture_packs: vec![],
-        base_game_version: BaseGameVersion(String::from("1.20.70")),
-        experiments: Experiments {
-            experiments: vec![],
-            ever_toggled: false,
-        },
-        include_editor_packs: false,
-    })]).await {
+    match connection
+        .send_gamepackets(vec![GamePacket::ResourcePackStack(
+            ResourcePacksStackPacket {
+                texture_pack_required: false,
+                addons: vec![],
+                texture_packs: vec![],
+                base_game_version: BaseGameVersion(String::from("1.20.70")),
+                experiments: Experiments {
+                    experiments: vec![],
+                    ever_toggled: false,
+                },
+                include_editor_packs: false,
+            },
+        )])
+        .await
+    {
         Ok(_) => {}
-        Err(e) => { return Err(LoginError::ConnError(e)); }
+        Err(e) => {
+            return Err(LoginError::ConnError(e));
+        }
     };
 
     println!("RESOURCE PACKS STACK");
@@ -189,9 +194,7 @@ pub async fn handle_login_server_side(
     // Receive Resource Packs Response
     // TODO: Check this for success
     let rp_response = match connection.recv_gamepackets().await {
-        Ok(v) => {
-            v
-        }
+        Ok(v) => v,
         Err(e) => return Err(LoginError::ConnError(e)),
     };
 

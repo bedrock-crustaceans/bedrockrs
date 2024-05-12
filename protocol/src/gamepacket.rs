@@ -700,12 +700,10 @@ impl GamePacket {
                 cursor,
                 ResourcePacksInfoPacket
             ))),
-            GamePacketID::ResourcePackStackID => {
-                Ok(GamePacket::ResourcePackStack(de_packet!(
-                    cursor,
-                    ResourcePacksStackPacket
-                )))
-            }
+            GamePacketID::ResourcePackStackID => Ok(GamePacket::ResourcePackStack(de_packet!(
+                cursor,
+                ResourcePacksStackPacket
+            ))),
             GamePacketID::ResourcePackClientResponseID => {
                 Ok(GamePacket::ResourcePackClientResponse(de_packet!(
                     cursor,

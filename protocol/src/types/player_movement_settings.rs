@@ -1,3 +1,1 @@
-pub struct PlayerMovementSettings {
-
-}
+pub struct PlayerMovementSettings {}

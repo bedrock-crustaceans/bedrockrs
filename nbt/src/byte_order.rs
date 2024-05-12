@@ -1,4 +1,5 @@
 use std::io::Cursor;
+
 use crate::error::NbtError;
 
 pub trait NbtByteOrder {
@@ -9,7 +10,6 @@ pub trait NbtByteOrder {
     fn write_f32(buf: &mut Vec<u8>, int64: f32) -> Result<(), NbtError>;
     fn write_f64(buf: &mut Vec<u8>, int64: f64) -> Result<(), NbtError>;
     fn write_string(buf: &mut Vec<u8>, int64: String) -> Result<(), NbtError>;
-
 
     fn read_u8(buf: &mut Cursor<Vec<u8>>) -> Result<u8, NbtError>;
     fn read_i16(buf: &mut Cursor<Vec<u8>>) -> Result<i16, NbtError>;

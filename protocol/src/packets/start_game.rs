@@ -1,8 +1,3 @@
-use bedrock_core::types::{ivar32, ivar64, uvar64};
-use bedrock_core::vec::{Vec2, Vec3};
-use crate::types::level_settings::LevelSettings;
-use crate::types::player_movement_settings::PlayerMovementSettings;
-
 pub struct StartGamePacket {
     // target_actor_id: ivar64,
     // target_runtime_id: uvar64,
@@ -22,5 +17,4 @@ pub struct StartGamePacket {
     // item_stack_net_manager: bool,
     // server_version: String,
     // player_property_data: ,
-
 }
