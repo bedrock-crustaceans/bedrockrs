@@ -1,5 +1,6 @@
 use std::io::{Cursor, ErrorKind, Read, Write};
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
+use varint_rs::{VarintReader, VarintWriter};
 use crate::byte_order::NbtByteOrder;
 use crate::error::NbtError;
 
@@ -16,28 +17,28 @@ macro_rules! to_nbt_error {
 
 impl NbtByteOrder for NbtLittleEndianNetwork {
     fn write_u8(buf: &mut Vec<u8>, byte: u8) -> Result<(), NbtError> {
-        match buf.write_u8(byte) {
+        match buf.write_u8_varint(byte) {
             Ok(v) => { Ok(v) }
             Err(e) => { to_nbt_error!(e) }
         }
     }
 
     fn write_i16(buf: &mut Vec<u8>, int16: i16) -> Result<(), NbtError> {
-        match buf.write_i16::<LittleEndian>(int16) {
+        match buf.write_i16(int16) {
             Ok(v) => { Ok(v) }
             Err(e) => { to_nbt_error!(e) }
         }
     }
 
     fn write_i32(buf: &mut Vec<u8>, int32: i32) -> Result<(), NbtError> {
-        match buf.write_i32::<LittleEndian>(int32) {
+        match buf.write_i32_varint(int32) {
             Ok(v) => { Ok(v) }
             Err(e) => { to_nbt_error!(e) }
         }
     }
 
     fn write_i64(buf: &mut Vec<u8>, int64: i64) -> Result<(), NbtError> {
-        match buf.write_i64::<LittleEndian>(int64) {
+        match buf.write_i64_varint(int64) {
             Ok(v) => { Ok(v) }
             Err(e) => { to_nbt_error!(e) }
         }
@@ -75,28 +76,28 @@ impl NbtByteOrder for NbtLittleEndianNetwork {
     }
 
     fn read_u8(buf: &mut Cursor<Vec<u8>>) -> Result<u8, NbtError> {
-        match buf.read_u8() {
+        match buf.read_u8_varint() {
             Ok(v) => { Ok(v) }
             Err(e) => { to_nbt_error!(e) }
         }
     }
 
     fn read_i16(buf: &mut Cursor<Vec<u8>>) -> Result<i16, NbtError> {
-        match buf.read_i16::<LittleEndian>() {
+        match buf.read_i16() {
             Ok(v) => { Ok(v) }
             Err(e) => { to_nbt_error!(e) }
         }
     }
 
     fn read_i32(buf: &mut Cursor<Vec<u8>>) -> Result<i32, NbtError> {
-        match buf.read_i32::<LittleEndian>() {
+        match buf.read_i32_varint() {
             Ok(v) => { Ok(v) }
             Err(e) => { to_nbt_error!(e) }
         }
     }
 
     fn read_i64(buf: &mut Cursor<Vec<u8>>) -> Result<i64, NbtError> {
-        match buf.read_i64::<LittleEndian>() {
+        match buf.read_i64_varint() {
             Ok(v) => { Ok(v) }
             Err(e) => { to_nbt_error!(e) }
         }
