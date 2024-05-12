@@ -8,5 +8,7 @@ edition = "2021"
 [dependencies]
 bedrock_core = { path = "../bedrock_core" }
 
+nbt = { path = "../nbt" }
+
 byteorder = "1.5.0"
 varint-rs = "2.2.0"

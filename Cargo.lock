@@ -70,6 +70,7 @@ name = "bedrock-rs"
 version = "0.1.0"
 dependencies = [
  "bedrock_core",
+ "nbt",
  "packs",
  "protocol",
  "serialize",
@@ -455,6 +456,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "nbt"
+version = "0.1.0"
+dependencies = [
+ "bedrock_core",
+ "byteorder",
+ "thiserror",
+ "varint-rs",
+ "varintrs",
+]
+
+[[package]]
 name = "num-bigint"
 version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -801,6 +813,7 @@ version = "0.1.0"
 dependencies = [
  "bedrock_core",
  "byteorder",
+ "nbt",
  "varint-rs",
 ]
 
@@ -1014,6 +1027,12 @@ name = "varint-rs"
 version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8f54a172d0620933a27a4360d3db3e2ae0dd6cceae9730751a036bbf182c4b23"
+
+[[package]]
+name = "varintrs"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9ae7d19d2a5534f047150ec11ddf677a1da653748495c72be0de97eab5e4969c"
 
 [[package]]
 name = "wasi"

@@ -10,6 +10,8 @@ bedrock_core = { path = "bedrock_core" }
 
 protocol = { path = "protocol" }
 
+nbt = { path = "nbt" }
+
 serialize = { path = "serialize" }
 serialize_derive = { path = "serialize_derive" }
 

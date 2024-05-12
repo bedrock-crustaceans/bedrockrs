@@ -18,6 +18,10 @@ pub mod protocol {
     }
 }
 
+pub mod nbt {
+    pub use nbt::*;
+}
+
 pub mod packs {
     pub use packs::*;
 }
