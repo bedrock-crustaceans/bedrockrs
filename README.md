@@ -16,7 +16,7 @@ A universal library for rust to interact with mcbe and provide standards, as wel
   - Support for both Server and Client side intended.
  
 - ### [World](https://github.com/Adrian8115/bedrock-rs/tree/main/world):
-  - Implementation of the MCBE level format using `rusty-leveldb`.
+  - Implementation of the MCBE level format using `rusty-leveldb` serialization and deserialization.
 
 - ### [Packs](https://github.com/Adrian8115/bedrock-rs/tree/main/packs):
   - Common collection of metadata for behavior packs, resource packs and other MCBE related packs.
