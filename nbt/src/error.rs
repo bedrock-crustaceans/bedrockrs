@@ -3,6 +3,9 @@ use std::string::FromUtf8Error;
 
 use thiserror::Error;
 
+/// All errors that the NBT implementation can output.
+/// (Uses `thiserror` for an easy implementation of the standard libraries
+/// [Error]([std::error::Error]) trait)
 #[derive(Debug, Error)]
 pub enum NbtError {
     #[error("Unexpectedly reached end of buffer")]
