@@ -22,9 +22,4 @@ A universal library for rust to interact with mcbe and provide standards, as wel
   - Common collection of metadata for behavior packs, resource packs and other MCBE related packs.
 
 ## Contributing:
-Feel free to contribute at any moment. Contribute is always appreciated, a huge thanks goes to all contributors.
-It is recommended to make yourself familiar with the `bedrock-rs` codebase.
-You can always look at some issues and fix some bugs/add some features,
-but also feel free to add entirely new features/modules to this library for enhancing the capabilities of `bedrock-rs`.
-Just be creative and let us all profit from our work!
-
+Feel free to join in at any time. Your contributions are highly valued, and a big thank you to all who participate. We recommend getting acquainted with the bedrock-rs codebase. Whether it's tackling existing issues, adding new features, or even introducing entirely fresh modules, your creativity is welcome. Let's all benefit from our collective efforts!
