@@ -437,7 +437,7 @@ impl NbtTag {
 
                 let mut vec = vec![];
 
-                for i in 0..(len-1) {
+                for _ in 0..(len-1) {
                     match Self::nbt_deserialize_val::<T>(cursor, list_type) {
                         Ok(v) => { vec.push(v) }
                         Err(e) => { return Err(e) }
