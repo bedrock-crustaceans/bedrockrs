@@ -86,15 +86,15 @@ impl NbtTag {
     /// Returns the tag (open) ID for a given tag.
     pub fn get_id(&self) -> u8 {
         match self {
-            NbtTag::Byte(_) => { Self::BYTE_ID }
-            NbtTag::Int16(_) => { Self::INT16_ID }
-            NbtTag::Int32(_) => { Self::INT32_ID }
-            NbtTag::Int64(_) => { Self::INT64_ID }
-            NbtTag::Float32(_) => { Self::FLOAT32_ID }
-            NbtTag::Float64(_) => { Self::FLOAT64_ID }
-            NbtTag::String(_) => { Self::STRING_ID }
-            NbtTag::List(_) => { Self::LIST_ID }
-            NbtTag::Compound(_) => { Self::COMPOUND_ID_START }
+            NbtTag::Byte(_) => Self::BYTE_ID,
+            NbtTag::Int16(_) => Self::INT16_ID,
+            NbtTag::Int32(_) => Self::INT32_ID,
+            NbtTag::Int64(_) => Self::INT64_ID,
+            NbtTag::Float32(_) => Self::FLOAT32_ID,
+            NbtTag::Float64(_) => Self::FLOAT64_ID,
+            NbtTag::String(_) => Self::STRING_ID,
+            NbtTag::List(_) => Self::LIST_ID,
+            NbtTag::Compound(_) => Self::COMPOUND_ID_START,
         }
     }
 
@@ -149,78 +149,64 @@ impl NbtTag {
 
     /// Serialize the NBT via a simple vec.
     /// Simpler alternative to [NbtTag::nbt_serialize].
-    pub fn nbt_serialize_vec<T: NbtByteOrder>(&self, key: impl Into<String>) -> Result<Vec<u8>, NbtError> {
+    pub fn nbt_serialize_vec<T: NbtByteOrder>(
+        &self,
+        key: impl Into<String>,
+    ) -> Result<Vec<u8>, NbtError> {
         let mut buf = vec![];
 
         match NbtTag::nbt_serialize::<T>(self, key, &mut buf) {
-            Ok(_) => { Ok(buf) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(buf),
+            Err(e) => Err(e),
         }
     }
 
     /// Serializes a given val without any key or type notation.
     /// Should only be used by the [NbtTag::nbt_serialize] function internally.
-    fn nbt_serialize_val<T: NbtByteOrder>(
-        &self,
-        buf: &mut Vec<u8>,
-    ) -> Result<(), NbtError> {
+    fn nbt_serialize_val<T: NbtByteOrder>(&self, buf: &mut Vec<u8>) -> Result<(), NbtError> {
         match self {
-            NbtTag::Byte(v) => {
-                match T::write_u8(buf, *v) {
-                    Ok(_) => {}
-                    Err(e) => {
-                        return Err(e);
-                    }
+            NbtTag::Byte(v) => match T::write_u8(buf, *v) {
+                Ok(_) => {}
+                Err(e) => {
+                    return Err(e);
                 }
-            }
-            NbtTag::Int16(v) => {
-                match T::write_i16(buf, *v) {
-                    Ok(_) => {}
-                    Err(e) => {
-                        return Err(e);
-                    }
+            },
+            NbtTag::Int16(v) => match T::write_i16(buf, *v) {
+                Ok(_) => {}
+                Err(e) => {
+                    return Err(e);
                 }
-            }
-            NbtTag::Int32(v) => {
-                match T::write_i32(buf, *v) {
-                    Ok(_) => {}
-                    Err(e) => {
-                        return Err(e);
-                    }
+            },
+            NbtTag::Int32(v) => match T::write_i32(buf, *v) {
+                Ok(_) => {}
+                Err(e) => {
+                    return Err(e);
                 }
-            }
-            NbtTag::Int64(v) => {
-                match T::write_i64(buf, *v) {
-                    Ok(_) => {}
-                    Err(e) => {
-                        return Err(e);
-                    }
+            },
+            NbtTag::Int64(v) => match T::write_i64(buf, *v) {
+                Ok(_) => {}
+                Err(e) => {
+                    return Err(e);
                 }
-            }
-            NbtTag::Float32(v) => {
-                match T::write_f32(buf, *v) {
-                    Ok(_) => {}
-                    Err(e) => {
-                        return Err(e);
-                    }
+            },
+            NbtTag::Float32(v) => match T::write_f32(buf, *v) {
+                Ok(_) => {}
+                Err(e) => {
+                    return Err(e);
                 }
-            }
-            NbtTag::Float64(v) => {
-                match T::write_f64(buf, *v) {
-                    Ok(_) => {}
-                    Err(e) => {
-                        return Err(e);
-                    }
+            },
+            NbtTag::Float64(v) => match T::write_f64(buf, *v) {
+                Ok(_) => {}
+                Err(e) => {
+                    return Err(e);
                 }
-            }
-            NbtTag::String(v) => {
-                match T::write_string(buf, v.to_string()) {
-                    Ok(_) => {}
-                    Err(e) => {
-                        return Err(e);
-                    }
+            },
+            NbtTag::String(v) => match T::write_string(buf, v.to_string()) {
+                Ok(_) => {}
+                Err(e) => {
+                    return Err(e);
                 }
-            }
+            },
             NbtTag::List(v) => {
                 let list_type = if v.is_empty() {
                     Self::BYTE_ID
@@ -235,10 +221,13 @@ impl NbtTag {
                     }
                 }
 
-                match T::write_i32(buf, match v.len().try_into() {
-                    Ok(v) => { v }
-                    Err(e) => { return Err(NbtError::IntError(e)) }
-                }) {
+                match T::write_i32(
+                    buf,
+                    match v.len().try_into() {
+                        Ok(v) => v,
+                        Err(e) => return Err(NbtError::IntError(e)),
+                    },
+                ) {
                     Ok(_) => {}
                     Err(e) => {
                         return Err(e);
@@ -317,7 +306,7 @@ impl NbtTag {
         };
 
         if id == Self::COMPOUND_ID_END {
-            return Err(NbtError::CompoundClosingTag)
+            return Err(NbtError::CompoundClosingTag);
         }
 
         let name = match T::read_string(cursor) {
@@ -328,8 +317,8 @@ impl NbtTag {
         };
 
         let tag = match Self::nbt_deserialize_val::<T>(cursor, id) {
-            Ok(v) => { v },
-            Err(e) => { return Err(e) }
+            Ok(v) => v,
+            Err(e) => return Err(e),
         };
 
         Ok((name, tag))
@@ -347,7 +336,7 @@ impl NbtTag {
     /// Should only be used by the [NbtTag::nbt_deserialize] function internally.
     fn nbt_deserialize_val<T: NbtByteOrder>(
         cursor: &mut Cursor<Vec<u8>>,
-        id: u8
+        id: u8,
     ) -> Result<Self, NbtError> {
         let tag = match id {
             Self::BYTE_ID => {
@@ -437,10 +426,10 @@ impl NbtTag {
 
                 let mut vec = vec![];
 
-                for _ in 0..(len-1) {
+                for _ in 0..(len - 1) {
                     match Self::nbt_deserialize_val::<T>(cursor, list_type) {
-                        Ok(v) => { vec.push(v) }
-                        Err(e) => { return Err(e) }
+                        Ok(v) => vec.push(v),
+                        Err(e) => return Err(e),
                     }
                 }
 
