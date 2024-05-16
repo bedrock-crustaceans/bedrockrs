@@ -20,6 +20,9 @@ pub mod protocol {
 
 pub mod nbt {
     pub use nbt::*;
+    pub use nbt::error::*;
+    pub use nbt::byte_order::*;
+    pub use nbt::endian::*;
 }
 
 pub mod packs {
