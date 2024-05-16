@@ -89,7 +89,7 @@ impl NbtByteOrder for NbtLittleEndian {
 
         match buf.write_all(string.as_bytes()) {
             Ok(_) => {}
-            Err(e) => return to_nbt_error!(e),
+            Err(e) => to_nbt_error!(e),
         }
 
         Ok(())
