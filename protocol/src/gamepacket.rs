@@ -8,6 +8,7 @@ use varint_rs::{VarintReader, VarintWriter};
 
 use crate::info::GamePacketID;
 use crate::packets::client_cache_status::ClientCacheStatusPacket;
+use crate::packets::disconnect::DisconnectPacket;
 use crate::packets::handshake_server_to_client::HandshakeServerToClientPacket;
 use crate::packets::login::LoginPacket;
 use crate::packets::network_settings::NetworkSettingsPacket;
@@ -17,14 +18,14 @@ use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
 use crate::packets::resource_packs_response::ResourcePacksResponsePacket;
 use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
 
-#[repr(u64)]
+#[repr(u16)]
 #[derive(Debug)]
 pub enum GamePacket {
     Login(LoginPacket),
     PlayStatus(PlayStatusPacket),
     ServerToClientHandshake(HandshakeServerToClientPacket),
     ClientToServerHandshake(),
-    Disconnect(),
+    Disconnect(DisconnectPacket),
     ResourcePacksInfo(ResourcePacksInfoPacket),
     ResourcePackStack(ResourcePacksStackPacket),
     ResourcePackClientResponse(ResourcePacksResponsePacket),
@@ -233,8 +234,8 @@ impl GamePacket {
             GamePacket::ClientToServerHandshake() => {
                 unimplemented!()
             }
-            GamePacket::Disconnect() => {
-                unimplemented!()
+            GamePacket::Disconnect(pk) => {
+                ser_packet!(buf, GamePacketID::DisconnectID, pk)
             }
             GamePacket::ResourcePacksInfo(pk) => {
                 ser_packet!(buf, GamePacketID::ResourcePacksInfoID, pk)
@@ -668,14 +669,14 @@ impl GamePacket {
     pub fn pk_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<GamePacket, DeserilizationError> {
         // Read the gamepacket length
         // We don't need it
-        match cursor.read_u64_varint() {
+        match cursor.read_u32_varint() {
             Ok(_) => {}
             Err(_) => return Err(DeserilizationError::ReadIOError),
         };
 
         // Read the gamepacket ID
-        let gamepacket_id: GamePacketID = match cursor.read_u64_varint() {
-            Ok(v) => match GamePacketID::from_u64(v) {
+        let gamepacket_id: GamePacketID = match cursor.read_u32_varint() {
+            Ok(v) => match GamePacketID::from_u32(v) {
                 Some(pk) => pk,
                 None => return Err(DeserilizationError::InvalidGamepacketID),
             },
@@ -693,9 +694,10 @@ impl GamePacket {
             GamePacketID::ClientToServerHandshakeID => {
                 unimplemented!()
             }
-            GamePacketID::DisconnectID => {
-                unimplemented!()
-            }
+            GamePacketID::DisconnectID => Ok(GamePacket::Disconnect(de_packet!(
+                cursor,
+                DisconnectPacket
+            ))),
             GamePacketID::ResourcePacksInfoID => Ok(GamePacket::ResourcePacksInfo(de_packet!(
                 cursor,
                 ResourcePacksInfoPacket
