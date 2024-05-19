@@ -50,6 +50,8 @@ pub enum NbtTag {
     /// Compound tags are special because they are opened by the [NbtTag::COMPOUND_ID_START]
     /// and closed again by the [NbtTag::COMPOUND_ID_END].
     Compound(HashMap<String, NbtTag>),
+    /// An empty NBT tag.
+    Empty,
 }
 
 impl NbtTag {
@@ -78,10 +80,10 @@ impl NbtTag {
     const LIST_ID: u8 = 0x09;
 
     /// The open tag ID of [NbtTag::Compound]
-    const COMPOUND_ID_START: u8 = 0x0A;
+    const COMPOUND_ID: u8 = 0x0A;
 
     /// The close tag ID of [NbtTag::Compound]
-    const COMPOUND_ID_END: u8 = 0x00;
+    const EMPTY_ID: u8 = 0x00;
 
     /// Returns the tag (open) ID for a given tag.
     pub fn get_id(&self) -> u8 {
@@ -94,7 +96,8 @@ impl NbtTag {
             NbtTag::Float64(_) => Self::FLOAT64_ID,
             NbtTag::String(_) => Self::STRING_ID,
             NbtTag::List(_) => Self::LIST_ID,
-            NbtTag::Compound(_) => Self::COMPOUND_ID_START,
+            NbtTag::Compound(_) => Self::COMPOUND_ID,
+            NbtTag::Empty => Self::EMPTY_ID,
         }
     }
 
@@ -255,13 +258,14 @@ impl NbtTag {
                     }
                 }
 
-                match T::write_u8(buf, Self::COMPOUND_ID_END) {
+                match T::write_u8(buf, Self::EMPTY_ID) {
                     Ok(_) => {}
                     Err(e) => {
                         return Err(e);
                     }
                 }
             }
+            NbtTag::Empty => {}
         }
 
         Ok(())
@@ -304,10 +308,6 @@ impl NbtTag {
                 return Err(e);
             }
         };
-
-        if id == Self::COMPOUND_ID_END {
-            return Err(NbtError::CompoundClosingTag);
-        }
 
         let name = match T::read_string(cursor) {
             Ok(v) => v,
@@ -435,20 +435,27 @@ impl NbtTag {
 
                 NbtTag::List(vec)
             }
-            Self::COMPOUND_ID_START => {
+            Self::COMPOUND_ID => {
                 let mut map = HashMap::new();
 
-                'compound_loop: loop {
-                    let (key, tag) = match Self::nbt_deserialize::<T>(cursor) {
-                        Ok(v) => v,
-                        Err(e) => match e {
-                            NbtError::CompoundClosingTag => {
-                                break 'compound_loop;
-                            }
-                            other => {
-                                return Err(other);
-                            }
-                        },
+                loop {
+                    let id = match T::read_u8(cursor) {
+                        Ok(v) => {v}
+                        Err(e) => { return Err(e) }
+                    };
+
+                    if id == Self::EMPTY_ID {
+                        break;
+                    }
+
+                    let key = match T::read_string(cursor) {
+                        Ok(v) => {v}
+                        Err(e) => { return Err(e) }
+                    };
+
+                    let tag = match Self::nbt_deserialize_val::<T>(cursor, id) {
+                        Ok(v) => {v}
+                        Err(e) => { return Err(e) }
                     };
 
                     map.insert(key, tag);
@@ -456,8 +463,8 @@ impl NbtTag {
 
                 NbtTag::Compound(map)
             }
-            Self::COMPOUND_ID_END => {
-                return Err(NbtError::CompoundClosingTag);
+            Self::EMPTY_ID => {
+                NbtTag::Empty
             }
             other => {
                 return Err(NbtError::UnexpectedID(other));

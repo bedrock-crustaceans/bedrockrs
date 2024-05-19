@@ -16,8 +16,6 @@ pub enum NbtError {
     Utf8Error(#[from] FromUtf8Error),
     #[error("Error while converting integers: {0}")]
     IntError(#[from] TryFromIntError),
-    #[error("Got unexpetcted Compound Closing Tag")]
-    CompoundClosingTag,
     #[error("IOError while reading/writing: {0}")]
     IOError(String),
 }
