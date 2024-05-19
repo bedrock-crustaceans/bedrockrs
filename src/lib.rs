@@ -2,7 +2,7 @@ pub mod core {
     pub use bedrock_core::*;
 }
 
-pub mod protocol {
+pub mod proto {
     pub use protocol::*;
 
     pub mod ser {
