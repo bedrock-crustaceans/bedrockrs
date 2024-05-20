@@ -1,4 +1,6 @@
 # bedrock-rs
+<a href="https://discord.gg/ArvWEVHGWs"><img src="https://img.shields.io/discord/1218673790775726182.svg?style=flat&label=Azurite&logo=discord&logoColor=ffffff&color=011e2c&labelColor=1f3157"><a/>
+
 _The universal toolkit for MCBE_
 
 A universal library for rust to interact with mcbe and provide standards, as well as common implementations for mcbe technologies written in pure rust.
