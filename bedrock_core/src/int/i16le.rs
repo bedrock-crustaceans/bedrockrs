@@ -103,6 +103,6 @@ impl Neg for i16le {
     #[inline]
     #[track_caller]
     fn neg(self) -> Self::Output {
-        -Self(self.0)
+        Self(-self.0)
     }
 }

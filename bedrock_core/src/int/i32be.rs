@@ -103,6 +103,6 @@ impl Neg for i32be {
     #[inline]
     #[track_caller]
     fn neg(self) -> Self::Output {
-        -Self(self.0)
+        Self(-self.0)
     }
 }
