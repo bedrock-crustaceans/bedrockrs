@@ -1,6 +1,6 @@
+use std::io::Error as IOError;
 use std::num::TryFromIntError;
 use std::string::FromUtf8Error;
-use std::io::Error as IOError;
 
 use thiserror::Error;
 

@@ -34,7 +34,6 @@ impl Sub for i16le {
 }
 
 impl SubAssign for i16le {
-
     #[inline]
     #[track_caller]
     fn sub_assign(&mut self, rhs: Self) {
@@ -53,10 +52,9 @@ impl Mul for i16le {
 }
 
 impl MulAssign for i16le {
-
     #[inline]
     #[track_caller]
-fn mul_assign(&mut self, rhs: Self) {
+    fn mul_assign(&mut self, rhs: Self) {
         self.0 *= rhs.0
     }
 }

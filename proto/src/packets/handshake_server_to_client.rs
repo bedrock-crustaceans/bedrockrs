@@ -1,9 +1,9 @@
 use std::collections::BTreeMap;
 use std::io::Cursor;
 
-use serde_json::Value;
-use proto_core::error::{ProtoCodecError};
+use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
+use serde_json::Value;
 
 #[derive(Debug)]
 pub struct HandshakeServerToClientPacket {
@@ -19,7 +19,6 @@ impl ProtoCodec for HandshakeServerToClientPacket {
         todo!()
     }
 }
-
 
 //
 // impl MCProtoSerialize for HandshakeServerToClientPacket {

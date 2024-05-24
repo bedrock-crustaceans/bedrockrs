@@ -6,9 +6,9 @@ use base64::Engine;
 use byteorder::LittleEndian;
 use byteorder::ReadBytesExt;
 use jsonwebtoken::{DecodingKey, Validation};
-use serde_json::Value;
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
+use serde_json::Value;
 use varint_rs::VarintReader;
 
 #[derive(Debug)]
@@ -137,7 +137,9 @@ impl ProtoCodec for ConnectionRequestType {
                     None => {
                         // the certificate chain should always be an object with just an array of
                         // JWTs called "chain"
-                        return Err(ProtoCodecError::FormatMismatch(String::from("Missing element \"chain\" in JWT certificate_chain")));
+                        return Err(ProtoCodecError::FormatMismatch(String::from(
+                            "Missing element \"chain\" in JWT certificate_chain",
+                        )));
                     }
                     Some(v) => {
                         match v.take() {
@@ -154,7 +156,9 @@ impl ProtoCodec for ConnectionRequestType {
             other => {
                 // the certificate chain should always be an object with just an array of
                 // JWTs called "chain"
-                return Err(ProtoCodecError::FormatMismatch(format!("Expected Object in base of JWT certificate_chain, got {other:?}")));
+                return Err(ProtoCodecError::FormatMismatch(format!(
+                    "Expected Object in base of JWT certificate_chain, got {other:?}"
+                )));
             }
         };
 
@@ -182,7 +186,11 @@ impl ProtoCodec for ConnectionRequestType {
             // Is first jwt, use self-signed header from x5u
             if key_data.is_empty() {
                 let x5u = match jwt_header.x5u {
-                    None => return Err(ProtoCodecError::FormatMismatch(String::from("Expected x5u in JWT header"))),
+                    None => {
+                        return Err(ProtoCodecError::FormatMismatch(String::from(
+                            "Expected x5u in JWT header",
+                        )))
+                    }
                     Some(ref v) => v.as_bytes(),
                 };
 

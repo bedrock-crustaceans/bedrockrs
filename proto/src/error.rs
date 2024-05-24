@@ -1,4 +1,5 @@
 use std::error::Error;
+
 use proto_core::error::ProtoCodecError;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]

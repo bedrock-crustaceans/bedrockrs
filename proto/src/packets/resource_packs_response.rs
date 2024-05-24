@@ -1,7 +1,7 @@
 use std::io::Cursor;
 
 use bedrock_core::u16le;
-use proto_core::error::{ProtoCodecError};
+use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
 
 use crate::types::resource_packs_response_status::ResourcePacksResponseStatus;

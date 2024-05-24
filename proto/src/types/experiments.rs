@@ -48,23 +48,26 @@ impl ProtoCodec for Experiments {
         Self: Sized,
     {
         let len = match u32le::proto_deserialize(cursor) {
-            Ok(v) => {v.0}
-            Err(e) => { return Err(e) }
+            Ok(v) => v.0,
+            Err(e) => {
+                return Err(e);
+            }
         };
 
         let mut experiments = vec![];
 
         for _ in 0..len {
             match Experiment::proto_deserialize(cursor) {
-                Ok(v) => { experiments.push(v) },
-                Err(e) => { return Err(e) }
+                Ok(v) => experiments.push(v),
+                Err(e) => {
+                    return Err(e);
+                }
             }
-        };
-
+        }
 
         Ok(Self {
             experiments,
-            ever_toggled: true
+            ever_toggled: true,
         })
     }
 }

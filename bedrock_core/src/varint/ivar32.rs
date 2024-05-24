@@ -34,7 +34,6 @@ impl Sub for ivar32 {
 }
 
 impl SubAssign for ivar32 {
-
     #[inline]
     #[track_caller]
     fn sub_assign(&mut self, rhs: Self) {

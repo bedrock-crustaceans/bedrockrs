@@ -1,4 +1,5 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign};
+
 use crate::i32le;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -21,7 +22,6 @@ impl Add for Vec2 {
 }
 
 impl AddAssign for Vec2 {
-
     #[inline]
     #[track_caller]
     fn add_assign(&mut self, rhs: Self) {

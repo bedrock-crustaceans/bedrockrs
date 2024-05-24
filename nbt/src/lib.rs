@@ -440,8 +440,10 @@ impl NbtTag {
 
                 loop {
                     let id = match T::read_u8(cursor) {
-                        Ok(v) => {v}
-                        Err(e) => { return Err(e) }
+                        Ok(v) => v,
+                        Err(e) => {
+                            return Err(e);
+                        }
                     };
 
                     if id == Self::EMPTY_ID {
@@ -449,13 +451,17 @@ impl NbtTag {
                     }
 
                     let key = match T::read_string(cursor) {
-                        Ok(v) => {v}
-                        Err(e) => { return Err(e) }
+                        Ok(v) => v,
+                        Err(e) => {
+                            return Err(e);
+                        }
                     };
 
                     let tag = match Self::nbt_deserialize_val::<T>(cursor, id) {
-                        Ok(v) => {v}
-                        Err(e) => { return Err(e) }
+                        Ok(v) => v,
+                        Err(e) => {
+                            return Err(e);
+                        }
                     };
 
                     map.insert(key, tag);
@@ -463,9 +469,7 @@ impl NbtTag {
 
                 NbtTag::Compound(map)
             }
-            Self::EMPTY_ID => {
-                NbtTag::Empty
-            }
+            Self::EMPTY_ID => NbtTag::Empty,
             other => {
                 return Err(NbtError::UnexpectedID(other));
             }

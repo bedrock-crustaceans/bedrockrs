@@ -816,7 +816,9 @@ impl GamePacket {
         }
     }
 
-    pub fn pk_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<(GamePacket, u8, u8), ProtoCodecError> {
+    pub fn pk_deserialize(
+        cursor: &mut Cursor<Vec<u8>>,
+    ) -> Result<(GamePacket, u8, u8), ProtoCodecError> {
         // Read the game packet length
         // We don't need it, yet
         // TODO: Use this to possibly async the packet handling
@@ -827,7 +829,7 @@ impl GamePacket {
 
         // Read the game packet header
         let game_packet_header = match cursor.read_u16_varint() {
-            Ok(v) => { v },
+            Ok(v) => v,
             Err(e) => return Err(ProtoCodecError::IOError(e)),
         };
 
@@ -860,24 +862,18 @@ impl GamePacket {
             GamePacket::CLIENT_TO_SERVER_HANDSHAKE_ID => {
                 unimplemented!()
             }
-            GamePacket::DISCONNECT_ID => GamePacket::Disconnect(de_packet!(
-                cursor,
-                DisconnectPacket
-            )),
-            GamePacket::RESOURCE_PACKS_INFO_ID => GamePacket::ResourcePacksInfo(de_packet!(
-                cursor,
-                ResourcePacksInfoPacket
-            )),
-            GamePacket::RESOURCE_PACK_STACK_ID => GamePacket::ResourcePackStack(de_packet!(
-                cursor,
-                ResourcePacksStackPacket
-            )),
-            GamePacket::RESOURCE_PACK_CLIENT_RESPONSE_ID => {
-                GamePacket::ResourcePackClientResponse(de_packet!(
-                    cursor,
-                    ResourcePacksResponsePacket
-                ))
+            GamePacket::DISCONNECT_ID => {
+                GamePacket::Disconnect(de_packet!(cursor, DisconnectPacket))
             }
+            GamePacket::RESOURCE_PACKS_INFO_ID => {
+                GamePacket::ResourcePacksInfo(de_packet!(cursor, ResourcePacksInfoPacket))
+            }
+            GamePacket::RESOURCE_PACK_STACK_ID => {
+                GamePacket::ResourcePackStack(de_packet!(cursor, ResourcePacksStackPacket))
+            }
+            GamePacket::RESOURCE_PACK_CLIENT_RESPONSE_ID => GamePacket::ResourcePackClientResponse(
+                de_packet!(cursor, ResourcePacksResponsePacket),
+            ),
             GamePacket::TEXT_ID => {
                 unimplemented!()
             }
@@ -1223,10 +1219,9 @@ impl GamePacket {
             GamePacket::VideoStreamConnectID => {
                 unimplemented!()
             }
-            GamePacket::ClientCacheStatusID => GamePacket::ClientCacheStatus(de_packet!(
-                cursor,
-                ClientCacheStatusPacket
-            )),
+            GamePacket::ClientCacheStatusID => {
+                GamePacket::ClientCacheStatus(de_packet!(cursor, ClientCacheStatusPacket))
+            }
             GamePacket::OnScreenTextureAnimationID => {
                 unimplemented!()
             }
@@ -1248,10 +1243,9 @@ impl GamePacket {
             GamePacket::ClientCacheMissResponseID => {
                 unimplemented!()
             }
-            GamePacket::NetworkSettingsID => GamePacket::NetworkSettings(de_packet!(
-                cursor,
-                NetworkSettingsPacket
-            )),
+            GamePacket::NetworkSettingsID => {
+                GamePacket::NetworkSettings(de_packet!(cursor, NetworkSettingsPacket))
+            }
             GamePacket::PlayerAuthInputID => {
                 unimplemented!()
             }
@@ -1291,13 +1285,15 @@ impl GamePacket {
             GamePacket::DimensionDataID => {
                 unimplemented!()
             }
-            GamePacket::RequestNetworkSettingsID => GamePacket::RequestNetworkSettings(
-                de_packet!(cursor, NetworkSettingsRequestPacket),
-            ),
+            GamePacket::RequestNetworkSettingsID => {
+                GamePacket::RequestNetworkSettings(de_packet!(cursor, NetworkSettingsRequestPacket))
+            }
             GamePacket::AlexEntityAnimationID => {
                 unimplemented!()
             }
-            _ => { return Err(ProtoCodecError::InvalidEnumID) }
+            _ => {
+                return Err(ProtoCodecError::InvalidEnumID);
+            }
         };
 
         Ok((game_packet, sub_client_sender_id, sub_client_target_id))

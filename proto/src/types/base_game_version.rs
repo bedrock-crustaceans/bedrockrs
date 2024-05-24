@@ -1,7 +1,7 @@
 use std::io::Cursor;
+
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
-
 
 #[derive(Debug)]
 pub struct BaseGameVersion(pub String);
@@ -19,10 +19,8 @@ impl ProtoCodec for BaseGameVersion {
         Self: Sized,
     {
         match String::proto_deserialize(cursor) {
-            Ok(v) => {Ok(Self(v))},
-            Err(e) => {
-                Err(e)
-            }
+            Ok(v) => Ok(Self(v)),
+            Err(e) => Err(e),
         }
     }
 }

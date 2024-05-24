@@ -1,4 +1,5 @@
 use std::io::Cursor;
+
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
 
@@ -31,26 +32,26 @@ impl ProtoCodec for PackURL {
 
     fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError> {
         let (uuid, version) = match String::proto_deserialize(cursor) {
-            Ok(v) => { match v.split_once("_") {
-                None => { return Err(ProtoCodecError::FormatMismatch(
-                    String::from("Expected uuid and version of pack url to be seperated by _")
-                )) }
-                Some((u, v)) => {
-                    (u.to_string(), v.to_string())
+            Ok(v) => match v.split_once("_") {
+                None => {
+                    return Err(ProtoCodecError::FormatMismatch(String::from(
+                        "Expected uuid and version of pack url to be seperated by _",
+                    )));
                 }
-            } }
-            Err(e) => { return Err(e) }
+                Some((u, v)) => (u.to_string(), v.to_string()),
+            },
+            Err(e) => {
+                return Err(e);
+            }
         };
 
         let url = match String::proto_deserialize(cursor) {
-            Ok(v) => {v}
-            Err(e) => { return Err(e) }
+            Ok(v) => v,
+            Err(e) => {
+                return Err(e);
+            }
         };
 
-        Ok(Self{
-            uuid,
-            version,
-            url,
-        })
+        Ok(Self { uuid, version, url })
     }
 }

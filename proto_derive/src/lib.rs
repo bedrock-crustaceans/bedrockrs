@@ -1,11 +1,10 @@
+use de::proto_build_de;
 use quote::quote;
+use ser::proto_build_ser;
 use syn::{parse_macro_input, DeriveInput};
 
-mod ser;
 mod de;
-
-use ser::proto_build_ser;
-use de::proto_build_de;
+mod ser;
 
 #[proc_macro_derive(ProtoCodec)]
 pub fn proto_serialize(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
@@ -37,4 +36,3 @@ pub fn proto_serialize(item: proc_macro::TokenStream) -> proc_macro::TokenStream
 
     proc_macro::TokenStream::from(expanded)
 }
-

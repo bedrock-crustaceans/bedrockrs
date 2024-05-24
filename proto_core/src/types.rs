@@ -1,10 +1,11 @@
 use std::f32;
 use std::io::{Cursor, Read, Write};
+
 use bedrock_core::*;
 use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
 use varint_rs::{VarintReader, VarintWriter};
-use crate::error::ProtoCodecError;
 
+use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 
 // i8
@@ -688,7 +689,7 @@ impl<T: ProtoCodec> ProtoCodec for Option<T> {
             },
             Some(v) => {
                 match true.proto_serialize(buf) {
-                    Ok(_) => { },
+                    Ok(_) => {}
                     Err(e) => return Err(e),
                 };
 

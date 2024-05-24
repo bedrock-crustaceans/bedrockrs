@@ -34,7 +34,6 @@ impl Sub for i64be {
 }
 
 impl SubAssign for i64be {
-
     #[inline]
     #[track_caller]
     fn sub_assign(&mut self, rhs: Self) {
@@ -53,10 +52,9 @@ impl Mul for i64be {
 }
 
 impl MulAssign for i64be {
-
     #[inline]
     #[track_caller]
-fn mul_assign(&mut self, rhs: Self) {
+    fn mul_assign(&mut self, rhs: Self) {
         self.0 *= rhs.0
     }
 }

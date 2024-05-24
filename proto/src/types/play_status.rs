@@ -32,8 +32,10 @@ impl ProtoCodec for PlayStatusType {
         Self: Sized,
     {
         match self.to_i32() {
-            None => { return Err(ProtoCodecError::InvalidEnumID) }
-            Some(v) => { i32be(v).proto_serialize(buf) }
+            None => {
+                return Err(ProtoCodecError::InvalidEnumID);
+            }
+            Some(v) => i32be(v).proto_serialize(buf),
         }
     }
 

@@ -34,7 +34,6 @@ impl Sub for u128be {
 }
 
 impl SubAssign for u128be {
-
     #[inline]
     #[track_caller]
     fn sub_assign(&mut self, rhs: Self) {
@@ -53,10 +52,9 @@ impl Mul for u128be {
 }
 
 impl MulAssign for u128be {
-
     #[inline]
     #[track_caller]
-fn mul_assign(&mut self, rhs: Self) {
+    fn mul_assign(&mut self, rhs: Self) {
         self.0 *= rhs.0
     }
 }

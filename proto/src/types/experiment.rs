@@ -1,4 +1,4 @@
-use proto_derive::{ProtoCodec};
+use proto_derive::ProtoCodec;
 
 #[derive(Debug, ProtoCodec)]
 pub struct Experiment {

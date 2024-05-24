@@ -42,13 +42,19 @@ pub async fn handle_login_server_side(
 
     // If too many or no packets were send then error
     if gamepackets.len() > 1 || gamepackets.len() < 1 {
-        return Err(LoginError::PacketMismatch("Too Many packets send while login".to_string()));
+        return Err(LoginError::PacketMismatch(
+            "Too Many packets send while login".to_string(),
+        ));
     }
 
     // Get the clients proto version
     let client_proto_ver = match &gamepackets[0] {
         GamePacket::RequestNetworkSettings(pk) => pk.client_network_version.0,
-        e => return Err(LoginError::PacketMismatch(format!("Expected RequestNetworkSettingsPacket got: {e:?}"))),
+        e => {
+            return Err(LoginError::PacketMismatch(format!(
+                "Expected RequestNetworkSettingsPacket got: {e:?}"
+            )))
+        }
     };
 
     // Look if Protocol versions match and if other proto versions are allowed
@@ -98,13 +104,19 @@ pub async fn handle_login_server_side(
 
     // If too many or no packets were send the error
     if login.len() > 1 || login.len() < 1 {
-        return Err(LoginError::PacketMismatch("Too Many packets send while login".to_string()));
+        return Err(LoginError::PacketMismatch(
+            "Too Many packets send while login".to_string(),
+        ));
     }
 
     // Get the clients proto version
     let login_pk = match &login[0] {
         GamePacket::Login(pk) => pk,
-        e => return Err(LoginError::PacketMismatch(format!("Expected LoginPacket got: {e:?}"))),
+        e => {
+            return Err(LoginError::PacketMismatch(format!(
+                "Expected LoginPacket got: {e:?}"
+            )))
+        }
     };
 
     println!("LOGIN");

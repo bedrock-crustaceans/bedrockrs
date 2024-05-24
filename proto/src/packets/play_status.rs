@@ -1,4 +1,4 @@
-use proto_derive::{ProtoCodec};
+use proto_derive::ProtoCodec;
 
 use crate::types::play_status::PlayStatusType;
 

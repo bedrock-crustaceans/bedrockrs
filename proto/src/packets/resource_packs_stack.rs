@@ -1,4 +1,4 @@
-use proto_derive::{ProtoCodec};
+use proto_derive::ProtoCodec;
 
 use crate::types::base_game_version::BaseGameVersion;
 use crate::types::experiments::Experiments;

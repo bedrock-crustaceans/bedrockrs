@@ -35,7 +35,6 @@ impl Sub for uvar32 {
 }
 
 impl SubAssign for uvar32 {
-
     #[inline]
     #[track_caller]
     fn sub_assign(&mut self, rhs: Self) {

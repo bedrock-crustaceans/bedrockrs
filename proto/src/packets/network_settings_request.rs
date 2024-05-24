@@ -1,5 +1,5 @@
 use bedrock_core::*;
-use proto_derive::{ProtoCodec};
+use proto_derive::ProtoCodec;
 
 #[derive(Debug, Copy, Clone, ProtoCodec)]
 pub struct NetworkSettingsRequestPacket {

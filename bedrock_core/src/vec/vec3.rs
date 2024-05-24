@@ -1,4 +1,5 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign};
+
 use crate::i32le;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -11,10 +12,10 @@ pub struct Vec3 {
 impl Add for Vec3 {
     type Output = Self;
 
-    
+
     #[inline]
     #[track_caller]
-fn add(self, rhs: Self) -> Self::Output {
+    fn add(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
@@ -24,10 +25,9 @@ fn add(self, rhs: Self) -> Self::Output {
 }
 
 impl AddAssign for Vec3 {
-    
     #[inline]
     #[track_caller]
-fn add_assign(&mut self, rhs: Self) {
+    fn add_assign(&mut self, rhs: Self) {
         self.x += rhs.x;
         self.y += rhs.y;
         self.z += rhs.z;
@@ -37,10 +37,10 @@ fn add_assign(&mut self, rhs: Self) {
 impl Sub for Vec3 {
     type Output = Self;
 
-    
+
     #[inline]
     #[track_caller]
-fn sub(self, rhs: Self) -> Self::Output {
+    fn sub(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
@@ -50,10 +50,9 @@ fn sub(self, rhs: Self) -> Self::Output {
 }
 
 impl SubAssign for Vec3 {
-    
     #[inline]
     #[track_caller]
-fn sub_assign(&mut self, rhs: Self) {
+    fn sub_assign(&mut self, rhs: Self) {
         self.x -= rhs.x;
         self.y -= rhs.y;
         self.z -= rhs.z;
@@ -63,10 +62,10 @@ fn sub_assign(&mut self, rhs: Self) {
 impl Mul for Vec3 {
     type Output = Self;
 
-    
+
     #[inline]
     #[track_caller]
-fn mul(self, rhs: Self) -> Self::Output {
+    fn mul(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x * rhs.x,
             y: self.y * rhs.y,
@@ -76,10 +75,9 @@ fn mul(self, rhs: Self) -> Self::Output {
 }
 
 impl MulAssign for Vec3 {
-    
     #[inline]
     #[track_caller]
-fn mul_assign(&mut self, rhs: Self) {
+    fn mul_assign(&mut self, rhs: Self) {
         self.x *= rhs.x;
         self.y *= rhs.y;
         self.z *= rhs.z;
@@ -89,10 +87,10 @@ fn mul_assign(&mut self, rhs: Self) {
 impl Div for Vec3 {
     type Output = Self;
 
-    
+
     #[inline]
     #[track_caller]
-fn div(self, rhs: Self) -> Self::Output {
+    fn div(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x / rhs.x,
             y: self.y / rhs.y,
@@ -102,10 +100,9 @@ fn div(self, rhs: Self) -> Self::Output {
 }
 
 impl DivAssign for Vec3 {
-    
     #[inline]
     #[track_caller]
-fn div_assign(&mut self, rhs: Self) {
+    fn div_assign(&mut self, rhs: Self) {
         self.x /= rhs.x;
         self.y /= rhs.y;
         self.z /= rhs.z;
@@ -115,10 +112,10 @@ fn div_assign(&mut self, rhs: Self) {
 impl Rem for Vec3 {
     type Output = Self;
 
-    
+
     #[inline]
     #[track_caller]
-fn rem(self, rhs: Self) -> Self::Output {
+    fn rem(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x % rhs.x,
             y: self.y % rhs.y,
@@ -128,10 +125,9 @@ fn rem(self, rhs: Self) -> Self::Output {
 }
 
 impl RemAssign for Vec3 {
-    
     #[inline]
     #[track_caller]
-fn rem_assign(&mut self, rhs: Self) {
+    fn rem_assign(&mut self, rhs: Self) {
         self.x %= rhs.x;
         self.y %= rhs.y;
         self.z %= rhs.z;
@@ -141,10 +137,10 @@ fn rem_assign(&mut self, rhs: Self) {
 impl Neg for Vec3 {
     type Output = Self;
 
-    
+
     #[inline]
     #[track_caller]
-fn neg(self) -> Self::Output {
+    fn neg(self) -> Self::Output {
         Self {
             x: -self.x,
             y: -self.y,

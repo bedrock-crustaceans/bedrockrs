@@ -1,9 +1,10 @@
 use std::io::Error as IOError;
 use std::string::FromUtf8Error;
+
+use base64::DecodeError as Base64DecodeError;
+use jsonwebtoken::errors::Error as JwtError;
 use nbt::error::NbtError;
 use serde_json::error::Error as JsonError;
-use jsonwebtoken::errors::Error as JwtError;
-use base64::DecodeError as Base64DecodeError;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -27,4 +28,3 @@ pub enum ProtoCodecError {
     #[error("Expected format got mismatched: {0}")]
     FormatMismatch(String),
 }
-

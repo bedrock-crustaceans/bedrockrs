@@ -1,5 +1,3 @@
-use num_derive::FromPrimitive;
-
 pub const RAKNET_GAME_PACKET_ID: u8 = 0xfe;
 pub const PROTOCOL_VERSION: i32 = 671;
 pub const MINECRAFT_VERSION: &'static str = "1.20.80";
