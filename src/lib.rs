@@ -3,18 +3,12 @@ pub mod core {
 }
 
 pub mod proto {
-    pub use protocol::*;
+    pub use proto::*;
 
-    pub mod ser {
-        pub use serialize::error::SerilizationError;
-        pub use serialize::proto::ser::*;
-        pub use serialize_derive::MCProtoSerialize;
-    }
-
-    pub mod de {
-        pub use serialize::error::DeserilizationError;
-        pub use serialize::proto::de::*;
-        pub use serialize_derive::MCProtoDeserialize;
+    pub mod codec {
+        pub use proto_core::error::ProtoCodecError;
+        pub use proto_core::ProtoCodec;
+        pub use proto_derive::ProtoCodec;
     }
 }
 

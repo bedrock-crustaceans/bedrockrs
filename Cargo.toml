@@ -8,12 +8,12 @@ edition = "2021"
 [dependencies]
 bedrock_core = { path = "bedrock_core" }
 
-protocol = { path = "protocol" }
 
 nbt = { path = "nbt" }
 
-serialize = { path = "serialize" }
-serialize_derive = { path = "serialize_derive" }
+proto = { path = "proto" }
+proto_core = { path = "proto_core" }
+proto_derive = { path = "proto_derive" }
 
 packs = { path = "packs" }
 

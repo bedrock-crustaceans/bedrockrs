@@ -1,4 +1,4 @@
-use std::io::{Cursor, ErrorKind, Read, Write};
+use std::io::{Cursor, Read, Write};
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use varint_rs::{VarintReader, VarintWriter};
@@ -8,25 +8,12 @@ use crate::error::NbtError;
 
 pub struct NbtLittleEndianNetwork;
 
-macro_rules! to_nbt_error {
-    ($err:expr) => {
-        match $err.kind() {
-            ErrorKind::UnexpectedEof => {
-                return Err(NbtError::UnexpectedEOF);
-            }
-            _ => {
-                return Err(NbtError::IOError($err.to_string()));
-            }
-        }
-    };
-}
-
 impl NbtByteOrder for NbtLittleEndianNetwork {
     fn write_u8(buf: &mut Vec<u8>, byte: u8) -> Result<(), NbtError> {
         match buf.write_u8_varint(byte) {
             Ok(v) => Ok(v),
             Err(e) => {
-                to_nbt_error!(e)
+                Err(NbtError::IOError(e))
             }
         }
     }
@@ -35,7 +22,7 @@ impl NbtByteOrder for NbtLittleEndianNetwork {
         match buf.write_i16::<LittleEndian>(int16) {
             Ok(v) => Ok(v),
             Err(e) => {
-                to_nbt_error!(e)
+                Err(NbtError::IOError(e))
             }
         }
     }
@@ -44,7 +31,7 @@ impl NbtByteOrder for NbtLittleEndianNetwork {
         match buf.write_i32_varint(int32) {
             Ok(v) => Ok(v),
             Err(e) => {
-                to_nbt_error!(e)
+                Err(NbtError::IOError(e))
             }
         }
     }
@@ -53,7 +40,7 @@ impl NbtByteOrder for NbtLittleEndianNetwork {
         match buf.write_i64_varint(int64) {
             Ok(v) => Ok(v),
             Err(e) => {
-                to_nbt_error!(e)
+                Err(NbtError::IOError(e))
             }
         }
     }
@@ -62,7 +49,7 @@ impl NbtByteOrder for NbtLittleEndianNetwork {
         match buf.write_f32::<LittleEndian>(float32) {
             Ok(v) => Ok(v),
             Err(e) => {
-                to_nbt_error!(e)
+                Err(NbtError::IOError(e))
             }
         }
     }
@@ -71,7 +58,7 @@ impl NbtByteOrder for NbtLittleEndianNetwork {
         match buf.write_f64::<LittleEndian>(float64) {
             Ok(v) => Ok(v),
             Err(e) => {
-                to_nbt_error!(e)
+                Err(NbtError::IOError(e))
             }
         }
     }
@@ -89,18 +76,16 @@ impl NbtByteOrder for NbtLittleEndianNetwork {
         }
 
         match buf.write_all(string.as_bytes()) {
-            Ok(_) => {}
-            Err(e) => to_nbt_error!(e),
+            Ok(_) => { Ok(()) }
+            Err(e) => Err(NbtError::IOError(e)),
         }
-
-        Ok(())
     }
 
     fn read_u8(buf: &mut Cursor<Vec<u8>>) -> Result<u8, NbtError> {
         match buf.read_u8_varint() {
             Ok(v) => Ok(v),
             Err(e) => {
-                to_nbt_error!(e)
+                Err(NbtError::IOError(e))
             }
         }
     }
@@ -109,7 +94,7 @@ impl NbtByteOrder for NbtLittleEndianNetwork {
         match buf.read_i16::<LittleEndian>() {
             Ok(v) => Ok(v),
             Err(e) => {
-                to_nbt_error!(e)
+                Err(NbtError::IOError(e))
             }
         }
     }
@@ -118,7 +103,7 @@ impl NbtByteOrder for NbtLittleEndianNetwork {
         match buf.read_i32_varint() {
             Ok(v) => Ok(v),
             Err(e) => {
-                to_nbt_error!(e)
+                Err(NbtError::IOError(e))
             }
         }
     }
@@ -127,7 +112,7 @@ impl NbtByteOrder for NbtLittleEndianNetwork {
         match buf.read_i64_varint() {
             Ok(v) => Ok(v),
             Err(e) => {
-                to_nbt_error!(e)
+                Err(NbtError::IOError(e))
             }
         }
     }
@@ -136,7 +121,7 @@ impl NbtByteOrder for NbtLittleEndianNetwork {
         match buf.read_f32::<LittleEndian>() {
             Ok(v) => Ok(v),
             Err(e) => {
-                to_nbt_error!(e)
+                Err(NbtError::IOError(e))
             }
         }
     }
@@ -145,7 +130,7 @@ impl NbtByteOrder for NbtLittleEndianNetwork {
         match buf.read_f64::<LittleEndian>() {
             Ok(v) => Ok(v),
             Err(e) => {
-                to_nbt_error!(e)
+                Err(NbtError::IOError(e))
             }
         }
     }
@@ -171,15 +156,13 @@ impl NbtByteOrder for NbtLittleEndianNetwork {
         match buf.read_exact(&mut string_buf) {
             Ok(_) => {}
             Err(e) => {
-                to_nbt_error!(e)
+                return Err(NbtError::IOError(e))
             }
         };
 
-        let string = match String::from_utf8(string_buf) {
-            Ok(v) => v,
-            Err(e) => return Err(NbtError::Utf8Error(e)),
-        };
-
-        Ok(string)
+        match String::from_utf8(string_buf) {
+            Ok(v) => Ok(v),
+            Err(e) => Err(NbtError::Utf8Error(e)),
+        }
     }
 }
