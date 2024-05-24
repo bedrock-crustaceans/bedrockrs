@@ -53,7 +53,9 @@ impl Mul for i16be {
 }
 
 impl MulAssign for i16be {
-    fn mul_assign(&mut self, rhs: Self) {
+
+    #[inline]
+    #[track_caller]ign(&mut self, rhs: Self) {
         self.0 *= rhs.0
     }
 }

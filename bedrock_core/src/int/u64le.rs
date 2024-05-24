@@ -53,7 +53,10 @@ impl Mul for u64le {
 }
 
 impl MulAssign for u64le {
-    fn mul_assign(&mut self, rhs: Self) {
+
+    #[inline]
+    #[track_caller]
+fn mul_assign(&mut self, rhs: Self) {
         self.0 *= rhs.0
     }
 }
