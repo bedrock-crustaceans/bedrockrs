@@ -10,7 +10,10 @@ pub struct Vec3f {
 impl Add for Vec3f {
     type Output = Self;
 
-    fn add(self, rhs: Self) -> Self::Output {
+    
+    #[inline]
+    #[track_caller]
+fn add(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
@@ -20,7 +23,10 @@ impl Add for Vec3f {
 }
 
 impl AddAssign for Vec3f {
-    fn add_assign(&mut self, rhs: Self) {
+    
+    #[inline]
+    #[track_caller]
+fn add_assign(&mut self, rhs: Self) {
         self.x += rhs.x;
         self.y += rhs.y;
         self.z += rhs.z;
@@ -30,7 +36,10 @@ impl AddAssign for Vec3f {
 impl Sub for Vec3f {
     type Output = Self;
 
-    fn sub(self, rhs: Self) -> Self::Output {
+    
+    #[inline]
+    #[track_caller]
+fn sub(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
@@ -40,7 +49,10 @@ impl Sub for Vec3f {
 }
 
 impl SubAssign for Vec3f {
-    fn sub_assign(&mut self, rhs: Self) {
+    
+    #[inline]
+    #[track_caller]
+fn sub_assign(&mut self, rhs: Self) {
         self.x -= rhs.x;
         self.y -= rhs.y;
         self.z -= rhs.z;
@@ -50,7 +62,10 @@ impl SubAssign for Vec3f {
 impl Mul for Vec3f {
     type Output = Self;
 
-    fn mul(self, rhs: Self) -> Self::Output {
+    
+    #[inline]
+    #[track_caller]
+fn mul(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x * rhs.x,
             y: self.y * rhs.y,
@@ -60,7 +75,10 @@ impl Mul for Vec3f {
 }
 
 impl MulAssign for Vec3f {
-    fn mul_assign(&mut self, rhs: Self) {
+    
+    #[inline]
+    #[track_caller]
+fn mul_assign(&mut self, rhs: Self) {
         self.x *= rhs.x;
         self.y *= rhs.y;
         self.z *= rhs.z;
@@ -70,7 +88,10 @@ impl MulAssign for Vec3f {
 impl Div for Vec3f {
     type Output = Self;
 
-    fn div(self, rhs: Self) -> Self::Output {
+    
+    #[inline]
+    #[track_caller]
+fn div(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x / rhs.x,
             y: self.y / rhs.y,
@@ -80,7 +101,10 @@ impl Div for Vec3f {
 }
 
 impl DivAssign for Vec3f {
-    fn div_assign(&mut self, rhs: Self) {
+    
+    #[inline]
+    #[track_caller]
+fn div_assign(&mut self, rhs: Self) {
         self.x /= rhs.x;
         self.y /= rhs.y;
         self.z /= rhs.z;
@@ -90,7 +114,10 @@ impl DivAssign for Vec3f {
 impl Rem for Vec3f {
     type Output = Self;
 
-    fn rem(self, rhs: Self) -> Self::Output {
+    
+    #[inline]
+    #[track_caller]
+fn rem(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x % rhs.x,
             y: self.y % rhs.y,
@@ -100,7 +127,10 @@ impl Rem for Vec3f {
 }
 
 impl RemAssign for Vec3f {
-    fn rem_assign(&mut self, rhs: Self) {
+    
+    #[inline]
+    #[track_caller]
+fn rem_assign(&mut self, rhs: Self) {
         self.x %= rhs.x;
         self.y %= rhs.y;
         self.z %= rhs.z;
@@ -110,7 +140,10 @@ impl RemAssign for Vec3f {
 impl Neg for Vec3f {
     type Output = Self;
 
-    fn neg(self) -> Self::Output {
+    
+    #[inline]
+    #[track_caller]
+fn neg(self) -> Self::Output {
         Self {
             x: -self.x,
             y: -self.y,

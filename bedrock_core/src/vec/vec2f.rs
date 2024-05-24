@@ -9,7 +9,10 @@ pub struct Vec2f {
 impl Add for Vec2f {
     type Output = Self;
 
-    fn add(self, rhs: Self) -> Self::Output {
+    
+    #[inline]
+    #[track_caller]
+fn add(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x + rhs.x,
             z: self.z + rhs.z,
@@ -18,7 +21,10 @@ impl Add for Vec2f {
 }
 
 impl AddAssign for Vec2f {
-    fn add_assign(&mut self, rhs: Self) {
+    
+    #[inline]
+    #[track_caller]
+fn add_assign(&mut self, rhs: Self) {
         self.x += rhs.x;
         self.z += rhs.z;
     }
@@ -27,7 +33,10 @@ impl AddAssign for Vec2f {
 impl Sub for Vec2f {
     type Output = Self;
 
-    fn sub(self, rhs: Self) -> Self::Output {
+    
+    #[inline]
+    #[track_caller]
+fn sub(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x - rhs.x,
             z: self.z - rhs.z,
@@ -36,7 +45,10 @@ impl Sub for Vec2f {
 }
 
 impl SubAssign for Vec2f {
-    fn sub_assign(&mut self, rhs: Self) {
+    
+    #[inline]
+    #[track_caller]
+fn sub_assign(&mut self, rhs: Self) {
         self.x -= rhs.x;
         self.z -= rhs.z;
     }
@@ -45,7 +57,10 @@ impl SubAssign for Vec2f {
 impl Mul for Vec2f {
     type Output = Self;
 
-    fn mul(self, rhs: Self) -> Self::Output {
+    
+    #[inline]
+    #[track_caller]
+fn mul(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x * rhs.x,
             z: self.z * rhs.z,
@@ -54,7 +69,10 @@ impl Mul for Vec2f {
 }
 
 impl MulAssign for Vec2f {
-    fn mul_assign(&mut self, rhs: Self) {
+    
+    #[inline]
+    #[track_caller]
+fn mul_assign(&mut self, rhs: Self) {
         self.x *= rhs.x;
         self.z *= rhs.z;
     }
@@ -63,7 +81,10 @@ impl MulAssign for Vec2f {
 impl Div for Vec2f {
     type Output = Self;
 
-    fn div(self, rhs: Self) -> Self::Output {
+    
+    #[inline]
+    #[track_caller]
+fn div(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x / rhs.x,
             z: self.z / rhs.z,
@@ -72,7 +93,10 @@ impl Div for Vec2f {
 }
 
 impl DivAssign for Vec2f {
-    fn div_assign(&mut self, rhs: Self) {
+    
+    #[inline]
+    #[track_caller]
+fn div_assign(&mut self, rhs: Self) {
         self.x /= rhs.x;
         self.z /= rhs.z;
     }
@@ -81,7 +105,10 @@ impl DivAssign for Vec2f {
 impl Rem for Vec2f {
     type Output = Self;
 
-    fn rem(self, rhs: Self) -> Self::Output {
+    
+    #[inline]
+    #[track_caller]
+fn rem(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x % rhs.x,
             z: self.z % rhs.z,
@@ -90,7 +117,10 @@ impl Rem for Vec2f {
 }
 
 impl RemAssign for Vec2f {
-    fn rem_assign(&mut self, rhs: Self) {
+    
+    #[inline]
+    #[track_caller]
+fn rem_assign(&mut self, rhs: Self) {
         self.x %= rhs.x;
         self.z %= rhs.z;
     }
@@ -99,7 +129,10 @@ impl RemAssign for Vec2f {
 impl Neg for Vec2f {
     type Output = Self;
 
-    fn neg(self) -> Self::Output {
+    
+    #[inline]
+    #[track_caller]
+fn neg(self) -> Self::Output {
         Self {
             x: -self.x,
             z: -self.z,
