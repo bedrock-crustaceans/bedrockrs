@@ -189,7 +189,7 @@ impl ProtoCodec for ConnectionRequestType {
                     None => {
                         return Err(ProtoCodecError::FormatMismatch(String::from(
                             "Expected x5u in JWT header",
-                        )))
+                        )));
                     }
                     Some(ref v) => v.as_bytes(),
                 };

@@ -53,7 +53,7 @@ pub async fn handle_login_server_side(
         e => {
             return Err(LoginError::PacketMismatch(format!(
                 "Expected RequestNetworkSettingsPacket got: {e:?}"
-            )))
+            )));
         }
     };
 
@@ -115,7 +115,7 @@ pub async fn handle_login_server_side(
         e => {
             return Err(LoginError::PacketMismatch(format!(
                 "Expected LoginPacket got: {e:?}"
-            )))
+            )));
         }
     };
 

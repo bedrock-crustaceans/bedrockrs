@@ -1,4 +1,6 @@
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign};
+use std::ops::{
+    Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
+};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vec2f {
@@ -8,7 +10,6 @@ pub struct Vec2f {
 
 impl Add for Vec2f {
     type Output = Self;
-
 
     #[inline]
     #[track_caller]
@@ -32,7 +33,6 @@ impl AddAssign for Vec2f {
 impl Sub for Vec2f {
     type Output = Self;
 
-
     #[inline]
     #[track_caller]
     fn sub(self, rhs: Self) -> Self::Output {
@@ -54,7 +54,6 @@ impl SubAssign for Vec2f {
 
 impl Mul for Vec2f {
     type Output = Self;
-
 
     #[inline]
     #[track_caller]
@@ -78,7 +77,6 @@ impl MulAssign for Vec2f {
 impl Div for Vec2f {
     type Output = Self;
 
-
     #[inline]
     #[track_caller]
     fn div(self, rhs: Self) -> Self::Output {
@@ -101,7 +99,6 @@ impl DivAssign for Vec2f {
 impl Rem for Vec2f {
     type Output = Self;
 
-
     #[inline]
     #[track_caller]
     fn rem(self, rhs: Self) -> Self::Output {
@@ -123,7 +120,6 @@ impl RemAssign for Vec2f {
 
 impl Neg for Vec2f {
     type Output = Self;
-
 
     #[inline]
     #[track_caller]

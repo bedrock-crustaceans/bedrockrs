@@ -1,10 +1,11 @@
 #![allow(non_camel_case_types)]
 
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign};
+use std::ops::{
+    Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
+};
 
 #[derive(Debug, Copy, Clone)]
 pub struct uvar32(pub u32);
-
 
 impl Add for uvar32 {
     type Output = Self;
