@@ -1,5 +1,4 @@
 #[allow(non_upper_case_globals, non_snake_case)]
-
 use crate::compression::snappy::SnappyCompression;
 use crate::compression::zlib::ZlibCompression;
 use crate::error::CompressionError;

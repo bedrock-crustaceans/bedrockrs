@@ -1,8 +1,8 @@
 use std::collections::BTreeMap;
 use std::io::{Cursor, Read};
 
-use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
+use base64::prelude::BASE64_STANDARD;
 use byteorder::LittleEndian;
 use byteorder::ReadBytesExt;
 use jsonwebtoken::{DecodingKey, Validation};
@@ -83,16 +83,16 @@ pub struct ConnectionRequestType {
 
 impl ProtoCodec for ConnectionRequestType {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         todo!()
     }
 
     // TODO: Add microsoft auth
     fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         let mut certificate_chain: Vec<BTreeMap<String, Value>> = vec![];
 

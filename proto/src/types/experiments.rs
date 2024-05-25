@@ -14,8 +14,8 @@ pub struct Experiments {
 
 impl ProtoCodec for Experiments {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match u32le(self.experiments.len() as u32).proto_serialize(buf) {
             Ok(_) => {}
@@ -44,8 +44,8 @@ impl ProtoCodec for Experiments {
     }
 
     fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         let len = match u32le::proto_deserialize(cursor) {
             Ok(v) => v.0,

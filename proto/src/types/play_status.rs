@@ -28,8 +28,8 @@ pub enum PlayStatusType {
 
 impl ProtoCodec for PlayStatusType {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match self.to_i32() {
             None => {
@@ -40,8 +40,8 @@ impl ProtoCodec for PlayStatusType {
     }
 
     fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         match i32be::proto_deserialize(cursor) {
             Ok(v) => match PlayStatusType::from_i32(v.0) {
