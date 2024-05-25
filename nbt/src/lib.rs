@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fmt::{Debug, Formatter};
 use std::io::Cursor;
 
 use crate::byte_order::NbtByteOrder;
@@ -16,7 +17,6 @@ pub mod error;
 /// - long array
 ///
 /// (These missing types are rarely if not even unused in MCBE)
-#[derive(Debug)]
 pub enum NbtTag {
     /// A simple byte.
     /// Can represent multiple things like:
@@ -476,5 +476,44 @@ impl NbtTag {
         };
 
         Ok(tag)
+    }
+}
+
+// Implement the Debug trait for NbtTag
+impl Debug for NbtTag {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        // check for pretty format with #
+        match f.alternate() {
+            // normal format
+            false => {
+                match self {
+                    NbtTag::Byte(v) => { write!(f, "{v:?}") }
+                    NbtTag::Int16(v) => { write!(f, "{v:?}") }
+                    NbtTag::Int32(v) => { write!(f, "{v:?}") }
+                    NbtTag::Int64(v) => { write!(f, "{v:?}") }
+                    NbtTag::Float32(v) => { write!(f, "{v:?}") }
+                    NbtTag::Float64(v) => { write!(f, "{v:?}") }
+                    NbtTag::String(v) => { write!(f, "{v:?}") }
+                    NbtTag::List(v) => { write!(f, "{v:?}") }
+                    NbtTag::Compound(v) => { write!(f, "{v:?}") }
+                    NbtTag::Empty => { write!(f, "") }
+                }
+            }
+            // pretty format
+            true => {
+                match self {
+                    NbtTag::Byte(v) => { write!(f, "{v:#?}") }
+                    NbtTag::Int16(v) => { write!(f, "{v:#?}") }
+                    NbtTag::Int32(v) => { write!(f, "{v:#?}") }
+                    NbtTag::Int64(v) => { write!(f, "{v:#?}") }
+                    NbtTag::Float32(v) => { write!(f, "{v:#?}") }
+                    NbtTag::Float64(v) => { write!(f, "{v:#?}") }
+                    NbtTag::String(v) => { write!(f, "{v:#?}") }
+                    NbtTag::List(v) => { write!(f, "{v:#?}") }
+                    NbtTag::Compound(v) => { write!(f, "{v:#?}") }
+                    NbtTag::Empty => { write!(f, "") }
+                }
+            }
+        }
     }
 }
