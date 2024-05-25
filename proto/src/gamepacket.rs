@@ -1,3 +1,5 @@
+#![allow(non_upper_case_globals)]
+
 use std::io::{Cursor, Write};
 
 use proto_core::error::ProtoCodecError;
@@ -168,17 +170,17 @@ pub enum GamePacket {
 }
 
 impl GamePacket {
-    const LOGIN_ID: u16 = 1;
-    const PLAY_STATUS_ID: u16 = 2;
-    const SERVER_TO_CLIENT_HANDSHAKE_ID: u16 = 3;
-    const CLIENT_TO_SERVER_HANDSHAKE_ID: u16 = 4;
-    const DISCONNECT_ID: u16 = 5;
-    const RESOURCE_PACKS_INFO_ID: u16 = 6;
-    const RESOURCE_PACK_STACK_ID: u16 = 7;
-    const RESOURCE_PACK_CLIENT_RESPONSE_ID: u16 = 8;
-    const TEXT_ID: u16 = 9;
-    const SET_TIME_ID: u16 = 10;
-    const START_GAME_ID: u16 = 11;
+    const LoginID: u16 = 1;
+    const PlayStatusID: u16 = 2;
+    const ServerToClientHandshakeID: u16 = 3;
+    const ClientToServerHandshakeID: u16 = 4;
+    const DisconnectID: u16 = 5;
+    const ResourcePacksInfoID: u16 = 6;
+    const ResourcePacksStackID: u16 = 7;
+    const ResourcePacksClientResponseID: u16 = 8;
+    const TextID: u16 = 9;
+    const SetTimeID: u16 = 10;
+    const StartGameID: u16 = 11;
     const AddPlayerID: u16 = 12;
     const AddEntityID: u16 = 13;
     const RemoveEntityID: u16 = 14;
@@ -321,8 +323,8 @@ macro_rules! ser_packet {
     ($buf:expr, $packet_id:expr, $packet_data:expr) => {{
         let mut pk_buf = vec![];
 
-        // TODO add correct heade generation
-        let header = "";
+        // TODO add correct header generation
+        // let header = "";
 
         // Write the PacketID to the packet buffer
         match pk_buf.write_u16_varint($packet_id as u16) {
@@ -376,25 +378,25 @@ impl GamePacket {
                 ser_packet!(buf, GamePacket::Login as u16, pk)
             }
             GamePacket::PlayStatus(pk) => {
-                ser_packet!(buf, GamePacket::PLAY_STATUS_ID, pk)
+                ser_packet!(buf, GamePacket::PlayStatusID, pk)
             }
             GamePacket::ServerToClientHandshake(pk) => {
-                ser_packet!(buf, GamePacket::SERVER_TO_CLIENT_HANDSHAKE_ID, pk)
+                ser_packet!(buf, GamePacket::ServerToClientHandshakeID, pk)
             }
             GamePacket::ClientToServerHandshake() => {
                 unimplemented!()
             }
             GamePacket::Disconnect(pk) => {
-                ser_packet!(buf, GamePacket::DISCONNECT_ID, pk)
+                ser_packet!(buf, GamePacket::DisconnectID, pk)
             }
             GamePacket::ResourcePacksInfo(pk) => {
-                ser_packet!(buf, GamePacket::RESOURCE_PACKS_INFO_ID, pk)
+                ser_packet!(buf, GamePacket::ResourcePacksInfoID, pk)
             }
             GamePacket::ResourcePackStack(pk) => {
-                ser_packet!(buf, GamePacket::RESOURCE_PACK_STACK_ID, pk)
+                ser_packet!(buf, GamePacket::ResourcePacksStackID, pk)
             }
             GamePacket::ResourcePackClientResponse(pk) => {
-                ser_packet!(buf, GamePacket::RESOURCE_PACK_CLIENT_RESPONSE_ID, pk)
+                ser_packet!(buf, GamePacket::ResourcePacksClientResponseID, pk)
             }
             GamePacket::Text() => {
                 unimplemented!()
@@ -852,35 +854,35 @@ impl GamePacket {
 
         // Match the GamePacket to deserialize the correct packet type
         let game_packet = match game_packet_id {
-            GamePacket::LOGIN_ID => GamePacket::Login(de_packet!(cursor, LoginPacket)),
-            GamePacket::PLAY_STATUS_ID => {
+            GamePacket::LoginID => GamePacket::Login(de_packet!(cursor, LoginPacket)),
+            GamePacket::PlayStatusID => {
                 GamePacket::PlayStatus(de_packet!(cursor, PlayStatusPacket))
             }
-            GamePacket::SERVER_TO_CLIENT_HANDSHAKE_ID => GamePacket::ServerToClientHandshake(
+            GamePacket::ServerToClientHandshakeID => GamePacket::ServerToClientHandshake(
                 de_packet!(cursor, HandshakeServerToClientPacket),
             ),
-            GamePacket::CLIENT_TO_SERVER_HANDSHAKE_ID => {
+            GamePacket::ClientToServerHandshakeID => {
                 unimplemented!()
             }
-            GamePacket::DISCONNECT_ID => {
+            GamePacket::DisconnectID => {
                 GamePacket::Disconnect(de_packet!(cursor, DisconnectPacket))
             }
-            GamePacket::RESOURCE_PACKS_INFO_ID => {
+            GamePacket::ResourcePacksInfoID => {
                 GamePacket::ResourcePacksInfo(de_packet!(cursor, ResourcePacksInfoPacket))
             }
-            GamePacket::RESOURCE_PACK_STACK_ID => {
+            GamePacket::ResourcePacksStackID => {
                 GamePacket::ResourcePackStack(de_packet!(cursor, ResourcePacksStackPacket))
             }
-            GamePacket::RESOURCE_PACK_CLIENT_RESPONSE_ID => GamePacket::ResourcePackClientResponse(
+            GamePacket::ResourcePacksClientResponseID => GamePacket::ResourcePackClientResponse(
                 de_packet!(cursor, ResourcePacksResponsePacket),
             ),
-            GamePacket::TEXT_ID => {
+            GamePacket::TextID => {
                 unimplemented!()
             }
-            GamePacket::SET_TIME_ID => {
+            GamePacket::SetTimeID => {
                 unimplemented!()
             }
-            GamePacket::START_GAME_ID => {
+            GamePacket::StartGameID => {
                 unimplemented!()
             }
             GamePacket::AddPlayerID => {
