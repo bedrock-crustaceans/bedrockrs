@@ -41,9 +41,9 @@ impl Connection {
     ) -> Result<(), ConnectionError> {
         let mut buf_pks = vec![];
 
-        // Batch all gamepackets together
+        // Batch all game packets together
         for game_packet in game_packets {
-            // Write gamepacket
+            // Write game packet
             match game_packet.pk_serialize(&mut buf_pks) {
                 Ok(_) => {}
                 Err(e) => return Err(ConnectionError::ProtoCodecError(e)),
