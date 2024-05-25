@@ -1,9 +1,9 @@
 use bedrock_core::u16le;
 
-use crate::compression::{CompressionMethod, CompressionMethods};
 use crate::compression::none::NoCompression;
 use crate::compression::snappy::SnappyCompression;
 use crate::compression::zlib::ZlibCompression;
+use crate::compression::{CompressionMethod, CompressionMethods};
 use crate::conn::Connection;
 use crate::error::LoginError;
 use crate::gamepacket::GamePacket;

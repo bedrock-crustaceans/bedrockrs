@@ -140,7 +140,7 @@ impl NbtByteOrder for NbtLittleEndianNetwork {
                 Err(e) => {
                     return Err(NbtError::IntError(e));
                 }
-            },
+            }
         ];
 
         match buf.read_exact(&mut string_buf) {

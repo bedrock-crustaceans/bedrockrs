@@ -15,8 +15,8 @@ pub struct DisconnectPacket {
 
 impl ProtoCodec for DisconnectPacket {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
-        where
-            Self: Sized,
+    where
+        Self: Sized,
     {
         match self.reason.proto_serialize(buf) {
             Ok(_) => {}
@@ -57,8 +57,8 @@ impl ProtoCodec for DisconnectPacket {
     }
 
     fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
-        where
-            Self: Sized,
+    where
+        Self: Sized,
     {
         let reason = match ivar32::proto_deserialize(cursor) {
             Ok(v) => v,

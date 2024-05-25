@@ -12,8 +12,8 @@ pub struct PackURL {
 
 impl ProtoCodec for PackURL {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
-        where
-            Self: Sized,
+    where
+        Self: Sized,
     {
         let uuid_version = format!("{}_{}", self.uuid, self.version);
 

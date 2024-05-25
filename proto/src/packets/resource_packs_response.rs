@@ -16,8 +16,8 @@ pub struct ResourcePacksResponsePacket {
 
 impl ProtoCodec for ResourcePacksResponsePacket {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
-        where
-            Self: Sized,
+    where
+        Self: Sized,
     {
         match self.response.proto_serialize(buf) {
             Ok(_) => {}
@@ -40,8 +40,8 @@ impl ProtoCodec for ResourcePacksResponsePacket {
     }
 
     fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
-        where
-            Self: Sized,
+    where
+        Self: Sized,
     {
         // Read the Response
         let response = match ResourcePacksResponseStatus::proto_deserialize(cursor) {

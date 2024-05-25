@@ -490,35 +490,71 @@ impl Debug for NbtTag {
         // check for pretty format with #
         match f.alternate() {
             // normal format
-            false => {
-                match self {
-                    NbtTag::Byte(v) => { write!(f, "Byte({v:?})") }
-                    NbtTag::Int16(v) => { write!(f, "Int16({v:?})") }
-                    NbtTag::Int32(v) => { write!(f, "Int32({v:?})") }
-                    NbtTag::Int64(v) => { write!(f, "Int64({v:?})") }
-                    NbtTag::Float32(v) => { write!(f, "Float32({v:?})") }
-                    NbtTag::Float64(v) => { write!(f, "Float64({v:?})") }
-                    NbtTag::String(v) => { write!(f, "{v:?}") }
-                    NbtTag::List(v) => { write!(f, "{v:?}") }
-                    NbtTag::Compound(v) => { write!(f, "{v:?}") }
-                    NbtTag::Empty => { write!(f, "") }
+            false => match self {
+                NbtTag::Byte(v) => {
+                    write!(f, "Byte({v:?})")
                 }
-            }
+                NbtTag::Int16(v) => {
+                    write!(f, "Int16({v:?})")
+                }
+                NbtTag::Int32(v) => {
+                    write!(f, "Int32({v:?})")
+                }
+                NbtTag::Int64(v) => {
+                    write!(f, "Int64({v:?})")
+                }
+                NbtTag::Float32(v) => {
+                    write!(f, "Float32({v:?})")
+                }
+                NbtTag::Float64(v) => {
+                    write!(f, "Float64({v:?})")
+                }
+                NbtTag::String(v) => {
+                    write!(f, "{v:?}")
+                }
+                NbtTag::List(v) => {
+                    write!(f, "{v:?}")
+                }
+                NbtTag::Compound(v) => {
+                    write!(f, "{v:?}")
+                }
+                NbtTag::Empty => {
+                    write!(f, "")
+                }
+            },
             // pretty format
-            true => {
-                match self {
-                    NbtTag::Byte(v) => { write!(f, "Byte({v:#?})") }
-                    NbtTag::Int16(v) => { write!(f, "Int16({v:#?})") }
-                    NbtTag::Int32(v) => { write!(f, "Int32({v:#?})") }
-                    NbtTag::Int64(v) => { write!(f, "Int64({v:#?})") }
-                    NbtTag::Float32(v) => { write!(f, "Float32({v:#?})") }
-                    NbtTag::Float64(v) => { write!(f, "Float64({v:#?})") }
-                    NbtTag::String(v) => { write!(f, "{v:#?}") }
-                    NbtTag::List(v) => { write!(f, "{v:#?}") }
-                    NbtTag::Compound(v) => { write!(f, "{v:#?}") }
-                    NbtTag::Empty => { write!(f, "") }
+            true => match self {
+                NbtTag::Byte(v) => {
+                    write!(f, "Byte({v:#?})")
                 }
-            }
+                NbtTag::Int16(v) => {
+                    write!(f, "Int16({v:#?})")
+                }
+                NbtTag::Int32(v) => {
+                    write!(f, "Int32({v:#?})")
+                }
+                NbtTag::Int64(v) => {
+                    write!(f, "Int64({v:#?})")
+                }
+                NbtTag::Float32(v) => {
+                    write!(f, "Float32({v:#?})")
+                }
+                NbtTag::Float64(v) => {
+                    write!(f, "Float64({v:#?})")
+                }
+                NbtTag::String(v) => {
+                    write!(f, "{v:#?}")
+                }
+                NbtTag::List(v) => {
+                    write!(f, "{v:#?}")
+                }
+                NbtTag::Compound(v) => {
+                    write!(f, "{v:#?}")
+                }
+                NbtTag::Empty => {
+                    write!(f, "")
+                }
+            },
         }
     }
 }

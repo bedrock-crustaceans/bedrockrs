@@ -16,14 +16,14 @@ pub enum ResourcePacksResponseStatus {
 
 impl ProtoCodec for ResourcePacksResponseStatus {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
-        where
-            Self: Sized,
+    where
+        Self: Sized,
     {
         match match self.to_u8() {
             None => return Err(ProtoCodecError::InvalidEnumID),
             Some(v) => v,
         }
-            .proto_serialize(buf)
+        .proto_serialize(buf)
         {
             Ok(_) => Ok(()),
             Err(e) => Err(e),
@@ -31,8 +31,8 @@ impl ProtoCodec for ResourcePacksResponseStatus {
     }
 
     fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
-        where
-            Self: Sized,
+    where
+        Self: Sized,
     {
         match u8::proto_deserialize(cursor) {
             Ok(v) => match ResourcePacksResponseStatus::from_u8(v) {

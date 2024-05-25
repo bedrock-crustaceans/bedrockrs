@@ -21,8 +21,8 @@ pub struct ResourcePacksInfoPacket {
 
 impl ProtoCodec for ResourcePacksInfoPacket {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
-        where
-            Self: Sized,
+    where
+        Self: Sized,
     {
         // Serialize resource_pack_required as a bool
         match self.resource_pack_required.proto_serialize(buf) {
@@ -86,8 +86,8 @@ impl ProtoCodec for ResourcePacksInfoPacket {
     }
 
     fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
-        where
-            Self: Sized,
+    where
+        Self: Sized,
     {
         todo!()
     }
