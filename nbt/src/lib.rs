@@ -86,7 +86,8 @@ impl NbtTag {
     const EMPTY_ID: u8 = 0x00;
 
     /// Returns the tag (open) ID for a given tag.
-    pub fn get_id(&self) -> u8 {
+    #[inline]
+    fn get_id(&self) -> u8 {
         match self {
             NbtTag::Byte(_) => Self::BYTE_ID,
             NbtTag::Int16(_) => Self::INT16_ID,
@@ -152,6 +153,7 @@ impl NbtTag {
 
     /// Serialize the NBT via a simple vec.
     /// Simpler alternative to [NbtTag::nbt_serialize].
+    #[inline]
     pub fn nbt_serialize_vec<T: NbtByteOrder>(
         &self,
         key: impl Into<String>,
@@ -166,6 +168,7 @@ impl NbtTag {
 
     /// Serializes a given val without any key or type notation.
     /// Should only be used by the [NbtTag::nbt_serialize] function internally.
+    #[inline]
     fn nbt_serialize_val<T: NbtByteOrder>(&self, buf: &mut Vec<u8>) -> Result<(), NbtError> {
         match self {
             NbtTag::Byte(v) => match T::write_u8(buf, *v) {
@@ -326,6 +329,7 @@ impl NbtTag {
 
     /// Deserialize the NBT via a simple vec.
     /// Simpler alternative to [NbtTag::nbt_deserialize].
+    #[inline]
     pub fn nbt_deserialize_vec<T: NbtByteOrder>(vec: Vec<u8>) -> Result<(String, Self), NbtError> {
         let mut cursor = Cursor::new(vec);
 
@@ -334,6 +338,7 @@ impl NbtTag {
 
     /// Deserializes a given val without reading any key notation.
     /// Should only be used by the [NbtTag::nbt_deserialize] function internally.
+    #[inline]
     fn nbt_deserialize_val<T: NbtByteOrder>(
         cursor: &mut Cursor<Vec<u8>>,
         id: u8,
