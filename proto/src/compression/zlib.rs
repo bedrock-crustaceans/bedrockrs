@@ -22,12 +22,12 @@ impl CompressionMethod for ZlibCompression {
     const ID_u8: u8 = 0x00;
     const ID_u16: u16 = 0x0000;
 
-    #[inline(always)]
+    #[inline]
     fn get_threshold(&self) -> u16 {
         self.threshold
     }
 
-    #[inline(always)]
+    #[inline]
     fn compress(&self, data: Vec<u8>) -> Result<Vec<u8>, CompressionError> {
         let mut encoder = flate2::write::DeflateEncoder::new(
             Vec::new(),
@@ -45,7 +45,7 @@ impl CompressionMethod for ZlibCompression {
         }
     }
 
-    #[inline(always)]
+    #[inline]
     fn decompress(&self, data: Vec<u8>) -> Result<Vec<u8>, CompressionError> {
         let buf = Vec::new();
         let mut decoder = DeflateDecoder::new(buf);

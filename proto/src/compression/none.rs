@@ -7,17 +7,17 @@ impl CompressionMethod for NoCompression {
     const ID_u8: u8 = 0xFF;
     const ID_u16: u16 = 0xFFFF;
 
-    #[inline(always)]
+    #[inline]
     fn get_threshold(&self) -> u16 {
         u16::MAX
     }
 
-    #[inline(always)]
+    #[inline]
     fn compress(&self, data: Vec<u8>) -> Result<Vec<u8>, CompressionError> {
         Ok(data)
     }
 
-    #[inline(always)]
+    #[inline]
     fn decompress(&self, data: Vec<u8>) -> Result<Vec<u8>, CompressionError> {
         Ok(data)
     }
