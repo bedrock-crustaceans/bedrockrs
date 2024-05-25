@@ -109,7 +109,7 @@ pub async fn handle_login_server_side(
         ));
     }
 
-    // Get the clients proto version
+    // Get the clients login pk
     let login_pk = match &login[0] {
         GamePacket::Login(pk) => pk,
         e => {
