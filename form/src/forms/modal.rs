@@ -1,6 +1,7 @@
-use crate::elems::Element;
 use serde_json::json;
+
 use crate::elems::button::Button;
+use crate::elems::Element;
 use crate::forms::Form;
 
 pub struct ModalForm {
@@ -18,6 +19,7 @@ impl Form for ModalForm {
             "content": self.body,
             "button1": self.button1.elem_serialize(),
             "button2": self.button2.elem_serialize(),
-        }).to_string()
+        })
+        .to_string()
     }
 }

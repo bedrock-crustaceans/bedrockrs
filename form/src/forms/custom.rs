@@ -1,4 +1,5 @@
 use serde_json::json;
+
 use crate::elems::Element;
 use crate::forms::Form;
 
@@ -16,9 +17,10 @@ impl Form for CustomForm {
         }
 
         json!({
-		    "type": "custom_form",
-		    "title": self.title,
-		    "content": elems_strings,
-        }).to_string()
+            "type": "custom_form",
+            "title": self.title,
+            "content": elems_strings,
+        })
+        .to_string()
     }
 }

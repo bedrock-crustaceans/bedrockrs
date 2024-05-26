@@ -1,4 +1,5 @@
 use serde_json::{json, Value};
+
 use crate::elems::Element;
 
 pub struct Slider {
@@ -12,12 +13,12 @@ pub struct Slider {
 impl Element for Slider {
     fn elem_serialize(&self) -> Value {
         json!({
-		    "type": "slider",
-		    "text": self.text,
-		    "min": self.min,
-		    "max": self.max,
-		    "step": self.step_size,
-		    "default": self.default,
+            "type": "slider",
+            "text": self.text,
+            "min": self.min,
+            "max": self.max,
+            "step": self.step_size,
+            "default": self.default,
         })
     }
 }

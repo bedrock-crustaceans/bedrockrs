@@ -1,4 +1,5 @@
 use serde_json::json;
+
 use crate::elems::button::Button;
 use crate::elems::Element;
 use crate::forms::Form;
@@ -15,13 +16,14 @@ impl Form for SimpleForm {
 
         for button in &self.buttons {
             buttons_strings.push(button.elem_serialize());
-        };
+        }
 
         json!({
             "type": "form",
             "title": self.title,
             "content": self.body,
             "buttons": buttons_strings
-        }).to_string()
+        })
+        .to_string()
     }
 }

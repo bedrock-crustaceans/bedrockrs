@@ -5,9 +5,10 @@
 _The universal toolkit for MCBE in Rust_
 
 A universal library for the Minecraft Bedrock Edition written in Rust, that aims to provide:
- - standards
- - common implementations
- - an easy to use api
+
+- standards
+- common implementations
+- an easy to use api
 
 ## Modules:
 
@@ -16,14 +17,15 @@ A universal library for the Minecraft Bedrock Edition written in Rust, that aims
 
 - [Nbt](https://github.com/Adrian8115/bedrock-rs/tree/main/nbt):
     - A simple nbt implementation focused on MCBE.
-    - Provides Serialization for `NbtLittleEndian`, `NbtLittleEndianNetwork` (Commonly used in the mcbe protocol) and `NbtBigEndian`.
+    - Provides Serialization for `NbtLittleEndian`, `NbtLittleEndianNetwork` (Commonly used in the mcbe protocol)
+      and `NbtBigEndian`.
 
 - [Proto](https://github.com/Adrian8115/bedrock-rs/tree/main/proto):
     - Basic implementation of the Bedrock protocol.
     - Support for both Server and Client side intended.
 
 - [Form](https://github.com/Adrian8115/bedrock-rs/tree/main/form):
-    - An implementation of MCBEs json forms. 
+    - An implementation of MCBEs json forms.
 
 - [World](https://github.com/Adrian8115/bedrock-rs/tree/main/world):
     - Implementation of the Bedrock level format using our own `leveldb` bindings for mojangs leveldb fork.

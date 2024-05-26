@@ -1,4 +1,5 @@
 use serde_json::{json, Value};
+
 use crate::elems::Element;
 
 pub struct Input {
@@ -10,10 +11,10 @@ pub struct Input {
 impl Element for Input {
     fn elem_serialize(&self) -> Value {
         json!({
-		    "type": "input",
-		    "text": self.text,
-		    "default": self.default,
-		    "placeholder": self.placeholder,
+            "type": "input",
+            "text": self.text,
+            "default": self.default,
+            "placeholder": self.placeholder,
         })
     }
 }

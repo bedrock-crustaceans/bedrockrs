@@ -1,8 +1,9 @@
 use serde_json::{json, Value};
+
 use crate::elems::Element;
 
 pub struct Label {
-    text: String
+    text: String,
 }
 
 impl Element for Label {

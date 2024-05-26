@@ -1,4 +1,5 @@
 use serde_json::{json, Value};
+
 use crate::elems::Element;
 
 pub struct DropDown {
@@ -11,9 +12,9 @@ impl Element for DropDown {
     fn elem_serialize(&self) -> Value {
         json!({
             "type": "dropdown",
-		    "text": self.text,
-		    "default": self.default_index,
-		    "options": self.options,
+            "text": self.text,
+            "default": self.default_index,
+            "options": self.options,
         })
     }
 }
