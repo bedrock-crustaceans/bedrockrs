@@ -1,9 +1,9 @@
-use std::path::PathBuf;
+use std::{collections::HashMap, path::PathBuf};
 use mojang_leveldb::{error::DBError, Options, ReadOptions, WriteBatch, WriteOptions, DB};
-use nbt::{endian::little_endian::NbtLittleEndian, error::NbtError, NbtTag};
+use nbt::{endian::little_endian::NbtLittleEndian, NbtTag};
 use uuid::Uuid;
 
-use crate::{str_to_ascii_i8, vec_i8_into_u8, vec_u8_into_i8};
+use crate::{error::WorldError, str_to_ascii_i8, vec_i8_into_u8, vec_u8_into_i8};
 
 pub struct World {
     db: DB
@@ -24,7 +24,7 @@ impl World {
         })
     }
 
-    pub fn get_player(&self, uuid: Uuid) -> Result<Option<Result<(String, NbtTag), NbtError>>, DBError> {
+    pub fn get_player(&self, uuid: Uuid) -> Result<Option<HashMap<String, NbtTag>>, WorldError> {
 
         let mut str = uuid.to_string(); 
         str.insert_str(0, "player_"); 
@@ -32,27 +32,47 @@ impl World {
         let res = self.db.get(
             READ_OPTIONS, 
             str_to_ascii_i8(&str).unwrap().as_slice()
-        )?;
+        );
 
-        if let Some(bytes) = res {
+        if let Ok(Some(bytes)) = res {
             let u8_bytes = vec_i8_into_u8(bytes.get().into());
-            return Ok(Some(NbtTag::nbt_deserialize_vec::<NbtLittleEndian>(u8_bytes)))
+            let res = NbtTag::nbt_deserialize_vec::<NbtLittleEndian>(u8_bytes);
+            if let Ok(tag) = res {
+                if let NbtTag::Compound(ctag) = tag.1 {
+                    return Ok(Some(ctag));
+                }  
+            } else if let Err(e) = res {
+                return Err(WorldError::NbtError(e));
+            }
+        } else if let Err(x) = res {
+            return Err(WorldError::DBError(x));
         }
 
         Ok(None)
 
     }
 
-    pub fn set_player(&mut self, uuid: Uuid, tag_name: String, tag: NbtTag) -> Result<Result<(), DBError>, NbtError> {
-        let byte_nbt = vec_u8_into_i8(tag.nbt_serialize_vec::<NbtLittleEndian>(tag_name)?);
+    pub fn set_player(&mut self, uuid: Uuid, tag: NbtTag) -> Result<(), WorldError> {
+        match tag.nbt_serialize_vec::<NbtLittleEndian>("") {
+            Ok(sertag) => {
+                let byte_nbt = vec_u8_into_i8(sertag);
 
-        let mut str = uuid.to_string(); 
-        str.insert_str(0, "player_"); 
+                let mut str = uuid.to_string(); 
+                str.insert_str(0, "player_"); 
 
-        let mut wb = WriteBatch::new();
+                let mut wb = WriteBatch::new();
 
-        wb.put(str_to_ascii_i8(&str).unwrap().as_slice(), byte_nbt.as_slice());
+                wb.put(str_to_ascii_i8(&str).unwrap().as_slice(), byte_nbt.as_slice());
 
-        Ok(self.db.write(WRITE_OPTIONS, wb))
+                match self.db.write(WRITE_OPTIONS, wb) {
+                    Ok(()) => Ok(()),
+                    Err(dberr) => Err(WorldError::DBError(dberr))
+                }
+            },
+            Err(e) => {
+                Err(WorldError::NbtError(e))
+            }
+        }
+        
     }
 }

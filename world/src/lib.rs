@@ -1,5 +1,6 @@
 mod world;
 pub use world::*;
+pub mod error;
 
 fn str_to_ascii_i8(s: &str) -> Result<Vec<i8>, &'static str> {
 
