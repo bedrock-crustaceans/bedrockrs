@@ -26,3 +26,4 @@ pub use vec::vec3f::Vec3f;
 pub mod int;
 pub mod varint;
 pub mod vec;
+pub mod uuid;
