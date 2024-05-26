@@ -9,21 +9,22 @@ technologies written in pure rust.
 
 ## Modules:
 
-- ### [Bedrock Core](https://github.com/Adrian8115/bedrock-rs/tree/main/bedrock_core):
+- [Bedrock Core](https://github.com/Adrian8115/bedrock-rs/tree/main/bedrock_core):
     - Provides common data types and other shared code for other modules to use.
 
-- ### [Nbt](https://github.com/Adrian8115/bedrock-rs/tree/main/nbt):
+- [Nbt](https://github.com/Adrian8115/bedrock-rs/tree/main/nbt):
     - A simple nbt implementation focused on MCBE.
-    - Provides Serialization for `LittleEndian` and `LittleEndianNetwork` (Commonly used in the mcbe protocol).
+    - Provides Serialization for `NbtLittleEndian`, `NbtLittleEndianNetwork` (Commonly used in the mcbe protocol)
+      and `NbtBigEndian`.
 
-- ### [Protocol](https://github.com/Adrian8115/bedrock-rs/tree/main/protocol):
+- [Proto](https://github.com/Adrian8115/bedrock-rs/tree/main/proto):
     - Basic implemtation of the MCBE protocol.
     - Support for both Server and Client side intended.
 
-- ### [World](https://github.com/Adrian8115/bedrock-rs/tree/main/world):
-    - Implementation of the MCBE level format using `rusty-leveldb` serialization and deserialization.
+- [World](https://github.com/Adrian8115/bedrock-rs/tree/main/world):
+    - Implementation of the MCBE level format using our own `leveldb` bindings for mojangs leveldb fork.
 
-- ### [Packs](https://github.com/Adrian8115/bedrock-rs/tree/main/packs):
+- [Packs](https://github.com/Adrian8115/bedrock-rs/tree/main/packs):
     - Common collection of metadata for behavior packs, resource packs and other MCBE related packs.
 
 ## Contributing:
