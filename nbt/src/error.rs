@@ -1,3 +1,4 @@
+use std::io::Error as IOError;
 use std::num::TryFromIntError;
 use std::string::FromUtf8Error;
 
@@ -17,5 +18,5 @@ pub enum NbtError {
     #[error("Error while converting integers: {0}")]
     IntError(#[from] TryFromIntError),
     #[error("IOError while reading/writing: {0}")]
-    IOError(String),
+    IOError(IOError),
 }

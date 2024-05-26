@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fmt::{Debug, Formatter};
 use std::io::Cursor;
 
 use crate::byte_order::NbtByteOrder;
@@ -16,7 +17,6 @@ pub mod error;
 /// - long array
 ///
 /// (These missing types are rarely if not even unused in MCBE)
-#[derive(Debug)]
 pub enum NbtTag {
     /// A simple byte.
     /// Can represent multiple things like:
@@ -86,7 +86,8 @@ impl NbtTag {
     const EMPTY_ID: u8 = 0x00;
 
     /// Returns the tag (open) ID for a given tag.
-    pub fn get_id(&self) -> u8 {
+    #[inline]
+    fn get_id(&self) -> u8 {
         match self {
             NbtTag::Byte(_) => Self::BYTE_ID,
             NbtTag::Int16(_) => Self::INT16_ID,
@@ -152,6 +153,7 @@ impl NbtTag {
 
     /// Serialize the NBT via a simple vec.
     /// Simpler alternative to [NbtTag::nbt_serialize].
+    #[inline]
     pub fn nbt_serialize_vec<T: NbtByteOrder>(
         &self,
         key: impl Into<String>,
@@ -166,6 +168,7 @@ impl NbtTag {
 
     /// Serializes a given val without any key or type notation.
     /// Should only be used by the [NbtTag::nbt_serialize] function internally.
+    #[inline]
     fn nbt_serialize_val<T: NbtByteOrder>(&self, buf: &mut Vec<u8>) -> Result<(), NbtError> {
         match self {
             NbtTag::Byte(v) => match T::write_u8(buf, *v) {
@@ -326,6 +329,7 @@ impl NbtTag {
 
     /// Deserialize the NBT via a simple vec.
     /// Simpler alternative to [NbtTag::nbt_deserialize].
+    #[inline]
     pub fn nbt_deserialize_vec<T: NbtByteOrder>(vec: Vec<u8>) -> Result<(String, Self), NbtError> {
         let mut cursor = Cursor::new(vec);
 
@@ -334,6 +338,7 @@ impl NbtTag {
 
     /// Deserializes a given val without reading any key notation.
     /// Should only be used by the [NbtTag::nbt_deserialize] function internally.
+    #[inline]
     fn nbt_deserialize_val<T: NbtByteOrder>(
         cursor: &mut Cursor<Vec<u8>>,
         id: u8,
@@ -426,7 +431,7 @@ impl NbtTag {
 
                 let mut vec = vec![];
 
-                for _ in 0..(len - 1) {
+                for _ in 0..len {
                     match Self::nbt_deserialize_val::<T>(cursor, list_type) {
                         Ok(v) => vec.push(v),
                         Err(e) => return Err(e),
@@ -440,8 +445,10 @@ impl NbtTag {
 
                 loop {
                     let id = match T::read_u8(cursor) {
-                        Ok(v) => {v}
-                        Err(e) => { return Err(e) }
+                        Ok(v) => v,
+                        Err(e) => {
+                            return Err(e);
+                        }
                     };
 
                     if id == Self::EMPTY_ID {
@@ -449,13 +456,17 @@ impl NbtTag {
                     }
 
                     let key = match T::read_string(cursor) {
-                        Ok(v) => {v}
-                        Err(e) => { return Err(e) }
+                        Ok(v) => v,
+                        Err(e) => {
+                            return Err(e);
+                        }
                     };
 
                     let tag = match Self::nbt_deserialize_val::<T>(cursor, id) {
-                        Ok(v) => {v}
-                        Err(e) => { return Err(e) }
+                        Ok(v) => v,
+                        Err(e) => {
+                            return Err(e);
+                        }
                     };
 
                     map.insert(key, tag);
@@ -463,14 +474,87 @@ impl NbtTag {
 
                 NbtTag::Compound(map)
             }
-            Self::EMPTY_ID => {
-                NbtTag::Empty
-            }
+            Self::EMPTY_ID => NbtTag::Empty,
             other => {
                 return Err(NbtError::UnexpectedID(other));
             }
         };
 
         Ok(tag)
+    }
+}
+
+// Implement the Debug trait for NbtTag
+impl Debug for NbtTag {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        // check for pretty format with #
+        match f.alternate() {
+            // normal format
+            false => match self {
+                NbtTag::Byte(v) => {
+                    write!(f, "Byte({v:?})")
+                }
+                NbtTag::Int16(v) => {
+                    write!(f, "Int16({v:?})")
+                }
+                NbtTag::Int32(v) => {
+                    write!(f, "Int32({v:?})")
+                }
+                NbtTag::Int64(v) => {
+                    write!(f, "Int64({v:?})")
+                }
+                NbtTag::Float32(v) => {
+                    write!(f, "Float32({v:?})")
+                }
+                NbtTag::Float64(v) => {
+                    write!(f, "Float64({v:?})")
+                }
+                NbtTag::String(v) => {
+                    write!(f, "{v:?}")
+                }
+                NbtTag::List(v) => {
+                    write!(f, "{v:?}")
+                }
+                NbtTag::Compound(v) => {
+                    write!(f, "{v:?}")
+                }
+                NbtTag::Empty => {
+                    write!(f, "")
+                }
+            },
+            // pretty format
+            true => match self {
+                NbtTag::Byte(v) => {
+                    write!(f, "Byte({v:#?})")
+                }
+                NbtTag::Int16(v) => {
+                    write!(f, "Int16({v:#?})")
+                }
+                NbtTag::Int32(v) => {
+                    write!(f, "Int32({v:#?})")
+                }
+                NbtTag::Int64(v) => {
+                    write!(f, "Int64({v:#?})")
+                }
+                NbtTag::Float32(v) => {
+                    write!(f, "Float32({v:#?})")
+                }
+                NbtTag::Float64(v) => {
+                    write!(f, "Float64({v:#?})")
+                }
+                NbtTag::String(v) => {
+                    write!(f, "{v:#?}")
+                }
+                NbtTag::List(v) => {
+                    write!(f, "{v:#?}")
+                }
+                NbtTag::Compound(v) => {
+                    write!(f, "{v:#?}")
+                }
+                NbtTag::Empty => {
+                    write!(f, "")
+                }
+            },
+        }
     }
 }
