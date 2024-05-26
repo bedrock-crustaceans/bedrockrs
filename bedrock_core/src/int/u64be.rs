@@ -3,6 +3,7 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Rem, RemAssign, Sub, SubAssign};
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[repr(transparent)]
 pub struct u64be(pub u64);
 
 impl Add for u64be {

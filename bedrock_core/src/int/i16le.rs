@@ -5,6 +5,7 @@ use std::ops::{
 };
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[repr(transparent)]
 pub struct i16le(pub i16);
 
 impl Add for i16le {

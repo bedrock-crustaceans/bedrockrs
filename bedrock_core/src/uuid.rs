@@ -4,6 +4,7 @@ use crate::{u128be, u128le};
 /// A Universally Unique Identifier (UUID).
 /// (A simple wrapper around the uuid crates uuid::Uuid type)
 #[derive(Clone, Copy, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[repr(transparent)]
 pub struct UUID(uuid::Uuid);
 
 /// A general error that can occur when working with UUIDs.

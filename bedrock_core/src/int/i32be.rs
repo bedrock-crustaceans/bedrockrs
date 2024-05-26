@@ -5,6 +5,7 @@ use std::ops::{
 };
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[repr(transparent)]
 pub struct i32be(pub i32);
 
 impl Add for i32be {

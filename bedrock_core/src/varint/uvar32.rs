@@ -3,6 +3,7 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Rem, RemAssign, Sub, SubAssign};
 
 #[derive(Debug, Copy, Clone)]
+#[repr(transparent)]
 pub struct uvar32(pub u32);
 
 impl Add for uvar32 {
