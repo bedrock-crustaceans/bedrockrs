@@ -8,7 +8,6 @@ edition = "2021"
 [dependencies]
 bedrock_core = { path = "bedrock_core" }
 
-
 nbt = { path = "nbt" }
 
 proto = { path = "proto" }
@@ -18,3 +17,5 @@ proto_derive = { path = "proto_derive" }
 packs = { path = "packs" }
 
 world = { path = "world" }
+
+form = { path = "form" }
