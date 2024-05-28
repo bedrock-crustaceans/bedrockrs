@@ -16,6 +16,10 @@ const READ_OPTIONS: ReadOptions = ReadOptions {
 const WRITE_OPTIONS: WriteOptions = WriteOptions { sync: true };
 
 impl World {
+
+    /// Opens a world from a directory.
+    /// 
+    /// The leveldb database is in the `db` subdirectory.
     pub fn open(directory: PathBuf) -> Result<World, DBError> {
         Ok(World {
             db: DB::open(
@@ -28,6 +32,7 @@ impl World {
         })
     }
 
+    /// Read a player's NBT data for this world
     pub fn get_player(&self, uuid: Uuid) -> Result<Option<HashMap<String, NbtTag>>, WorldError> {
         let mut str = uuid.to_string();
         str.insert_str(0, "player_");
@@ -55,6 +60,7 @@ impl World {
         }
     }
 
+    /// Set a player's NBT data for this world
     pub fn set_player(&mut self, uuid: Uuid, data: HashMap<String, NbtTag>) -> Result<(), WorldError> {
         let tag = NbtTag::Compound(data);
         match tag.nbt_serialize_vec::<NbtLittleEndian>("") {
