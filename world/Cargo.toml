@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-mojang-leveldb = "0.1.0"
+mojang-leveldb = "0.2.0"
 nbt = { path = "../nbt" }
 thiserror = "1.0.61"
 
