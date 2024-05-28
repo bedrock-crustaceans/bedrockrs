@@ -4,4 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-rusty-leveldb = "3.0.0"
+mojang-leveldb = "0.1.0"
+nbt = { path = "../nbt" }
+thiserror = "1.0.61"
+
+[dependencies.uuid]
+version = "1.8.0"
