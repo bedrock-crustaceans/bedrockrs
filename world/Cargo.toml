@@ -4,9 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-mojang-leveldb = "0.2.0"
+bedrock_core = { path = "../bedrock_core" }
 nbt = { path = "../nbt" }
-thiserror = "1.0.61"
 
-[dependencies.uuid]
-version = "1.8.0"
+mojang-leveldb = "0.2.0"
+thiserror = "1.0.61"

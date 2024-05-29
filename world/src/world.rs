@@ -1,7 +1,7 @@
 use mojang_leveldb::{error::DBError, Options, ReadOptions, WriteBatch, WriteOptions, DB};
 use nbt::{endian::little_endian::NbtLittleEndian, NbtTag};
 use std::{collections::HashMap, path::PathBuf};
-use uuid::Uuid;
+use bedrock_core::uuid::UUID;
 
 use crate::{error::WorldError, str_to_ascii_i8, vec_i8_into_u8, vec_u8_into_i8};
 
@@ -33,7 +33,7 @@ impl World {
     }
 
     /// Read a player's NBT data for this world
-    pub fn get_player(&self, uuid: Uuid) -> Result<Option<HashMap<String, NbtTag>>, WorldError> {
+    pub fn get_player(&self, uuid: UUID) -> Result<Option<HashMap<String, NbtTag>>, WorldError> {
         let mut str = uuid.to_string();
         str.insert_str(0, "player_");
 
@@ -61,7 +61,7 @@ impl World {
     }
 
     /// Set a player's NBT data for this world
-    pub fn set_player(&mut self, uuid: Uuid, data: HashMap<String, NbtTag>) -> Result<(), WorldError> {
+    pub fn set_player(&mut self, uuid: UUID, data: HashMap<String, NbtTag>) -> Result<(), WorldError> {
         let tag = NbtTag::Compound(data);
         match tag.nbt_serialize_vec::<NbtLittleEndian>("") {
             Ok(sertag) => {
