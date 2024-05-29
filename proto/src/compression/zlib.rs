@@ -9,7 +9,7 @@ use crate::error::CompressionError;
 pub struct ZlibCompression {
     pub threshold: u16,
     /// Needs to be a number between 0 and 9.
-    /// Indicitaes how compressed the data becomes.
+    /// Indicates how compressed the data becomes.
     ///
     /// - 0 = None
     /// - 1 = Fastest
