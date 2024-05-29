@@ -1,3 +1,5 @@
+#[allow(non_upper_case_globals)]
+
 use std::io::Write;
 
 use flate2::write::DeflateDecoder;

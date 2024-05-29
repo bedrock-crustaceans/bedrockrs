@@ -1,3 +1,5 @@
+#[allow(non_upper_case_globals)]
+
 use crate::compression::CompressionMethod;
 use crate::error::CompressionError;
 
