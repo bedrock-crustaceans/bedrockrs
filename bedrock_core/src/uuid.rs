@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 use crate::{u128be, u128le};
 
@@ -71,5 +72,11 @@ impl UUID {
     #[inline]
     pub fn from_u128le(v: u128le) -> Self {
         Self(uuid::Uuid::from_u128_le(v.0))
+    }
+}
+
+impl Display for UUID {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
     }
 }
