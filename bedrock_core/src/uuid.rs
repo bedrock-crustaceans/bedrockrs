@@ -8,7 +8,7 @@ use crate::{u128be, u128le};
 pub struct UUID(uuid::Uuid);
 
 /// A general error that can occur when working with UUIDs.
-pub struct UUIDError(uuid::Error);
+pub struct UUIDError(pub uuid::Error);
 
 /// Parse Uuids from string literals at compile time.
 /// This macro transforms the string literal representation of an Uuid into the bytes
