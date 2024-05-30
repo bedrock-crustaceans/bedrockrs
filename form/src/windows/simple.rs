@@ -2,23 +2,27 @@ use serde_json::json;
 
 use crate::elems::button::Button;
 use crate::elems::Element;
-use crate::forms::Form;
+use crate::windows::Form;
 
-pub struct ModalForm {
+pub struct SimpleForm {
     pub title: String,
     pub body: String,
-    pub button1: Button,
-    pub button2: Button,
+    pub buttons: Vec<Button>,
 }
 
-impl Form for ModalForm {
+impl Form for SimpleForm {
     fn form_serialize(&self) -> String {
+        let mut buttons_strings = vec![];
+
+        for button in &self.buttons {
+            buttons_strings.push(button.elem_serialize());
+        }
+
         json!({
             "type": "form",
             "title": self.title,
             "content": self.body,
-            "button1": self.button1.elem_serialize(),
-            "button2": self.button2.elem_serialize(),
+            "buttons": buttons_strings
         })
         .to_string()
     }
