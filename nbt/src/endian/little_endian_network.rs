@@ -1,7 +1,6 @@
 use std::io::{Cursor, Read, Write};
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
-use no_panic::no_panic;
 use varint_rs::{VarintReader, VarintWriter};
 
 use crate::byte_order::NbtByteOrder;
