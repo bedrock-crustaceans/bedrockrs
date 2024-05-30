@@ -1,7 +1,7 @@
 use serde_json::json;
 
 use crate::elems::Element;
-use crate::windows::Form;
+use crate::window::Form;
 
 pub struct CustomForm {
     title: String,

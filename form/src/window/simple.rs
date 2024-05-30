@@ -2,7 +2,7 @@ use serde_json::json;
 
 use crate::elems::button::Button;
 use crate::elems::Element;
-use crate::windows::Form;
+use crate::window::Form;
 
 pub struct SimpleForm {
     pub title: String,
