@@ -23,6 +23,7 @@ pub mod packs {
     pub use packs::*;
 }
 
+#[cfg(feature = "world")]
 pub mod world {
     pub use world::*;
 }

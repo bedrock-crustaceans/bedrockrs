@@ -5,6 +5,10 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+default = []
+world = ["dep:world"]
+
 [dependencies]
 bedrock_core = { path = "bedrock_core" }
 
@@ -16,6 +20,6 @@ proto_derive = { path = "proto_derive" }
 
 packs = { path = "packs" }
 
-world = { path = "world" }
+world = { path = "world", optional = true }
 
 form = { path = "form" }
