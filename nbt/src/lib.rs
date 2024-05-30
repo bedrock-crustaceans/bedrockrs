@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
 use std::io::Cursor;
+use no_panic::no_panic;
 
 use crate::byte_order::NbtByteOrder;
 use crate::error::NbtError;
@@ -87,6 +88,7 @@ impl NbtTag {
 
     /// Returns the tag (open) ID for a given tag.
     #[inline]
+    #[no_panic]
     fn get_id(&self) -> u8 {
         match self {
             NbtTag::Byte(_) => Self::BYTE_ID,
@@ -129,6 +131,7 @@ impl NbtTag {
     /// println!("Nbt: {:#?}", tag);
     /// println!("Raw: {:?}", buf);
     /// ```
+    #[no_panic]
     pub fn nbt_serialize<T: NbtByteOrder>(
         &self,
         key: impl Into<String>,
@@ -154,6 +157,7 @@ impl NbtTag {
     /// Serialize the NBT via a simple vec.
     /// Simpler alternative to [NbtTag::nbt_serialize].
     #[inline]
+    #[no_panic]
     pub fn nbt_serialize_vec<T: NbtByteOrder>(
         &self,
         key: impl Into<String>,
@@ -169,6 +173,7 @@ impl NbtTag {
     /// Serializes a given val without any key or type notation.
     /// Should only be used by the [NbtTag::nbt_serialize] function internally.
     #[inline]
+    #[no_panic]
     fn nbt_serialize_val<T: NbtByteOrder>(&self, buf: &mut Vec<u8>) -> Result<(), NbtError> {
         match self {
             NbtTag::Byte(v) => match T::write_u8(buf, *v) {
@@ -302,6 +307,7 @@ impl NbtTag {
     ///
     /// println!("{:#?}: {:#?}", name, tag);
     /// ```
+    #[no_panic]
     pub fn nbt_deserialize<T: NbtByteOrder>(
         cursor: &mut Cursor<Vec<u8>>,
     ) -> Result<(String, Self), NbtError> {
@@ -330,6 +336,7 @@ impl NbtTag {
     /// Deserialize the NBT via a simple vec.
     /// Simpler alternative to [NbtTag::nbt_deserialize].
     #[inline]
+    #[no_panic]
     pub fn nbt_deserialize_vec<T: NbtByteOrder>(vec: Vec<u8>) -> Result<(String, Self), NbtError> {
         let mut cursor = Cursor::new(vec);
 
@@ -339,6 +346,7 @@ impl NbtTag {
     /// Deserializes a given val without reading any key notation.
     /// Should only be used by the [NbtTag::nbt_deserialize] function internally.
     #[inline]
+    #[no_panic]
     fn nbt_deserialize_val<T: NbtByteOrder>(
         cursor: &mut Cursor<Vec<u8>>,
         id: u8,
@@ -486,6 +494,7 @@ impl NbtTag {
 
 // Implement the Debug trait for NbtTag
 impl Debug for NbtTag {
+    #[no_panic]
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         // check for pretty format with #
         match f.alternate() {
