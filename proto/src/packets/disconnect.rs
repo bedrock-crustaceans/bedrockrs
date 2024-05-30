@@ -7,6 +7,7 @@ use proto_core::ProtoCodec;
 #[derive(Debug)]
 pub struct DisconnectPacket {
     /// TODO: Convert into enum, if possible
+    ///
     /// Seems to have no effect on the message being shown.
     /// It is just for telemetry.
     pub reason: ivar32,
