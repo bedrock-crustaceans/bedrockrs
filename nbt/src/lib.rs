@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
 use std::io::Cursor;
-use no_panic::no_panic;
 
 use crate::byte_order::NbtByteOrder;
 use crate::error::NbtError;
