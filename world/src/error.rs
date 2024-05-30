@@ -12,5 +12,4 @@ pub enum WorldError {
 
     #[error("Format Error: {0}")]
     FormatError(String)
-
 }
