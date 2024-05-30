@@ -45,8 +45,8 @@ pub enum NbtTag {
     List(Vec<NbtTag>),
     /// A key-value pair map of NBTs.
     ///
-    /// Each key is a String with a following NBT tag.
-    /// Tags enum variants may vary.
+    /// Each key is a String with the following NBT tag.
+    /// Tag enum variants may vary.
     /// Compound tags are special because they are opened by the [NbtTag::COMPOUND_ID_START]
     /// and closed again by the [NbtTag::COMPOUND_ID_END].
     Compound(HashMap<String, NbtTag>),
@@ -102,7 +102,7 @@ impl NbtTag {
         }
     }
 
-    /// Serializes a given NBT with a given key into the given buffer.
+    /// Serializes a given NBT with a given root tag name into the given buffer.
     /// Use the provided endian for serialization.
     ///
     /// Use [NbtTag::nbt_serialize] as a simple alternative that just returns
@@ -131,7 +131,7 @@ impl NbtTag {
     /// ```
     pub fn nbt_serialize<T: NbtByteOrder>(
         &self,
-        key: impl Into<String>,
+        root_tag_name: impl Into<String>,
         buf: &mut Vec<u8>,
     ) -> Result<(), NbtError> {
         match T::write_u8(buf, self.get_id()) {
@@ -141,7 +141,7 @@ impl NbtTag {
             }
         }
 
-        match T::write_string(buf, key.into()) {
+        match T::write_string(buf, root_tag_name.into()) {
             Ok(_) => {}
             Err(e) => {
                 return Err(e);
@@ -166,7 +166,7 @@ impl NbtTag {
         }
     }
 
-    /// Serializes a given val without any key or type notation.
+    /// Serializes a given val without any root tag name or type notation.
     /// Should only be used by the [NbtTag::nbt_serialize] function internally.
     #[inline]
     fn nbt_serialize_val<T: NbtByteOrder>(&self, buf: &mut Vec<u8>) -> Result<(), NbtError> {
@@ -252,8 +252,8 @@ impl NbtTag {
             NbtTag::Compound(v) => {
                 let iter = v.iter();
 
-                for (key, v) in iter {
-                    match v.nbt_serialize::<T>(key, buf) {
+                for (tag_name, v) in iter {
+                    match v.nbt_serialize::<T>(tag_name, buf) {
                         Ok(_) => {}
                         Err(e) => {
                             return Err(e);
@@ -274,7 +274,7 @@ impl NbtTag {
         Ok(())
     }
 
-    /// Deserializes an NBT from a given buffer, returns the NBT and its name.
+    /// Deserializes an NBT from a given buffer, returns the NBT and its root tag name.
     /// Uses the provided endian encoding for deserialization.
     ///
     /// Use [NbtTag::nbt_deserialize_vec] as a simple alternative that just takes
@@ -336,7 +336,7 @@ impl NbtTag {
         NbtTag::nbt_deserialize::<T>(&mut cursor)
     }
 
-    /// Deserializes a given val without reading any key notation.
+    /// Deserializes a given val without reading any tag name notation.
     /// Should only be used by the [NbtTag::nbt_deserialize] function internally.
     #[inline]
     fn nbt_deserialize_val<T: NbtByteOrder>(
