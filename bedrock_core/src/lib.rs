@@ -27,3 +27,4 @@ pub mod int;
 pub mod varint;
 pub mod vec;
 pub mod uuid;
+pub mod permissions_level;
