@@ -78,7 +78,7 @@ impl NbtByteOrder for NbtBigEndian {
     }
 
     #[inline]
-    fn read_u8(buf: &mut Cursor<Vec<u8>>) -> Result<u8, NbtError> {
+    fn read_u8(buf: &mut Cursor<&Vec<u8>>) -> Result<u8, NbtError> {
         match buf.read_u8() {
             Ok(v) => Ok(v),
             Err(e) => Err(NbtError::IOError(e)),
@@ -86,7 +86,7 @@ impl NbtByteOrder for NbtBigEndian {
     }
 
     #[inline]
-    fn read_i16(buf: &mut Cursor<Vec<u8>>) -> Result<i16, NbtError> {
+    fn read_i16(buf: &mut Cursor<&Vec<u8>>) -> Result<i16, NbtError> {
         match buf.read_i16::<BigEndian>() {
             Ok(v) => Ok(v),
             Err(e) => Err(NbtError::IOError(e)),
@@ -94,7 +94,7 @@ impl NbtByteOrder for NbtBigEndian {
     }
 
     #[inline]
-    fn read_i32(buf: &mut Cursor<Vec<u8>>) -> Result<i32, NbtError> {
+    fn read_i32(buf: &mut Cursor<&Vec<u8>>) -> Result<i32, NbtError> {
         match buf.read_i32::<BigEndian>() {
             Ok(v) => Ok(v),
             Err(e) => Err(NbtError::IOError(e)),
@@ -102,7 +102,7 @@ impl NbtByteOrder for NbtBigEndian {
     }
 
     #[inline]
-    fn read_i64(buf: &mut Cursor<Vec<u8>>) -> Result<i64, NbtError> {
+    fn read_i64(buf: &mut Cursor<&Vec<u8>>) -> Result<i64, NbtError> {
         match buf.read_i64::<BigEndian>() {
             Ok(v) => Ok(v),
             Err(e) => Err(NbtError::IOError(e)),
@@ -110,7 +110,7 @@ impl NbtByteOrder for NbtBigEndian {
     }
 
     #[inline]
-    fn read_f32(buf: &mut Cursor<Vec<u8>>) -> Result<f32, NbtError> {
+    fn read_f32(buf: &mut Cursor<&Vec<u8>>) -> Result<f32, NbtError> {
         match buf.read_f32::<BigEndian>() {
             Ok(v) => Ok(v),
             Err(e) => Err(NbtError::IOError(e)),
@@ -118,7 +118,7 @@ impl NbtByteOrder for NbtBigEndian {
     }
 
     #[inline]
-    fn read_f64(buf: &mut Cursor<Vec<u8>>) -> Result<f64, NbtError> {
+    fn read_f64(buf: &mut Cursor<&Vec<u8>>) -> Result<f64, NbtError> {
         match buf.read_f64::<BigEndian>() {
             Ok(v) => Ok(v),
             Err(e) => Err(NbtError::IOError(e)),
@@ -126,7 +126,7 @@ impl NbtByteOrder for NbtBigEndian {
     }
 
     #[inline]
-    fn read_string(buf: &mut Cursor<Vec<u8>>) -> Result<String, NbtError> {
+    fn read_string(buf: &mut Cursor<&Vec<u8>>) -> Result<String, NbtError> {
         let len = match Self::read_i16(buf) {
             Ok(v) => v,
             Err(e) => return Err(e),
