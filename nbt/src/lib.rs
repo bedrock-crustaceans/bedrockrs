@@ -340,7 +340,7 @@ impl NbtTag {
     /// Should only be used by the [NbtTag::nbt_deserialize] function internally.
     #[inline]
     fn nbt_deserialize_val<T: NbtByteOrder>(
-        cursor: &mut Cursor<Vec<u8>>,
+        cursor: &mut Cursor<&Vec<u8>>,
         id: u8,
     ) -> Result<Self, NbtError> {
         let tag = match id {
