@@ -29,3 +29,4 @@ pub mod vec;
 pub mod uuid;
 pub mod permissions_level;
 pub mod difficulty;
+pub mod dimension;
