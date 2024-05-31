@@ -23,6 +23,7 @@ pub use vec::vec2f::Vec2f;
 pub use vec::vec3::Vec3;
 pub use vec::vec3f::Vec3f;
 
+pub mod stream;
 pub mod int;
 pub mod varint;
 pub mod vec;
