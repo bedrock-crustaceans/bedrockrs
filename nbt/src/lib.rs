@@ -296,7 +296,7 @@ impl NbtTag {
     ///     42, 0, 0, 0, 0
     /// ];
     ///
-    /// let mut cursor = Cursor::new(data);
+    /// let mut cursor = Cursor::new(&data);
     ///
     /// let (tag, name) = NbtTag::nbt_deserialize::<NbtLittleEndian>(&mut cursor).unwrap();
     ///
