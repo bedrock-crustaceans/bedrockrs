@@ -116,8 +116,8 @@ impl NbtTag {
     ///
     /// let mut map = HashMap::new();
     ///
-    /// map.insert("My Text".to_string(), NbtTag::String("This is my text".to_string()));
-    /// map.insert("My int32".to_string(), NbtTag::Int32(42));
+    /// map.insert("MyText".to_string(), NbtTag::String("This is my text".to_string()));
+    /// map.insert("MyInt32".to_string(), NbtTag::Int32(42));
     ///
     /// let tag = NbtTag::Compound(map);
     ///
