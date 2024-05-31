@@ -303,7 +303,7 @@ impl NbtTag {
     /// println!("{:#?}: {:#?}", name, tag);
     /// ```
     pub fn nbt_deserialize<T: NbtByteOrder>(
-        cursor: &mut Cursor<Vec<u8>>,
+        cursor: &mut Cursor<&Vec<u8>>,
     ) -> Result<(String, Self), NbtError> {
         let id = match T::read_u8(cursor) {
             Ok(v) => v,
@@ -330,7 +330,7 @@ impl NbtTag {
     /// Deserialize the NBT via a simple vec.
     /// Simpler alternative to [NbtTag::nbt_deserialize].
     #[inline]
-    pub fn nbt_deserialize_vec<T: NbtByteOrder>(vec: Vec<u8>) -> Result<(String, Self), NbtError> {
+    pub fn nbt_deserialize_vec<T: NbtByteOrder>(vec: &Vec<u8>) -> Result<(String, Self), NbtError> {
         let mut cursor = Cursor::new(vec);
 
         NbtTag::nbt_deserialize::<T>(&mut cursor)
