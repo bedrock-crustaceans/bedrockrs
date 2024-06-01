@@ -7,5 +7,5 @@ edition = "2021"
 bedrock_core = { path = "../bedrock_core" }
 nbt = { path = "../nbt" }
 
-mojang-leveldb = "0.2.0"
-thiserror = "1.0.61"
+mojang-leveldb = "0.2"
+thiserror = "1.0"
