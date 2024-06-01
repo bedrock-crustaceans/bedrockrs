@@ -36,13 +36,13 @@ pub enum NbtTag {
     Float32(f32),
     /// A 64-bit float
     Float64(f64),
-    /// a simple string
+    /// A simple string
     /// Should never be larger than [i16::MAX]
     String(String),
     /// A list of NBTs.
     ///
     /// All elements should use the same enum variant.
-    /// The serialized type declaration is the 1st element in the list
+    /// The serialized type declaration is the first element in the list
     List(Vec<NbtTag>),
     /// A key-value pair map of NBTs.
     ///
@@ -103,7 +103,8 @@ impl NbtTag {
         }
     }
 
-    /// Serializes a given NBT with a given root tag name into the given buffer.
+    /// Serializes a given NBT with a given root tag
+    /// (the root tags name is nearly always left empty) name into the given buffer.
     /// Use the provided endian for serialization.
     ///
     /// Use [NbtTag::nbt_serialize] as a simple alternative that just returns
@@ -125,7 +126,7 @@ impl NbtTag {
     /// let mut buf = vec![];
     ///
     /// // You can also use other endian encodings
-    /// NbtTag::nbt_serialize::<NbtLittleEndian>(&tag, "my nbt", &mut buf).unwrap();
+    /// NbtTag::nbt_serialize::<NbtLittleEndian>(&tag, "", &mut buf).unwrap();
     ///
     /// println!("Nbt: {:#?}", tag);
     /// println!("Raw: {:?}", buf);
@@ -275,10 +276,11 @@ impl NbtTag {
         Ok(())
     }
 
-    /// Deserializes an NBT from a given buffer, returns the NBT and its root tag name.
+    /// Deserializes an NBT from a [`ByteStreamRead`], returns the NBT and its root tag name
+    /// (The root tag name is nearly always left empty).
     /// Uses the provided endian encoding for deserialization.
     ///
-    /// Use [NbtTag::nbt_deserialize_vec] as a simple alternative that just takes
+    /// Use [`NbtTag::nbt_deserialize_vec`] as a simple alternative that just takes
     /// a vec as an argument.
     ///
     /// # Example:
@@ -298,8 +300,10 @@ impl NbtTag {
     ///     42, 0, 0, 0, 0
     /// ];
     ///
+    /// // Create the stream
     /// let mut stream = ByteStreamRead::from(data);
     ///
+    /// // Read the nbt tag and its name
     /// let (tag, name) = NbtTag::nbt_deserialize::<NbtLittleEndian>(&mut stream).unwrap();
     ///
     /// println!("{:#?}: {:#?}", name, tag);
