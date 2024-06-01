@@ -1,16 +1,16 @@
 use std::f32;
-use std::io::{Cursor, Read, Write};
+use std::io::{Read, Write};
 
 use bedrock_core::*;
-use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
-use varint_rs::{VarintReader, VarintWriter};
+use bedrock_core::stream::read::ByteStreamRead;
+use bedrock_core::stream::write::ByteStreamWrite;
 
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 
 // i8
 impl ProtoCodec for i8 {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
@@ -20,7 +20,7 @@ impl ProtoCodec for i8 {
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
@@ -33,7 +33,7 @@ impl ProtoCodec for i8 {
 
 // u8
 impl ProtoCodec for u8 {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
@@ -43,7 +43,7 @@ impl ProtoCodec for u8 {
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
@@ -56,44 +56,44 @@ impl ProtoCodec for u8 {
 
 // i16
 impl ProtoCodec for i16le {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_i16::<LittleEndian>(self.0) {
+        match buf.write_i16le(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_i16::<LittleEndian>() {
-            Ok(v) => Ok(Self(v)),
+        match data.read_i16le() {
+            Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 }
 
 impl ProtoCodec for i16be {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_i16::<BigEndian>(self.0) {
+        match buf.write_i16be(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_i16::<BigEndian>() {
-            Ok(v) => Ok(Self(v)),
+        match data.read_i16be() {
+            Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
@@ -101,44 +101,44 @@ impl ProtoCodec for i16be {
 
 // u16
 impl ProtoCodec for u16le {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_u16::<LittleEndian>(self.0) {
+        match buf.write_u16le(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_u16::<LittleEndian>() {
-            Ok(v) => Ok(Self(v)),
+        match data.read_u16le() {
+            Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 }
 
 impl ProtoCodec for u16be {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_u16::<BigEndian>(self.0) {
+        match buf.write_u16be(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_u16::<BigEndian>() {
-            Ok(v) => Ok(Self(v)),
+        match data.read_u16be() {
+            Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
@@ -147,44 +147,44 @@ impl ProtoCodec for u16be {
 // i32
 
 impl ProtoCodec for i32le {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_i32::<LittleEndian>(self.0) {
+        match buf.write_i32le(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_i32::<LittleEndian>() {
-            Ok(v) => Ok(Self(v)),
+        match data.read_i32le() {
+            Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 }
 
 impl ProtoCodec for i32be {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_i32::<BigEndian>(self.0) {
+        match buf.write_i32be(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_i32::<BigEndian>() {
-            Ok(v) => Ok(Self(v)),
+        match data.read_i32be() {
+            Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
@@ -193,44 +193,44 @@ impl ProtoCodec for i32be {
 // u32
 
 impl ProtoCodec for u32le {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_u32::<LittleEndian>(self.0) {
+        match buf.write_u32le(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_u32::<LittleEndian>() {
-            Ok(v) => Ok(Self(v)),
+        match data.read_u32le() {
+            Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 }
 
 impl ProtoCodec for u32be {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_u32::<BigEndian>(self.0) {
+        match buf.write_u32be(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_u32::<BigEndian>() {
-            Ok(v) => Ok(Self(v)),
+        match data.read_u32be() {
+            Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
@@ -239,44 +239,44 @@ impl ProtoCodec for u32be {
 // i64
 
 impl ProtoCodec for i64le {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_i64::<LittleEndian>(self.0) {
+        match buf.write_i64le(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_i64::<LittleEndian>() {
-            Ok(v) => Ok(Self(v)),
+        match data.read_i64le() {
+            Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 }
 
 impl ProtoCodec for i64be {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_i64::<BigEndian>(self.0) {
+        match buf.write_i64be(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_i64::<BigEndian>() {
-            Ok(v) => Ok(Self(v)),
+        match data.read_i64be() {
+            Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
@@ -285,22 +285,22 @@ impl ProtoCodec for i64be {
 // u64
 
 impl ProtoCodec for u64le {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_u64::<LittleEndian>(self.0) {
+        match buf.write_u64le(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_u64::<LittleEndian>() {
-            Ok(v) => Ok(Self(v)),
+        match data.read_u64le() {
+            Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
@@ -309,44 +309,44 @@ impl ProtoCodec for u64le {
 // i128
 
 impl ProtoCodec for i128le {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_i128::<LittleEndian>(self.0) {
+        match buf.write_i128le(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_i128::<LittleEndian>() {
-            Ok(v) => Ok(Self(v)),
+        match data.read_i128le() {
+            Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 }
 
 impl ProtoCodec for i128be {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_i128::<BigEndian>(self.0) {
+        match buf.write_i128be(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_i128::<BigEndian>() {
-            Ok(v) => Ok(Self(v)),
+        match data.read_i128be() {
+            Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
@@ -355,44 +355,44 @@ impl ProtoCodec for i128be {
 // u128
 
 impl ProtoCodec for u128le {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_u128::<LittleEndian>(self.0) {
+        match buf.write_u128le(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_u128::<LittleEndian>() {
-            Ok(v) => Ok(Self(v)),
+        match data.read_u128le() {
+            Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 }
 
 impl ProtoCodec for u128be {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_u128::<BigEndian>(self.0) {
+        match buf.write_u128be(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_u128::<BigEndian>() {
-            Ok(v) => Ok(Self(v)),
+        match data.read_u128be() {
+            Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
@@ -401,21 +401,21 @@ impl ProtoCodec for u128be {
 // f32
 
 impl ProtoCodec for f32 {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_f32::<LittleEndian>(*self) {
+        match buf.write_f32le(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_f32::<LittleEndian>() {
+        match data.read_f32le() {
             Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
@@ -425,21 +425,21 @@ impl ProtoCodec for f32 {
 // f64
 
 impl ProtoCodec for f64 {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_f64::<LittleEndian>(*self) {
+        match buf.write_f64le(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_f64::<LittleEndian>() {
+        match data.read_f64le() {
             Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
@@ -449,22 +449,22 @@ impl ProtoCodec for f64 {
 // uvarint 32
 
 impl ProtoCodec for uvar32 {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_u32_varint(self.0) {
+        match buf.write_uvar32(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_u32_varint() {
-            Ok(v) => Ok(Self(v)),
+        match data.read_uvar32() {
+            Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
@@ -473,22 +473,22 @@ impl ProtoCodec for uvar32 {
 // ivarint 32
 
 impl ProtoCodec for ivar32 {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_i32_varint(self.0) {
+        match buf.write_ivar32(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_i32_varint() {
-            Ok(v) => Ok(Self(v)),
+        match data.read_ivar32() {
+            Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
@@ -497,22 +497,22 @@ impl ProtoCodec for ivar32 {
 // uvarint 64
 
 impl ProtoCodec for uvar64 {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_u64_varint(self.0) {
+        match buf.write_uvar64(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_u64_varint() {
-            Ok(v) => Ok(Self(v)),
+        match data.read_uvar64() {
+            Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
@@ -521,22 +521,22 @@ impl ProtoCodec for uvar64 {
 // ivarint 64
 
 impl ProtoCodec for ivar64 {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_i64_varint(self.0) {
+        match buf.write_ivar64(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
 
-    fn proto_deserialize(data: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(data: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match data.read_i64_varint() {
-            Ok(v) => Ok(Self(v)),
+        match data.read_ivar64() {
+            Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(e)),
         }
     }
@@ -545,7 +545,7 @@ impl ProtoCodec for ivar64 {
 // bool
 
 impl ProtoCodec for bool {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
@@ -561,12 +561,12 @@ impl ProtoCodec for bool {
         }
     }
 
-    fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
         // a bool is represented as a byte
-        return match cursor.read_u8() {
+        return match stream.read_u8() {
             Ok(v) => {
                 match v {
                     // 0 is counted as false
@@ -583,11 +583,11 @@ impl ProtoCodec for bool {
 // String
 
 impl ProtoCodec for String {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_u32_varint(self.len() as u32) {
+        match buf.write_uvar32(uvar32(self.len() as u32)) {
             Ok(_) => {}
             Err(e) => return Err(ProtoCodecError::IOError(e)),
         };
@@ -600,12 +600,12 @@ impl ProtoCodec for String {
         Ok(())
     }
 
-    fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        let len = match cursor.read_u32_varint() {
-            Ok(v) => v,
+        let len = match stream.read_uvar32() {
+            Ok(v) => v.0,
             Err(e) => {
                 return Err(ProtoCodecError::IOError(e));
             }
@@ -613,7 +613,7 @@ impl ProtoCodec for String {
 
         let mut string_buf = vec![0u8; len as usize];
 
-        match cursor.read_exact(&mut *string_buf) {
+        match stream.read_exact(&mut *string_buf) {
             Ok(_) => {}
             Err(e) => {
                 return Err(ProtoCodecError::IOError(e));
@@ -630,11 +630,11 @@ impl ProtoCodec for String {
 // vec
 
 impl<T: ProtoCodec> ProtoCodec for Vec<T> {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match buf.write_u32_varint(self.len() as u32) {
+        match buf.write_uvar32(uvar32(self.len() as u32)) {
             Ok(_) => {}
             Err(e) => return Err(ProtoCodecError::IOError(e)),
         };
@@ -649,12 +649,12 @@ impl<T: ProtoCodec> ProtoCodec for Vec<T> {
         Ok(())
     }
 
-    fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        let len = match cursor.read_u32_varint() {
-            Ok(v) => v,
+        let len = match stream.read_uvar32() {
+            Ok(v) => v.0,
             Err(e) => {
                 return Err(ProtoCodecError::IOError(e));
             }
@@ -663,7 +663,7 @@ impl<T: ProtoCodec> ProtoCodec for Vec<T> {
         let mut array = vec![];
 
         for _ in 0..len {
-            array.push(match T::proto_deserialize(cursor) {
+            array.push(match T::proto_deserialize(stream) {
                 Ok(v) => v,
                 Err(e) => {
                     return Err(e);
@@ -678,7 +678,7 @@ impl<T: ProtoCodec> ProtoCodec for Vec<T> {
 // option
 
 impl<T: ProtoCodec> ProtoCodec for Option<T> {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
@@ -701,14 +701,14 @@ impl<T: ProtoCodec> ProtoCodec for Option<T> {
         }
     }
 
-    fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match bool::proto_deserialize(cursor) {
+        match bool::proto_deserialize(stream) {
             Ok(v) => match v {
                 false => Ok(Option::None),
-                true => match T::proto_deserialize(cursor) {
+                true => match T::proto_deserialize(stream) {
                     Ok(v) => Ok(Option::Some(v)),
                     Err(e) => Err(e),
                 },
@@ -719,7 +719,7 @@ impl<T: ProtoCodec> ProtoCodec for Option<T> {
 }
 
 impl ProtoCodec for Vec2 {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
@@ -740,18 +740,18 @@ impl ProtoCodec for Vec2 {
         Ok(())
     }
 
-    fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
         Ok(Self {
-            x: match i32le::proto_deserialize(cursor) {
+            x: match i32le::proto_deserialize(stream) {
                 Ok(v) => v,
                 Err(e) => {
                     return Err(e);
                 }
             },
-            z: match i32le::proto_deserialize(cursor) {
+            z: match i32le::proto_deserialize(stream) {
                 Ok(v) => v,
                 Err(e) => {
                     return Err(e);
@@ -762,7 +762,7 @@ impl ProtoCodec for Vec2 {
 }
 
 impl ProtoCodec for Vec2f {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
@@ -783,18 +783,18 @@ impl ProtoCodec for Vec2f {
         Ok(())
     }
 
-    fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
         Ok(Self {
-            x: match f32::proto_deserialize(cursor) {
+            x: match f32::proto_deserialize(stream) {
                 Ok(v) => v,
                 Err(e) => {
                     return Err(e);
                 }
             },
-            z: match f32::proto_deserialize(cursor) {
+            z: match f32::proto_deserialize(stream) {
                 Ok(v) => v,
                 Err(e) => {
                     return Err(e);
@@ -805,7 +805,7 @@ impl ProtoCodec for Vec2f {
 }
 
 impl ProtoCodec for Vec3 {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
@@ -833,24 +833,24 @@ impl ProtoCodec for Vec3 {
         Ok(())
     }
 
-    fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
         Ok(Self {
-            x: match i32le::proto_deserialize(cursor) {
+            x: match i32le::proto_deserialize(stream) {
                 Ok(v) => v,
                 Err(e) => {
                     return Err(e);
                 }
             },
-            y: match i32le::proto_deserialize(cursor) {
+            y: match i32le::proto_deserialize(stream) {
                 Ok(v) => v,
                 Err(e) => {
                     return Err(e);
                 }
             },
-            z: match i32le::proto_deserialize(cursor) {
+            z: match i32le::proto_deserialize(stream) {
                 Ok(v) => v,
                 Err(e) => {
                     return Err(e);
@@ -861,7 +861,7 @@ impl ProtoCodec for Vec3 {
 }
 
 impl ProtoCodec for Vec3f {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
@@ -889,24 +889,24 @@ impl ProtoCodec for Vec3f {
         Ok(())
     }
 
-    fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
         Ok(Self {
-            x: match f32::proto_deserialize(cursor) {
+            x: match f32::proto_deserialize(stream) {
                 Ok(v) => v,
                 Err(e) => {
                     return Err(e);
                 }
             },
-            y: match f32::proto_deserialize(cursor) {
+            y: match f32::proto_deserialize(stream) {
                 Ok(v) => v,
                 Err(e) => {
                     return Err(e);
                 }
             },
-            z: match f32::proto_deserialize(cursor) {
+            z: match f32::proto_deserialize(stream) {
                 Ok(v) => v,
                 Err(e) => {
                     return Err(e);

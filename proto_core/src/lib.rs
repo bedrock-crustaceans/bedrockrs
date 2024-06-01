@@ -1,4 +1,5 @@
-use std::io::Cursor;
+use bedrock_core::stream::read::ByteStreamRead;
+use bedrock_core::stream::write::ByteStreamWrite;
 
 use crate::error::ProtoCodecError;
 
@@ -6,7 +7,7 @@ pub mod error;
 pub mod types;
 
 pub trait ProtoCodec: Sized {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>;
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>;
 
-    fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>;
+    fn proto_deserialize(cursor: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>;
 }
