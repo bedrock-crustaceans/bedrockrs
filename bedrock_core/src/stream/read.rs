@@ -1,5 +1,5 @@
 use std::io::Read;
-use bytes::{Buf, Bytes, BytesMut};
+use bytes::{Buf, Bytes};
 use byteorder::{BigEndian, LittleEndian, ReadBytesExt};
 use bytes::buf::Reader;
 use varint_rs::VarintReader;
@@ -240,21 +240,94 @@ impl ByteStreamRead {
         }
     }
 
-    /// Read a f32
+    /// Read a f32le
     #[inline]
-    pub fn read_f32(&mut self) -> Result<f32, std::io::Error> {
+    pub fn read_f32le(&mut self) -> Result<f32, std::io::Error> {
         match self.0.read_f32::<LittleEndian>() {
             Ok(v) => { Ok(v) }
             Err(e) => { Err(e) }
         }
     }
 
-    /// Read a f64
+    /// Read a f32be
     #[inline]
-    pub fn read_f64(&mut self) -> Result<f64, std::io::Error> {
+    pub fn read_f32be(&mut self) -> Result<f32, std::io::Error> {
+        match self.0.read_f32::<BigEndian>() {
+            Ok(v) => { Ok(v) }
+            Err(e) => { Err(e) }
+        }
+    }
+
+    /// Read a f64le
+    #[inline]
+    pub fn read_f64le(&mut self) -> Result<f64, std::io::Error> {
+        match self.0.read_f64::<LittleEndian>() {
+            Ok(v) => { Ok(v) }
+            Err(e) => { Err(e) }
+        }
+    }
+
+    /// Read a f64be
+    #[inline]
+    pub fn read_f64be(&mut self) -> Result<f64, std::io::Error> {
         match self.0.read_f64::<BigEndian>() {
             Ok(v) => { Ok(v) }
             Err(e) => { Err(e) }
         }
+    }
+
+    #[inline]
+    pub fn read_exact(&mut self, buf: &mut [u8]) -> Result<(), std::io::Error> {
+        self.0.read_exact(buf)
+    }
+}
+
+
+impl Default for ByteStreamRead {
+    #[inline]
+    fn default() -> ByteStreamRead {
+        ByteStreamRead::new()
+    }
+}
+
+impl From<&'static [u8]> for ByteStreamRead {
+    #[inline]
+    fn from(slice: &'static [u8]) -> ByteStreamRead {
+        ByteStreamRead::from_static(slice)
+    }
+}
+
+impl From<&'static str> for ByteStreamRead {
+    #[inline]
+    fn from(slice: &'static str) -> ByteStreamRead {
+        ByteStreamRead::from_static(slice.as_bytes())
+    }
+}
+
+impl From<Vec<u8>> for ByteStreamRead {
+    #[inline]
+    fn from(vec: Vec<u8>) -> ByteStreamRead {
+        ByteStreamRead::from_bytes(Bytes::from(vec))
+    }
+}
+
+impl From<Box<[u8]>> for ByteStreamRead {
+    #[inline]
+    fn from(slice: Box<[u8]>) -> ByteStreamRead {
+        ByteStreamRead::from_bytes(Bytes::from(slice))
+    }
+}
+
+impl From<String> for ByteStreamRead {
+    #[inline]
+    fn from(s: String) -> ByteStreamRead {
+        ByteStreamRead::from_bytes(Bytes::from(s))
+    }
+}
+
+impl From<ByteStreamRead> for Vec<u8> {
+    #[inline]
+    fn from(bytes: ByteStreamRead) -> Vec<u8> {
+        Vec::from(bytes.0.into_inner())
     }
 }
