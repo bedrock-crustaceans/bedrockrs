@@ -10,12 +10,15 @@ use nbt::endian::little_endian::NbtLittleEndian;
 use nbt::NbtTag;
 
 use crate::error::WorldError;
-use crate::level_dat::abilities::WorldAbilities;
+use crate::level_dat::abilities::LevelDatAbilities;
 
-pub struct WorldGameRules {
-    allow_destructive_objects: NbtTag,
-}
-
+/// A struct representing the data found in the `level.dat` and `level.dat_old` files for
+/// the Minecraft Bedrock Level Format.
+///
+/// The `level.dat` is still in uncompressed NBT format.
+/// The file begins with an 8-byte header, consisting of a little-endian 4-byte integer
+/// indicating the version of the file, which is currently 10. It is followed by another integer
+/// containing the length of the file, minus the header.
 #[derive(Debug)]
 pub struct LevelDat {
     /// Specifies the name of the world. (NBT entry: `LevelName`)
@@ -25,7 +28,7 @@ pub struct LevelDat {
     pub format_version: i32,
 
     /// The default permissions for players in the world. (NBT entry: `abilities`)
-    pub abilities: WorldAbilities,
+    pub abilities: LevelDatAbilities,
 
     /// A key value pair map for each experiment that Minecraft has/had.
     /// It is impossible to parse all Experiments due to frequent changes.
@@ -66,7 +69,14 @@ pub struct LevelDat {
 }
 
 impl LevelDat {
+    /// Opens the `level.dat` file from a given Minecraft Bedrock world directory.
+    ///
+    /// Returns the header of the `level.dat` file and a [`LevelDat`] object, the header consists
+    /// of two `i32` integers which represent the version of the Minecraft Bedrock world
+    /// (which currently is `10`) and the length of the `level.dat` file excluding the header size.
     pub fn open(directory: &PathBuf) -> Result<(i32, i32, Self), WorldError> {
+        // Open the level.dat file
+        // TODO find out why there is a level.dat_old file as well and how it can be utilised
         let mut file = match File::open(directory.join("level.dat")) {
             Ok(v) => v,
             Err(e) => {
@@ -74,8 +84,8 @@ impl LevelDat {
             }
         };
 
+        // Read the entire level.dat file
         let mut data = vec![];
-
         match file.read_to_end(&mut data) {
             Ok(_) => {}
             Err(e) => {
@@ -83,8 +93,10 @@ impl LevelDat {
             }
         };
 
+        // Build a ByteStreamRead with the file contents
         let mut stream = ByteStreamRead::from(data);
 
+        // Read the worlds format version
         let version = match stream.read_i32le() {
             Ok(v) => v.0,
             Err(e) => {
@@ -92,6 +104,7 @@ impl LevelDat {
             }
         };
 
+        // Read the level.dat size (without the header)
         let length = match stream.read_i32le() {
             Ok(v) => v.0,
             Err(e) => {
@@ -99,6 +112,7 @@ impl LevelDat {
             }
         };
 
+        // Read the uncompressed nbt tag
         let (_, nbt) = match NbtTag::nbt_deserialize::<NbtLittleEndian>(&mut stream) {
             Ok(v) => v,
             Err(e) => {
@@ -106,6 +120,7 @@ impl LevelDat {
             }
         };
 
+        // Parse the nbt tag into the LevelDat struct
         let level_dat = match Self::parse(nbt) {
             Ok(v) => v,
             Err(e) => {
@@ -116,6 +131,7 @@ impl LevelDat {
         Ok((version, length, level_dat))
     }
 
+    /// Parses a given [`NbtTag`] into a [`LevelDat`] object.
     pub fn parse(tag: NbtTag) -> Result<Self, WorldError> {
         fn get_string(map: &mut HashMap<String, NbtTag>, key: &str) -> Result<String, WorldError> {
             match map.remove(key) {
@@ -208,10 +224,11 @@ impl LevelDat {
         }
 
         match tag {
+            // It must be a compound tag
             NbtTag::Compound(mut map) => Ok(Self {
                 level_name: get_string(&mut map, "LevelName")?,
                 format_version: get_int32(&mut map, "StorageVersion")?,
-                abilities: WorldAbilities::parse(match map.remove("abilities") {
+                abilities: LevelDatAbilities::parse(match map.remove("abilities") {
                     Some(v) => v,
                     None => Err(WorldError::FormatError(format!(
                         "Missing field `abilities` in LevelDat"

@@ -5,9 +5,10 @@ use nbt::NbtTag;
 
 use crate::error::WorldError;
 
-/// The default permissions for players in the world.
+/// Represents the `abilities` compound tag in the `level.dat` and `level.dat_old` files,
+/// it's for storing the default permissions for players in the world.
 #[derive(Debug)]
-pub struct WorldAbilities {
+pub struct LevelDatAbilities {
     /// If the player can attack mobs. (NBT entry: `attackmobs`)
     pub attack_mobs: bool,
     /// If the player can attack other players. (NBT entry: `attackplayers`)
@@ -51,7 +52,8 @@ pub struct WorldAbilities {
     pub permissions_level_default: Option<PermissionLevel>,
 }
 
-impl WorldAbilities {
+impl LevelDatAbilities {
+    /// Parses a given [`NbtTag`] into a [`LevelDatAbilities`] object.
     pub fn parse(tag: NbtTag) -> Result<Self, WorldError> {
         fn get_byte_as_bool(
             map: &mut HashMap<String, NbtTag>,
