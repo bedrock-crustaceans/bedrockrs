@@ -1,8 +1,7 @@
 use nbt::error::NbtError;
 use thiserror::Error;
 
-#[derive(Error)]
-#[derive(Debug)]
+#[derive(Error, Debug)]
 pub enum WorldError {
     #[error("DB Error: {0}")]
     DBError(mojang_leveldb::error::DBError),
@@ -11,5 +10,5 @@ pub enum WorldError {
     NbtError(NbtError),
 
     #[error("Format Error: {0}")]
-    FormatError(String)
+    FormatError(String),
 }

@@ -1,5 +1,6 @@
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
+
 use crate::{u128be, u128le};
 
 /// A Universally Unique Identifier (UUID).
@@ -27,8 +28,8 @@ impl FromStr for UUID {
     #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match uuid::Uuid::from_str(s) {
-            Ok(v) => { Ok(Self(v)) }
-            Err(e) => { Err(UUIDError(e)) }
+            Ok(v) => Ok(Self(v)),
+            Err(e) => Err(UUIDError(e)),
         }
     }
 }
@@ -51,8 +52,8 @@ impl UUID {
     #[inline]
     pub fn from_slice(slice: &[u8]) -> Result<Self, UUIDError> {
         match uuid::Uuid::from_slice(slice) {
-            Ok(v) => { Ok(Self(v)) }
-            Err(e) => { Err(UUIDError(e)) }
+            Ok(v) => Ok(Self(v)),
+            Err(e) => Err(UUIDError(e)),
         }
     }
 

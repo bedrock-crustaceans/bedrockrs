@@ -1,6 +1,8 @@
 use std::collections::HashMap;
+
 use bedrock_core::permissions_level::PermissionLevel;
 use nbt::NbtTag;
+
 use crate::error::WorldError;
 
 /// The default permissions for players in the world.
@@ -51,18 +53,33 @@ pub struct WorldAbilities {
 
 impl WorldAbilities {
     pub fn parse(tag: NbtTag) -> Result<Self, WorldError> {
-        fn get_byte_as_bool(map: &mut HashMap<String, NbtTag>, key: &str) -> Result<bool, WorldError> {
+        fn get_byte_as_bool(
+            map: &mut HashMap<String, NbtTag>,
+            key: &str,
+        ) -> Result<bool, WorldError> {
             match map.remove(key) {
                 Some(NbtTag::Byte(v)) => Ok(v != 0),
-                Some(other) => Err(WorldError::FormatError(format!("Expected `{}` in LevelDat abilities to be of type Byte, got {:?}", key, other))),
-                None => Err(WorldError::FormatError(format!("Missing field `{}` in LevelDat abilities", key))),
+                Some(other) => Err(WorldError::FormatError(format!(
+                    "Expected `{}` in LevelDat abilities to be of type Byte, got {:?}",
+                    key, other
+                ))),
+                None => Err(WorldError::FormatError(format!(
+                    "Missing field `{}` in LevelDat abilities",
+                    key
+                ))),
             }
         }
 
-        fn get_byte_as_bool_option(map: &mut HashMap<String, NbtTag>, key: &str) -> Result<Option<bool>, WorldError> {
+        fn get_byte_as_bool_option(
+            map: &mut HashMap<String, NbtTag>,
+            key: &str,
+        ) -> Result<Option<bool>, WorldError> {
             match map.remove(key) {
                 Some(NbtTag::Byte(v)) => Ok(Some(v != 0)),
-                Some(other) => Err(WorldError::FormatError(format!("Expected `{}` in LevelDat abilities to be of type Byte, got {:?}", key, other))),
+                Some(other) => Err(WorldError::FormatError(format!(
+                    "Expected `{}` in LevelDat abilities to be of type Byte, got {:?}",
+                    key, other
+                ))),
                 None => Ok(None),
             }
         }
@@ -70,15 +87,27 @@ impl WorldAbilities {
         fn get_int32(map: &mut HashMap<String, NbtTag>, key: &str) -> Result<i32, WorldError> {
             match map.remove(key) {
                 Some(NbtTag::Int32(v)) => Ok(v),
-                Some(other) => Err(WorldError::FormatError(format!("Expected `{}` in LevelDat abilities to be of type Int32, got {:?}", key, other))),
-                None => Err(WorldError::FormatError(format!("Missing field `{}` in LevelDat abilities", key))),
+                Some(other) => Err(WorldError::FormatError(format!(
+                    "Expected `{}` in LevelDat abilities to be of type Int32, got {:?}",
+                    key, other
+                ))),
+                None => Err(WorldError::FormatError(format!(
+                    "Missing field `{}` in LevelDat abilities",
+                    key
+                ))),
             }
         }
 
-        fn get_int32_option(map: &mut HashMap<String, NbtTag>, key: &str) -> Result<Option<i32>, WorldError> {
+        fn get_int32_option(
+            map: &mut HashMap<String, NbtTag>,
+            key: &str,
+        ) -> Result<Option<i32>, WorldError> {
             match map.remove(key) {
                 Some(NbtTag::Int32(v)) => Ok(Some(v)),
-                Some(other) => Err(WorldError::FormatError(format!("Expected `{}` in LevelDat abilities to be of type Int32, got {:?}", key, other))),
+                Some(other) => Err(WorldError::FormatError(format!(
+                    "Expected `{}` in LevelDat abilities to be of type Int32, got {:?}",
+                    key, other
+                ))),
                 None => Ok(None),
             }
         }
@@ -86,21 +115,33 @@ impl WorldAbilities {
         fn get_int64(map: &mut HashMap<String, NbtTag>, key: &str) -> Result<i64, WorldError> {
             match map.remove(key) {
                 Some(NbtTag::Int64(v)) => Ok(v),
-                Some(other) => Err(WorldError::FormatError(format!("Expected `{}` in LevelDat abilities to be of type Int64, got {:?}", key, other))),
-                None => Err(WorldError::FormatError(format!("Missing field `{}` in LevelDat abilities", key))),
+                Some(other) => Err(WorldError::FormatError(format!(
+                    "Expected `{}` in LevelDat abilities to be of type Int64, got {:?}",
+                    key, other
+                ))),
+                None => Err(WorldError::FormatError(format!(
+                    "Missing field `{}` in LevelDat abilities",
+                    key
+                ))),
             }
         }
 
         fn get_f32(map: &mut HashMap<String, NbtTag>, key: &str) -> Result<f32, WorldError> {
             match map.remove(key) {
                 Some(NbtTag::Float32(v)) => Ok(v),
-                Some(other) => Err(WorldError::FormatError(format!("Expected `{}` in LevelDat abilities to be of type Float32, got {:?}", key, other))),
-                None => Err(WorldError::FormatError(format!("Missing field `{}` in LevelDat abilities", key))),
+                Some(other) => Err(WorldError::FormatError(format!(
+                    "Expected `{}` in LevelDat abilities to be of type Float32, got {:?}",
+                    key, other
+                ))),
+                None => Err(WorldError::FormatError(format!(
+                    "Missing field `{}` in LevelDat abilities",
+                    key
+                ))),
             }
         }
 
         match tag {
-            NbtTag::Compound(mut map) => Ok(Self{
+            NbtTag::Compound(mut map) => Ok(Self {
                 attack_mobs: get_byte_as_bool(&mut map, "attackmobs")?,
                 attack_players: get_byte_as_bool(&mut map, "attackplayers")?,
                 redstone_interact: get_byte_as_bool(&mut map, "doorsandswitches")?,
@@ -120,25 +161,34 @@ impl WorldAbilities {
                 teleport: get_byte_as_bool(&mut map, "teleport")?,
                 op: get_byte_as_bool(&mut map, "op")?,
                 permissions_level: match get_int32_option(&mut map, "playerPermissionsLevel")? {
-                    Some(0) => { Some(PermissionLevel::Default) }
-                    Some(1) => { Some(PermissionLevel::Operator) }
-                    Some(2) => { Some(PermissionLevel::Admin) }
-                    Some(3) => { Some(PermissionLevel::Host) }
-                    Some(4) => { Some(PermissionLevel::Owner) }
-                    Some(other) => { Err(WorldError::FormatError(format!("Value for `playerPermissionsLevel` is out of bounds, got {:?}", other)))? }
-                    None => { None }
+                    Some(0) => Some(PermissionLevel::Default),
+                    Some(1) => Some(PermissionLevel::Operator),
+                    Some(2) => Some(PermissionLevel::Admin),
+                    Some(3) => Some(PermissionLevel::Host),
+                    Some(4) => Some(PermissionLevel::Owner),
+                    Some(other) => Err(WorldError::FormatError(format!(
+                        "Value for `playerPermissionsLevel` is out of bounds, got {:?}",
+                        other
+                    )))?,
+                    None => None,
                 },
                 permissions_level_default: match get_int32_option(&mut map, "permissionsLevel")? {
-                    Some(0) => { Some(PermissionLevel::Default) }
-                    Some(1) => { Some(PermissionLevel::Operator) }
-                    Some(2) => { Some(PermissionLevel::Admin) }
-                    Some(3) => { Some(PermissionLevel::Host) }
-                    Some(4) => { Some(PermissionLevel::Owner) }
-                    Some(other) => { Err(WorldError::FormatError(format!("Value for `playerPermissionsLevel` is out of bounds, got {:?}", other)))? }
-                    None => { None }
+                    Some(0) => Some(PermissionLevel::Default),
+                    Some(1) => Some(PermissionLevel::Operator),
+                    Some(2) => Some(PermissionLevel::Admin),
+                    Some(3) => Some(PermissionLevel::Host),
+                    Some(4) => Some(PermissionLevel::Owner),
+                    Some(other) => Err(WorldError::FormatError(format!(
+                        "Value for `playerPermissionsLevel` is out of bounds, got {:?}",
+                        other
+                    )))?,
+                    None => None,
                 },
             }),
-            other => { Err(WorldError::FormatError(format!("Expected root tag in LevelDat abilities to be of type Compound, got {:?}", other))) }
+            other => Err(WorldError::FormatError(format!(
+                "Expected root tag in LevelDat abilities to be of type Compound, got {:?}",
+                other
+            ))),
         }
     }
 }

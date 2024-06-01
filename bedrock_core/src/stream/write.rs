@@ -1,9 +1,13 @@
-use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
-use bytes::{Buf, BufMut, BytesMut};
+use byteorder::{BigEndian, LittleEndian, WriteBytesExt};
 use bytes::buf::Writer;
+use bytes::{BufMut, BytesMut};
 use varint_rs::{VarintReader, VarintWriter};
+
 use crate::stream::read::ByteStreamRead;
-use crate::{i128be, i128le, i16be, i16le, i32be, i32le, i64be, i64le, ivar32, ivar64, u128be, u128le, u16be, u16le, u32be, u32le, u64be, u64le, uvar32, uvar64};
+use crate::{
+    i128be, i128le, i16be, i16le, i32be, i32le, i64be, i64le, ivar32, ivar64, u128be, u128le,
+    u16be, u16le, u32be, u32le, u64be, u64le, uvar32, uvar64,
+};
 
 /// A wrapper around [`bytes::BytesMut`].
 /// (A unique reference to a contiguous slice of memory).
@@ -76,8 +80,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_u16le(&mut self, n: u16le) -> Result<(), std::io::Error> {
         match self.0.write_u16::<LittleEndian>(n.0) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -85,8 +89,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_u16be(&mut self, n: u16be) -> Result<(), std::io::Error> {
         match self.0.write_u16::<BigEndian>(n.0) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -94,8 +98,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_i16le(&mut self, n: i16le) -> Result<(), std::io::Error> {
         match self.0.write_i16::<LittleEndian>(n.0) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -103,8 +107,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_i16be(&mut self, n: i16be) -> Result<(), std::io::Error> {
         match self.0.write_i16::<BigEndian>(n.0) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -112,8 +116,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_u32le(&mut self, n: u32le) -> Result<(), std::io::Error> {
         match self.0.write_u32::<LittleEndian>(n.0) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -121,8 +125,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_u32be(&mut self, n: u32be) -> Result<(), std::io::Error> {
         match self.0.write_u32::<BigEndian>(n.0) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -130,8 +134,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_i32le(&mut self, n: i32le) -> Result<(), std::io::Error> {
         match self.0.write_i32::<LittleEndian>(n.0) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -139,8 +143,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_i32be(&mut self, n: i32be) -> Result<(), std::io::Error> {
         match self.0.write_i32::<BigEndian>(n.0) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -148,8 +152,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_u64le(&mut self, n: u64le) -> Result<(), std::io::Error> {
         match self.0.write_u64::<LittleEndian>(n.0) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -157,8 +161,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_u64be(&mut self, n: u64be) -> Result<(), std::io::Error> {
         match self.0.write_u64::<BigEndian>(n.0) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -166,8 +170,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_i64le(&mut self, n: i64le) -> Result<(), std::io::Error> {
         match self.0.write_i64::<LittleEndian>(n.0) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -175,8 +179,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_i64be(&mut self, n: i64be) -> Result<(), std::io::Error> {
         match self.0.write_i64::<BigEndian>(n.0) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -184,8 +188,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_u128le(&mut self, n: u128le) -> Result<(), std::io::Error> {
         match self.0.write_u128::<LittleEndian>(n.0) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -193,8 +197,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_u128be(&mut self, n: u128be) -> Result<(), std::io::Error> {
         match self.0.write_u128::<BigEndian>(n.0) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -202,8 +206,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_i128le(&mut self, n: i128le) -> Result<(), std::io::Error> {
         match self.0.write_i128::<LittleEndian>(n.0) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -211,8 +215,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_i128be(&mut self, n: i128be) -> Result<(), std::io::Error> {
         match self.0.write_i128::<BigEndian>(n.0) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -220,8 +224,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_uvar32(&mut self, n: uvar32) -> Result<(), std::io::Error> {
         match self.0.write_u32_varint(n.0) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -229,8 +233,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_ivar32(&mut self, n: ivar32) -> Result<(), std::io::Error> {
         match self.0.write_i32_varint(n.0) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -238,8 +242,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_uvar64(&mut self, n: uvar64) -> Result<(), std::io::Error> {
         match self.0.write_u64_varint(n.0) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -247,8 +251,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_ivar64(&mut self, n: ivar64) -> Result<(), std::io::Error> {
         match self.0.write_i64_varint(n.0) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -256,8 +260,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_f32(&mut self, n: f32) -> Result<(), std::io::Error> {
         match self.0.write_f32::<LittleEndian>(n) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 
@@ -265,8 +269,8 @@ impl ByteStreamWrite {
     #[inline]
     pub fn write_f64(&mut self, n: f64) -> Result<(), std::io::Error> {
         match self.0.write_f64::<BigEndian>(n) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
         }
     }
 }

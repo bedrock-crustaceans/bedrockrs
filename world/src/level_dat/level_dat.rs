@@ -2,11 +2,13 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
+
 use bedrock_core::difficulty::Difficulty;
 use bedrock_core::dimension::Dimension;
 use bedrock_core::stream::read::ByteStreamRead;
 use nbt::endian::little_endian::NbtLittleEndian;
 use nbt::NbtTag;
+
 use crate::error::WorldError;
 use crate::level_dat::abilities::WorldAbilities;
 
@@ -66,72 +68,110 @@ pub struct LevelDat {
 impl LevelDat {
     pub fn open(directory: &PathBuf) -> Result<(i32, i32, Self), WorldError> {
         let mut file = match File::open(directory.join("level.dat")) {
-            Ok(v) => { v }
-            Err(e) => { return Err(WorldError::FormatError(e.to_string())) }
+            Ok(v) => v,
+            Err(e) => {
+                return Err(WorldError::FormatError(e.to_string()));
+            }
         };
 
         let mut data = vec![];
 
         match file.read_to_end(&mut data) {
             Ok(_) => {}
-            Err(e) => { return Err(WorldError::FormatError(e.to_string())) }
+            Err(e) => {
+                return Err(WorldError::FormatError(e.to_string()));
+            }
         };
 
         let mut stream = ByteStreamRead::from(data);
 
         let version = match stream.read_i32le() {
-            Ok(v) => { v.0 }
-            Err(e) => { return Err(WorldError::FormatError(e.to_string())) }
+            Ok(v) => v.0,
+            Err(e) => {
+                return Err(WorldError::FormatError(e.to_string()));
+            }
         };
 
         let length = match stream.read_i32le() {
-            Ok(v) => { v.0 }
-            Err(e) => { return Err(WorldError::FormatError(e.to_string())) }
+            Ok(v) => v.0,
+            Err(e) => {
+                return Err(WorldError::FormatError(e.to_string()));
+            }
         };
 
         let (_, nbt) = match NbtTag::nbt_deserialize::<NbtLittleEndian>(&mut stream) {
-            Ok(v) => { v }
-            Err(e) => { return Err(WorldError::NbtError(e)) }
+            Ok(v) => v,
+            Err(e) => {
+                return Err(WorldError::NbtError(e));
+            }
         };
 
         let level_dat = match Self::parse(nbt) {
-            Ok(v) => { v }
-            Err(e) => { return Err(e) }
+            Ok(v) => v,
+            Err(e) => {
+                return Err(e);
+            }
         };
 
         Ok((version, length, level_dat))
-
     }
 
     pub fn parse(tag: NbtTag) -> Result<Self, WorldError> {
         fn get_string(map: &mut HashMap<String, NbtTag>, key: &str) -> Result<String, WorldError> {
             match map.remove(key) {
                 Some(NbtTag::String(v)) => Ok(v),
-                Some(other) => Err(WorldError::FormatError(format!("Expected `{}` in LevelDat to be of type String, got {:?}", key, other))),
-                None => Err(WorldError::FormatError(format!("Missing field `{}` in LevelDat", key))),
+                Some(other) => Err(WorldError::FormatError(format!(
+                    "Expected `{}` in LevelDat to be of type String, got {:?}",
+                    key, other
+                ))),
+                None => Err(WorldError::FormatError(format!(
+                    "Missing field `{}` in LevelDat",
+                    key
+                ))),
             }
         }
 
-        fn get_byte_as_bool(map: &mut HashMap<String, NbtTag>, key: &str) -> Result<bool, WorldError> {
+        fn get_byte_as_bool(
+            map: &mut HashMap<String, NbtTag>,
+            key: &str,
+        ) -> Result<bool, WorldError> {
             match map.remove(key) {
                 Some(NbtTag::Byte(v)) => Ok(v != 0),
-                Some(other) => Err(WorldError::FormatError(format!("Expected `{}` in LevelDat to be of type Byte, got {:?}", key, other))),
-                None => Err(WorldError::FormatError(format!("Missing field `{}` in LevelDat", key))),
+                Some(other) => Err(WorldError::FormatError(format!(
+                    "Expected `{}` in LevelDat to be of type Byte, got {:?}",
+                    key, other
+                ))),
+                None => Err(WorldError::FormatError(format!(
+                    "Missing field `{}` in LevelDat",
+                    key
+                ))),
             }
         }
 
         fn get_int32(map: &mut HashMap<String, NbtTag>, key: &str) -> Result<i32, WorldError> {
             match map.remove(key) {
                 Some(NbtTag::Int32(v)) => Ok(v),
-                Some(other) => Err(WorldError::FormatError(format!("Expected `{}` in LevelDat to be of type Int32, got {:?}", key, other))),
-                None => Err(WorldError::FormatError(format!("Missing field `{}` in LevelDat", key))),
+                Some(other) => Err(WorldError::FormatError(format!(
+                    "Expected `{}` in LevelDat to be of type Int32, got {:?}",
+                    key, other
+                ))),
+                None => Err(WorldError::FormatError(format!(
+                    "Missing field `{}` in LevelDat",
+                    key
+                ))),
             }
         }
 
-        fn get_int32_option(map: &mut HashMap<String, NbtTag>, key: &str) -> Result<Option<i32>, WorldError> {
+        fn get_int32_option(
+            map: &mut HashMap<String, NbtTag>,
+            key: &str,
+        ) -> Result<Option<i32>, WorldError> {
             match map.remove(key) {
                 Some(NbtTag::Int32(v)) => Ok(Some(v)),
-                Some(other) => Err(WorldError::FormatError(format!("Expected `{}` in LevelDat to be of type Int32, got {:?}", key, other))),
+                Some(other) => Err(WorldError::FormatError(format!(
+                    "Expected `{}` in LevelDat to be of type Int32, got {:?}",
+                    key, other
+                ))),
                 None => Ok(None),
             }
         }
@@ -139,16 +179,31 @@ impl LevelDat {
         fn get_int64(map: &mut HashMap<String, NbtTag>, key: &str) -> Result<i64, WorldError> {
             match map.remove(key) {
                 Some(NbtTag::Int64(v)) => Ok(v),
-                Some(other) => Err(WorldError::FormatError(format!("Expected `{}` in LevelDat to be of type Int64, got {:?}", key, other))),
-                None => Err(WorldError::FormatError(format!("Missing field `{}` in LevelDat", key))),
+                Some(other) => Err(WorldError::FormatError(format!(
+                    "Expected `{}` in LevelDat to be of type Int64, got {:?}",
+                    key, other
+                ))),
+                None => Err(WorldError::FormatError(format!(
+                    "Missing field `{}` in LevelDat",
+                    key
+                ))),
             }
         }
 
-        fn get_compound(map: &mut HashMap<String, NbtTag>, key: &str) -> Result<HashMap<String, NbtTag>, WorldError> {
+        fn get_compound(
+            map: &mut HashMap<String, NbtTag>,
+            key: &str,
+        ) -> Result<HashMap<String, NbtTag>, WorldError> {
             match map.remove(key) {
                 Some(NbtTag::Compound(v)) => Ok(v),
-                Some(other) => Err(WorldError::FormatError(format!("Expected `{}` in LevelDat to be of type Compound, got {:?}", key, other))),
-                None => Err(WorldError::FormatError(format!("Missing field `{}` in LevelDat", key))),
+                Some(other) => Err(WorldError::FormatError(format!(
+                    "Expected `{}` in LevelDat to be of type Compound, got {:?}",
+                    key, other
+                ))),
+                None => Err(WorldError::FormatError(format!(
+                    "Missing field `{}` in LevelDat",
+                    key
+                ))),
             }
         }
 
@@ -157,8 +212,10 @@ impl LevelDat {
                 level_name: get_string(&mut map, "LevelName")?,
                 format_version: get_int32(&mut map, "StorageVersion")?,
                 abilities: WorldAbilities::parse(match map.remove("abilities") {
-                    Some(v) => { v }
-                    None => { Err(WorldError::FormatError(format!("Missing field `abilities` in LevelDat")))? }
+                    Some(v) => v,
+                    None => Err(WorldError::FormatError(format!(
+                        "Missing field `abilities` in LevelDat"
+                    )))?,
                 })?,
                 experiments: {
                     let mut nbt = get_compound(&mut map, "experiments")?;
@@ -174,18 +231,24 @@ impl LevelDat {
                     experiments
                 },
                 difficulty: match get_int32(&mut map, "Difficulty")? {
-                    0 => { Difficulty::Peaceful }
-                    1 => { Difficulty::Easy }
-                    2 => { Difficulty::Normal }
-                    3 => { Difficulty::Hard }
-                    other => { Err(WorldError::FormatError(format!("Value for `Difficulty` is out of bounds, got {:?}", other)))? }
+                    0 => Difficulty::Peaceful,
+                    1 => Difficulty::Easy,
+                    2 => Difficulty::Normal,
+                    3 => Difficulty::Hard,
+                    other => Err(WorldError::FormatError(format!(
+                        "Value for `Difficulty` is out of bounds, got {:?}",
+                        other
+                    )))?,
                 },
                 dimension: match get_int32_option(&mut map, "Dimension")? {
-                    Some(1) => { Some(Dimension::Overworld) }
-                    Some(2) => { Some(Dimension::Nether) }
-                    Some(3) => { Some(Dimension::End) }
-                    Some(other) => { Err(WorldError::FormatError(format!("Value for `Dimension` is out of bounds, got {:?}", other)))? }
-                    None => { None }
+                    Some(1) => Some(Dimension::Overworld),
+                    Some(2) => Some(Dimension::Nether),
+                    Some(3) => Some(Dimension::End),
+                    Some(other) => Err(WorldError::FormatError(format!(
+                        "Value for `Dimension` is out of bounds, got {:?}",
+                        other
+                    )))?,
+                    None => None,
                 },
                 bonus_chest_enabled: get_byte_as_bool(&mut map, "bonusChestEnabled")?,
                 bonus_chest_spawned: get_byte_as_bool(&mut map, "bonusChestSpawned")?,
@@ -196,7 +259,10 @@ impl LevelDat {
                 spawn_z: get_int32(&mut map, "SpawnZ")?,
                 cheats: get_byte_as_bool(&mut map, "commandsEnabled")?,
             }),
-            other => Err(WorldError::FormatError(format!("Expected root tag in LevelDat to be of type Compound, got {:?}", other))),
+            other => Err(WorldError::FormatError(format!(
+                "Expected root tag in LevelDat to be of type Compound, got {:?}",
+                other
+            ))),
         }
     }
 }

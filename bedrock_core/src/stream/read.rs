@@ -1,8 +1,10 @@
 use std::io::Read;
-use bytes::{Buf, Bytes};
+
 use byteorder::{BigEndian, LittleEndian, ReadBytesExt};
 use bytes::buf::Reader;
+use bytes::{Buf, Bytes};
 use varint_rs::VarintReader;
+
 use crate::*;
 
 /// A wrapper around [`bytes::Bytes`].
@@ -64,8 +66,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_u16le(&mut self) -> Result<u16le, std::io::Error> {
         match self.0.read_u16::<LittleEndian>() {
-            Ok(v) => { Ok(u16le(v)) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(u16le(v)),
+            Err(e) => Err(e),
         }
     }
 
@@ -73,8 +75,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_u16be(&mut self) -> Result<u16be, std::io::Error> {
         match self.0.read_u16::<BigEndian>() {
-            Ok(v) => { Ok(u16be(v)) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(u16be(v)),
+            Err(e) => Err(e),
         }
     }
 
@@ -82,8 +84,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_i16le(&mut self) -> Result<i16le, std::io::Error> {
         match self.0.read_i16::<LittleEndian>() {
-            Ok(v) => { Ok(i16le(v)) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(i16le(v)),
+            Err(e) => Err(e),
         }
     }
 
@@ -91,8 +93,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_i16be(&mut self) -> Result<i16be, std::io::Error> {
         match self.0.read_i16::<BigEndian>() {
-            Ok(v) => { Ok(i16be(v)) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(i16be(v)),
+            Err(e) => Err(e),
         }
     }
 
@@ -100,8 +102,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_u32le(&mut self) -> Result<u32le, std::io::Error> {
         match self.0.read_u32::<LittleEndian>() {
-            Ok(v) => { Ok(u32le(v)) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(u32le(v)),
+            Err(e) => Err(e),
         }
     }
 
@@ -109,8 +111,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_u32be(&mut self) -> Result<u32be, std::io::Error> {
         match self.0.read_u32::<BigEndian>() {
-            Ok(v) => { Ok(u32be(v)) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(u32be(v)),
+            Err(e) => Err(e),
         }
     }
 
@@ -118,8 +120,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_i32le(&mut self) -> Result<i32le, std::io::Error> {
         match self.0.read_i32::<LittleEndian>() {
-            Ok(v) => { Ok(i32le(v)) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(i32le(v)),
+            Err(e) => Err(e),
         }
     }
 
@@ -127,8 +129,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_i32be(&mut self) -> Result<i32be, std::io::Error> {
         match self.0.read_i32::<BigEndian>() {
-            Ok(v) => { Ok(i32be(v)) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(i32be(v)),
+            Err(e) => Err(e),
         }
     }
 
@@ -136,8 +138,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_u64le(&mut self) -> Result<u64le, std::io::Error> {
         match self.0.read_u64::<LittleEndian>() {
-            Ok(v) => { Ok(u64le(v)) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(u64le(v)),
+            Err(e) => Err(e),
         }
     }
 
@@ -145,8 +147,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_u64be(&mut self) -> Result<u64be, std::io::Error> {
         match self.0.read_u64::<BigEndian>() {
-            Ok(v) => { Ok(u64be(v)) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(u64be(v)),
+            Err(e) => Err(e),
         }
     }
 
@@ -154,8 +156,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_i64le(&mut self) -> Result<i64le, std::io::Error> {
         match self.0.read_i64::<LittleEndian>() {
-            Ok(v) => { Ok(i64le(v)) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(i64le(v)),
+            Err(e) => Err(e),
         }
     }
 
@@ -163,8 +165,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_i64be(&mut self) -> Result<i64be, std::io::Error> {
         match self.0.read_i64::<BigEndian>() {
-            Ok(v) => { Ok(i64be(v)) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(i64be(v)),
+            Err(e) => Err(e),
         }
     }
 
@@ -172,8 +174,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_u128le(&mut self) -> Result<u128le, std::io::Error> {
         match self.0.read_u128::<LittleEndian>() {
-            Ok(v) => { Ok(u128le(v)) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(u128le(v)),
+            Err(e) => Err(e),
         }
     }
 
@@ -181,8 +183,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_u128be(&mut self) -> Result<u128be, std::io::Error> {
         match self.0.read_u128::<BigEndian>() {
-            Ok(v) => { Ok(u128be(v)) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(u128be(v)),
+            Err(e) => Err(e),
         }
     }
 
@@ -190,8 +192,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_i128le(&mut self) -> Result<i128le, std::io::Error> {
         match self.0.read_i128::<LittleEndian>() {
-            Ok(v) => { Ok(i128le(v)) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(i128le(v)),
+            Err(e) => Err(e),
         }
     }
 
@@ -199,8 +201,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_i128be(&mut self) -> Result<i128be, std::io::Error> {
         match self.0.read_i128::<BigEndian>() {
-            Ok(v) => { Ok(i128be(v)) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(i128be(v)),
+            Err(e) => Err(e),
         }
     }
 
@@ -208,8 +210,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_uvar32(&mut self) -> Result<uvar32, std::io::Error> {
         match self.0.read_u32_varint() {
-            Ok(v) => { Ok(uvar32(v)) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(uvar32(v)),
+            Err(e) => Err(e),
         }
     }
 
@@ -217,8 +219,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_ivar32(&mut self) -> Result<ivar32, std::io::Error> {
         match self.0.read_i32_varint() {
-            Ok(v) => { Ok(ivar32(v)) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(ivar32(v)),
+            Err(e) => Err(e),
         }
     }
 
@@ -226,8 +228,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_uvar64(&mut self) -> Result<uvar64, std::io::Error> {
         match self.0.read_u64_varint() {
-            Ok(v) => { Ok(uvar64(v)) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(uvar64(v)),
+            Err(e) => Err(e),
         }
     }
 
@@ -235,8 +237,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_ivar64(&mut self) -> Result<ivar64, std::io::Error> {
         match self.0.read_i64_varint() {
-            Ok(v) => { Ok(ivar64(v)) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(ivar64(v)),
+            Err(e) => Err(e),
         }
     }
 
@@ -244,8 +246,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_f32le(&mut self) -> Result<f32, std::io::Error> {
         match self.0.read_f32::<LittleEndian>() {
-            Ok(v) => { Ok(v) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(v),
+            Err(e) => Err(e),
         }
     }
 
@@ -253,8 +255,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_f32be(&mut self) -> Result<f32, std::io::Error> {
         match self.0.read_f32::<BigEndian>() {
-            Ok(v) => { Ok(v) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(v),
+            Err(e) => Err(e),
         }
     }
 
@@ -262,8 +264,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_f64le(&mut self) -> Result<f64, std::io::Error> {
         match self.0.read_f64::<LittleEndian>() {
-            Ok(v) => { Ok(v) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(v),
+            Err(e) => Err(e),
         }
     }
 
@@ -271,8 +273,8 @@ impl ByteStreamRead {
     #[inline]
     pub fn read_f64be(&mut self) -> Result<f64, std::io::Error> {
         match self.0.read_f64::<BigEndian>() {
-            Ok(v) => { Ok(v) }
-            Err(e) => { Err(e) }
+            Ok(v) => Ok(v),
+            Err(e) => Err(e),
         }
     }
 
@@ -281,7 +283,6 @@ impl ByteStreamRead {
         self.0.read_exact(buf)
     }
 }
-
 
 impl Default for ByteStreamRead {
     #[inline]

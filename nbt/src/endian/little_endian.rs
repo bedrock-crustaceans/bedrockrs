@@ -1,6 +1,6 @@
-use std::io::{Cursor, Read, Write};
-use bedrock_core::stream::read::ByteStreamRead;
+use std::io::{Read, Write};
 
+use bedrock_core::stream::read::ByteStreamRead;
 use byteorder::{LittleEndian, WriteBytesExt};
 
 use crate::byte_order::NbtByteOrder;

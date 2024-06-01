@@ -23,11 +23,11 @@ pub use vec::vec2f::Vec2f;
 pub use vec::vec3::Vec3;
 pub use vec::vec3f::Vec3f;
 
-pub mod stream;
-pub mod int;
-pub mod varint;
-pub mod vec;
-pub mod uuid;
-pub mod permissions_level;
 pub mod difficulty;
 pub mod dimension;
+pub mod int;
+pub mod permissions_level;
+pub mod stream;
+pub mod uuid;
+pub mod varint;
+pub mod vec;

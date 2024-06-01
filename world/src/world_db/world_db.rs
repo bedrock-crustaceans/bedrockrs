@@ -1,8 +1,10 @@
+use std::fmt::{Debug, Formatter};
+use std::{collections::HashMap, path::PathBuf};
+
+use bedrock_core::uuid::UUID;
 use mojang_leveldb::{error::DBError, Options, ReadOptions, WriteBatch, WriteOptions, DB};
 use nbt::{endian::little_endian::NbtLittleEndian, NbtTag};
-use std::{collections::HashMap, path::PathBuf};
-use std::fmt::{Debug, Formatter};
-use bedrock_core::uuid::UUID;
+
 use crate::error::WorldError;
 
 pub struct WorldDB {
@@ -17,9 +19,8 @@ const READ_OPTIONS: ReadOptions = ReadOptions {
 const WRITE_OPTIONS: WriteOptions = WriteOptions { sync: true };
 
 impl WorldDB {
-
     /// Opens a world from a directory.
-    /// 
+    ///
     /// The leveldb database is in the `db` subdirectory.
     pub fn open(directory: &PathBuf) -> Result<Self, DBError> {
         Ok(WorldDB {
@@ -46,23 +47,27 @@ impl WorldDB {
                 Some(bytes) => {
                     let u8_bytes = vec_i8_into_u8(bytes.get().into());
                     match NbtTag::nbt_deserialize_vec::<NbtLittleEndian>(&u8_bytes) {
-                        Ok((_, tag)) => {
-                            match tag {
-                                NbtTag::Compound(ctag) => Ok(Some(ctag)),
-                                _ => Err(WorldError::FormatError("Player data tag is not a compound tag".to_string()))
-                            }
+                        Ok((_, tag)) => match tag {
+                            NbtTag::Compound(ctag) => Ok(Some(ctag)),
+                            _ => Err(WorldError::FormatError(
+                                "Player data tag is not a compound tag".to_string(),
+                            )),
                         },
-                        Err(e) => Err(WorldError::NbtError(e))
+                        Err(e) => Err(WorldError::NbtError(e)),
                     }
-                },
-                None => Ok(None)
+                }
+                None => Ok(None),
             },
-            Err(e) => Err(WorldError::DBError(e))
+            Err(e) => Err(WorldError::DBError(e)),
         }
     }
 
     /// Set a player's NBT data for this world
-    pub fn set_player(&mut self, uuid: UUID, data: HashMap<String, NbtTag>) -> Result<(), WorldError> {
+    pub fn set_player(
+        &mut self,
+        uuid: UUID,
+        data: HashMap<String, NbtTag>,
+    ) -> Result<(), WorldError> {
         let tag = NbtTag::Compound(data);
         match tag.nbt_serialize_vec::<NbtLittleEndian>("") {
             Ok(sertag) => {
@@ -89,7 +94,6 @@ impl WorldDB {
 }
 
 fn str_to_ascii_i8(s: &str) -> Result<Vec<i8>, &'static str> {
-
     if !s.is_ascii() {
         return Err("Input string contains non-ASCII characters");
     }
@@ -102,7 +106,6 @@ fn str_to_ascii_i8(s: &str) -> Result<Vec<i8>, &'static str> {
 }
 
 fn vec_i8_into_u8(v: Vec<i8>) -> Vec<u8> {
-
     let mut v = std::mem::ManuallyDrop::new(v);
 
     let p = v.as_mut_ptr();
@@ -113,7 +116,6 @@ fn vec_i8_into_u8(v: Vec<i8>) -> Vec<u8> {
 }
 
 fn vec_u8_into_i8(v: Vec<u8>) -> Vec<i8> {
-
     let mut v = std::mem::ManuallyDrop::new(v);
 
     let p = v.as_mut_ptr();
@@ -122,7 +124,6 @@ fn vec_u8_into_i8(v: Vec<u8>) -> Vec<i8> {
 
     unsafe { Vec::from_raw_parts(p as *mut i8, len, cap) }
 }
-
 
 impl Debug for WorldDB {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
