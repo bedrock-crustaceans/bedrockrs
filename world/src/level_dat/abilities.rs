@@ -44,9 +44,9 @@ pub struct WorldAbilities {
     pub op: bool,
 
     /// What permissions a player defaults to, when joining a world. (NBT entry: `permissionsLevel`)
-    pub permissions_level: PermissionLevel,
+    pub permissions_level: Option<PermissionLevel>,
     /// What permissions a player has. (NBT entry: `playerPermissionsLevel`)
-    pub player_permissions_level: PermissionLevel,
+    pub permissions_level_default: Option<PermissionLevel>,
 }
 
 impl WorldAbilities {
@@ -72,6 +72,14 @@ impl WorldAbilities {
                 Some(NbtTag::Int32(v)) => Ok(v),
                 Some(other) => Err(WorldError::FormatError(format!("Expected `{}` in LevelDat abilities to be of type Int32, got {:?}", key, other))),
                 None => Err(WorldError::FormatError(format!("Missing field `{}` in LevelDat abilities", key))),
+            }
+        }
+
+        fn get_int32_option(map: &mut HashMap<String, NbtTag>, key: &str) -> Result<Option<i32>, WorldError> {
+            match map.remove(key) {
+                Some(NbtTag::Int32(v)) => Ok(Some(v)),
+                Some(other) => Err(WorldError::FormatError(format!("Expected `{}` in LevelDat abilities to be of type Int32, got {:?}", key, other))),
+                None => Ok(None),
             }
         }
 
@@ -111,8 +119,24 @@ impl WorldAbilities {
                 world_builder: get_byte_as_bool_option(&mut map, "worldbuilder")?,
                 teleport: get_byte_as_bool(&mut map, "teleport")?,
                 op: get_byte_as_bool(&mut map, "op")?,
-                permissions_level: PermissionLevel::Default,
-                player_permissions_level: PermissionLevel::Default,
+                permissions_level: match get_int32_option(&mut map, "playerPermissionsLevel")? {
+                    Some(0) => { Some(PermissionLevel::Default) }
+                    Some(1) => { Some(PermissionLevel::Operator) }
+                    Some(2) => { Some(PermissionLevel::Admin) }
+                    Some(3) => { Some(PermissionLevel::Host) }
+                    Some(4) => { Some(PermissionLevel::Owner) }
+                    Some(other) => { Err(WorldError::FormatError(format!("Value for `playerPermissionsLevel` is out of bounds, got {:?}", other)))? }
+                    None => { None }
+                },
+                permissions_level_default: match get_int32_option(&mut map, "permissionsLevel")? {
+                    Some(0) => { Some(PermissionLevel::Default) }
+                    Some(1) => { Some(PermissionLevel::Operator) }
+                    Some(2) => { Some(PermissionLevel::Admin) }
+                    Some(3) => { Some(PermissionLevel::Host) }
+                    Some(4) => { Some(PermissionLevel::Owner) }
+                    Some(other) => { Err(WorldError::FormatError(format!("Value for `playerPermissionsLevel` is out of bounds, got {:?}", other)))? }
+                    None => { None }
+                },
             }),
             other => { Err(WorldError::FormatError(format!("Expected root tag in LevelDat abilities to be of type Compound, got {:?}", other))) }
         }
