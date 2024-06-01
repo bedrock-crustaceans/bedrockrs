@@ -4,11 +4,12 @@ use std::fmt::{Debug, Formatter};
 use bedrock_core::stream::read::ByteStreamRead;
 
 use crate::byte_order::NbtByteOrder;
-use crate::error::NbtError;
 
 pub mod byte_order;
 pub mod endian;
 pub mod error;
+
+pub use error::NbtError;
 
 /// An enum representing all possible NBT tags.
 ///
