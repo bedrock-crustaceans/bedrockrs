@@ -17,7 +17,7 @@ pub mod error;
 /// - int array
 /// - long array
 ///
-/// (These missing types are rarely if not even unused in MCBE)
+/// (These missing types are rarely, if not even un-, used in MCBE)
 pub enum NbtTag {
     /// A simple byte.
     /// Can represent multiple things like:
@@ -52,6 +52,7 @@ pub enum NbtTag {
     /// and closed again by the [NbtTag::COMPOUND_ID_END].
     Compound(HashMap<String, NbtTag>),
     /// An empty NBT tag.
+    /// Not commonly used, it rather just marks the end of a compound tag.
     Empty,
 }
 
