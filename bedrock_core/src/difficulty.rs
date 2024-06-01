@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub enum Difficulty {
     Peaceful = 0,
     Easy = 1,

@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub enum PermissionLevel {
     /// Any/Normal permission
     Default = 0,

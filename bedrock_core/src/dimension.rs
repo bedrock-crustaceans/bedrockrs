@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub enum Dimension {
     Overworld = 0,
     Nether = 1,
