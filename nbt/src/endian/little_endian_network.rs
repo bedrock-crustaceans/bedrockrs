@@ -1,6 +1,7 @@
 use std::io::{Cursor, Read, Write};
+use bedrock_core::stream::read::ByteStreamRead;
 
-use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
+use byteorder::{LittleEndian, WriteBytesExt};
 use varint_rs::{VarintReader, VarintWriter};
 
 use crate::byte_order::NbtByteOrder;
@@ -77,55 +78,55 @@ impl NbtByteOrder for NbtLittleEndianNetwork {
     }
 
     #[inline]
-    fn read_u8(buf: &mut Cursor<&Vec<u8>>) -> Result<u8, NbtError> {
-        match buf.read_u8_varint() {
+    fn read_u8(buf: &mut ByteStreamRead) -> Result<u8, NbtError> {
+        match buf.read_u8() {
             Ok(v) => Ok(v),
             Err(e) => Err(NbtError::IOError(e)),
         }
     }
 
     #[inline]
-    fn read_i16(buf: &mut Cursor<&Vec<u8>>) -> Result<i16, NbtError> {
-        match buf.read_i16::<LittleEndian>() {
+    fn read_i16(buf: &mut ByteStreamRead) -> Result<i16, NbtError> {
+        match buf.read_i16le() {
+            Ok(v) => Ok(v.0),
+            Err(e) => Err(NbtError::IOError(e)),
+        }
+    }
+
+    #[inline]
+    fn read_i32(buf: &mut ByteStreamRead) -> Result<i32, NbtError> {
+        match buf.read_ivar32() {
+            Ok(v) => Ok(v.0),
+            Err(e) => Err(NbtError::IOError(e)),
+        }
+    }
+
+    #[inline]
+    fn read_i64(buf: &mut ByteStreamRead) -> Result<i64, NbtError> {
+        match buf.read_ivar64() {
+            Ok(v) => Ok(v.0),
+            Err(e) => Err(NbtError::IOError(e)),
+        }
+    }
+
+    #[inline]
+    fn read_f32(buf: &mut ByteStreamRead) -> Result<f32, NbtError> {
+        match buf.read_f32le() {
             Ok(v) => Ok(v),
             Err(e) => Err(NbtError::IOError(e)),
         }
     }
 
     #[inline]
-    fn read_i32(buf: &mut Cursor<&Vec<u8>>) -> Result<i32, NbtError> {
-        match buf.read_i32_varint() {
+    fn read_f64(buf: &mut ByteStreamRead) -> Result<f64, NbtError> {
+        match buf.read_f64le() {
             Ok(v) => Ok(v),
             Err(e) => Err(NbtError::IOError(e)),
         }
     }
 
     #[inline]
-    fn read_i64(buf: &mut Cursor<&Vec<u8>>) -> Result<i64, NbtError> {
-        match buf.read_i64_varint() {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(e)),
-        }
-    }
-
-    #[inline]
-    fn read_f32(buf: &mut Cursor<&Vec<u8>>) -> Result<f32, NbtError> {
-        match buf.read_f32::<LittleEndian>() {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(e)),
-        }
-    }
-
-    #[inline]
-    fn read_f64(buf: &mut Cursor<&Vec<u8>>) -> Result<f64, NbtError> {
-        match buf.read_f64::<LittleEndian>() {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(e)),
-        }
-    }
-
-    #[inline]
-    fn read_string(buf: &mut Cursor<&Vec<u8>>) -> Result<String, NbtError> {
+    fn read_string(buf: &mut ByteStreamRead) -> Result<String, NbtError> {
         let len = match Self::read_i16(buf) {
             Ok(v) => v,
             Err(e) => return Err(e),
