@@ -1,4 +1,4 @@
-use std::io::{Read, Write};
+use std::io::Write;
 
 use bedrock_core::stream::read::ByteStreamRead;
 use byteorder::{LittleEndian, WriteBytesExt};
