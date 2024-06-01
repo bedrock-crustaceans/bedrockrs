@@ -1,13 +1,10 @@
 use byteorder::{BigEndian, LittleEndian, WriteBytesExt};
 use bytes::buf::Writer;
 use bytes::{BufMut, BytesMut};
-use varint_rs::{VarintReader, VarintWriter};
+use varint_rs::{VarintWriter};
 
 use crate::stream::read::ByteStreamRead;
-use crate::{
-    i128be, i128le, i16be, i16le, i32be, i32le, i64be, i64le, ivar32, ivar64, u128be, u128le,
-    u16be, u16le, u32be, u32le, u64be, u64le, uvar32, uvar64,
-};
+use crate::*;
 
 /// A wrapper around [`bytes::BytesMut`].
 /// (A unique reference to a contiguous slice of memory).
