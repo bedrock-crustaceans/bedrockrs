@@ -1,7 +1,11 @@
+use core::hash;
+use std::borrow::Borrow;
+use std::{cmp, slice};
+use std::hash::Hash;
 use std::io::Read;
-
+use std::ops::Deref;
 use byteorder::{BigEndian, LittleEndian, ReadBytesExt};
-use bytes::buf::Reader;
+use bytes::buf::{IntoIter, Reader};
 use bytes::{Buf, Bytes};
 use varint_rs::VarintReader;
 
@@ -282,6 +286,281 @@ impl ByteStreamRead {
     pub fn read_exact(&mut self, buf: &mut [u8]) -> Result<(), std::io::Error> {
         self.0.read_exact(buf)
     }
+
+    #[inline]
+    pub fn as_slice(&self) -> &[u8] {
+        unsafe { slice::from_raw_parts(self.0.get_ref().as_ptr(), self.len()) }
+    }
+}
+
+impl Read for ByteStreamRead {
+    #[inline]
+    fn read(&mut self, dst: &mut [u8]) -> std::io::Result<usize> {
+        std::io::Read::read(&mut self.0, dst)
+    }
+}
+
+impl Buf for ByteStreamRead {
+    #[inline]
+    fn remaining(&self) -> usize {
+        self.0.get_ref().remaining()
+    }
+
+    #[inline]
+    fn chunk(&self) -> &[u8] {
+        self.0.get_ref().chunk()
+    }
+
+    #[inline]
+    fn advance(&mut self, cnt: usize) {
+        self.0.get_mut().advance(cnt)
+    }
+}
+
+
+impl Deref for ByteStreamRead {
+    type Target = [u8];
+
+    #[inline]
+    fn deref(&self) -> &[u8] {
+        self.as_slice()
+    }
+}
+
+impl AsRef<[u8]> for ByteStreamRead {
+    #[inline]
+    fn as_ref(&self) -> &[u8] {
+        self.as_slice()
+    }
+}
+
+impl hash::Hash for ByteStreamRead {
+    #[inline]
+    fn hash<H>(&self, state: &mut H)
+        where
+            H: hash::Hasher,
+    {
+        self.as_slice().hash(state);
+    }
+}
+
+impl Borrow<[u8]> for ByteStreamRead {
+    #[inline]
+    fn borrow(&self) -> &[u8] {
+        self.as_slice()
+    }
+}
+
+impl IntoIterator for ByteStreamRead {
+    type Item = u8;
+    type IntoIter = IntoIter<ByteStreamRead>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter {
+        IntoIter::new(self)
+    }
+}
+
+impl<'a> IntoIterator for &'a ByteStreamRead {
+    type Item = &'a u8;
+    type IntoIter = core::slice::Iter<'a, u8>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter {
+        self.as_slice().iter()
+    }
+}
+
+impl FromIterator<u8> for ByteStreamRead {
+    #[inline]
+    fn from_iter<T: IntoIterator<Item = u8>>(into_iter: T) -> Self {
+        Vec::from_iter(into_iter).into()
+    }
+}
+
+// impl Eq
+
+impl PartialEq for ByteStreamRead {
+    #[inline]
+    fn eq(&self, other: &ByteStreamRead) -> bool {
+        self.as_slice() == other.as_slice()
+    }
+}
+
+impl PartialOrd for ByteStreamRead {
+    #[inline]
+    fn partial_cmp(&self, other: &ByteStreamRead) -> Option<cmp::Ordering> {
+        self.as_slice().partial_cmp(other.as_slice())
+    }
+}
+
+impl Ord for ByteStreamRead {
+    #[inline]
+    fn cmp(&self, other: &ByteStreamRead) -> cmp::Ordering {
+        self.as_slice().cmp(other.as_slice())
+    }
+}
+
+impl Eq for ByteStreamRead {}
+
+impl PartialEq<[u8]> for ByteStreamRead {
+    #[inline]
+    fn eq(&self, other: &[u8]) -> bool {
+        self.as_slice() == other
+    }
+}
+
+impl PartialOrd<[u8]> for ByteStreamRead {
+    #[inline]
+    fn partial_cmp(&self, other: &[u8]) -> Option<cmp::Ordering> {
+        self.as_slice().partial_cmp(other)
+    }
+}
+
+impl PartialEq<ByteStreamRead> for [u8] {
+    #[inline]
+    fn eq(&self, other: &ByteStreamRead) -> bool {
+        *other == *self
+    }
+}
+
+impl PartialOrd<ByteStreamRead> for [u8] {
+    #[inline]
+    fn partial_cmp(&self, other: &ByteStreamRead) -> Option<cmp::Ordering> {
+        <[u8] as PartialOrd<[u8]>>::partial_cmp(self, other)
+    }
+}
+
+impl PartialEq<str> for ByteStreamRead {
+    #[inline]
+    fn eq(&self, other: &str) -> bool {
+        self.as_slice() == other.as_bytes()
+    }
+}
+
+impl PartialOrd<str> for ByteStreamRead {
+    #[inline]
+    fn partial_cmp(&self, other: &str) -> Option<cmp::Ordering> {
+        self.as_slice().partial_cmp(other.as_bytes())
+    }
+}
+
+impl PartialEq<ByteStreamRead> for str {
+    #[inline]
+    fn eq(&self, other: &ByteStreamRead) -> bool {
+        *other == *self
+    }
+}
+
+impl PartialOrd<ByteStreamRead> for str {
+    #[inline]
+    fn partial_cmp(&self, other: &ByteStreamRead) -> Option<cmp::Ordering> {
+        <[u8] as PartialOrd<[u8]>>::partial_cmp(self.as_bytes(), other)
+    }
+}
+
+impl PartialEq<Vec<u8>> for ByteStreamRead {
+    #[inline]
+    fn eq(&self, other: &Vec<u8>) -> bool {
+        *self == other[..]
+    }
+}
+
+impl PartialOrd<Vec<u8>> for ByteStreamRead {
+    #[inline]
+    fn partial_cmp(&self, other: &Vec<u8>) -> Option<cmp::Ordering> {
+        self.as_slice().partial_cmp(&other[..])
+    }
+}
+
+impl PartialEq<ByteStreamRead> for Vec<u8> {
+    #[inline]
+    fn eq(&self, other: &ByteStreamRead) -> bool {
+        *other == *self
+    }
+}
+
+impl PartialOrd<ByteStreamRead> for Vec<u8> {
+    #[inline]
+    fn partial_cmp(&self, other: &ByteStreamRead) -> Option<cmp::Ordering> {
+        <[u8] as PartialOrd<[u8]>>::partial_cmp(self, other)
+    }
+}
+
+impl PartialEq<String> for ByteStreamRead {
+    #[inline]
+    fn eq(&self, other: &String) -> bool {
+        *self == other[..]
+    }
+}
+
+impl PartialOrd<String> for ByteStreamRead {
+    #[inline]
+    fn partial_cmp(&self, other: &String) -> Option<cmp::Ordering> {
+        self.as_slice().partial_cmp(other.as_bytes())
+    }
+}
+
+impl PartialEq<ByteStreamRead> for String {
+    #[inline]
+    fn eq(&self, other: &ByteStreamRead) -> bool {
+        *other == *self
+    }
+}
+
+impl PartialOrd<ByteStreamRead> for String {
+    #[inline]
+    fn partial_cmp(&self, other: &ByteStreamRead) -> Option<cmp::Ordering> {
+        <[u8] as PartialOrd<[u8]>>::partial_cmp(self.as_bytes(), other)
+    }
+}
+
+impl PartialEq<ByteStreamRead> for &[u8] {
+    #[inline]
+    fn eq(&self, other: &ByteStreamRead) -> bool {
+        *other == *self
+    }
+}
+
+impl PartialOrd<ByteStreamRead> for &[u8] {
+    #[inline]
+    fn partial_cmp(&self, other: &ByteStreamRead) -> Option<cmp::Ordering> {
+        <[u8] as PartialOrd<[u8]>>::partial_cmp(self, other)
+    }
+}
+
+impl PartialEq<ByteStreamRead> for &str {
+    #[inline]
+    fn eq(&self, other: &ByteStreamRead) -> bool {
+        *other == *self
+    }
+}
+
+impl PartialOrd<ByteStreamRead> for &str {
+    #[inline]
+    fn partial_cmp(&self, other: &ByteStreamRead) -> Option<cmp::Ordering> {
+        <[u8] as PartialOrd<[u8]>>::partial_cmp(self.as_bytes(), other)
+    }
+}
+
+impl<'a, T: ?Sized> PartialEq<&'a T> for ByteStreamRead
+    where
+        ByteStreamRead: PartialEq<T>,
+{
+    #[inline]
+    fn eq(&self, other: &&'a T) -> bool {
+        *self == **other
+    }
+}
+
+impl<'a, T: ?Sized> PartialOrd<&'a T> for ByteStreamRead
+    where
+        ByteStreamRead: PartialOrd<T>,
+{
+    #[inline]
+    fn partial_cmp(&self, other: &&'a T) -> Option<cmp::Ordering> {
+        self.partial_cmp(&**other)
+    }
 }
 
 impl Default for ByteStreamRead {
@@ -312,12 +591,6 @@ impl From<Vec<u8>> for ByteStreamRead {
     }
 }
 
-impl From<Box<[u8]>> for ByteStreamRead {
-    #[inline]
-    fn from(slice: Box<[u8]>) -> ByteStreamRead {
-        ByteStreamRead::from_bytes(Bytes::from(slice))
-    }
-}
 
 impl From<String> for ByteStreamRead {
     #[inline]
