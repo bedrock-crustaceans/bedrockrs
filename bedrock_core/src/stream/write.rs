@@ -1,6 +1,12 @@
+use core::{fmt, hash};
+use std::borrow::{Borrow, BorrowMut};
+use std::{cmp, slice};
+use std::hash::Hash;
+use std::io::Write;
+use std::ops::{Deref, DerefMut};
 use byteorder::{BigEndian, LittleEndian, WriteBytesExt};
-use bytes::buf::Writer;
-use bytes::{BufMut, BytesMut};
+use bytes::buf::{IntoIter, Writer};
+use bytes::{Buf, BufMut, BytesMut};
 use varint_rs::{VarintWriter};
 
 use crate::stream::read::ByteStreamRead;
@@ -253,21 +259,272 @@ impl ByteStreamWrite {
         }
     }
 
-    /// Write a f32
+    /// Write a f32le
     #[inline]
-    pub fn write_f32(&mut self, n: f32) -> Result<(), std::io::Error> {
+    pub fn write_f32le(&mut self, n: f32) -> Result<(), std::io::Error> {
         match self.0.write_f32::<LittleEndian>(n) {
             Ok(_) => Ok(()),
             Err(e) => Err(e),
         }
     }
 
-    /// Write a f64
+    /// Write a f32be
     #[inline]
-    pub fn write_f64(&mut self, n: f64) -> Result<(), std::io::Error> {
-        match self.0.write_f64::<BigEndian>(n) {
+    pub fn write_f32be(&mut self, n: f32) -> Result<(), std::io::Error> {
+        match self.0.write_f32::<BigEndian>(n) {
             Ok(_) => Ok(()),
             Err(e) => Err(e),
         }
     }
+
+    /// Write a f64le
+    #[inline]
+    pub fn write_f64le(&mut self, n: f64) -> Result<(), std::io::Error> {
+        match self.0.write_f64::<LittleEndian>(n) {
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
+        }
+    }
+
+
+    /// Write a f64be
+    #[inline]
+    pub fn write_f64be(&mut self, n: f64) -> Result<(), std::io::Error> {
+        match self.0.write_f64::<LittleEndian>(n) {
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
+        }
+    }
+
+    #[inline]
+    pub fn as_slice(&self) -> &[u8] {
+        unsafe { slice::from_raw_parts(self.0.get_ref().as_ptr(), self.len()) }
+    }
+
+    #[inline]
+    pub fn as_slice_mut(&mut self) -> &mut [u8] {
+        unsafe { slice::from_raw_parts_mut(self.0.get_mut().as_mut_ptr(), self.len()) }
+    }
 }
+
+impl Write for ByteStreamWrite {
+    #[inline]
+    fn write(&mut self, src: &[u8]) -> std::io::Result<usize> {
+        std::io::Write::write(&mut self.0, src)
+    }
+
+    #[inline]
+    fn flush(&mut self) -> std::io::Result<()> {
+        self.0.flush()
+    }
+}
+
+
+impl Buf for ByteStreamWrite {
+    #[inline]
+    fn remaining(&self) -> usize {
+        self.0.get_ref().remaining()
+    }
+
+    #[inline]
+    fn chunk(&self) -> &[u8] {
+        self.0.get_ref().chunk()
+    }
+
+    #[inline]
+    fn advance(&mut self, cnt: usize) {
+        self.0.get_mut().advance(cnt)
+    }
+}
+
+impl AsRef<[u8]> for ByteStreamWrite {
+    #[inline]
+    fn as_ref(&self) -> &[u8] {
+        self.as_slice()
+    }
+}
+
+impl Deref for ByteStreamWrite {
+    type Target = [u8];
+
+    #[inline]
+    fn deref(&self) -> &[u8] {
+        self.as_ref()
+    }
+}
+
+impl AsMut<[u8]> for ByteStreamWrite {
+    #[inline]
+    fn as_mut(&mut self) -> &mut [u8] {
+        self.as_slice_mut()
+    }
+}
+
+impl DerefMut for ByteStreamWrite {
+    #[inline]
+    fn deref_mut(&mut self) -> &mut [u8] {
+        self.as_mut()
+    }
+}
+
+impl<'a> From<&'a [u8]> for ByteStreamWrite {
+    #[inline]
+    fn from(src: &'a [u8]) -> ByteStreamWrite {
+        ByteStreamWrite::from(src)
+    }
+}
+
+impl<'a> From<&'a str> for ByteStreamWrite {
+    #[inline]
+    fn from(src: &'a str) -> ByteStreamWrite {
+        ByteStreamWrite::from(src.as_bytes())
+    }
+}
+
+impl From<ByteStreamWrite> for ByteStreamRead {
+    #[inline]
+    fn from(src: ByteStreamWrite) -> ByteStreamRead {
+        src.freeze()
+    }
+}
+
+impl PartialEq for ByteStreamWrite {
+    #[inline]
+    fn eq(&self, other: &ByteStreamWrite) -> bool {
+        self.as_slice() == other.as_slice()
+    }
+}
+
+impl PartialOrd for ByteStreamWrite {
+    #[inline]
+    fn partial_cmp(&self, other: &ByteStreamWrite) -> Option<cmp::Ordering> {
+        self.as_slice().partial_cmp(other.as_slice())
+    }
+}
+
+impl Ord for ByteStreamWrite {
+    #[inline]
+    fn cmp(&self, other: &ByteStreamWrite) -> cmp::Ordering {
+        self.as_slice().cmp(other.as_slice())
+    }
+}
+
+impl Eq for ByteStreamWrite {}
+
+impl Default for ByteStreamWrite {
+    #[inline]
+    fn default() -> ByteStreamWrite {
+        ByteStreamWrite::new()
+    }
+}
+
+impl hash::Hash for ByteStreamWrite {
+    #[inline]
+    fn hash<H>(&self, state: &mut H)
+        where
+            H: hash::Hasher,
+    {
+        let s: &[u8] = self.as_ref();
+        s.hash(state);
+    }
+}
+
+impl Borrow<[u8]> for ByteStreamWrite {
+    #[inline]
+    fn borrow(&self) -> &[u8] {
+        self.as_ref()
+    }
+}
+
+impl BorrowMut<[u8]> for ByteStreamWrite {
+    #[inline]
+    fn borrow_mut(&mut self) -> &mut [u8] {
+        self.as_mut()
+    }
+}
+
+impl fmt::Write for ByteStreamWrite {
+    #[inline]
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        self.0.get_mut().write_str(s)
+    }
+
+    #[inline]
+    fn write_fmt(&mut self, args: fmt::Arguments<'_>) -> fmt::Result {
+        fmt::write(self, args)
+    }
+}
+
+impl Clone for ByteStreamWrite {
+    #[inline]
+    fn clone(&self) -> ByteStreamWrite {
+        ByteStreamWrite::from(&self[..])
+    }
+}
+
+impl IntoIterator for ByteStreamWrite {
+    type Item = u8;
+    type IntoIter = IntoIter<ByteStreamWrite>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter {
+        IntoIter::new(self)
+    }
+}
+
+impl<'a> IntoIterator for &'a ByteStreamWrite {
+    type Item = &'a u8;
+    type IntoIter = core::slice::Iter<'a, u8>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter {
+        self.as_ref().iter()
+    }
+}
+
+impl Extend<u8> for ByteStreamWrite {
+    #[inline]
+    fn extend<T>(&mut self, iter: T)
+        where
+            T: IntoIterator<Item = u8>,
+    {
+        self.extend(iter)
+    }
+}
+
+impl<'a> Extend<&'a u8> for ByteStreamWrite {
+    #[inline]
+    fn extend<T>(&mut self, iter: T)
+        where
+            T: IntoIterator<Item = &'a u8>,
+    {
+        self.extend(iter.into_iter().copied())
+    }
+}
+
+impl Extend<ByteStreamWrite> for ByteStreamWrite {
+    #[inline]
+    fn extend<T>(&mut self, iter: T)
+        where
+            T: IntoIterator<Item = ByteStreamWrite>,
+    {
+        for bytes in iter {
+            self.0.get_mut().extend_from_slice(&bytes)
+        }
+    }
+}
+
+impl FromIterator<u8> for ByteStreamWrite {
+    #[inline]
+    fn from_iter<T: IntoIterator<Item = u8>>(into_iter: T) -> Self {
+        ByteStreamWrite::from(&*Vec::from_iter(into_iter))
+    }
+}
+
+impl<'a> FromIterator<&'a u8> for ByteStreamWrite {
+    #[inline]
+    fn from_iter<T: IntoIterator<Item = &'a u8>>(into_iter: T) -> Self {
+        ByteStreamWrite::from_iter(into_iter.into_iter().copied())
+    }
+}
+
