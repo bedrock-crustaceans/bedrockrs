@@ -1,7 +1,6 @@
 use core::{fmt, hash};
 use std::borrow::{Borrow, BorrowMut};
 use std::{cmp, slice};
-use std::hash::Hash;
 use std::io::Write;
 use std::ops::{Deref, DerefMut};
 use byteorder::{BigEndian, LittleEndian, WriteBytesExt};
@@ -370,7 +369,7 @@ impl DerefMut for ByteStreamWrite {
 impl<'a> From<&'a [u8]> for ByteStreamWrite {
     #[inline]
     fn from(src: &'a [u8]) -> ByteStreamWrite {
-        ByteStreamWrite::from(src)
+        ByteStreamWrite::from_bytes_mut(BytesMut::from(src))
     }
 }
 
@@ -488,7 +487,7 @@ impl Extend<u8> for ByteStreamWrite {
         where
             T: IntoIterator<Item = u8>,
     {
-        self.extend(iter)
+        self.0.get_mut().extend(iter)
     }
 }
 

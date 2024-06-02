@@ -1,7 +1,6 @@
 use core::hash;
 use std::borrow::Borrow;
 use std::{cmp, slice};
-use std::hash::Hash;
 use std::io::Read;
 use std::ops::Deref;
 use byteorder::{BigEndian, LittleEndian, ReadBytesExt};
