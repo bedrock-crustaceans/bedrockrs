@@ -9,8 +9,6 @@ edition = "2021"
 bedrock_core = { path = "../bedrock_core" }
 nbt = { path = "../nbt" }
 
-byteorder = "1.5"
-varint-rs = "2.2"
 thiserror = "1.0"
 serde_json = "1.0"
 jsonwebtoken = "9.3"

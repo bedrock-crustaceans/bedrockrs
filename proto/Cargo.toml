@@ -11,22 +11,22 @@ proto_core = { path = "../proto_core" }
 proto_derive = { path = "../proto_derive" }
 nbt = { path = "../nbt" }
 
-byteorder = "1.5"
-varint-rs = "2.2"
+s2n-quic = "1.37"
+
 jsonwebtoken = "9.3"
 ring = { version = "0.17" }
 rand = "0.8"
-base64 = "0.22.1"
+base64 = "0.22"
 serde_json = "1.0"
 rak-rs = { version = "0.3", default-features = false, features = ["async_tokio", "mcpe"] }
-tokio = { version = "1", features = ["full"] }
+tokio = { version = "1.38", features = ["full"] }
 
 flate2 = "1.0"
 snap = "1.1"
 
-num-traits = "0.2.19"
-num-derive = "0.4.2"
+num-traits = "0.2"
+num-derive = "0.4"
 
-x509-cert = "0.2.5"
+x509-cert = "0.2"
 
 uuid = "1.8"
