@@ -1,6 +1,5 @@
 use bedrock_core::dimension::Dimension;
 
-#[derive(Clone, Copy)]
 pub enum RecordType {
     Data3D,
     Version,
@@ -27,8 +26,8 @@ pub enum RecordType {
     LegacyVersion
 }
 
-impl From<RecordType> for u8 {
-    fn from(value: RecordType) -> Self {
+impl From<&RecordType> for u8 {
+    fn from(value: &RecordType) -> Self {
         match value {
             RecordType::Data3D => 43,
             RecordType::Version => 44,
@@ -68,7 +67,7 @@ pub fn create_key(x: i32, z: i32, dimension: Dimension, record_type: RecordType)
         }
     }
 
-    out.push(Into::<u8>::into(record_type));
+    out.push(Into::<u8>::into(&record_type));
 
     match record_type {
         RecordType::SubChunkPrefix { y } => {
