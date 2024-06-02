@@ -1,5 +1,6 @@
 use bedrock_core::dimension::Dimension;
 
+// don't know what a lot of these mean, some are for world gen that we don't care about
 pub enum RecordType {
     Data3D,
     Version,
@@ -56,6 +57,12 @@ impl From<&RecordType> for u8 {
     }
 }
 
+// format: https://minecraft.wiki/w/Bedrock_Edition_level_format#Chunk_key_format
+// 
+// Two signed 32-bit little-endian integers (x and z in chunk coordinates, respectively),
+// An optional third 32-bit little-endian integer (1 for the Nether, 2 for the End, omitted for the Overworld),
+// A one-byte tag specifying the type of record represented by the key (see table), and
+// (for a "SubChunkPrefix" record) a one-byte subchunk index (from 0 to 15).
 pub fn create_key(x: i32, z: i32, dimension: Dimension, record_type: RecordType) -> Vec<u8> {
     let mut out: Vec<u8> = Vec::new();
     out.extend_from_slice(&x.to_le_bytes());
