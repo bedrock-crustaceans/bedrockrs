@@ -122,7 +122,7 @@ pub async fn handle_login_server_side(
 
     println!("LOGIN");
 
-    // If encryption is enabled send the
+    // If encryption is enabled, send the handshake
     if options.encryption {
         // TODO: Setup Encryption
     }

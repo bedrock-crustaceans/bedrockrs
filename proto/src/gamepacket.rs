@@ -353,7 +353,7 @@ macro_rules! ser_packet {
         }
 
         // Copy pk stream into stream
-        match $stream.write_all(&*pk_stream) {
+        match $stream.write_all(pk_stream.as_slice()) {
             Ok(_) => {}
             Err(e) => {
                 return Err(ProtoCodecError::IOError(e));
