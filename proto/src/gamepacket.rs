@@ -1,10 +1,12 @@
 #![allow(non_upper_case_globals)]
 
-use std::io::{Cursor, Write};
+use std::io::{Write};
+use bedrock_core::stream::read::ByteStreamRead;
+use bedrock_core::stream::write::ByteStreamWrite;
+use bedrock_core::uvar32;
 
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
-use varint_rs::{VarintReader, VarintWriter};
 
 use crate::packets::client_cache_status::ClientCacheStatusPacket;
 use crate::packets::disconnect::DisconnectPacket;
@@ -320,22 +322,22 @@ impl GamePacket {
 }
 
 macro_rules! ser_packet {
-    ($buf:expr, $packet_id:expr, $packet_data:expr) => {{
-        let mut pk_buf = vec![];
+    ($stream:expr, $packet_id:expr, $packet_data:expr) => {{
+        let mut pk_stream = ByteStreamWrite::new();
 
         // TODO add correct header generation
         // let header = "";
 
-        // Write the PacketID to the packet buffer
-        match pk_buf.write_u16_varint($packet_id as u16) {
+        // Write the PacketID to the packet streamfer
+        match pk_stream.write_uvar32(uvar32($packet_id as u32)) {
             Ok(_) => {}
             Err(e) => {
                 return Err(ProtoCodecError::IOError(e));
             }
         }
 
-        // Write the packet data to the packet buffer
-        match $packet_data.proto_serialize(&mut pk_buf) {
+        // Write the packet data to the packet streamfer
+        match $packet_data.proto_serialize(&mut pk_stream) {
             Ok(_) => {}
             Err(e) => {
                 return Err(e);
@@ -343,15 +345,15 @@ macro_rules! ser_packet {
         }
 
         // Write buffer length
-        match $buf.write_u32_varint(pk_buf.len() as u32) {
+        match $stream.write_uvar32(uvar32(pk_stream.len() as u32)) {
             Ok(_) => {}
             Err(e) => {
                 return Err(ProtoCodecError::IOError(e));
             }
         }
 
-        // Copy pk buffer into buffer
-        match $buf.write_all(&*pk_buf) {
+        // Copy pk stream into stream
+        match $stream.write_all(&*pk_stream) {
             Ok(_) => {}
             Err(e) => {
                 return Err(ProtoCodecError::IOError(e));
@@ -363,8 +365,8 @@ macro_rules! ser_packet {
 }
 
 macro_rules! de_packet {
-    ($cursor:expr, $packet_struct:ty) => {{
-        match <$packet_struct>::proto_deserialize($cursor) {
+    ($stream:expr, $packet_struct:ty) => {{
+        match <$packet_struct>::proto_deserialize($stream) {
             Ok(v) => v,
             Err(e) => return Err(e),
         }
@@ -372,31 +374,31 @@ macro_rules! de_packet {
 }
 
 impl GamePacket {
-    pub fn pk_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
+    pub fn pk_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError> {
         match self {
             GamePacket::Login(pk) => {
-                ser_packet!(buf, GamePacket::Login as u16, pk)
+                ser_packet!(stream, GamePacket::Login as u16, pk)
             }
             GamePacket::PlayStatus(pk) => {
-                ser_packet!(buf, GamePacket::PlayStatusID, pk)
+                ser_packet!(stream, GamePacket::PlayStatusID, pk)
             }
             GamePacket::ServerToClientHandshake(pk) => {
-                ser_packet!(buf, GamePacket::ServerToClientHandshakeID, pk)
+                ser_packet!(stream, GamePacket::ServerToClientHandshakeID, pk)
             }
             GamePacket::ClientToServerHandshake() => {
                 unimplemented!()
             }
             GamePacket::Disconnect(pk) => {
-                ser_packet!(buf, GamePacket::DisconnectID, pk)
+                ser_packet!(stream, GamePacket::DisconnectID, pk)
             }
             GamePacket::ResourcePacksInfo(pk) => {
-                ser_packet!(buf, GamePacket::ResourcePacksInfoID, pk)
+                ser_packet!(stream, GamePacket::ResourcePacksInfoID, pk)
             }
             GamePacket::ResourcePackStack(pk) => {
-                ser_packet!(buf, GamePacket::ResourcePacksStackID, pk)
+                ser_packet!(stream, GamePacket::ResourcePacksStackID, pk)
             }
             GamePacket::ResourcePackClientResponse(pk) => {
-                ser_packet!(buf, GamePacket::ResourcePacksClientResponseID, pk)
+                ser_packet!(stream, GamePacket::ResourcePacksClientResponseID, pk)
             }
             GamePacket::Text() => {
                 unimplemented!()
@@ -744,7 +746,7 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::ClientCacheStatus(pk) => {
-                ser_packet!(buf, GamePacket::ClientCacheStatusID, pk)
+                ser_packet!(stream, GamePacket::ClientCacheStatusID, pk)
             }
             GamePacket::OnScreenTextureAnimation() => {
                 unimplemented!()
@@ -768,7 +770,7 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::NetworkSettings(pk) => {
-                ser_packet!(buf, GamePacket::NetworkSettingsID, pk)
+                ser_packet!(stream, GamePacket::NetworkSettingsID, pk)
             }
             GamePacket::PlayerAuthInput() => {
                 unimplemented!()
@@ -810,7 +812,7 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::RequestNetworkSettings(pk) => {
-                ser_packet!(buf, GamePacket::RequestNetworkSettingsID, pk)
+                ser_packet!(stream, GamePacket::RequestNetworkSettingsID, pk)
             }
             GamePacket::AlexEntityAnimation() => {
                 unimplemented!()
@@ -819,19 +821,22 @@ impl GamePacket {
     }
 
     pub fn pk_deserialize(
-        cursor: &mut Cursor<Vec<u8>>,
+        stream: &mut ByteStreamRead,
     ) -> Result<(GamePacket, u8, u8), ProtoCodecError> {
         // Read the game packet length
         // We don't need it, yet
         // TODO: Use this to possibly async the packet handling
-        match cursor.read_u32_varint() {
+        match stream.read_uvar32() {
             Ok(_) => {}
             Err(e) => return Err(ProtoCodecError::IOError(e)),
         };
 
-        // Read the game packet header
-        let game_packet_header = match cursor.read_u16_varint() {
-            Ok(v) => v,
+        // Read the game packet header and parse it into an u16
+        let game_packet_header: u16 = match stream.read_uvar32() {
+            Ok(v) => match v.0.try_into() {
+                Ok(v) => { v }
+                Err(e) => { return Err(ProtoCodecError::FromIntError(e)) }
+            },
             Err(e) => return Err(ProtoCodecError::IOError(e)),
         };
 
@@ -846,35 +851,29 @@ impl GamePacket {
         // Can never be more than an 8-bit integer due to being 2 bits big
         let sub_client_target_id = (game_packet_header & 0b0011_0000_0000_0000) as u8;
 
-        // Parse the game packet id into a valid GamePacket enum variant
-        // let game_packet_id = match GamePacket::from_u16(game_packet_id) {
-        //     Some(id) => id,
-        //     None => return Err(ProtoCodecError::InvalidGamePacket(game_packet_id)),
-        // };
-
         // Match the GamePacket to deserialize the correct packet type
         let game_packet = match game_packet_id {
-            GamePacket::LoginID => GamePacket::Login(de_packet!(cursor, LoginPacket)),
+            GamePacket::LoginID => GamePacket::Login(de_packet!(stream, LoginPacket)),
             GamePacket::PlayStatusID => {
-                GamePacket::PlayStatus(de_packet!(cursor, PlayStatusPacket))
+                GamePacket::PlayStatus(de_packet!(stream, PlayStatusPacket))
             }
             GamePacket::ServerToClientHandshakeID => GamePacket::ServerToClientHandshake(
-                de_packet!(cursor, HandshakeServerToClientPacket),
+                de_packet!(stream, HandshakeServerToClientPacket),
             ),
             GamePacket::ClientToServerHandshakeID => {
                 unimplemented!()
             }
             GamePacket::DisconnectID => {
-                GamePacket::Disconnect(de_packet!(cursor, DisconnectPacket))
+                GamePacket::Disconnect(de_packet!(stream, DisconnectPacket))
             }
             GamePacket::ResourcePacksInfoID => {
-                GamePacket::ResourcePacksInfo(de_packet!(cursor, ResourcePacksInfoPacket))
+                GamePacket::ResourcePacksInfo(de_packet!(stream, ResourcePacksInfoPacket))
             }
             GamePacket::ResourcePacksStackID => {
-                GamePacket::ResourcePackStack(de_packet!(cursor, ResourcePacksStackPacket))
+                GamePacket::ResourcePackStack(de_packet!(stream, ResourcePacksStackPacket))
             }
             GamePacket::ResourcePacksClientResponseID => GamePacket::ResourcePackClientResponse(
-                de_packet!(cursor, ResourcePacksResponsePacket),
+                de_packet!(stream, ResourcePacksResponsePacket),
             ),
             GamePacket::TextID => {
                 unimplemented!()
@@ -1222,7 +1221,7 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::ClientCacheStatusID => {
-                GamePacket::ClientCacheStatus(de_packet!(cursor, ClientCacheStatusPacket))
+                GamePacket::ClientCacheStatus(de_packet!(stream, ClientCacheStatusPacket))
             }
             GamePacket::OnScreenTextureAnimationID => {
                 unimplemented!()
@@ -1246,7 +1245,7 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::NetworkSettingsID => {
-                GamePacket::NetworkSettings(de_packet!(cursor, NetworkSettingsPacket))
+                GamePacket::NetworkSettings(de_packet!(stream, NetworkSettingsPacket))
             }
             GamePacket::PlayerAuthInputID => {
                 unimplemented!()
@@ -1288,13 +1287,13 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::RequestNetworkSettingsID => {
-                GamePacket::RequestNetworkSettings(de_packet!(cursor, NetworkSettingsRequestPacket))
+                GamePacket::RequestNetworkSettings(de_packet!(stream, NetworkSettingsRequestPacket))
             }
             GamePacket::AlexEntityAnimationID => {
                 unimplemented!()
             }
-            _ => {
-                return Err(ProtoCodecError::InvalidEnumID);
+            id => {
+                return Err(ProtoCodecError::InvalidGamePacketID(id));
             }
         };
 
