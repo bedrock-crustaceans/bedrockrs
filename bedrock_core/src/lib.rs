@@ -1,3 +1,5 @@
+pub use difficulty::*;
+pub use dimension::*;
 pub use int::i128be::i128be;
 pub use int::i128le::i128le;
 pub use int::i16be::i16be;
@@ -14,6 +16,9 @@ pub use int::u32be::u32be;
 pub use int::u32le::u32le;
 pub use int::u64be::u64be;
 pub use int::u64le::u64le;
+pub use permissions_level::*;
+pub use stream::*;
+pub use uuid::*;
 pub use varint::ivar32::ivar32;
 pub use varint::ivar64::ivar64;
 pub use varint::uvar32::uvar32;
@@ -27,15 +32,9 @@ pub mod int;
 pub mod varint;
 pub mod vec;
 
-pub use stream::*;
 pub mod stream;
 
-pub use uuid::*;
 pub mod uuid;
-
-pub use difficulty::*;
-pub use dimension::*;
-pub use permissions_level::*;
 
 pub mod difficulty;
 pub mod dimension;

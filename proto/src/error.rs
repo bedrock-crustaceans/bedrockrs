@@ -8,7 +8,7 @@ pub enum ListenerError {
     AddrBindError,
     AlreadyOnline,
     NotListening,
-    TransportListenerError(TransportLayerError)
+    TransportListenerError(TransportLayerError),
 }
 
 #[derive(Debug)]
@@ -33,7 +33,7 @@ pub enum CompressionError {
 #[derive(Debug)]
 pub enum LoginError {
     ConnError(ConnectionError),
-    WrongProtocolVersion{ client: i32, server: Vec<i32> },
+    WrongProtocolVersion { client: i32, server: Vec<i32> },
     PacketMismatch(String),
 }
 
@@ -48,5 +48,5 @@ pub enum RaknetError {
     RecvError(RecvError),
     SendError(SendQueueError),
     ServerError(ServerError),
-    FormatError(String)
+    FormatError(String),
 }

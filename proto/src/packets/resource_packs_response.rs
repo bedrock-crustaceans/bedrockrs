@@ -1,6 +1,4 @@
-use std::io::Cursor;
 use bedrock_core::read::ByteStreamRead;
-
 use bedrock_core::u16le;
 use bedrock_core::write::ByteStreamWrite;
 use proto_core::error::ProtoCodecError;

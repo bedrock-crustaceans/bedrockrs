@@ -1,9 +1,9 @@
 use std::f32;
-use std::io::{Write};
+use std::io::Write;
 
-use bedrock_core::*;
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
+use bedrock_core::*;
 
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;

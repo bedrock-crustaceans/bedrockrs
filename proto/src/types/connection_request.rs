@@ -1,5 +1,5 @@
 use std::collections::BTreeMap;
-use std::io::{Cursor, Read};
+use std::io::Read;
 
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;

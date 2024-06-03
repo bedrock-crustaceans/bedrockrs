@@ -1,12 +1,13 @@
 use core::{fmt, hash};
 use std::borrow::{Borrow, BorrowMut};
-use std::{cmp, slice};
 use std::io::Write;
 use std::ops::{Deref, DerefMut};
+use std::{cmp, slice};
+
 use byteorder::{BigEndian, LittleEndian, WriteBytesExt};
 use bytes::buf::{IntoIter, Writer};
 use bytes::{Buf, BufMut, BytesMut};
-use varint_rs::{VarintWriter};
+use varint_rs::VarintWriter;
 
 use crate::stream::read::ByteStreamRead;
 use crate::*;
@@ -285,7 +286,6 @@ impl ByteStreamWrite {
         }
     }
 
-
     /// Write a f64be
     #[inline]
     pub fn write_f64be(&mut self, n: f64) -> Result<(), std::io::Error> {
@@ -317,7 +317,6 @@ impl Write for ByteStreamWrite {
         self.0.flush()
     }
 }
-
 
 impl Buf for ByteStreamWrite {
     #[inline]
@@ -420,8 +419,8 @@ impl Default for ByteStreamWrite {
 impl hash::Hash for ByteStreamWrite {
     #[inline]
     fn hash<H>(&self, state: &mut H)
-        where
-            H: hash::Hasher,
+    where
+        H: hash::Hasher,
     {
         let s: &[u8] = self.as_ref();
         s.hash(state);
@@ -484,8 +483,8 @@ impl<'a> IntoIterator for &'a ByteStreamWrite {
 impl Extend<u8> for ByteStreamWrite {
     #[inline]
     fn extend<T>(&mut self, iter: T)
-        where
-            T: IntoIterator<Item = u8>,
+    where
+        T: IntoIterator<Item = u8>,
     {
         self.0.get_mut().extend(iter)
     }
@@ -494,8 +493,8 @@ impl Extend<u8> for ByteStreamWrite {
 impl<'a> Extend<&'a u8> for ByteStreamWrite {
     #[inline]
     fn extend<T>(&mut self, iter: T)
-        where
-            T: IntoIterator<Item = &'a u8>,
+    where
+        T: IntoIterator<Item = &'a u8>,
     {
         self.extend(iter.into_iter().copied())
     }
@@ -504,8 +503,8 @@ impl<'a> Extend<&'a u8> for ByteStreamWrite {
 impl Extend<ByteStreamWrite> for ByteStreamWrite {
     #[inline]
     fn extend<T>(&mut self, iter: T)
-        where
-            T: IntoIterator<Item = ByteStreamWrite>,
+    where
+        T: IntoIterator<Item = ByteStreamWrite>,
     {
         for bytes in iter {
             self.0.get_mut().extend_from_slice(&bytes)
@@ -526,4 +525,3 @@ impl<'a> FromIterator<&'a u8> for ByteStreamWrite {
         ByteStreamWrite::from_iter(into_iter.into_iter().copied())
     }
 }
-

@@ -1,6 +1,7 @@
+use std::io::Write;
+
 use bedrock_core::stream::read::ByteStreamRead;
 use byteorder::{LittleEndian, WriteBytesExt};
-use std::io::Write;
 use varint_rs::VarintWriter;
 
 use crate::byte_order::NbtByteOrder;

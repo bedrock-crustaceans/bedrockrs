@@ -8,7 +8,7 @@ use rand::RngCore;
 use crate::conn::Conn;
 use crate::error::{ListenerError, RaknetError, TransportLayerError};
 use crate::info::{MINECRAFT_EDITION_MOTD, MINECRAFT_VERSION, PROTOCOL_VERSION};
-use crate::transport_layer::{TransportLaterListener, TransportLayerType};
+use crate::transport_layer::TransportLaterListener;
 
 pub struct Listener {
     listener: TransportLaterListener,
@@ -28,7 +28,11 @@ impl Listener {
         // Check for success
         let mut rak_listener = match rak_listener {
             Ok(v) => v,
-            Err(e) => return Err(ListenerError::TransportListenerError(TransportLayerError::RaknetUDPError(RaknetError::ServerError(e)))),
+            Err(e) => {
+                return Err(ListenerError::TransportListenerError(
+                    TransportLayerError::RaknetUDPError(RaknetError::ServerError(e)),
+                ))
+            }
         };
 
         // generate a random guid

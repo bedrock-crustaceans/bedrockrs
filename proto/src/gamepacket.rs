@@ -1,10 +1,10 @@
 #![allow(non_upper_case_globals)]
 
-use std::io::{Write};
+use std::io::Write;
+
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
 use bedrock_core::uvar32;
-
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
 
@@ -834,8 +834,10 @@ impl GamePacket {
         // Read the game packet header and parse it into an u16
         let game_packet_header: u16 = match stream.read_uvar32() {
             Ok(v) => match v.0.try_into() {
-                Ok(v) => { v }
-                Err(e) => { return Err(ProtoCodecError::FromIntError(e)) }
+                Ok(v) => v,
+                Err(e) => {
+                    return Err(ProtoCodecError::FromIntError(e));
+                }
             },
             Err(e) => return Err(ProtoCodecError::IOError(e)),
         };

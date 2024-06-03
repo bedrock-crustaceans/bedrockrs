@@ -1,8 +1,7 @@
 use std::collections::BTreeMap;
-use std::io::Cursor;
+
 use bedrock_core::read::ByteStreamRead;
 use bedrock_core::write::ByteStreamWrite;
-
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
 use serde_json::Value;

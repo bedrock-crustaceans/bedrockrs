@@ -2,14 +2,13 @@ use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
 
 use bedrock_core::stream::read::ByteStreamRead;
+pub use error::NbtError;
 
 use crate::byte_order::NbtByteOrder;
 
 pub mod byte_order;
 pub mod endian;
 pub mod error;
-
-pub use error::NbtError;
 
 /// An enum representing all possible NBT tags.
 ///

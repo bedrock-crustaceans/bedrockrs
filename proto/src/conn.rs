@@ -1,12 +1,11 @@
-use std::io::{Cursor, Error, Write};
-use bedrock_core::stream::read::ByteStreamRead;
+use std::io::Write;
+
 use bedrock_core::stream::write::ByteStreamWrite;
 use tokio::io::AsyncWriteExt;
 
 use crate::compression::Compression;
-
 use crate::encryption::Encryption;
-use crate::error::{CompressionError, ConnectionError};
+use crate::error::ConnectionError;
 use crate::gamepacket::GamePacket;
 use crate::transport_layer::TransportLayerConn;
 
@@ -56,25 +55,28 @@ impl Conn {
                     Err(e) => return Err(ConnectionError::IOError(e)),
                 };
 
-                if compression.compression_needed() && pk_stream.len() as u16 > compression.threshold() {
+                if compression.compression_needed()
+                    && pk_stream.len() as u16 > compression.threshold()
+                {
                     match compression.compress(&pk_stream.freeze(), &mut compressed_stream) {
-                        Ok(_) => { }
-                        Err(e) => { return Err(ConnectionError::CompressError(e)) }
+                        Ok(_) => {}
+                        Err(e) => {
+                            return Err(ConnectionError::CompressError(e));
+                        }
                     };
-                }
-                else {
+                } else {
                     match compressed_stream.write(pk_stream.as_slice()) {
                         Ok(_) => {}
-                        Err(e) => { return Err(ConnectionError::IOError(e)) }
+                        Err(e) => {
+                            return Err(ConnectionError::IOError(e));
+                        }
                     }
                 };
 
                 compressed_stream
             }
             // If no compression is set zero copy the packet stream
-            None => {
-                pk_stream
-            }
+            None => pk_stream,
         };
 
         // Encrypt the compressed data
@@ -82,9 +84,7 @@ impl Conn {
             Some(encryption) => {
                 todo!("Encrypt the data (after compression)")
             }
-            None => {
-                compressed_stream
-            }
+            None => compressed_stream,
         };
 
         // Send the data
@@ -107,16 +107,14 @@ impl Conn {
             Some(encryption) => {
                 todo!("Decrypt the data (before decompression)")
             }
-            None => { stream }
+            None => stream,
         };
 
         // Decompress data
         let mut decompressed_stream = match &self.compression {
             Some(compression) => {
                 match decrypted_stream.read_u8() {
-                    Ok(v) => { if v != compression.id_u8() {
-
-                    }}
+                    Ok(v) => if v != compression.id_u8() {},
                     Err(_) => {}
                 };
 
@@ -124,12 +122,14 @@ impl Conn {
 
                 match compression.decompress(&mut decrypted_stream, &mut decompressed_stream) {
                     Ok(_) => {}
-                    Err(e) => { return Err(ConnectionError::CompressError(e)) }
+                    Err(e) => {
+                        return Err(ConnectionError::CompressError(e));
+                    }
                 };
 
                 decompressed_stream.freeze()
             }
-            None => { decrypted_stream }
+            None => decrypted_stream,
         };
 
         let mut gamepackets = vec![];

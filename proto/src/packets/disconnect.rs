@@ -1,5 +1,3 @@
-use std::io::Cursor;
-
 use bedrock_core::ivar32;
 use bedrock_core::read::ByteStreamRead;
 use bedrock_core::write::ByteStreamWrite;

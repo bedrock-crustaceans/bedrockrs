@@ -1,7 +1,5 @@
-use std::io::Cursor;
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
-
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::{FromPrimitive, ToPrimitive};
 use proto_core::error::ProtoCodecError;

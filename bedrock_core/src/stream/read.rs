@@ -1,8 +1,9 @@
 use core::hash;
 use std::borrow::Borrow;
-use std::{cmp, slice};
 use std::io::{Cursor, Read};
 use std::ops::Deref;
+use std::{cmp, slice};
+
 use byteorder::{BigEndian, LittleEndian, ReadBytesExt};
 use bytes::buf::IntoIter;
 use bytes::{Buf, Bytes};
@@ -334,7 +335,6 @@ impl Buf for ByteStreamRead {
     }
 }
 
-
 impl Deref for ByteStreamRead {
     type Target = [u8];
 
@@ -354,8 +354,8 @@ impl AsRef<[u8]> for ByteStreamRead {
 impl hash::Hash for ByteStreamRead {
     #[inline]
     fn hash<H>(&self, state: &mut H)
-        where
-            H: hash::Hasher,
+    where
+        H: hash::Hasher,
     {
         self.as_slice().hash(state);
     }
@@ -561,8 +561,8 @@ impl PartialOrd<ByteStreamRead> for &str {
 }
 
 impl<'a, T: ?Sized> PartialEq<&'a T> for ByteStreamRead
-    where
-        ByteStreamRead: PartialEq<T>,
+where
+    ByteStreamRead: PartialEq<T>,
 {
     #[inline]
     fn eq(&self, other: &&'a T) -> bool {
@@ -571,8 +571,8 @@ impl<'a, T: ?Sized> PartialEq<&'a T> for ByteStreamRead
 }
 
 impl<'a, T: ?Sized> PartialOrd<&'a T> for ByteStreamRead
-    where
-        ByteStreamRead: PartialOrd<T>,
+where
+    ByteStreamRead: PartialOrd<T>,
 {
     #[inline]
     fn partial_cmp(&self, other: &&'a T) -> Option<cmp::Ordering> {
@@ -607,7 +607,6 @@ impl From<Vec<u8>> for ByteStreamRead {
         ByteStreamRead::from_bytes(Bytes::from(vec))
     }
 }
-
 
 impl From<String> for ByteStreamRead {
     #[inline]

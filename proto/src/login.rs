@@ -1,6 +1,6 @@
 use bedrock_core::u16le;
-use crate::compression::Compression;
 
+use crate::compression::Compression;
 use crate::conn::Conn;
 use crate::error::LoginError;
 use crate::gamepacket::GamePacket;
@@ -66,8 +66,8 @@ pub async fn handle_login_server_side(
 
     // Get the compression threshold for the network settings packet
     let threshold = match options.compression {
-        Compression::Zlib{threshold, ..} => threshold,
-        Compression::Snappy{threshold} => threshold,
+        Compression::Zlib { threshold, .. } => threshold,
+        Compression::Snappy { threshold } => threshold,
         Compression::None => 0,
     };
 

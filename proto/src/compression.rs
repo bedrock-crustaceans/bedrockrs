@@ -1,7 +1,9 @@
 use std::io;
 use std::io::Write;
+
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
+
 use crate::error::CompressionError;
 
 pub enum Compression {
@@ -27,15 +29,9 @@ impl Compression {
     #[inline]
     pub const fn id_u8(&self) -> u8 {
         match self {
-            Compression::Zlib { .. } => {
-                0x00
-            }
-            Compression::Snappy { .. } => {
-                0x01
-            }
-            Compression::None => {
-                0xFF
-            }
+            Compression::Zlib { .. } => 0x00,
+            Compression::Snappy { .. } => 0x01,
+            Compression::None => 0xFF,
         }
     }
 
@@ -44,15 +40,9 @@ impl Compression {
     #[inline]
     pub const fn id_u16(&self) -> u16 {
         match self {
-            Compression::Zlib { .. } => {
-                0x0000
-            }
-            Compression::Snappy { .. } => {
-                0x0001
-            }
-            Compression::None => {
-                0xFFFF
-            }
+            Compression::Zlib { .. } => 0x0000,
+            Compression::Snappy { .. } => 0x0001,
+            Compression::None => 0xFFFF,
         }
     }
 
@@ -61,9 +51,9 @@ impl Compression {
     #[inline]
     pub const fn compression_needed(&self) -> bool {
         match self {
-            Compression::Zlib { .. } => { true }
-            Compression::Snappy { .. } => { true }
-            Compression::None => { false }
+            Compression::Zlib { .. } => true,
+            Compression::Snappy { .. } => true,
+            Compression::None => false,
         }
     }
 
@@ -71,26 +61,32 @@ impl Compression {
     #[inline]
     pub fn threshold(&self) -> u16 {
         match self {
-            Compression::Zlib { threshold, .. } => { *threshold }
-            Compression::Snappy { threshold, .. } => { *threshold }
-            Compression::None => { 0x0000 }
+            Compression::Zlib { threshold, .. } => *threshold,
+            Compression::Snappy { threshold, .. } => *threshold,
+            Compression::None => 0x0000,
         }
     }
 
     /// Compress the given uncompressed src stream into the given dst stream
     /// with the compressed data
     #[inline]
-    pub fn compress(&self, src: &ByteStreamRead, dst: &mut ByteStreamWrite) -> Result<(), CompressionError> {
+    pub fn compress(
+        &self,
+        src: &ByteStreamRead,
+        dst: &mut ByteStreamWrite,
+    ) -> Result<(), CompressionError> {
         match self {
-            Compression::Zlib { threshold: _ , compression_level } => {
-
+            Compression::Zlib {
+                threshold: _,
+                compression_level,
+            } => {
                 let mut encoder = flate2::write::DeflateEncoder::new(
                     dst,
                     flate2::Compression::new(*compression_level as u32),
                 );
 
                 match encoder.write_all(src.as_slice()) {
-                    Ok(_) => { Ok(()) }
+                    Ok(_) => Ok(()),
                     Err(e) => Err(CompressionError::ZlibError(Box::new(e))),
                 }
             }
@@ -98,15 +94,15 @@ impl Compression {
                 let mut encoder = snap::write::FrameEncoder::new(dst);
 
                 match io::copy(&mut src.as_slice(), &mut encoder) {
-                    Ok(_) => { Ok(()) }
-                    Err(e) => { Err(CompressionError::SnappyError(e)) }
+                    Ok(_) => Ok(()),
+                    Err(e) => Err(CompressionError::SnappyError(e)),
                 }
             }
             Compression::None => {
                 // unnecessary copying, this fn shouldn't be called when `compression_needed` returns false
                 match dst.write_all(src.as_slice()) {
-                    Ok(_) => { Ok(()) }
-                    Err(e) => { Err(CompressionError::IOError(e)) }
+                    Ok(_) => Ok(()),
+                    Err(e) => Err(CompressionError::IOError(e)),
                 }
             }
         }
@@ -115,13 +111,17 @@ impl Compression {
     /// Decompress the given compressed src stream into the given dst stream
     /// with the decompressed data
     #[inline]
-    pub fn decompress(&self, src: &ByteStreamRead, dst: &mut ByteStreamWrite) -> Result<(), CompressionError> {
+    pub fn decompress(
+        &self,
+        src: &ByteStreamRead,
+        dst: &mut ByteStreamWrite,
+    ) -> Result<(), CompressionError> {
         match self {
             Compression::Zlib { .. } => {
                 let mut decoder = flate2::read::DeflateDecoder::new(src.as_slice());
 
                 match io::copy(&mut decoder, dst) {
-                    Ok(_) => { Ok(()) }
+                    Ok(_) => Ok(()),
                     Err(e) => Err(CompressionError::ZlibError(Box::new(e))),
                 }
             }
@@ -129,15 +129,15 @@ impl Compression {
                 let mut decoder = snap::read::FrameDecoder::new(src.as_slice());
 
                 match io::copy(&mut decoder, dst) {
-                    Ok(_) => { Ok(()) }
-                    Err(e) => { Err(CompressionError::SnappyError(e)) }
+                    Ok(_) => Ok(()),
+                    Err(e) => Err(CompressionError::SnappyError(e)),
                 }
             }
             Compression::None => {
                 // unnecessary copying, this fn shouldn't be called when `compression_needed` returns false
                 match dst.write_all(src.as_slice()) {
-                    Ok(_) => { Ok(()) }
-                    Err(e) => { Err(CompressionError::IOError(e)) }
+                    Ok(_) => Ok(()),
+                    Err(e) => Err(CompressionError::IOError(e)),
                 }
             }
         }
