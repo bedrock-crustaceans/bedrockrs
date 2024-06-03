@@ -1,10 +1,10 @@
 use core::hash;
 use std::borrow::Borrow;
 use std::{cmp, slice};
-use std::io::{BufRead, Cursor, Read};
+use std::io::{Cursor, Read};
 use std::ops::Deref;
 use byteorder::{BigEndian, LittleEndian, ReadBytesExt};
-use bytes::buf::{IntoIter, Reader};
+use bytes::buf::IntoIter;
 use bytes::{Buf, Bytes};
 use varint_rs::VarintReader;
 
