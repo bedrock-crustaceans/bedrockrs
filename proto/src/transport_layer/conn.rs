@@ -1,28 +1,26 @@
-use std::future::Future;
-use std::io::{Error, Write};
+use std::io::Write;
 
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
-use rak_rs::connection::RecvError;
-use tokio::io::AsyncWriteExt;
 use tokio::net;
 
 use crate::error::{ConnTransportLayerError, RaknetError};
 use crate::info::RAKNET_GAME_PACKET_ID;
 
 ///
-pub enum ConnTransportLayer {
+pub enum TransportLayerConn {
     RaknetUDP(rak_rs::connection::Connection),
-    //TODO RaknetTCP(...),
-    Quic(s2n_quic::connection::Connection),
-    Tcp(net::TcpStream),
-    Udp(net::UdpSocket)
+    // TODO RaknetTCP(...),
+    NetherNet(/* TODO */)
+    // TODO Quic(s2n_quic::connection::Connection),
+    // TODO Tcp(net::TcpStream),
+    // TODO Udp(net::UdpSocket)
 }
 
-impl ConnTransportLayer {
+impl TransportLayerConn {
     pub async fn send(&mut self, stream: &ByteStreamRead) -> Result<(), ConnTransportLayerError> {
         match self {
-            ConnTransportLayer::RaknetUDP(conn) => {
+            TransportLayerConn::RaknetUDP(conn) => {
                 let mut final_stream = ByteStreamWrite::new();
 
                 match final_stream.write_u8(RAKNET_GAME_PACKET_ID) {
@@ -36,12 +34,10 @@ impl ConnTransportLayer {
                 };
 
                 // TODO Find out if immediate: true should be used
-                match conn.send(final_stream.as_slice(), true) {
-                    Ok(_) => {}
+                match conn.send(final_stream.as_slice(), true).await {
+                    Ok(_) => { Ok(()) }
                     Err(e) => { return Err(ConnTransportLayerError::RaknetUDPError(RaknetError::SendError(e))) }
-                };
-
-                Ok(())
+                }
             }
             _ => { todo!() }
         }
@@ -49,7 +45,7 @@ impl ConnTransportLayer {
 
     pub async fn recv(&mut self) -> Result<ByteStreamRead, ConnTransportLayerError> {
         match self {
-            ConnTransportLayer::RaknetUDP(conn) => {
+            TransportLayerConn::RaknetUDP(conn) => {
                 let mut stream = match conn.recv().await {
                     Ok(v) => { ByteStreamRead::from(v) }
                     Err(e) => { return Err(ConnTransportLayerError::RaknetUDPError(RaknetError::RecvError(e))) }
