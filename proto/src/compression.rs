@@ -23,8 +23,7 @@ pub enum Compression {
 }
 
 impl Compression {
-    /// Used after the raknet game packet header id for identifying with which
-    /// CompressionMethod a packet was compressed
+    /// Used for identifying the compression method used by a given packet
     #[inline]
     pub const fn id_u8(&self) -> u8 {
         match self {
@@ -68,7 +67,7 @@ impl Compression {
         }
     }
 
-    /// Get the compression threshold of the CompressionMethod.
+    /// Get the compression threshold of the Compression.
     #[inline]
     pub fn threshold(&self) -> u16 {
         match self {
@@ -78,7 +77,7 @@ impl Compression {
         }
     }
 
-    /// Compress the given data and return an owned Vector
+    /// Compress the given uncompressed src stream into the given dst stream
     /// with the compressed data
     #[inline]
     pub fn compress(&self, src: &ByteStreamRead, dst: &mut ByteStreamWrite) -> Result<(), CompressionError> {
@@ -86,7 +85,7 @@ impl Compression {
             Compression::Zlib { threshold: _ , compression_level } => {
 
                 let mut encoder = flate2::write::DeflateEncoder::new(
-                    &mut dst,
+                    dst,
                     flate2::Compression::new(*compression_level as u32),
                 );
 
@@ -98,7 +97,7 @@ impl Compression {
             Compression::Snappy { .. } => {
                 let mut encoder = snap::write::FrameEncoder::new(dst);
 
-                match io::copy(&mut src, &mut encoder) {
+                match io::copy(&mut src.as_slice(), &mut encoder) {
                     Ok(_) => { Ok(()) }
                     Err(e) => { Err(CompressionError::SnappyError(e)) }
                 }
@@ -113,23 +112,23 @@ impl Compression {
         }
     }
 
-    /// Decompress the given compressed data and return an owned Vector
+    /// Decompress the given compressed src stream into the given dst stream
     /// with the decompressed data
     #[inline]
     pub fn decompress(&self, src: &ByteStreamRead, dst: &mut ByteStreamWrite) -> Result<(), CompressionError> {
         match self {
             Compression::Zlib { .. } => {
-                let mut decoder = flate2::read::DeflateDecoder::new(&mut dst);
+                let mut decoder = flate2::read::DeflateDecoder::new(src.as_slice());
 
-                match decoder.write_all(src.as_slice()) {
+                match io::copy(&mut decoder, dst) {
                     Ok(_) => { Ok(()) }
                     Err(e) => Err(CompressionError::ZlibError(Box::new(e))),
                 }
             }
             Compression::Snappy { .. } => {
-                let mut decoder = snap::read::FrameDecoder::new(dst);
+                let mut decoder = snap::read::FrameDecoder::new(src.as_slice());
 
-                match io::copy(&mut src, &mut decoder) {
+                match io::copy(&mut decoder, dst) {
                     Ok(_) => { Ok(()) }
                     Err(e) => { Err(CompressionError::SnappyError(e)) }
                 }
