@@ -1,7 +1,7 @@
 use core::hash;
 use std::borrow::Borrow;
 use std::{cmp, slice};
-use std::io::Read;
+use std::io::{BufRead, Cursor, Read};
 use std::ops::Deref;
 use byteorder::{BigEndian, LittleEndian, ReadBytesExt};
 use bytes::buf::{IntoIter, Reader};
@@ -13,32 +13,50 @@ use crate::*;
 /// A wrapper around [`bytes::Bytes`].
 /// (A cheaply cloneable and sliceable chunk of contiguous memory).
 #[repr(transparent)]
-pub struct ByteStreamRead(Reader<Bytes>);
+pub struct ByteStreamRead(Cursor<Bytes>);
 
 impl ByteStreamRead {
     /// Creates a new empty `ByteStreamRead`.
     /// This will not allocate and the returned Bytes handle will be empty.
     #[inline]
     pub fn new() -> Self {
-        Self(Bytes::new().reader())
+        Self(Cursor::new(Bytes::new()))
     }
 
     /// Creates a new empty `ByteStreamRead` from a given [`bytes::Bytes`] object.
     #[inline]
     pub fn from_bytes(bytes: Bytes) -> Self {
-        Self(bytes.reader())
+        Self(Cursor::new(bytes))
     }
 
     /// Creates a new `ByteStreamRead` from a static slice.
     #[inline]
     pub fn from_static(bytes: &'static [u8]) -> Self {
-        Self(Bytes::from_static(bytes).reader())
+        Self(Cursor::new(Bytes::from_static(bytes)))
     }
 
     /// Returns the number of bytes contained in this `ByteStreamRead`.
     #[inline]
     pub fn len(&self) -> usize {
         self.0.get_ref().len()
+    }
+
+    /// Advance the stream.
+    #[inline]
+    pub fn consume(&mut self, amt: usize) {
+        self.0.advance(amt)
+    }
+
+    /// Returns the current position of this stream.
+    #[inline]
+    pub fn position(&self) -> u64 {
+        self.0.position()
+    }
+
+    /// Returns the number of bytes between the current position and the end of the buffer.
+    #[inline]
+    pub fn remaining(&self) -> usize {
+        self.0.remaining()
     }
 
     /// Returns true if the `ByteStreamRead` has a length of 0.
