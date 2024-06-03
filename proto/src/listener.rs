@@ -5,21 +5,20 @@ use rak_rs::mcpe::motd::Gamemode;
 use rak_rs::Motd;
 use rand::RngCore;
 
-use crate::conn::Connection;
-use crate::error::ListenerError;
+use crate::conn::Conn;
+use crate::error::{ListenerError, RaknetError, TransportLayerError};
 use crate::info::{MINECRAFT_EDITION_MOTD, MINECRAFT_VERSION, PROTOCOL_VERSION};
+use crate::transport_layer::{TransportLaterListener, TransportLayerType};
 
 pub struct Listener {
-    rak_listener: rak_rs::Listener,
+    listener: TransportLaterListener,
+    pub config: ListenerConfig,
     socket_addr_v4: SocketAddrV4,
-    // TODO: Add this when ipv6 is supported by rak-rs
-    // socket_addr_v6: SocketAddrV6,
     guid: u64,
-    config: ListenerConfig,
 }
 
 impl Listener {
-    pub async fn new(
+    pub async fn new_raknet(
         listener_config: ListenerConfig,
         socket_addr_v4: SocketAddrV4,
     ) -> Result<Self, ListenerError> {
@@ -29,12 +28,13 @@ impl Listener {
         // Check for success
         let mut rak_listener = match rak_listener {
             Ok(v) => v,
-            Err(_) => return Err(ListenerError::AddrBindError),
+            Err(e) => return Err(ListenerError::TransportListenerError(TransportLayerError::RaknetUDPError(RaknetError::ServerError(e)))),
         };
 
         // generate a random guid
         let guid: u64 = rand::thread_rng().next_u64();
 
+        // Setup the motd
         rak_listener.motd = Motd {
             edition: String::from(MINECRAFT_EDITION_MOTD),
             // Prevent String no impl copy
@@ -53,7 +53,7 @@ impl Listener {
         };
 
         Ok(Self {
-            rak_listener,
+            listener: TransportLaterListener::RaknetUDP(rak_listener),
             config: listener_config,
             socket_addr_v4,
             guid,
@@ -61,31 +61,19 @@ impl Listener {
     }
 
     pub async fn start(&mut self) -> Result<(), ListenerError> {
-        match self.rak_listener.start().await {
+        match self.listener.start().await {
             Ok(_) => Ok(()),
-            Err(_) => Err(ListenerError::AlreadyOnline),
+            Err(e) => Err(ListenerError::TransportListenerError(e)),
         }
     }
 
-    pub async fn accept(&mut self) -> Result<Connection, ListenerError> {
-        let rak_conn = match self.rak_listener.accept().await {
+    pub async fn accept(&mut self) -> Result<Conn, ListenerError> {
+        let rak_conn = match self.listener.accept().await {
             Ok(c) => c,
-            Err(_) => return Err(ListenerError::NotListening),
+            Err(e) => return Err(ListenerError::TransportListenerError(e)),
         };
 
-        Ok(Connection::new(rak_conn))
-    }
-
-    fn get_config(&self) -> &ListenerConfig {
-        &self.config
-    }
-
-    fn get_config_mut(&mut self) -> &mut ListenerConfig {
-        &mut self.config
-    }
-
-    fn set_config(&mut self, config: ListenerConfig) {
-        self.config = config;
+        Ok(Conn::new(rak_conn))
     }
 
     fn update_pongdata() {}
