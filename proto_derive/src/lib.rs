@@ -21,12 +21,12 @@ pub fn proto_serialize(item: proc_macro::TokenStream) -> proc_macro::TokenStream
 
     let expanded = quote! {
         impl #impl_generics proto_core::ProtoCodec for #name #ty_generics #where_clause {
-            fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), proto_core::error::ProtoCodecError> where Self: Sized {
+            fn proto_serialize(&self, stream: &mut bedrock_core::stream::write::ByteStreamWrite) -> Result<(), proto_core::error::ProtoCodecError> where Self: Sized {
                 #ser
                 Ok(())
             }
 
-            fn proto_deserialize(cursor: &mut std::io::Cursor<Vec<u8>>) -> Result<Self, proto_core::error::ProtoCodecError> where Self: Sized {
+            fn proto_deserialize(stream: &mut bedrock_core::stream::read::ByteStreamRead) -> Result<Self, proto_core::error::ProtoCodecError> where Self: Sized {
                 Ok(Self{
                     #de
                 })

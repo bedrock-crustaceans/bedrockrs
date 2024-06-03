@@ -10,8 +10,9 @@ pub fn proto_build_ser(data: &Data) -> TokenStream {
 
     let field_ser_calls = fields.iter().map(|field| {
         let field_name = field.ident.as_ref().expect("Field has no name");
+
         quote! {
-            match proto_core::ProtoCodec::proto_serialize(&self.#field_name, buf) {
+            match proto_core::ProtoCodec::proto_serialize(&self.#field_name, stream) {
                 Ok(_) => { },
                 Err(e) => { return Err(e) }
             };
