@@ -3,13 +3,12 @@ use std::io::{Cursor, Read};
 
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
-use byteorder::LittleEndian;
-use byteorder::ReadBytesExt;
+use bedrock_core::stream::read::ByteStreamRead;
+use bedrock_core::stream::write::ByteStreamWrite;
 use jsonwebtoken::{DecodingKey, Validation};
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
 use serde_json::Value;
-use varint_rs::VarintReader;
 
 #[derive(Debug)]
 pub struct ConnectionRequestType {
@@ -82,7 +81,7 @@ pub struct ConnectionRequestType {
 }
 
 impl ProtoCodec for ConnectionRequestType {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
@@ -90,24 +89,24 @@ impl ProtoCodec for ConnectionRequestType {
     }
 
     // TODO: Add microsoft auth
-    fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(cursor: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
         let mut certificate_chain: Vec<BTreeMap<String, Value>> = vec![];
 
-        // read the ConnectionRequest's length
+        // read the ConnectionRequests length
         // (certificate_chain len + raw_token len + 8)
         // 8 = i32 len + i32 len (length of certificate_chain's len and raw_token's len)
         // can be ignored, other lengths are provided
-        match cursor.read_u32_varint() {
+        match cursor.read_uvar32() {
             Ok(_) => {}
             Err(e) => return Err(ProtoCodecError::IOError(e)),
         };
 
         // read length of certificate_chain vec
-        let certificate_chain_len = match cursor.read_i32::<LittleEndian>() {
-            Ok(l) => l,
+        let certificate_chain_len = match cursor.read_i32le() {
+            Ok(l) => l.0,
             Err(e) => return Err(ProtoCodecError::IOError(e)),
         };
 
@@ -179,7 +178,7 @@ impl ProtoCodec for ConnectionRequestType {
             };
 
             let mut jwt_validation = Validation::new(jwt_header.alg);
-            // TODO: This definitely is not right. Even Zuri-MC doesn't understand this.. I may understand it
+            // TODO: This definitely is not right. Even Zuri-MC doesn't understand this.. I may understand it.. I do understand it
             jwt_validation.insecure_disable_signature_validation();
             jwt_validation.set_required_spec_claims::<&str>(&[]);
 
@@ -227,8 +226,8 @@ impl ProtoCodec for ConnectionRequestType {
         }
 
         // read length of certificate_chain vec
-        let raw_token_len = match cursor.read_i32::<LittleEndian>() {
-            Ok(l) => l,
+        let raw_token_len = match cursor.read_i32le() {
+            Ok(l) => l.0,
             Err(e) => return Err(ProtoCodecError::IOError(e)),
         };
 
