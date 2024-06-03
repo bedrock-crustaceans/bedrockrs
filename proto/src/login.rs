@@ -1,10 +1,7 @@
 use bedrock_core::u16le;
+use crate::compression::Compression;
 
-use crate::compression::none::NoCompression;
-use crate::compression::snappy::SnappyCompression;
-use crate::compression::zlib::ZlibCompression;
-use crate::compression::{CompressionMethod, CompressionMethods};
-use crate::conn::Connection;
+use crate::conn::Conn;
 use crate::error::LoginError;
 use crate::gamepacket::GamePacket;
 use crate::packets::network_settings::NetworkSettingsPacket;
@@ -16,11 +13,11 @@ use crate::types::experiments::Experiments;
 use crate::types::play_status::PlayStatusType;
 
 pub struct LoginServerSideOptions {
-    pub compression: CompressionMethods,
+    pub compression: Compression,
     pub encryption: bool,
     /// TODO: impl Microsoft Auth
     pub authentication_enabled: bool,
-    /// Even if the client has another proto version the login
+    /// Even if the client has another proto version, the login
     /// process should continue, might cause problems when the login process
     /// differs in the different proto versions
     pub allowed_proto_versions: Vec<i32>,
@@ -31,7 +28,7 @@ pub struct LoginServerSideResult {
 }
 
 pub async fn handle_login_server_side(
-    connection: &mut Connection,
+    connection: &mut Conn,
     options: LoginServerSideOptions,
 ) -> Result<(), LoginError> {
     // Receive NetworkRequestSettings
@@ -61,23 +58,27 @@ pub async fn handle_login_server_side(
     if !options.allowed_proto_versions.contains(&client_proto_ver) {
         return Err(LoginError::WrongProtocolVersion {
             client: client_proto_ver,
+            server: options.allowed_proto_versions,
         });
     }
 
     println!("NETWORK SETTINGS REQUEST");
 
-    // Get the compression threshold and id for the network settings packet
-    let (threshold, id_u16) = match &options.compression {
-        CompressionMethods::Zlib(zlib) => (zlib.threshold, ZlibCompression::ID_u16),
-        CompressionMethods::Snappy(snappy) => (snappy.threshold, SnappyCompression::ID_u16),
-        CompressionMethods::None => (0, NoCompression::ID_u16),
+    // Get the compression threshold for the network settings packet
+    let threshold = match options.compression {
+        Compression::Zlib{threshold, ..} => threshold,
+        Compression::Snappy{threshold} => threshold,
+        Compression::None => 0,
     };
+
+    // Get the compression id for the network settings packet
+    let id_u16 = options.compression.id_u16();
 
     // Send Network Settings
     match connection
         .send_gamepackets(vec![GamePacket::NetworkSettings(NetworkSettingsPacket {
             compression_threshold: u16le(threshold),
-            compression_algorythm: u16le(id_u16),
+            compression_algorithm: u16le(id_u16),
             // TODO: Figure out what all of this is
             client_throttle_enabled: false,
             client_throttle_threshold: 0,
@@ -89,10 +90,10 @@ pub async fn handle_login_server_side(
         Err(e) => return Err(LoginError::ConnError(e)),
     };
 
-    println!("NETWORK SETTINGS");
+    // Enable Compression after sending Network Settings
+    connection.compression = Some(options.compression);
 
-    // Enable Compression after Network Settings
-    connection.set_compression_method(Some(options.compression));
+    println!("NETWORK SETTINGS");
 
     // Receive Login
     let login = match connection.recv_gamepackets().await {
@@ -102,7 +103,7 @@ pub async fn handle_login_server_side(
         }
     };
 
-    // If too many or no packets were send the error
+    // If too many or no packets were sent
     if login.len() > 1 || login.len() < 1 {
         return Err(LoginError::PacketMismatch(
             "Too Many packets send while login".to_string(),
@@ -215,6 +216,6 @@ pub async fn handle_login_server_side(
     Ok(())
 }
 
-pub fn handle_login_client_side(connection: &mut Connection) {
+pub fn handle_login_client_side(connection: &mut Conn) {
     todo!()
 }
