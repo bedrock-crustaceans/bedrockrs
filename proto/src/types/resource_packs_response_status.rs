@@ -1,4 +1,6 @@
 use std::io::Cursor;
+use bedrock_core::stream::read::ByteStreamRead;
+use bedrock_core::stream::write::ByteStreamWrite;
 
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::{FromPrimitive, ToPrimitive};
@@ -15,7 +17,7 @@ pub enum ResourcePacksResponseStatus {
 }
 
 impl ProtoCodec for ResourcePacksResponseStatus {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
@@ -23,18 +25,18 @@ impl ProtoCodec for ResourcePacksResponseStatus {
             None => return Err(ProtoCodecError::InvalidEnumID),
             Some(v) => v,
         }
-        .proto_serialize(buf)
+        .proto_serialize(stream)
         {
             Ok(_) => Ok(()),
             Err(e) => Err(e),
         }
     }
 
-    fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match u8::proto_deserialize(cursor) {
+        match u8::proto_deserialize(stream) {
             Ok(v) => match ResourcePacksResponseStatus::from_u8(v) {
                 None => return Err(ProtoCodecError::InvalidEnumID),
                 Some(v) => Ok(v),
