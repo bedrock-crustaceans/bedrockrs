@@ -96,8 +96,6 @@ impl Compression {
                 }
             }
             Compression::Snappy { .. } => {
-                // TODO Optimize this
-
                 let mut encoder = snap::write::FrameEncoder::new(dst);
 
                 match io::copy(&mut src, &mut encoder) {
@@ -118,10 +116,10 @@ impl Compression {
     /// Decompress the given compressed data and return an owned Vector
     /// with the decompressed data
     #[inline]
-    fn decompress(&self, src: &ByteStreamRead, dst: &mut ByteStreamWrite) -> Result<(), CompressionError> {
+    pub fn decompress(&self, src: &ByteStreamRead, dst: &mut ByteStreamWrite) -> Result<(), CompressionError> {
         match self {
             Compression::Zlib { .. } => {
-                let mut decoder = flate2::read::DeflateDecoder::new(&mut src);
+                let mut decoder = flate2::read::DeflateDecoder::new(&mut dst);
 
                 match decoder.write_all(src.as_slice()) {
                     Ok(_) => { Ok(()) }
@@ -132,11 +130,9 @@ impl Compression {
                 let mut decoder = snap::read::FrameDecoder::new(dst);
 
                 match io::copy(&mut src, &mut decoder) {
-                    Ok(_) => {}
+                    Ok(_) => { Ok(()) }
                     Err(e) => { Err(CompressionError::SnappyError(e)) }
-                };
-
-                Ok(())
+                }
             }
             Compression::None => {
                 // unnecessary copying, this fn shouldn't be called when `compression_needed` returns false
