@@ -1,6 +1,8 @@
 use std::io::Cursor;
 
 use bedrock_core::i32be;
+use bedrock_core::stream::read::ByteStreamRead;
+use bedrock_core::stream::write::ByteStreamWrite;
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::{FromPrimitive, ToPrimitive};
 use proto_core::error::ProtoCodecError;
@@ -27,7 +29,7 @@ pub enum PlayStatusType {
 }
 
 impl ProtoCodec for PlayStatusType {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
@@ -35,15 +37,15 @@ impl ProtoCodec for PlayStatusType {
             None => {
                 return Err(ProtoCodecError::InvalidEnumID);
             }
-            Some(v) => i32be(v).proto_serialize(buf),
+            Some(v) => i32be(v).proto_serialize(stream),
         }
     }
 
-    fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match i32be::proto_deserialize(cursor) {
+        match i32be::proto_deserialize(stream) {
             Ok(v) => match PlayStatusType::from_i32(v.0) {
                 None => Err(ProtoCodecError::InvalidEnumID),
                 Some(v) => Ok(v),
