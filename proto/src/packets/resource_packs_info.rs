@@ -1,4 +1,5 @@
 use std::io::Cursor;
+use bedrock_core::read::ByteStreamRead;
 
 use bedrock_core::u16le;
 use bedrock_core::write::ByteStreamWrite;
@@ -21,64 +22,64 @@ pub struct ResourcePacksInfoPacket {
 }
 
 impl ProtoCodec for ResourcePacksInfoPacket {
-    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
         // Serialize resource_pack_required as a bool
-        match self.resource_pack_required.proto_serialize(buf) {
+        match self.resource_pack_required.proto_serialize(stream) {
             Ok(_) => {}
             Err(e) => return Err(e),
         }
 
         // Serialize has_addon_packs as a bool
-        match self.has_addon_packs.proto_serialize(buf) {
+        match self.has_addon_packs.proto_serialize(stream) {
             Ok(_) => {}
             Err(e) => return Err(e),
         }
 
         // Serialize has_scripts as a bool
-        match self.has_scripts.proto_serialize(buf) {
+        match self.has_scripts.proto_serialize(stream) {
             Ok(_) => {}
             Err(e) => return Err(e),
         }
 
         // Serialize force_server_packs_enabled as a bool
-        match self.force_server_packs_enabled.proto_serialize(buf) {
+        match self.force_server_packs_enabled.proto_serialize(stream) {
             Ok(_) => {}
             Err(e) => return Err(e),
         }
 
         // Write length of behavior packs as an u16le
-        match u16le(self.behavior_packs.len() as u16).proto_serialize(buf) {
+        match u16le(self.behavior_packs.len() as u16).proto_serialize(stream) {
             Ok(_) => {}
             Err(e) => return Err(e),
         }
 
         // Write every behavior pack
         for behavior_pack in &self.behavior_packs {
-            match behavior_pack.proto_serialize(buf) {
+            match behavior_pack.proto_serialize(stream) {
                 Ok(_) => {}
                 Err(e) => return Err(e),
             }
         }
 
         // Write length of resource packs as an u16le
-        match u16le(self.resource_packs.len() as u16).proto_serialize(buf) {
+        match u16le(self.resource_packs.len() as u16).proto_serialize(stream) {
             Ok(_) => {}
             Err(e) => return Err(e),
         }
 
         // Write every resource pack
         for behavior_pack in &self.resource_packs {
-            match behavior_pack.proto_serialize(buf) {
+            match behavior_pack.proto_serialize(stream) {
                 Ok(_) => {}
                 Err(e) => return Err(e),
             }
         }
 
         // Write all cdn urls
-        match self.cdn_urls.proto_serialize(buf) {
+        match self.cdn_urls.proto_serialize(stream) {
             Ok(_) => {}
             Err(e) => return Err(e),
         }
@@ -86,7 +87,7 @@ impl ProtoCodec for ResourcePacksInfoPacket {
         Ok(())
     }
 
-    fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
