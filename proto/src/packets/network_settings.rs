@@ -4,15 +4,16 @@ use proto_derive::ProtoCodec;
 #[derive(Debug, ProtoCodec)]
 pub struct NetworkSettingsPacket {
     /// Determines the smallest size of raw network payload to compress.
-    /// - 0 is disable compression
-    /// - 1 is compress everything 1 byte or larger (so everything)
+    /// - 0 is "disable compression"
+    /// - 1 is "compress everything 1 byte or larger" (so everything)
+    /// - others are just the normal threshold
     pub compression_threshold: u16le,
-    /// Determines the compression Algorythm used
+    /// Determines the compression Algorithm used
     /// - 0x0000 is Zlib
     /// - 0x0001 is Snappy
     /// - 0xFFFF is No compression
-    /// All 3 compression Algorythms are supported
-    pub compression_algorythm: u16le,
+    /// All 3 compression Algorithms are supported
+    pub compression_algorithm: u16le,
     pub client_throttle_enabled: bool,
     pub client_throttle_threshold: u8,
     pub client_throttle_scalar: f32,

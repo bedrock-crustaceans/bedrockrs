@@ -1,6 +1,7 @@
 use std::io::Cursor;
 
 use bedrock_core::u16le;
+use bedrock_core::write::ByteStreamWrite;
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
 
@@ -20,7 +21,7 @@ pub struct ResourcePacksInfoPacket {
 }
 
 impl ProtoCodec for ResourcePacksInfoPacket {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {

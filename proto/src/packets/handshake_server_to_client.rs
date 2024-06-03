@@ -1,5 +1,7 @@
 use std::collections::BTreeMap;
 use std::io::Cursor;
+use bedrock_core::read::ByteStreamRead;
+use bedrock_core::write::ByteStreamWrite;
 
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
@@ -11,11 +13,11 @@ pub struct HandshakeServerToClientPacket {
 }
 
 impl ProtoCodec for HandshakeServerToClientPacket {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
+    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError> {
         todo!()
     }
 
-    fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError> {
+    fn proto_deserialize(cursor: &mut ByteStreamRead) -> Result<Self, ProtoCodecError> {
         todo!()
     }
 }
