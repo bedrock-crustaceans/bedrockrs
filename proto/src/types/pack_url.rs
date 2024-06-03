@@ -1,4 +1,6 @@
 use std::io::Cursor;
+use bedrock_core::stream::read::ByteStreamRead;
+use bedrock_core::stream::write::ByteStreamWrite;
 
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
@@ -11,18 +13,18 @@ pub struct PackURL {
 }
 
 impl ProtoCodec for PackURL {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
         let uuid_version = format!("{}_{}", self.uuid, self.version);
 
-        match uuid_version.proto_serialize(buf) {
+        match uuid_version.proto_serialize(stream) {
             Ok(_) => {}
             Err(e) => return Err(e),
         }
 
-        match self.url.proto_serialize(buf) {
+        match self.url.proto_serialize(stream) {
             Ok(_) => {}
             Err(e) => return Err(e),
         }
@@ -30,8 +32,8 @@ impl ProtoCodec for PackURL {
         Ok(())
     }
 
-    fn proto_deserialize(cursor: &mut Cursor<Vec<u8>>) -> Result<Self, ProtoCodecError> {
-        let (uuid, version) = match String::proto_deserialize(cursor) {
+    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError> {
+        let (uuid, version) = match String::proto_deserialize(stream) {
             Ok(v) => match v.split_once("_") {
                 None => {
                     return Err(ProtoCodecError::FormatMismatch(String::from(
@@ -45,7 +47,7 @@ impl ProtoCodec for PackURL {
             }
         };
 
-        let url = match String::proto_deserialize(cursor) {
+        let url = match String::proto_deserialize(stream) {
             Ok(v) => v,
             Err(e) => {
                 return Err(e);
