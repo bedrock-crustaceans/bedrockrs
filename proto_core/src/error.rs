@@ -1,4 +1,5 @@
 use std::io::Error as IOError;
+use std::num::TryFromIntError;
 use std::string::FromUtf8Error;
 
 use base64::DecodeError as Base64DecodeError;
@@ -15,6 +16,8 @@ pub enum ProtoCodecError {
     NbtError(#[from] NbtError),
     #[error("Error while reading UTF8 encoded String: {0}")]
     UTF8Error(#[from] FromUtf8Error),
+    #[error("Error while converting integers: {0}")]
+    FromIntError(#[from] TryFromIntError),
     #[error("Json Error: {0}")]
     JsonError(#[from] JsonError),
     #[error("Jwt Error: {0}")]
