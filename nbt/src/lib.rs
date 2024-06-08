@@ -18,6 +18,7 @@ pub mod error;
 /// - long array
 ///
 /// (These missing types are rarely, if not even un-, used in MCBE)
+#[derive(Clone)]
 pub enum NbtTag {
     /// A simple byte.
     /// Can represent multiple things like:
@@ -48,8 +49,8 @@ pub enum NbtTag {
     ///
     /// Each key is a String with the following NBT tag.
     /// Tag enum variants may vary.
-    /// Compound tags are special because they are opened by the [NbtTag::COMPOUND_ID_START]
-    /// and closed again by the [NbtTag::COMPOUND_ID_END].
+    /// Compound tags are special because they are opened by the [NbtTag::COMPOUND_ID]
+    /// and closed again by the [NbtTag::EMPTY_ID].
     Compound(HashMap<String, NbtTag>),
     /// An empty NBT tag.
     /// Not commonly used, it rather just marks the end of a compound tag.
@@ -310,23 +311,23 @@ impl NbtTag {
     /// println!("{:#?}: {:#?}", name, tag);
     /// ```
     pub fn nbt_deserialize<T: NbtByteOrder>(
-        cursor: &mut ByteStreamRead,
+        stream: &mut ByteStreamRead,
     ) -> Result<(String, Self), NbtError> {
-        let id = match T::read_u8(cursor) {
+        let id = match T::read_u8(stream) {
             Ok(v) => v,
             Err(e) => {
                 return Err(e);
             }
         };
 
-        let name = match T::read_string(cursor) {
+        let name = match T::read_string(stream) {
             Ok(v) => v,
             Err(e) => {
                 return Err(e);
             }
         };
 
-        let tag = match Self::nbt_deserialize_val::<T>(cursor, id) {
+        let tag = match Self::nbt_deserialize_val::<T>(stream, id) {
             Ok(v) => v,
             Err(e) => return Err(e),
         };
@@ -345,12 +346,12 @@ impl NbtTag {
     /// Should only be used by the [NbtTag::nbt_deserialize] function internally.
     #[inline]
     fn nbt_deserialize_val<T: NbtByteOrder>(
-        cursor: &mut ByteStreamRead,
+        stream: &mut ByteStreamRead,
         id: u8,
     ) -> Result<Self, NbtError> {
         let tag = match id {
             Self::BYTE_ID => {
-                let byte = match T::read_u8(cursor) {
+                let byte = match T::read_u8(stream) {
                     Ok(v) => v,
                     Err(e) => {
                         return Err(e);
@@ -360,7 +361,7 @@ impl NbtTag {
                 NbtTag::Byte(byte)
             }
             Self::INT16_ID => {
-                let int16 = match T::read_i16(cursor) {
+                let int16 = match T::read_i16(stream) {
                     Ok(v) => v,
                     Err(e) => {
                         return Err(e);
@@ -370,7 +371,7 @@ impl NbtTag {
                 NbtTag::Int16(int16)
             }
             Self::INT32_ID => {
-                let int32 = match T::read_i32(cursor) {
+                let int32 = match T::read_i32(stream) {
                     Ok(v) => v,
                     Err(e) => {
                         return Err(e);
@@ -380,7 +381,7 @@ impl NbtTag {
                 NbtTag::Int32(int32)
             }
             Self::INT64_ID => {
-                let int64 = match T::read_i64(cursor) {
+                let int64 = match T::read_i64(stream) {
                     Ok(v) => v,
                     Err(e) => {
                         return Err(e);
@@ -390,7 +391,7 @@ impl NbtTag {
                 NbtTag::Int64(int64)
             }
             Self::FLOAT32_ID => {
-                let float32 = match T::read_f32(cursor) {
+                let float32 = match T::read_f32(stream) {
                     Ok(v) => v,
                     Err(e) => {
                         return Err(e);
@@ -400,7 +401,7 @@ impl NbtTag {
                 NbtTag::Float32(float32)
             }
             Self::FLOAT64_ID => {
-                let float64 = match T::read_f64(cursor) {
+                let float64 = match T::read_f64(stream) {
                     Ok(v) => v,
                     Err(e) => {
                         return Err(e);
@@ -410,7 +411,7 @@ impl NbtTag {
                 NbtTag::Float64(float64)
             }
             Self::STRING_ID => {
-                let string = match T::read_string(cursor) {
+                let string = match T::read_string(stream) {
                     Ok(v) => v,
                     Err(e) => {
                         return Err(e);
@@ -420,14 +421,14 @@ impl NbtTag {
                 NbtTag::String(string)
             }
             Self::LIST_ID => {
-                let list_type = match T::read_u8(cursor) {
+                let list_type = match T::read_u8(stream) {
                     Ok(v) => v,
                     Err(e) => {
                         return Err(e);
                     }
                 };
 
-                let len = match T::read_i32(cursor) {
+                let len = match T::read_i32(stream) {
                     Ok(v) => v,
                     Err(e) => {
                         return Err(e);
@@ -437,7 +438,7 @@ impl NbtTag {
                 let mut vec = vec![];
 
                 for _ in 0..len {
-                    match Self::nbt_deserialize_val::<T>(cursor, list_type) {
+                    match Self::nbt_deserialize_val::<T>(stream, list_type) {
                         Ok(v) => vec.push(v),
                         Err(e) => return Err(e),
                     }
@@ -449,7 +450,7 @@ impl NbtTag {
                 let mut map = HashMap::new();
 
                 loop {
-                    let id = match T::read_u8(cursor) {
+                    let id = match T::read_u8(stream) {
                         Ok(v) => v,
                         Err(e) => {
                             return Err(e);
@@ -460,14 +461,14 @@ impl NbtTag {
                         break;
                     }
 
-                    let key = match T::read_string(cursor) {
+                    let key = match T::read_string(stream) {
                         Ok(v) => v,
                         Err(e) => {
                             return Err(e);
                         }
                     };
 
-                    let tag = match Self::nbt_deserialize_val::<T>(cursor, id) {
+                    let tag = match Self::nbt_deserialize_val::<T>(stream, id) {
                         Ok(v) => v,
                         Err(e) => {
                             return Err(e);
@@ -492,7 +493,7 @@ impl NbtTag {
 // Implement the Debug trait for NbtTag
 impl Debug for NbtTag {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        // check for pretty format with #
+        // check for pretty formating with #
         match f.alternate() {
             // normal format
             false => match self {
@@ -556,8 +557,9 @@ impl Debug for NbtTag {
                 NbtTag::Compound(v) => {
                     write!(f, "{v:#?}")
                 }
+                // Any better idea of what should be written?
                 NbtTag::Empty => {
-                    write!(f, "")
+                    write!(f, "EMPTY")
                 }
             },
         }
