@@ -22,13 +22,13 @@ macro_rules! impl_be {
     ($type:ty, $read_fn_name:ident, $write_fn_name:ident) => {
         impl BE<$type> {
             #[inline]
-            fn $read_fn_name<R: Read>(reader: &mut R) -> io::Result<Self> {
+            fn read<R: Read>(reader: &mut R) -> io::Result<Self> {
                 let num = reader.$read_fn_name::<BigEndian>()?;
                 Ok(BE::new(num))
             }
 
             #[inline]
-            fn $write_fn_name<W: Write>(&self, writer: &mut W) -> io::Result<()> {
+            fn write<W: Write>(&self, writer: &mut W) -> io::Result<()> {
                 writer.$write_fn_name::<BigEndian>(self.num)?;
                 Ok(())
             }
@@ -37,24 +37,24 @@ macro_rules! impl_be {
 }
 
 impl BE<u8> {
-    fn read_u8<R: Read>(reader: &mut R) -> io::Result<Self> {
+    fn read<R: Read>(reader: &mut R) -> io::Result<Self> {
         let num = reader.read_u8()?;
         Ok(BE::new(num))
     }
 
-    fn write_u8<W: Write>(&self, writer: &mut W) -> io::Result<()> {
+    fn write<W: Write>(&self, writer: &mut W) -> io::Result<()> {
         writer.write_u8(self.num)?;
         Ok(())
     }
 }
 
 impl BE<i8> {
-    fn read_i8<R: Read>(reader: &mut R) -> io::Result<Self> {
+    fn read<R: Read>(reader: &mut R) -> io::Result<Self> {
         let num = reader.read_i8()?;
         Ok(BE::new(num))
     }
 
-    fn write_i8<W: Write>(&self, writer: &mut W) -> io::Result<()> {
+    fn write<W: Write>(&self, writer: &mut W) -> io::Result<()> {
         writer.write_i8(self.num)?;
         Ok(())
     }
