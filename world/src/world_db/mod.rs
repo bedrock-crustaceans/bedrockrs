@@ -3,3 +3,4 @@ pub use key::*;
 
 pub mod world_db;
 pub mod key;
+pub mod subchunk;
