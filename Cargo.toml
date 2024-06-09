@@ -19,8 +19,8 @@ world = { path = "world", optional = true }
 
 form = { path = "form" }
 
-paletted_storage = { path = "paletted_storage" }
+paletted_storage = { path = "paletted_storage", optional = true }
 
 [features]
 default = []
-world = ["dep:world"]
+world = ["dep:world", "dep:paletted_storage"]

@@ -1,4 +1,5 @@
 use bedrock_core::LE;
+
 use crate::compression::Compression;
 use crate::conn::Conn;
 use crate::error::LoginError;

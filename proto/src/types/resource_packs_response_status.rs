@@ -1,6 +1,6 @@
-use bedrock_core::LE;
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
+use bedrock_core::LE;
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::{FromPrimitive, ToPrimitive};
 use proto_core::error::ProtoCodecError;
@@ -22,11 +22,12 @@ impl ProtoCodec for ResourcePacksResponseStatus {
     {
         let status = match self.to_u8() {
             Some(v) => LE::new(v),
-            None => { return Err(ProtoCodecError::InvalidEnumID) },
+            None => {
+                return Err(ProtoCodecError::InvalidEnumID);
+            }
         };
 
-        match status.proto_serialize(stream)
-        {
+        match status.proto_serialize(stream) {
             Ok(_) => Ok(()),
             Err(e) => Err(e),
         }

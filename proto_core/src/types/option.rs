@@ -1,12 +1,13 @@
 use bedrock_core::read::ByteStreamRead;
 use bedrock_core::write::ByteStreamWrite;
+
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 
 impl<T: ProtoCodec> ProtoCodec for Option<T> {
     fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
-        where
-            Self: Sized,
+    where
+        Self: Sized,
     {
         match self {
             None => match false.proto_serialize(buf) {
@@ -28,8 +29,8 @@ impl<T: ProtoCodec> ProtoCodec for Option<T> {
     }
 
     fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
-        where
-            Self: Sized,
+    where
+        Self: Sized,
     {
         match bool::proto_deserialize(stream) {
             Ok(v) => match v {

@@ -1,4 +1,4 @@
-use bedrock_core::{LE};
+use bedrock_core::LE;
 use proto_derive::ProtoCodec;
 
 #[derive(Debug, ProtoCodec)]

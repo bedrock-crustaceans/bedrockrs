@@ -12,15 +12,15 @@ macro_rules! impl_proto_codec {
         impl ProtoCodec for $wrapper<$int> {
             fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError> {
                 match $wrapper::<$int>::write(self, stream) {
-                    Ok(_) => { Ok(()) }
-                    Err(e) => { Err(ProtoCodecError::IOError(e)) }
+                    Ok(_) => Ok(()),
+                    Err(e) => Err(ProtoCodecError::IOError(e)),
                 }
             }
 
             fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError> {
                 match $wrapper::<$int>::read(stream) {
-                    Ok(v) => { Ok(v) }
-                    Err(e) => { Err(ProtoCodecError::IOError(e)) }
+                    Ok(v) => Ok(v),
+                    Err(e) => Err(ProtoCodecError::IOError(e)),
                 }
             }
         }

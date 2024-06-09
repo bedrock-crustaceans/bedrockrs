@@ -1,15 +1,16 @@
-use std::convert::TryInto;
 use std::io::{Read, Write};
-use bedrock_core::LE;
+
 use bedrock_core::read::ByteStreamRead;
 use bedrock_core::write::ByteStreamWrite;
+use bedrock_core::LE;
+
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 
 impl ProtoCodec for bool {
     fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
-        where
-            Self: Sized,
+    where
+        Self: Sized,
     {
         match self {
             true => match LE::<u8>::new(1).write(buf) {
@@ -24,8 +25,8 @@ impl ProtoCodec for bool {
     }
 
     fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
-        where
-            Self: Sized,
+    where
+        Self: Sized,
     {
         // a bool is represented as a byte
         return match LE::<u8>::read(stream) {

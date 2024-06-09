@@ -1,6 +1,6 @@
 use bedrock_core::read::ByteStreamRead;
-use bedrock_core::VAR;
 use bedrock_core::write::ByteStreamWrite;
+use bedrock_core::VAR;
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
 

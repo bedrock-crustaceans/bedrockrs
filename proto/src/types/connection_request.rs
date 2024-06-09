@@ -3,9 +3,9 @@ use std::io::Read;
 
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
-use bedrock_core::{LE, VAR};
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
+use bedrock_core::{LE, VAR};
 use jsonwebtoken::{DecodingKey, Validation};
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
@@ -112,8 +112,10 @@ impl ProtoCodec for ConnectionRequestType {
         };
 
         let certificate_chain_len = match certificate_chain_len.try_into() {
-            Ok(v) => { v }
-            Err(e) => { return Err(ProtoCodecError::FromIntError(e)) }
+            Ok(v) => v,
+            Err(e) => {
+                return Err(ProtoCodecError::FromIntError(e));
+            }
         };
 
         let mut certificate_chain_buf = vec![0; certificate_chain_len];
@@ -238,8 +240,10 @@ impl ProtoCodec for ConnectionRequestType {
         };
 
         let raw_token_len = match raw_token_len.try_into() {
-            Ok(v) => { v }
-            Err(e) => { return Err(ProtoCodecError::FromIntError(e)) }
+            Ok(v) => v,
+            Err(e) => {
+                return Err(ProtoCodecError::FromIntError(e));
+            }
         };
 
         let mut raw_token_buf = vec![0; raw_token_len];

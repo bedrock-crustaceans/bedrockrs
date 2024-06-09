@@ -175,7 +175,10 @@ impl NbtTag {
     /// Serializes a given val without any root tag name or type notation.
     /// Should only be used by the [NbtTag::nbt_serialize] function internally.
     #[inline]
-    fn nbt_serialize_val<T: NbtByteOrder>(&self, buf: &mut ByteStreamWrite) -> Result<(), NbtError> {
+    fn nbt_serialize_val<T: NbtByteOrder>(
+        &self,
+        buf: &mut ByteStreamWrite,
+    ) -> Result<(), NbtError> {
         match self {
             NbtTag::Byte(v) => match T::write_u8(buf, *v) {
                 Ok(_) => {}
