@@ -9,7 +9,7 @@ pub struct SubChunk {
 }
 
 impl SubChunk {
-    pub fn load(bytes: Vec<u8>) -> SubChunk {
+    pub fn load(bytes: &Vec<u8>) -> SubChunk {
         let mut cur = Cursor::new(bytes);
         let ver = cur.read_u8().expect("Missing subchunk version");
         match ver {
