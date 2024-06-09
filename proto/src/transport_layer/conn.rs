@@ -1,4 +1,5 @@
 use std::io::Write;
+use bedrock_core::LE;
 
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
@@ -17,17 +18,17 @@ pub enum TransportLayerConn {
 }
 
 impl TransportLayerConn {
-    pub async fn send(&mut self, stream: &ByteStreamRead) -> Result<(), TransportLayerError> {
+    pub async fn send(&mut self, stream: &ByteStreamRead<'_>) -> Result<(), TransportLayerError> {
         match self {
             TransportLayerConn::RaknetUDP(conn) => {
                 let mut final_stream = ByteStreamWrite::new();
 
-                match final_stream.write_u8(RAKNET_GAME_PACKET_ID) {
+                match LE::<u8>::write(&LE::new(RAKNET_GAME_PACKET_ID), &mut final_stream) {
                     Ok(_) => {}
                     Err(e) => return Err(TransportLayerError::IOError(e)),
                 };
 
-                match final_stream.write(stream.as_slice()) {
+                match final_stream.write(stream.get_ref().as_slice()) {
                     Ok(_) => {}
                     Err(e) => return Err(TransportLayerError::IOError(e)),
                 };
@@ -48,11 +49,11 @@ impl TransportLayerConn {
         }
     }
 
-    pub async fn recv(&mut self) -> Result<ByteStreamRead, TransportLayerError> {
+    pub async fn recv(&mut self, stream: &mut ByteStreamWrite) -> Result<(), TransportLayerError> {
         match self {
             TransportLayerConn::RaknetUDP(conn) => {
-                let mut stream = match conn.recv().await {
-                    Ok(v) => ByteStreamRead::from(v),
+                let mut recv_stream = match conn.recv().await {
+                    Ok(v) => v,
                     Err(e) => {
                         return Err(TransportLayerError::RaknetUDPError(RaknetError::RecvError(
                             e,
@@ -60,22 +61,31 @@ impl TransportLayerConn {
                     }
                 };
 
-                match stream.read_u8() {
-                    Ok(RAKNET_GAME_PACKET_ID) => {}
-                    Ok(other) => {
-                        return Err(TransportLayerError::RaknetUDPError(
-                            RaknetError::FormatError(format!(
-                                "Expected Raknet Game Packet ID ({:?}), got: {:?}",
-                                RAKNET_GAME_PACKET_ID, other
-                            )),
-                        ));
+                let mut recv_stream = ByteStreamRead::new(&recv_stream);
+
+                match LE::<u8>::read(&mut recv_stream) {
+                    Ok(v) => {
+                        match v.into_inner() {
+                            RAKNET_GAME_PACKET_ID => {}
+                            other => {
+                                return Err(TransportLayerError::RaknetUDPError(
+                                    RaknetError::FormatError(format!(
+                                        "Expected Raknet Game Packet ID ({:?}), got: {:?}",
+                                        RAKNET_GAME_PACKET_ID, other
+                                    )),
+                                ));
+                            }
+                        }
                     }
                     Err(e) => {
                         return Err(TransportLayerError::IOError(e));
                     }
                 };
 
-                Ok(stream)
+                match stream.write_all(recv_stream.into_inner()) {
+                    Ok(_) => { Ok(()) }
+                    Err(e) => { Err(TransportLayerError::IOError(e)) }
+                }
             }
             _ => {
                 todo!()

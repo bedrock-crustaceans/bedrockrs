@@ -1,4 +1,4 @@
-use bedrock_core::i32be;
+use bedrock_core::{BE};
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
 use num_derive::{FromPrimitive, ToPrimitive};
@@ -35,7 +35,7 @@ impl ProtoCodec for PlayStatusType {
             None => {
                 return Err(ProtoCodecError::InvalidEnumID);
             }
-            Some(v) => i32be(v).proto_serialize(stream),
+            Some(v) => BE::<i32>::new(v).proto_serialize(stream),
         }
     }
 
@@ -43,8 +43,8 @@ impl ProtoCodec for PlayStatusType {
     where
         Self: Sized,
     {
-        match i32be::proto_deserialize(stream) {
-            Ok(v) => match PlayStatusType::from_i32(v.0) {
+        match BE::<i32>::proto_deserialize(stream) {
+            Ok(v) => match PlayStatusType::from_i32(v.into_inner()) {
                 None => Err(ProtoCodecError::InvalidEnumID),
                 Some(v) => Ok(v),
             },

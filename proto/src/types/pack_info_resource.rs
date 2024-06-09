@@ -1,11 +1,11 @@
-use bedrock_core::u64le;
+use bedrock_core::LE;
 use proto_derive::ProtoCodec;
 
 #[derive(Debug, ProtoCodec)]
 pub struct ResourcePackInfoType {
     id: String,
     version: String,
-    size: u64le,
+    size: LE<u64>,
     content_key: String,
     sub_pack_name: String,
     content_identify: String,

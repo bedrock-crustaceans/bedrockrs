@@ -1,7 +1,7 @@
-use std::io::Write;
+use std::io::{Cursor, Write};
+use bedrock_core::LE;
 
 use bedrock_core::stream::write::ByteStreamWrite;
-use tokio::io::AsyncWriteExt;
 
 use crate::compression::Compression;
 use crate::encryption::Encryption;
@@ -50,7 +50,7 @@ impl Conn {
             Some(compression) => {
                 let mut compressed_stream = ByteStreamWrite::new();
 
-                match compressed_stream.write_u8(compression.id_u8()) {
+                match LE::<u8>::write(&LE::new(compression.id_u8()), &mut compressed_stream) {
                     Ok(_) => {}
                     Err(e) => return Err(ConnectionError::IOError(e)),
                 };
@@ -58,7 +58,7 @@ impl Conn {
                 if compression.compression_needed()
                     && pk_stream.len() as u16 > compression.threshold()
                 {
-                    match compression.compress(&pk_stream.freeze(), &mut compressed_stream) {
+                    match compression.compress(&Cursor::new(&pk_stream), &mut compressed_stream) {
                         Ok(_) => {}
                         Err(e) => {
                             return Err(ConnectionError::CompressError(e));
@@ -88,7 +88,7 @@ impl Conn {
         };
 
         // Send the data
-        match self.connection.send(&encrypted_stream.freeze()).await {
+        match self.connection.send(&Cursor::new(&encrypted_stream)).await {
             Ok(_) => {}
             Err(e) => return Err(ConnectionError::TransportError(e)),
         }
@@ -97,11 +97,15 @@ impl Conn {
     }
 
     pub async fn recv_gamepackets(&mut self) -> Result<Vec<GamePacket>, ConnectionError> {
+        let mut stream = ByteStreamWrite::new();
+
         // Receive data and turn it into cursor
-        let mut stream = match self.connection.recv().await {
+        match self.connection.recv(&mut stream).await {
             Ok(v) => v,
             Err(e) => return Err(ConnectionError::TransportError(e)),
         };
+
+        let stream = Cursor::new(&stream);
 
         let mut decrypted_stream = match &self.encryption {
             Some(encryption) => {
@@ -110,15 +114,17 @@ impl Conn {
             None => stream,
         };
 
+        let mut decompressed_stream = ByteStreamWrite::new();
+
         // Decompress data
         let mut decompressed_stream = match &self.compression {
             Some(compression) => {
-                match decrypted_stream.read_u8() {
-                    Ok(v) => if v != compression.id_u8() {},
+                match LE::<u8>::read(&mut decrypted_stream) {
+                    Ok(v) => if v.into_inner() != compression.id_u8() {
+                        // TODO: Handle invalid compression method
+                    },
                     Err(_) => {}
                 };
-
-                let mut decompressed_stream = ByteStreamWrite::new();
 
                 match compression.decompress(&mut decrypted_stream, &mut decompressed_stream) {
                     Ok(_) => {}
@@ -127,7 +133,7 @@ impl Conn {
                     }
                 };
 
-                decompressed_stream.freeze()
+                Cursor::new(&decompressed_stream)
             }
             None => decrypted_stream,
         };
@@ -143,7 +149,8 @@ impl Conn {
             };
 
             // Is at the end of batched packet data cursor
-            if decompressed_stream.position() == decompressed_stream.len() as u64 {
+            // TODO: Overflow checking
+            if decompressed_stream.position() == decompressed_stream.get_ref().len() as u64 {
                 break 'gamepacket_read;
             }
         }

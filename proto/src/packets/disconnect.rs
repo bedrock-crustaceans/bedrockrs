@@ -1,5 +1,5 @@
-use bedrock_core::ivar32;
 use bedrock_core::read::ByteStreamRead;
+use bedrock_core::VAR;
 use bedrock_core::write::ByteStreamWrite;
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
@@ -10,7 +10,7 @@ pub struct DisconnectPacket {
     ///
     /// Seems to have no effect on the message being shown.
     /// It is just for telemetry.
-    pub reason: ivar32,
+    pub reason: VAR<i32>,
     pub message: Option<String>,
 }
 
@@ -61,7 +61,7 @@ impl ProtoCodec for DisconnectPacket {
     where
         Self: Sized,
     {
-        let reason = match ivar32::proto_deserialize(cursor) {
+        let reason = match VAR::<i32>::proto_deserialize(cursor) {
             Ok(v) => v,
             Err(e) => {
                 return Err(e);

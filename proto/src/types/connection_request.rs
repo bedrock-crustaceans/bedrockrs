@@ -3,6 +3,7 @@ use std::io::Read;
 
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
+use bedrock_core::{LE, VAR};
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
 use jsonwebtoken::{DecodingKey, Validation};
@@ -81,7 +82,7 @@ pub struct ConnectionRequestType {
 }
 
 impl ProtoCodec for ConnectionRequestType {
-    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
@@ -89,7 +90,7 @@ impl ProtoCodec for ConnectionRequestType {
     }
 
     // TODO: Add microsoft auth
-    fn proto_deserialize(cursor: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
@@ -99,21 +100,26 @@ impl ProtoCodec for ConnectionRequestType {
         // (certificate_chain len + raw_token len + 8)
         // 8 = i32 len + i32 len (length of certificate_chain's len and raw_token's len)
         // can be ignored, other lengths are provided
-        match cursor.read_uvar32() {
+        match VAR::<u32>::read(stream) {
             Ok(_) => {}
             Err(e) => return Err(ProtoCodecError::IOError(e)),
         };
 
         // read length of certificate_chain vec
-        let certificate_chain_len = match cursor.read_i32le() {
-            Ok(l) => l.0,
+        let certificate_chain_len = match LE::<i32>::read(stream) {
+            Ok(l) => l.into_inner(),
             Err(e) => return Err(ProtoCodecError::IOError(e)),
         };
 
-        let mut certificate_chain_buf = vec![0; certificate_chain_len as usize];
+        let certificate_chain_len = match certificate_chain_len.try_into() {
+            Ok(v) => { v }
+            Err(e) => { return Err(ProtoCodecError::FromIntError(e)) }
+        };
+
+        let mut certificate_chain_buf = vec![0; certificate_chain_len];
 
         // read string data (certificate_chain)
-        match cursor.read_exact(&mut certificate_chain_buf) {
+        match stream.read_exact(&mut certificate_chain_buf) {
             Ok(_) => {}
             Err(e) => return Err(ProtoCodecError::IOError(e)),
         };
@@ -226,15 +232,20 @@ impl ProtoCodec for ConnectionRequestType {
         }
 
         // read length of certificate_chain vec
-        let raw_token_len = match cursor.read_i32le() {
-            Ok(l) => l.0,
+        let raw_token_len = match LE::<i32>::read(stream) {
+            Ok(v) => v.into_inner(),
             Err(e) => return Err(ProtoCodecError::IOError(e)),
         };
 
-        let mut raw_token_buf = vec![0; raw_token_len as usize];
+        let raw_token_len = match raw_token_len.try_into() {
+            Ok(v) => { v }
+            Err(e) => { return Err(ProtoCodecError::FromIntError(e)) }
+        };
+
+        let mut raw_token_buf = vec![0; raw_token_len];
 
         // read string data (certificate_chain)
-        match cursor.read_exact(&mut raw_token_buf) {
+        match stream.read_exact(&mut raw_token_buf) {
             Ok(_) => {}
             Err(e) => return Err(ProtoCodecError::IOError(e)),
         };

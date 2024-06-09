@@ -1,5 +1,5 @@
+use bedrock_core::LE;
 use bedrock_core::read::ByteStreamRead;
-use bedrock_core::u32le;
 use bedrock_core::write::ByteStreamWrite;
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
@@ -13,19 +13,23 @@ pub struct Experiments {
 }
 
 impl ProtoCodec for Experiments {
-    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match u32le(self.experiments.len() as u32).proto_serialize(buf) {
-            Ok(_) => {}
-            Err(e) => {
-                return Err(e);
-            }
+        let len = match self.experiments.len().try_into() {
+            Ok(v) => { v }
+            Err(e) => { return Err(ProtoCodecError::FromIntError(e)) }
         };
 
+        // Write length of downloading packs as an u16le
+        match LE::<u16>::new(len).proto_serialize(stream) {
+            Ok(_) => {}
+            Err(e) => return Err(e),
+        }
+
         for experiment in &self.experiments {
-            match experiment.proto_serialize(buf) {
+            match experiment.proto_serialize(stream) {
                 Ok(_) => {}
                 Err(e) => {
                     return Err(e);
@@ -33,7 +37,7 @@ impl ProtoCodec for Experiments {
             }
         }
 
-        match self.ever_toggled.proto_serialize(buf) {
+        match self.ever_toggled.proto_serialize(stream) {
             Ok(_) => {}
             Err(e) => {
                 return Err(e);
@@ -43,12 +47,12 @@ impl ProtoCodec for Experiments {
         Ok(())
     }
 
-    fn proto_deserialize(cursor: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        let len = match u32le::proto_deserialize(cursor) {
-            Ok(v) => v.0,
+        let len = match LE::<u32>::proto_deserialize(stream) {
+            Ok(v) => v.into_inner(),
             Err(e) => {
                 return Err(e);
             }
@@ -57,7 +61,7 @@ impl ProtoCodec for Experiments {
         let mut experiments = vec![];
 
         for _ in 0..len {
-            match Experiment::proto_deserialize(cursor) {
+            match Experiment::proto_deserialize(stream) {
                 Ok(v) => experiments.push(v),
                 Err(e) => {
                     return Err(e);

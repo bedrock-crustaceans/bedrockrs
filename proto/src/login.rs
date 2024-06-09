@@ -1,5 +1,4 @@
-use bedrock_core::u16le;
-
+use bedrock_core::LE;
 use crate::compression::Compression;
 use crate::conn::Conn;
 use crate::error::LoginError;
@@ -46,7 +45,7 @@ pub async fn handle_login_server_side(
 
     // Get the clients proto version
     let client_proto_ver = match &gamepackets[0] {
-        GamePacket::RequestNetworkSettings(pk) => pk.client_network_version.0,
+        GamePacket::RequestNetworkSettings(pk) => pk.client_network_version.into_inner(),
         e => {
             return Err(LoginError::PacketMismatch(format!(
                 "Expected RequestNetworkSettingsPacket got: {e:?}"
@@ -77,12 +76,12 @@ pub async fn handle_login_server_side(
     // Send Network Settings
     match connection
         .send_gamepackets(vec![GamePacket::NetworkSettings(NetworkSettingsPacket {
-            compression_threshold: u16le(threshold),
-            compression_algorithm: u16le(id_u16),
+            compression_threshold: LE::new(threshold),
+            compression_algorithm: LE::new(id_u16),
             // TODO: Figure out what all of this is
             client_throttle_enabled: false,
-            client_throttle_threshold: 0,
-            client_throttle_scalar: 0.0,
+            client_throttle_threshold: LE::new(0),
+            client_throttle_scalar: LE::new(0.0),
         })])
         .await
     {

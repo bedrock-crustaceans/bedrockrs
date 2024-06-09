@@ -1,5 +1,5 @@
+use bedrock_core::LE;
 use bedrock_core::read::ByteStreamRead;
-use bedrock_core::u16le;
 use bedrock_core::write::ByteStreamWrite;
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
@@ -48,8 +48,13 @@ impl ProtoCodec for ResourcePacksInfoPacket {
             Err(e) => return Err(e),
         }
 
+        let len = match self.behavior_packs.len().try_into() {
+            Ok(v) => { v }
+            Err(e) => { return Err(ProtoCodecError::FromIntError(e)) }
+        };
+
         // Write length of behavior packs as an u16le
-        match u16le(self.behavior_packs.len() as u16).proto_serialize(stream) {
+        match LE::<u16>::new(len).proto_serialize(stream) {
             Ok(_) => {}
             Err(e) => return Err(e),
         }
@@ -62,8 +67,13 @@ impl ProtoCodec for ResourcePacksInfoPacket {
             }
         }
 
+        let len = match self.resource_packs.len().try_into() {
+            Ok(v) => { v }
+            Err(e) => { return Err(ProtoCodecError::FromIntError(e)) }
+        };
+
         // Write length of resource packs as an u16le
-        match u16le(self.resource_packs.len() as u16).proto_serialize(stream) {
+        match LE::<u16>::new(len).proto_serialize(stream) {
             Ok(_) => {}
             Err(e) => return Err(e),
         }

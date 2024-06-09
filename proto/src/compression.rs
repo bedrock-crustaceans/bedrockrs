@@ -85,7 +85,7 @@ impl Compression {
                     flate2::Compression::new(*compression_level as u32),
                 );
 
-                match encoder.write_all(src.as_slice()) {
+                match encoder.write_all(src.get_ref().as_slice()) {
                     Ok(_) => Ok(()),
                     Err(e) => Err(CompressionError::ZlibError(Box::new(e))),
                 }
@@ -93,14 +93,14 @@ impl Compression {
             Compression::Snappy { .. } => {
                 let mut encoder = snap::write::FrameEncoder::new(dst);
 
-                match io::copy(&mut src.as_slice(), &mut encoder) {
+                match io::copy(&mut src.get_ref().as_slice(), &mut encoder) {
                     Ok(_) => Ok(()),
                     Err(e) => Err(CompressionError::SnappyError(e)),
                 }
             }
             Compression::None => {
                 // unnecessary copying, this fn shouldn't be called when `compression_needed` returns false
-                match dst.write_all(src.as_slice()) {
+                match dst.write_all(src.get_ref().as_slice()) {
                     Ok(_) => Ok(()),
                     Err(e) => Err(CompressionError::IOError(e)),
                 }
@@ -118,7 +118,7 @@ impl Compression {
     ) -> Result<(), CompressionError> {
         match self {
             Compression::Zlib { .. } => {
-                let mut decoder = flate2::read::DeflateDecoder::new(src.as_slice());
+                let mut decoder = flate2::read::DeflateDecoder::new(src.get_ref().as_slice());
 
                 match io::copy(&mut decoder, dst) {
                     Ok(_) => Ok(()),
@@ -126,7 +126,7 @@ impl Compression {
                 }
             }
             Compression::Snappy { .. } => {
-                let mut decoder = snap::read::FrameDecoder::new(src.as_slice());
+                let mut decoder = snap::read::FrameDecoder::new(src.get_ref().as_slice());
 
                 match io::copy(&mut decoder, dst) {
                     Ok(_) => Ok(()),
@@ -135,7 +135,7 @@ impl Compression {
             }
             Compression::None => {
                 // unnecessary copying, this fn shouldn't be called when `compression_needed` returns false
-                match dst.write_all(src.as_slice()) {
+                match dst.write_all(src.get_ref().as_slice()) {
                     Ok(_) => Ok(()),
                     Err(e) => Err(CompressionError::IOError(e)),
                 }

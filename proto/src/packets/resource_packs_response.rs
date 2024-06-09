@@ -1,5 +1,5 @@
+use bedrock_core::{LE, VAR};
 use bedrock_core::read::ByteStreamRead;
-use bedrock_core::u16le;
 use bedrock_core::write::ByteStreamWrite;
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
@@ -15,22 +15,28 @@ pub struct ResourcePacksResponsePacket {
 }
 
 impl ProtoCodec for ResourcePacksResponsePacket {
-    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match self.response.proto_serialize(buf) {
+        match self.response.proto_serialize(stream) {
             Ok(_) => {}
             Err(e) => return Err(e),
         }
 
-        match u16le(self.downloading_packs.len() as u16).proto_serialize(buf) {
+        let len = match self.downloading_packs.len().try_into() {
+            Ok(v) => { v }
+            Err(e) => { return Err(ProtoCodecError::FromIntError(e)) }
+        };
+
+        // Write length of downloading packs as an u16le
+        match LE::<u16>::new(len).proto_serialize(stream) {
             Ok(_) => {}
             Err(e) => return Err(e),
         }
 
         for downloading_pack in &self.downloading_packs {
-            match downloading_pack.proto_serialize(buf) {
+            match downloading_pack.proto_serialize(stream) {
                 Ok(_) => {}
                 Err(e) => return Err(e),
             }
@@ -49,14 +55,14 @@ impl ProtoCodec for ResourcePacksResponsePacket {
             Err(e) => return Err(e),
         };
 
-        let downloading_packs_len = match u16le::proto_deserialize(cursor) {
-            Ok(v) => v,
+        let downloading_packs_len = match VAR::<u16>::proto_deserialize(cursor) {
+            Ok(v) => v.into_inner(),
             Err(e) => return Err(e),
         };
 
         let mut downloading_packs = vec![];
 
-        for _ in 0..downloading_packs_len.0 {
+        for _ in 0..downloading_packs_len {
             match String::proto_deserialize(cursor) {
                 Ok(v) => downloading_packs.push(v),
                 Err(e) => return Err(e),

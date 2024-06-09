@@ -4,7 +4,7 @@ use std::io::Write;
 
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
-use bedrock_core::uvar32;
+use bedrock_core::VAR;
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
 
@@ -329,7 +329,7 @@ macro_rules! ser_packet {
         // let header = "";
 
         // Write the PacketID to the packet streamfer
-        match pk_stream.write_uvar32(uvar32($packet_id as u32)) {
+        match VAR::<u16>::write(&VAR::new($packet_id), $stream) {
             Ok(_) => {}
             Err(e) => {
                 return Err(ProtoCodecError::IOError(e));
@@ -345,7 +345,8 @@ macro_rules! ser_packet {
         }
 
         // Write buffer length
-        match $stream.write_uvar32(uvar32(pk_stream.len() as u32)) {
+        // TODO: Handle overflow
+        match VAR::<u32>::write(&VAR::new(pk_stream.len() as u32), $stream) {
             Ok(_) => {}
             Err(e) => {
                 return Err(ProtoCodecError::IOError(e));
@@ -826,14 +827,14 @@ impl GamePacket {
         // Read the game packet length
         // We don't need it, yet
         // TODO: Use this to possibly async the packet handling
-        match stream.read_uvar32() {
+        match VAR::<u32>::read(stream) {
             Ok(_) => {}
             Err(e) => return Err(ProtoCodecError::IOError(e)),
         };
 
         // Read the game packet header and parse it into an u16
-        let game_packet_header: u16 = match stream.read_uvar32() {
-            Ok(v) => match v.0.try_into() {
+        let game_packet_header: u16 = match VAR::<u32>::read(stream) {
+            Ok(v) => match v.into_inner().try_into() {
                 Ok(v) => v,
                 Err(e) => {
                     return Err(ProtoCodecError::FromIntError(e));
