@@ -2,12 +2,10 @@ use std::ops::{
     Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
 };
 
-use crate::i32le;
-
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Vec2 {
-    pub x: i32le,
-    pub z: i32le,
+    pub x: i32,
+    pub z: i32,
 }
 
 impl Add for Vec2 {

@@ -1,8 +1,6 @@
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
-use crate::{u128be, u128le};
-
 /// A Universally Unique Identifier (UUID).
 /// (A simple wrapper around the uuid crates uuid::Uuid type)
 #[derive(Clone, Copy, Eq, Hash, Ord, PartialEq, PartialOrd)]
@@ -65,14 +63,8 @@ impl UUID {
 
     /// Creates a UUID from a 128bit value.
     #[inline]
-    pub fn from_u128be(v: u128be) -> Self {
-        Self(uuid::Uuid::from_u128(v.0))
-    }
-
-    /// Creates a UUID from a 128bit value.
-    #[inline]
-    pub fn from_u128le(v: u128le) -> Self {
-        Self(uuid::Uuid::from_u128_le(v.0))
+    pub fn from_u128be(v: u128) -> Self {
+        Self(uuid::Uuid::from_u128(v))
     }
 }
 
