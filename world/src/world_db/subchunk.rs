@@ -2,8 +2,9 @@ use byteorder::ReadBytesExt;
 use paletted_storage::PalettedStorage;
 use std::io::Cursor;
 
+#[derive(Debug)]
 pub struct SubChunk {
-    pub paletted_storage: PalettedStorage
+    pub paletted_storage: Vec<PalettedStorage>
 }
 
 
@@ -14,20 +15,26 @@ impl SubChunk {
         let ver = cur.read_u8().expect("Missing subchunk version");
         match ver {
             8 | 9 => {
+                let mut out = SubChunk{paletted_storage: Vec::new()};
                 let storage_layers = cur.read_u8().expect("Missing storage layers");
-                let mut y_index = None;
+                // let mut y_index = None;
                 if ver == 9 {
-                    y_index = Some(cur.read_u8().expect("Missing Y index"));
+                    // idk if we need the y index or not yet
+                    // y_index = Some(
+                        cur.read_u8().expect("Missing Y index");
+                    // );
+                }
+                
+                for i in 0..storage_layers {
+                    println!("layer: {}, count: {}", i, storage_layers);
+                    out.paletted_storage.push(PalettedStorage::decode(&mut cur));
                 }
 
-                println!("storage_layers:{}", storage_layers);
-                println!("y-index:{:?}", y_index);
-                
-                SubChunk{paletted_storage: PalettedStorage::decode(cur)}
+                out
             },
 
             1 => {
-                todo!("Subchunk V1");
+                SubChunk{paletted_storage: vec![PalettedStorage::decode(&mut cur)]}
             }
 
             a => {panic!("Unsupported subchunk version {}", a);}

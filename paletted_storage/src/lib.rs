@@ -13,12 +13,13 @@ pub struct PalettedStorage {
 impl PalettedStorage {
     // https://www.reddit.com/r/technicalminecraft/comments/x3pzb7/bedrock_leveldb_subchunk_format/
     // I have no idea how this actually works tbh
-    pub fn decode(mut cur: Cursor<Vec<u8>>) -> PalettedStorage {
+    pub fn decode(cur: &mut Cursor<Vec<u8>>) -> PalettedStorage {
         let mut out = PalettedStorage{blocks: [0; 4096], palette: Vec::new()};
         let palette_type = cur.read_u8().expect("Missing palette type");
         let bits_per_block = palette_type >> 1;
+        println!("bpb: {}", bits_per_block);
         if bits_per_block == 0 {
-            
+            return out
         }
         let blocks_per_word = 32 / bits_per_block;
         let num_words: i32 = (4096 + Into::<i32>::into(blocks_per_word) - 1) / Into::<i32>::into(blocks_per_word);
@@ -51,13 +52,16 @@ impl PalettedStorage {
     }
 }
 
-fn cursor_to_bytes(mut cursor: Cursor<Vec<u8>>) -> Bytes { // ugly chatgpt hack because bytes::Bytes is awkward
+fn cursor_to_bytes(cursor: &mut Cursor<Vec<u8>>) -> Bytes {
     // Get the current position of the cursor
     let position = cursor.position() as usize;
     
     // Split the underlying Vec<u8> at the current position
     let buffer = cursor.get_mut();
     let remaining_data = buffer.split_off(position);
+
+    // Update the cursor to the new buffer (which is now empty since we've taken all remaining data)
+    *cursor = Cursor::new(remaining_data.clone());
 
     // Convert the remaining data into Bytes
     Bytes::from(remaining_data)
