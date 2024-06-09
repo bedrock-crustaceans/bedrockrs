@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
+use std::io::Cursor;
 
 use bedrock_core::stream::read::ByteStreamRead;
+use bedrock_core::write::ByteStreamWrite;
 pub use error::NbtError;
 
 use crate::byte_order::NbtByteOrder;
@@ -136,23 +138,23 @@ impl NbtTag {
     pub fn nbt_serialize<T: NbtByteOrder>(
         &self,
         root_tag_name: impl Into<String>,
-        buf: &mut Vec<u8>,
+        stream: &mut ByteStreamWrite,
     ) -> Result<(), NbtError> {
-        match T::write_u8(buf, self.get_id()) {
+        match T::write_u8(stream, self.get_id()) {
             Ok(_) => {}
             Err(e) => {
                 return Err(e);
             }
         }
 
-        match T::write_string(buf, root_tag_name.into()) {
+        match T::write_string(stream, root_tag_name.into()) {
             Ok(_) => {}
             Err(e) => {
                 return Err(e);
             }
         }
 
-        self.nbt_serialize_val::<T>(buf)
+        self.nbt_serialize_val::<T>(stream)
     }
 
     /// Serialize the NBT via a simple vec.
@@ -173,7 +175,7 @@ impl NbtTag {
     /// Serializes a given val without any root tag name or type notation.
     /// Should only be used by the [NbtTag::nbt_serialize] function internally.
     #[inline]
-    fn nbt_serialize_val<T: NbtByteOrder>(&self, buf: &mut Vec<u8>) -> Result<(), NbtError> {
+    fn nbt_serialize_val<T: NbtByteOrder>(&self, buf: &mut ByteStreamWrite) -> Result<(), NbtError> {
         match self {
             NbtTag::Byte(v) => match T::write_u8(buf, *v) {
                 Ok(_) => {}
@@ -303,7 +305,7 @@ impl NbtTag {
     /// ];
     ///
     /// // Create the stream
-    /// let mut stream = ByteStreamRead::from(data);
+    /// let mut stream = ByteStreamRead::from(Cursor::new(&data));
     ///
     /// // Read the nbt tag and its name
     /// let (tag, name) = NbtTag::nbt_deserialize::<NbtLittleEndian>(&mut stream).unwrap();
@@ -339,7 +341,7 @@ impl NbtTag {
     /// Simpler alternative to [NbtTag::nbt_deserialize].
     #[inline]
     pub fn nbt_deserialize_vec<T: NbtByteOrder>(vec: &Vec<u8>) -> Result<(String, Self), NbtError> {
-        NbtTag::nbt_deserialize::<T>(&mut ByteStreamRead::from(vec.clone()))
+        NbtTag::nbt_deserialize::<T>(&mut ByteStreamRead::from(Cursor::new(vec)))
     }
 
     /// Deserializes a given val without reading any tag name notation.

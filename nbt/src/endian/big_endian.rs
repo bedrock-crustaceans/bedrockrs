@@ -1,7 +1,7 @@
-use std::io::Write;
+use std::io::{Read, Write};
+use bedrock_core::BE;
 
 use bedrock_core::stream::read::ByteStreamRead;
-use byteorder::{BigEndian, WriteBytesExt};
 
 use crate::byte_order::NbtByteOrder;
 use crate::error::NbtError;
@@ -11,7 +11,7 @@ pub struct NbtBigEndian;
 impl NbtByteOrder for NbtBigEndian {
     #[inline]
     fn write_u8(buf: &mut Vec<u8>, byte: u8) -> Result<(), NbtError> {
-        match buf.write_u8(byte) {
+        match BE::<u8>::write(&BE::new(byte), buf) {
             Ok(v) => Ok(v),
             Err(e) => Err(NbtError::IOError(e)),
         }
@@ -19,7 +19,7 @@ impl NbtByteOrder for NbtBigEndian {
 
     #[inline]
     fn write_i16(buf: &mut Vec<u8>, int16: i16) -> Result<(), NbtError> {
-        match buf.write_i16::<BigEndian>(int16) {
+        match BE::<i16>::write(&BE::new(int16), buf) {
             Ok(v) => Ok(v),
             Err(e) => Err(NbtError::IOError(e)),
         }
@@ -27,7 +27,7 @@ impl NbtByteOrder for NbtBigEndian {
 
     #[inline]
     fn write_i32(buf: &mut Vec<u8>, int32: i32) -> Result<(), NbtError> {
-        match buf.write_i32::<BigEndian>(int32) {
+        match BE::<i32>::write(&BE::new(int32), buf) {
             Ok(v) => Ok(v),
             Err(e) => Err(NbtError::IOError(e)),
         }
@@ -35,7 +35,7 @@ impl NbtByteOrder for NbtBigEndian {
 
     #[inline]
     fn write_i64(buf: &mut Vec<u8>, int64: i64) -> Result<(), NbtError> {
-        match buf.write_i64::<BigEndian>(int64) {
+        match BE::<i64>::write(&BE::new(int64), buf) {
             Ok(v) => Ok(v),
             Err(e) => Err(NbtError::IOError(e)),
         }
@@ -43,7 +43,7 @@ impl NbtByteOrder for NbtBigEndian {
 
     #[inline]
     fn write_f32(buf: &mut Vec<u8>, float32: f32) -> Result<(), NbtError> {
-        match buf.write_f32::<BigEndian>(float32) {
+        match BE::<f32>::write(&BE::new(float32), buf) {
             Ok(v) => Ok(v),
             Err(e) => Err(NbtError::IOError(e)),
         }
@@ -51,7 +51,7 @@ impl NbtByteOrder for NbtBigEndian {
 
     #[inline]
     fn write_f64(buf: &mut Vec<u8>, float64: f64) -> Result<(), NbtError> {
-        match buf.write_f64::<BigEndian>(float64) {
+        match BE::<f64>::write(&BE::new(float64), buf) {
             Ok(v) => Ok(v),
             Err(e) => Err(NbtError::IOError(e)),
         }
@@ -80,48 +80,48 @@ impl NbtByteOrder for NbtBigEndian {
 
     #[inline]
     fn read_u8(buf: &mut ByteStreamRead) -> Result<u8, NbtError> {
-        match buf.read_u8() {
-            Ok(v) => Ok(v),
+        match BE::<u8>::read(buf) {
+            Ok(v) => Ok(v.into_inner()),
             Err(e) => Err(NbtError::IOError(e)),
         }
     }
 
     #[inline]
     fn read_i16(buf: &mut ByteStreamRead) -> Result<i16, NbtError> {
-        match buf.read_i16be() {
-            Ok(v) => Ok(v.0),
+        match BE::<i16>::read(buf) {
+            Ok(v) => Ok(v.into_inner()),
             Err(e) => Err(NbtError::IOError(e)),
         }
     }
 
     #[inline]
     fn read_i32(buf: &mut ByteStreamRead) -> Result<i32, NbtError> {
-        match buf.read_i32be() {
-            Ok(v) => Ok(v.0),
+        match BE::<i32>::read(buf) {
+            Ok(v) => Ok(v.into_inner()),
             Err(e) => Err(NbtError::IOError(e)),
         }
     }
 
     #[inline]
     fn read_i64(buf: &mut ByteStreamRead) -> Result<i64, NbtError> {
-        match buf.read_i64be() {
-            Ok(v) => Ok(v.0),
+        match BE::<i64>::read(buf) {
+            Ok(v) => Ok(v.into_inner()),
             Err(e) => Err(NbtError::IOError(e)),
         }
     }
 
     #[inline]
     fn read_f32(buf: &mut ByteStreamRead) -> Result<f32, NbtError> {
-        match buf.read_f32be() {
-            Ok(v) => Ok(v),
+        match BE::<f32>::read(buf) {
+            Ok(v) => Ok(v.into_inner()),
             Err(e) => Err(NbtError::IOError(e)),
         }
     }
 
     #[inline]
     fn read_f64(buf: &mut ByteStreamRead) -> Result<f64, NbtError> {
-        match buf.read_f64be() {
-            Ok(v) => Ok(v),
+        match BE::<f64>::read(buf) {
+            Ok(v) => Ok(v.into_inner()),
             Err(e) => Err(NbtError::IOError(e)),
         }
     }
