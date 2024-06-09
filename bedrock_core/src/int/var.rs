@@ -3,18 +3,20 @@ use std::io::{Read, Write};
 
 use varint_rs::{VarintReader, VarintWriter};
 
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
+#[repr(transparent)]
 pub struct VAR<T> {
     num: T,
 }
 
 impl<T> VAR<T> {
     #[inline]
-    fn new(num: T) -> Self {
+    pub fn new(num: T) -> Self {
         Self { num }
     }
 
     #[inline]
-    fn into_inner(self) -> T {
+    pub fn into_inner(self) -> T {
         self.num
     }
 }
@@ -23,13 +25,13 @@ macro_rules! impl_var {
     ($type:ty, $read_fn_name:ident, $write_fn_name:ident) => {
         impl VAR<$type> {
             #[inline]
-            fn read<R: Read>(reader: &mut R) -> io::Result<Self> {
+            pub fn read<R: Read>(reader: &mut R) -> io::Result<Self> {
                 let num = reader.$read_fn_name()?;
                 Ok(VAR::new(num))
             }
 
             #[inline]
-            fn write<W: Write>(&self, writer: &mut W) -> io::Result<()> {
+            pub fn write<W: Write>(&self, writer: &mut W) -> io::Result<()> {
                 writer.$write_fn_name(self.num)?;
                 Ok(())
             }

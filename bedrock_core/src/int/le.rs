@@ -2,18 +2,20 @@ use std::io::{self, Read, Write};
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
+#[repr(transparent)]
 pub struct LE<T> {
     num: T,
 }
 
 impl<T> LE<T> {
     #[inline]
-    fn new(num: T) -> Self {
+    pub fn new(num: T) -> Self {
         Self { num }
     }
 
     #[inline]
-    fn into_inner(self) -> T {
+    pub fn into_inner(self) -> T {
         self.num
     }
 }
@@ -22,13 +24,13 @@ macro_rules! impl_le {
     ($type:ty, $read_fn_name:ident, $write_fn_name:ident) => {
         impl LE<$type> {
             #[inline]
-            fn read<R: Read>(reader: &mut R) -> io::Result<Self> {
+            pub fn read<R: Read>(reader: &mut R) -> io::Result<Self> {
                 let num = reader.$read_fn_name::<LittleEndian>()?;
                 Ok(LE::new(num))
             }
 
             #[inline]
-            fn write<W: Write>(&self, writer: &mut W) -> io::Result<()> {
+            pub fn write<W: Write>(&self, writer: &mut W) -> io::Result<()> {
                 writer.$write_fn_name::<LittleEndian>(self.num)?;
                 Ok(())
             }
@@ -37,24 +39,24 @@ macro_rules! impl_le {
 }
 
 impl LE<u8> {
-    fn read<R: Read>(reader: &mut R) -> io::Result<Self> {
+    pub fn read<R: Read>(reader: &mut R) -> io::Result<Self> {
         let num = reader.read_u8()?;
         Ok(LE::new(num))
     }
 
-    fn write<W: Write>(&self, writer: &mut W) -> io::Result<()> {
+    pub fn write<W: Write>(&self, writer: &mut W) -> io::Result<()> {
         writer.write_u8(self.num)?;
         Ok(())
     }
 }
 
 impl LE<i8> {
-    fn read<R: Read>(reader: &mut R) -> io::Result<Self> {
+    pub fn read<R: Read>(reader: &mut R) -> io::Result<Self> {
         let num = reader.read_i8()?;
         Ok(LE::new(num))
     }
 
-    fn write<W: Write>(&self, writer: &mut W) -> io::Result<()> {
+    pub fn write<W: Write>(&self, writer: &mut W) -> io::Result<()> {
         writer.write_i8(self.num)?;
         Ok(())
     }
@@ -71,3 +73,6 @@ impl_le!(i64, read_i64, write_i64);
 
 impl_le!(u128, read_u128, write_u128);
 impl_le!(i128, read_i128, write_i128);
+
+impl_le!(f32, read_f32, write_f32);
+impl_le!(f64, read_f64, write_f64);
