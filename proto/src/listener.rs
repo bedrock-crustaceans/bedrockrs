@@ -31,7 +31,7 @@ impl Listener {
             Err(e) => {
                 return Err(ListenerError::TransportListenerError(
                     TransportLayerError::RaknetUDPError(RaknetError::ServerError(e)),
-                ))
+                ));
             }
         };
 

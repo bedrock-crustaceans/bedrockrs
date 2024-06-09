@@ -1,8 +1,8 @@
 use std::io::Write;
-use bedrock_core::LE;
 
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
+use bedrock_core::LE;
 
 use crate::error::{RaknetError, TransportLayerError};
 use crate::info::RAKNET_GAME_PACKET_ID;
@@ -64,27 +64,25 @@ impl TransportLayerConn {
                 let mut recv_stream = ByteStreamRead::new(&recv_stream);
 
                 match LE::<u8>::read(&mut recv_stream) {
-                    Ok(v) => {
-                        match v.into_inner() {
-                            RAKNET_GAME_PACKET_ID => {}
-                            other => {
-                                return Err(TransportLayerError::RaknetUDPError(
-                                    RaknetError::FormatError(format!(
-                                        "Expected Raknet Game Packet ID ({:?}), got: {:?}",
-                                        RAKNET_GAME_PACKET_ID, other
-                                    )),
-                                ));
-                            }
+                    Ok(v) => match v.into_inner() {
+                        RAKNET_GAME_PACKET_ID => {}
+                        other => {
+                            return Err(TransportLayerError::RaknetUDPError(
+                                RaknetError::FormatError(format!(
+                                    "Expected Raknet Game Packet ID ({:?}), got: {:?}",
+                                    RAKNET_GAME_PACKET_ID, other
+                                )),
+                            ));
                         }
-                    }
+                    },
                     Err(e) => {
                         return Err(TransportLayerError::IOError(e));
                     }
                 };
 
                 match stream.write_all(recv_stream.into_inner()) {
-                    Ok(_) => { Ok(()) }
-                    Err(e) => { Err(TransportLayerError::IOError(e)) }
+                    Ok(_) => Ok(()),
+                    Err(e) => Err(TransportLayerError::IOError(e)),
                 }
             }
             _ => {

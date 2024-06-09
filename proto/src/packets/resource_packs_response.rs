@@ -1,6 +1,6 @@
-use bedrock_core::{LE, VAR};
 use bedrock_core::read::ByteStreamRead;
 use bedrock_core::write::ByteStreamWrite;
+use bedrock_core::{LE, VAR};
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
 
@@ -25,8 +25,10 @@ impl ProtoCodec for ResourcePacksResponsePacket {
         }
 
         let len = match self.downloading_packs.len().try_into() {
-            Ok(v) => { v }
-            Err(e) => { return Err(ProtoCodecError::FromIntError(e)) }
+            Ok(v) => v,
+            Err(e) => {
+                return Err(ProtoCodecError::FromIntError(e));
+            }
         };
 
         // Write length of downloading packs as an u16le

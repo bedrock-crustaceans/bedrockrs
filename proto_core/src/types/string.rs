@@ -1,19 +1,23 @@
 use std::convert::TryInto;
 use std::io::{Read, Write};
+
 use bedrock_core::read::ByteStreamRead;
-use bedrock_core::VAR;
 use bedrock_core::write::ByteStreamWrite;
+use bedrock_core::VAR;
+
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 
 impl ProtoCodec for String {
     fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
-        where
-            Self: Sized,
+    where
+        Self: Sized,
     {
         let len = match self.len().try_into() {
-            Ok(v) => { v }
-            Err(e) => { return Err(ProtoCodecError::FromIntError(e)) }
+            Ok(v) => v,
+            Err(e) => {
+                return Err(ProtoCodecError::FromIntError(e));
+            }
         };
 
         match VAR::<u32>::new(len).write(buf) {
@@ -30,8 +34,8 @@ impl ProtoCodec for String {
     }
 
     fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
-        where
-            Self: Sized,
+    where
+        Self: Sized,
     {
         let len = match VAR::<u32>::read(stream) {
             Ok(v) => v.into_inner(),
@@ -41,8 +45,10 @@ impl ProtoCodec for String {
         };
 
         let len = match len.try_into() {
-            Ok(v) => { v }
-            Err(e) => { return Err(ProtoCodecError::FromIntError(e)) }
+            Ok(v) => v,
+            Err(e) => {
+                return Err(ProtoCodecError::FromIntError(e));
+            }
         };
 
         let mut string_buf = vec![0u8; len];

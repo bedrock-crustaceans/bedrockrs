@@ -1,7 +1,7 @@
 use std::io::{Cursor, Write};
-use bedrock_core::LE;
 
 use bedrock_core::stream::write::ByteStreamWrite;
+use bedrock_core::LE;
 
 use crate::compression::Compression;
 use crate::encryption::Encryption;
@@ -120,9 +120,11 @@ impl Conn {
         let mut decompressed_stream = match &self.compression {
             Some(compression) => {
                 match LE::<u8>::read(&mut decrypted_stream) {
-                    Ok(v) => if v.into_inner() != compression.id_u8() {
-                        // TODO: Handle invalid compression method
-                    },
+                    Ok(v) => {
+                        if v.into_inner() != compression.id_u8() {
+                            // TODO: Handle invalid compression method
+                        }
+                    }
                     Err(_) => {}
                 };
 

@@ -6,7 +6,7 @@ pub enum RecordType {
     Version,
     Data2D,
     Data2DLegacy,
-    SubChunkPrefix{y: u8}, // -4 to 20 as of 1.18
+    SubChunkPrefix { y: u8 }, // -4 to 20 as of 1.18
     LegacyTerrain,
     BlockEntity,
     Entity,
@@ -24,7 +24,7 @@ pub enum RecordType {
     BlendingBiomeHeight,
     BlendingData,
     ActorDigestVersion,
-    LegacyVersion
+    LegacyVersion,
 }
 
 impl From<&RecordType> for u8 {
@@ -34,7 +34,7 @@ impl From<&RecordType> for u8 {
             RecordType::Version => 44,
             RecordType::Data2D => 45,
             RecordType::Data2DLegacy => 46,
-            RecordType::SubChunkPrefix {y: _} => 47,
+            RecordType::SubChunkPrefix { y: _ } => 47,
             RecordType::LegacyTerrain => 48,
             RecordType::BlockEntity => 49,
             RecordType::Entity => 50,
@@ -52,13 +52,13 @@ impl From<&RecordType> for u8 {
             RecordType::BlendingBiomeHeight => 63,
             RecordType::BlendingData => 64,
             RecordType::ActorDigestVersion => 65,
-            RecordType::LegacyVersion => 76
+            RecordType::LegacyVersion => 76,
         }
     }
 }
 
 // format: https://minecraft.wiki/w/Bedrock_Edition_level_format#Chunk_key_format
-// 
+//
 // Two signed 32-bit little-endian integers (x and z in chunk coordinates, respectively),
 // An optional third 32-bit little-endian integer (1 for the Nether, 2 for the End, omitted for the Overworld),
 // A one-byte tag specifying the type of record represented by the key (see table), and
@@ -68,7 +68,7 @@ pub fn create_key(x: i32, z: i32, dimension: Dimension, record_type: RecordType)
     out.extend_from_slice(&x.to_le_bytes());
     out.extend_from_slice(&z.to_le_bytes());
     match dimension {
-        Dimension::Overworld => {},
+        Dimension::Overworld => {}
         dim => {
             out.extend_from_slice(&(dim as i32).to_le_bytes());
         }

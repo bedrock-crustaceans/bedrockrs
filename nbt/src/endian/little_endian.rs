@@ -1,7 +1,7 @@
 use std::io::{Read, Write};
-use bedrock_core::LE;
 
 use bedrock_core::stream::read::ByteStreamRead;
+use bedrock_core::LE;
 
 use crate::byte_order::NbtByteOrder;
 use crate::error::NbtError;

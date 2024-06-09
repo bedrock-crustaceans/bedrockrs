@@ -93,7 +93,8 @@ impl WorldDB {
     }
 }
 
-pub fn str_to_ascii_i8(s: &str) -> Result<Vec<i8>, &'static str> { // TODO: Private
+pub fn str_to_ascii_i8(s: &str) -> Result<Vec<i8>, &'static str> {
+    // TODO: Private
     if !s.is_ascii() {
         return Err("Input string contains non-ASCII characters");
     }
