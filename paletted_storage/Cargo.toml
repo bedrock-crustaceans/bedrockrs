@@ -7,4 +7,3 @@ edition = "2021"
 nbt = { path="../nbt" }
 byteorder = "1.5"
 bedrock_core = { path = "../bedrock_core"}
-bytes = "1.6"

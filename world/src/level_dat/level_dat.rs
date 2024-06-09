@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 use std::fs::File;
-use std::io::Read;
+use std::io::{Cursor, Read};
 use std::path::PathBuf;
 
 use bedrock_core::difficulty::Difficulty;
 use bedrock_core::dimension::Dimension;
 use bedrock_core::stream::read::ByteStreamRead;
+use byteorder::{LittleEndian, ReadBytesExt};
 use nbt::endian::little_endian::NbtLittleEndian;
 use nbt::NbtTag;
 
@@ -94,19 +95,19 @@ impl LevelDat {
         };
 
         // Build a ByteStreamRead with the file contents
-        let mut stream = ByteStreamRead::from(data);
+        let mut stream = Cursor::new(&data);
 
         // Read the worlds format version
-        let version = match stream.read_i32le() {
-            Ok(v) => v.0,
+        let version = match stream.read_i32::<LittleEndian>() {
+            Ok(v) => v,
             Err(e) => {
                 return Err(WorldError::FormatError(e.to_string()));
             }
         };
 
         // Read the level.dat size (without the header)
-        let length = match stream.read_i32le() {
-            Ok(v) => v.0,
+        let length = match stream.read_i32::<LittleEndian>() {
+            Ok(v) => v,
             Err(e) => {
                 return Err(WorldError::FormatError(e.to_string()));
             }

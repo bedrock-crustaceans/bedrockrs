@@ -1,7 +1,5 @@
 use std::io::Cursor;
-use bedrock_core::stream::read::ByteStreamRead;
 use byteorder::{LittleEndian, ReadBytesExt};
-use bytes::Bytes;
 use nbt::{endian::little_endian::NbtLittleEndian, NbtTag};
 
 #[derive(Debug)]
@@ -13,7 +11,7 @@ pub struct PalettedStorage {
 impl PalettedStorage {
     // https://www.reddit.com/r/technicalminecraft/comments/x3pzb7/bedrock_leveldb_subchunk_format/
     // I have no idea how this actually works tbh
-    pub fn decode(cur: &mut Cursor<Vec<u8>>) -> PalettedStorage {
+    pub fn decode(cur: &mut Cursor<&Vec<u8>>) -> PalettedStorage {
         let mut out = PalettedStorage{blocks: [0; 4096], palette: Vec::new()};
         let palette_type = cur.read_u8().expect("Missing palette type");
         let bits_per_block = palette_type >> 1;
@@ -41,28 +39,10 @@ impl PalettedStorage {
 
         let palette_count = cur.read_i32::<LittleEndian>().expect("Missing palette count");
 
-        // this is where the bytes::Bytes really hurt
-        let mut bsr = ByteStreamRead::from_bytes(cursor_to_bytes(cur));
-
         for _ in 0..palette_count {
-            out.palette.push(NbtTag::nbt_deserialize::<NbtLittleEndian>(&mut bsr).expect("Bad NBT Tag in palette").1);
+            out.palette.push(NbtTag::nbt_deserialize::<NbtLittleEndian>(cur).expect("Bad NBT Tag in palette").1);
         }
 
         return out;
     }
-}
-
-fn cursor_to_bytes(cursor: &mut Cursor<Vec<u8>>) -> Bytes {
-    // Get the current position of the cursor
-    let position = cursor.position() as usize;
-    
-    // Split the underlying Vec<u8> at the current position
-    let buffer = cursor.get_mut();
-    let remaining_data = buffer.split_off(position);
-
-    // Update the cursor to the new buffer (which is now empty since we've taken all remaining data)
-    *cursor = Cursor::new(remaining_data.clone());
-
-    // Convert the remaining data into Bytes
-    Bytes::from(remaining_data)
 }
