@@ -4,7 +4,7 @@ use nbt::{endian::little_endian::NbtLittleEndian, NbtTag};
 
 #[derive(Debug)]
 pub struct PalettedStorage {
-    blocks: [i32; 4096],
+    blocks: [u32; 4096],
     palette: Vec<NbtTag>
 }
 
@@ -25,7 +25,7 @@ impl PalettedStorage {
         
         let mut pos = 0;
         for _ in 0..num_words {
-            let mut word = cur.read_i32::<LittleEndian>().expect("Missing word");
+            let mut word = cur.read_u32::<LittleEndian>().expect("Missing word");
             for _ in 0..blocks_per_word {
                 let val = word & mask;
                 if pos == 4096 {
@@ -45,4 +45,49 @@ impl PalettedStorage {
 
         return out;
     }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut out = Vec::new();
+        let palette_type: u8 = 0;
+        let bits_per_block = bits_needed_to_store(self.palette.len() as u32);
+        
+        let combined = ((bits_per_block << 1) as u8 ) + palette_type;
+
+        out.push(combined);
+
+        let mut current_word = 0u32;
+        let mut bits_written = 0;
+
+        for block in self.blocks {
+            if bits_written + bits_per_block > 32 {
+                out.extend_from_slice(&current_word.to_le_bytes());
+                current_word = 0;
+                bits_written = 0;
+            }
+
+            current_word = current_word + (block << bits_written);
+            bits_written += bits_per_block;
+        }
+
+        if bits_written != 0 {
+            out.extend_from_slice(&current_word.to_le_bytes());
+        }
+
+        out.extend((self.palette.len() as i32).to_le_bytes());
+
+        for nbt in &self.palette {
+            nbt.nbt_serialize::<NbtLittleEndian>("", &mut out).unwrap();
+        }
+
+        out
+
+    }
+
+}
+
+fn bits_needed_to_store(n: u32) -> u32 {
+    if n == 0 {
+        return 1; // Edge case: 0 requires 1 bit to represent
+    }
+    (32 - n.leading_zeros()) as u32
 }
