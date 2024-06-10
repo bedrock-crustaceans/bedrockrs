@@ -9,7 +9,7 @@ use crate::error::ConnectionError;
 use crate::gamepacket::GamePacket;
 use crate::transport_layer::TransportLayerConn;
 
-pub struct Conn {
+pub struct Connection {
     /// Represents the connections internal transport layer, this allows using different
     /// transport layers with the client or proxies, this can improve performance.
     connection: TransportLayerConn,
@@ -21,7 +21,7 @@ pub struct Conn {
     pub encryption: Option<Encryption>,
 }
 
-impl Conn {
+impl Connection {
     pub fn new(conn: TransportLayerConn) -> Self {
         Self {
             connection: conn,

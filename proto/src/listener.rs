@@ -5,7 +5,7 @@ use rak_rs::mcpe::motd::Gamemode;
 use rak_rs::Motd;
 use rand::RngCore;
 
-use crate::conn::Conn;
+use crate::conn::Connection;
 use crate::error::{ListenerError, RaknetError, TransportLayerError};
 use crate::info::{MINECRAFT_EDITION_MOTD, MINECRAFT_VERSION, PROTOCOL_VERSION};
 use crate::transport_layer::TransportLaterListener;
@@ -71,16 +71,14 @@ impl Listener {
         }
     }
 
-    pub async fn accept(&mut self) -> Result<Conn, ListenerError> {
+    pub async fn accept(&mut self) -> Result<Connection, ListenerError> {
         let rak_conn = match self.listener.accept().await {
             Ok(c) => c,
             Err(e) => return Err(ListenerError::TransportListenerError(e)),
         };
 
-        Ok(Conn::new(rak_conn))
+        Ok(Connection::new(rak_conn))
     }
-
-    fn update_pongdata() {}
 }
 
 #[derive(Debug, Eq, PartialEq)]
