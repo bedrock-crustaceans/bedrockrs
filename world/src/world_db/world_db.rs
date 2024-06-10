@@ -2,10 +2,14 @@ use std::fmt::{Debug, Formatter};
 use std::{collections::HashMap, path::PathBuf};
 
 use bedrock_core::uuid::UUID;
+use bedrock_core::Dimension;
 use mojang_leveldb::{error::DBError, Options, ReadOptions, WriteBatch, WriteOptions, DB};
 use nbt::{endian::little_endian::NbtLittleEndian, NbtTag};
 
 use crate::error::WorldError;
+
+use super::{create_key, RecordType};
+use super::subchunk::SubChunk;
 
 pub struct WorldDB {
     pub db: DB,
@@ -90,6 +94,14 @@ impl WorldDB {
             }
             Err(e) => Err(WorldError::NbtError(e)),
         }
+    }
+
+    pub fn get_subchunk(&self, x: i32, y: u8, z: i32, dimension: Dimension) -> Result<Option<SubChunk>, DBError> {
+        let bytes = self.db.get(READ_OPTIONS, vec_u8_into_i8(create_key(x, z, dimension, RecordType::SubChunkPrefix { y })).as_slice())?;
+        Ok(match bytes {
+            Some(x) => Some(SubChunk::load(&vec_i8_into_u8(x.get().to_vec()))), // TODO: to_vec copies, free manually and return a vec from leveldb
+            None => None,
+        })
     }
 }
 

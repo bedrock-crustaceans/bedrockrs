@@ -43,4 +43,14 @@ impl SubChunk {
             }
         }
     }
+
+    pub fn save(&self) -> Vec<u8> {
+        let mut out = Vec::new();
+        out.push(8u8);
+        out.push(self.paletted_storage.len() as u8);
+        for ps in &self.paletted_storage {
+            out.extend(ps.encode());
+        }
+        out
+    }
 }
