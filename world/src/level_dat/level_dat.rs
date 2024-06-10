@@ -5,7 +5,6 @@ use std::path::PathBuf;
 
 use bedrock_core::difficulty::Difficulty;
 use bedrock_core::dimension::Dimension;
-use bedrock_core::stream::read::ByteStreamRead;
 use byteorder::{LittleEndian, ReadBytesExt};
 use nbt::endian::little_endian::NbtLittleEndian;
 use nbt::NbtTag;

@@ -6,4 +6,4 @@ edition = "2021"
 [dependencies]
 nbt = { path = "../nbt" }
 byteorder = "1.5"
-bedrock_core = { path = "../bedrock_core"}
+bedrock_core = { path = "../bedrock_core" }
