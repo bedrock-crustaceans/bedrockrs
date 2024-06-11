@@ -27,8 +27,7 @@ impl SubChunk {
                     // );
                 }
 
-                for i in 0..storage_layers {
-                    println!("layer: {}, count: {}", i, storage_layers);
+                for _ in 0..storage_layers {
                     out.paletted_storage.push(PalettedStorage::decode(&mut cur));
                 }
 

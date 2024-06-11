@@ -20,7 +20,6 @@ impl PalettedStorage {
         let palette_type = cur.read_u8().expect("Missing palette type");
         let network = palette_type & 1;
         let bits_per_block = palette_type >> 1;
-        println!("bpb: {}", bits_per_block);
         if bits_per_block == 0 {
             return out;
         }
