@@ -1,7 +1,6 @@
 use std::io::Cursor;
 
 use byteorder::ReadBytesExt;
-use nbt::endian::little_endian::NbtLittleEndian;
 use paletted_storage::PalettedStorage;
 
 #[derive(Debug)]
@@ -49,7 +48,7 @@ impl SubChunk {
         out.push(8u8);
         out.push(self.paletted_storage.len() as u8);
         for ps in &self.paletted_storage {
-            out.extend(ps.encode::<NbtLittleEndian>());
+            out.extend(ps.encode(false));
         }
         out
     }
