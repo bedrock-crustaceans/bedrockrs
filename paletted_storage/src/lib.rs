@@ -68,9 +68,9 @@ impl PalettedStorage {
         return out;
     }
 
-    pub fn encode<T: NbtByteOrder>(&self) -> Vec<u8> {
+    pub fn encode(&self, network: bool) -> Vec<u8> {
         let mut out = Vec::new();
-        let palette_type: u8 = 0;
+        let palette_type: u8 = network.into();
         let bits_per_block = bits_needed_to_store(self.palette.len() as u32);
         
         let combined = ((bits_per_block << 1) as u8 ) + palette_type;
@@ -98,7 +98,11 @@ impl PalettedStorage {
         out.extend((self.palette.len() as i32).to_le_bytes());
 
         for nbt in &self.palette {
-            nbt.nbt_serialize::<T>("", &mut out).unwrap();
+            if network {
+                nbt.nbt_serialize::<NbtLittleEndianNetwork>("", &mut out).unwrap();
+            } else {
+                nbt.nbt_serialize::<NbtLittleEndian>("", &mut out).unwrap();
+            }
         }
 
         out
