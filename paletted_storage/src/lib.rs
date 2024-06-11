@@ -1,7 +1,7 @@
 use std::io::Cursor;
 
 use byteorder::{LittleEndian, ReadBytesExt};
-use nbt::{endian::little_endian::NbtLittleEndian, NbtTag};
+use nbt::{byte_order::NbtByteOrder, endian::{little_endian::NbtLittleEndian, little_endian_network::NbtLittleEndianNetwork}, NbtTag};
 
 #[derive(Debug)]
 pub struct PalettedStorage {
@@ -18,6 +18,7 @@ impl PalettedStorage {
             palette: Vec::new(),
         };
         let palette_type = cur.read_u8().expect("Missing palette type");
+        let network = palette_type & 1;
         let bits_per_block = palette_type >> 1;
         println!("bpb: {}", bits_per_block);
         if bits_per_block == 0 {
@@ -47,17 +48,28 @@ impl PalettedStorage {
             .expect("Missing palette count");
 
         for _ in 0..palette_count {
-            out.palette.push(
-                NbtTag::nbt_deserialize::<NbtLittleEndian>(cur)
-                    .expect("Bad NBT Tag in palette")
-                    .1,
-            );
+            match network {
+                0 => {
+                    out.palette.push(
+                        NbtTag::nbt_deserialize::<NbtLittleEndian>(cur)
+                            .expect("Bad NBT Tag in palette")
+                            .1,
+                    );
+                },
+                _ => {
+                    out.palette.push(
+                        NbtTag::nbt_deserialize::<NbtLittleEndianNetwork>(cur)
+                            .expect("Bad NBT Tag in palette")
+                            .1,
+                    );
+                }
+            }
         }
 
         return out;
     }
 
-    pub fn encode(&self) -> Vec<u8> {
+    pub fn encode<T: NbtByteOrder>(&self) -> Vec<u8> {
         let mut out = Vec::new();
         let palette_type: u8 = 0;
         let bits_per_block = bits_needed_to_store(self.palette.len() as u32);
@@ -87,7 +99,7 @@ impl PalettedStorage {
         out.extend((self.palette.len() as i32).to_le_bytes());
 
         for nbt in &self.palette {
-            nbt.nbt_serialize::<NbtLittleEndian>("", &mut out).unwrap();
+            nbt.nbt_serialize::<T>("", &mut out).unwrap();
         }
 
         out
