@@ -1,11 +1,18 @@
-use std::io::Write;
+use std::io::{Read, Write};
 
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
 use bedrock_core::LE;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
+use crate::conn::Conn;
 use crate::error::{RaknetError, TransportLayerError};
 use crate::info::RAKNET_GAME_PACKET_ID;
+
+use bedrock_core::stream::read::ByteStreamRead;
+use bedrock_core::stream::write::ByteStreamWrite;
+
+use crate::error::TransportLayerError;
 
 ///
 pub enum TransportLayerConn {
@@ -13,8 +20,8 @@ pub enum TransportLayerConn {
     // TODO RaknetTCP(...),
     NetherNet(/* TODO */),
     // TODO Quic(s2n_quic::connection::Connection),
-    // TODO Tcp(net::TcpStream),
-    // TODO Udp(net::UdpSocket)
+    Tcp(tokio::net::TcpStream),
+    Udp(tokio::net::UdpSocket)
 }
 
 impl TransportLayerConn {
@@ -43,6 +50,25 @@ impl TransportLayerConn {
                     }
                 }
             }
+
+            TransportLayerConn::Tcp(conn) => {
+                let buf_data = stream.get_ref().as_slice();
+
+                match conn.write_all(buf_data).await {
+                    Ok(_) => Ok(()),
+                    Err(e) => Err(TransportLayerError::IOError(e)),
+                }
+            }
+
+            TransportLayerConn::Udp(socket) => {
+                let buf_data = stream.get_ref().as_slice();
+
+                match socket.send(buf_data).await {
+                    Ok(_) => Ok(()),
+                    Err(e) => Err(TransportLayerError::IOError(e)),
+                }
+            }
+
             _ => {
                 todo!()
             }
@@ -85,6 +111,33 @@ impl TransportLayerConn {
                     Err(e) => Err(TransportLayerError::IOError(e)),
                 }
             }
+
+            TransportLayerConn::Tcp(socket) => {
+                let mut recv_buffer = [0; 4096]; 
+                match socket.read(&mut recv_buffer).await {
+                    Ok(n) if n > 0 => {
+                        stream.write_all(&recv_buffer[..n])?;
+                        Ok(())
+                    }
+                    Ok(_) => {
+                        // Connection closed by peer
+                        Err(TransportLayerError::ConnectionClosed)
+                    }
+                    Err(e) => Err(e.into()),
+                }
+            }
+
+            TransportLayerConn::Udp(socket) => {
+                let mut recv_buffer = [0; 4096];
+                match socket.recv_from(&mut recv_buffer) {
+                    Ok((bytes_received, _)) => {
+                        stream.write_all(&recv_buffer[..bytes_received])?;
+                        Ok(())
+                    }
+                    Err(e) => Err(TransportLayerError::IOError(e)),
+                }
+            }
+
             _ => {
                 todo!()
             }
