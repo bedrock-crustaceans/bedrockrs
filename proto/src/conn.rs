@@ -30,14 +30,14 @@ impl Connection {
         }
     }
 
-    pub async fn send_gamepackets(
+    pub async fn send(
         &mut self,
-        game_packets: Vec<GamePacket>,
+        gamepackets: Vec<GamePacket>,
     ) -> Result<(), ConnectionError> {
         let mut pk_stream = ByteStreamWrite::new();
 
         // Batch all game packets together
-        for game_packet in game_packets {
+        for game_packet in gamepackets {
             // Write a game packet
             match game_packet.pk_serialize(&mut pk_stream) {
                 Ok(_) => {}
@@ -75,7 +75,7 @@ impl Connection {
 
                 compressed_stream
             }
-            // If no compression is set zero copy the packet stream
+            // If no compression is set none copy the packet stream
             None => pk_stream,
         };
 
@@ -96,7 +96,7 @@ impl Connection {
         Ok(())
     }
 
-    pub async fn recv_gamepackets(&mut self) -> Result<Vec<GamePacket>, ConnectionError> {
+    pub async fn recv(&mut self) -> Result<Vec<GamePacket>, ConnectionError> {
         let mut stream = ByteStreamWrite::new();
 
         // Receive data and turn it into cursor

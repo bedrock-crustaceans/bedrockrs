@@ -28,5 +28,3 @@ num-traits = "0.2"
 num-derive = "0.4"
 
 x509-cert = "0.2"
-
-uuid = "1.8"

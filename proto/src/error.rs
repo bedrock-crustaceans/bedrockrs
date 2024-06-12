@@ -34,7 +34,7 @@ pub enum CompressionError {
 pub enum LoginError {
     ConnError(ConnectionError),
     WrongProtocolVersion { client: i32, server: Vec<i32> },
-    PacketMismatch(String),
+    FormatError(String),
 }
 
 #[derive(Debug)]
