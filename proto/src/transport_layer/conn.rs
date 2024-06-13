@@ -85,6 +85,24 @@ impl TransportLayerConn {
                     Err(e) => Err(TransportLayerError::IOError(e)),
                 }
             }
+
+            TransportLayerConn::Tcp(stream) => {
+
+                let mut recv_buf = [0; 4096];
+
+                let n = match stream.read(&mut recv_buf) {
+                    Ok(n) => n,
+                    Err(e) => {
+                        return Err(TransportLayerError::IOError(e));
+                    }
+                };
+
+                match stream.write_all(&recv_buf[..n]) {
+                    Ok(_) => Ok(()),
+                    Err(e) => Err(TransportLayerError::IOError(e)),
+                }
+            }
+            
             _ => {
                 todo!()
             }
