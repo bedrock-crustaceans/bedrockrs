@@ -1,4 +1,4 @@
-use std::fmt::{Debug, Formatter, write};
+use std::fmt::{Debug, Formatter};
 use std::io;
 use std::io::{Read, Write};
 

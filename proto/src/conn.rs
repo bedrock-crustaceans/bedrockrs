@@ -30,10 +30,7 @@ impl Connection {
         }
     }
 
-    pub async fn send(
-        &mut self,
-        gamepackets: Vec<GamePacket>,
-    ) -> Result<(), ConnectionError> {
+    pub async fn send(&mut self, gamepackets: Vec<GamePacket>) -> Result<(), ConnectionError> {
         let mut pk_stream = ByteStreamWrite::new();
 
         // Batch all game packets together
@@ -111,7 +108,7 @@ impl Connection {
 
         // Receive data and turn it into cursor
         match self.connection.recv(&mut stream).await {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(e) => return Err(ConnectionError::TransportError(e)),
         };
 

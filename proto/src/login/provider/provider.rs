@@ -8,19 +8,20 @@ pub trait LoginProviderServer {
     fn compression(&self) -> Compression;
     fn encryption_enabled(&self) -> bool;
 
-    fn on_network_settings_request_pk(&self, pk: &mut NetworkSettingsRequestPacket) -> LoginProviderStatus{
+    fn on_network_settings_request_pk(
+        &self,
+        pk: &mut NetworkSettingsRequestPacket,
+    ) -> LoginProviderStatus {
         LoginProviderStatus::ContinueLogin
     }
 
-    fn on_network_settings_pk(&self, pk: &mut NetworkSettingsPacket) -> LoginProviderStatus{
+    fn on_network_settings_pk(&self, pk: &mut NetworkSettingsPacket) -> LoginProviderStatus {
         LoginProviderStatus::ContinueLogin
     }
 
     fn on_login_pk(&self, pk: &mut LoginPacket) -> LoginProviderStatus {
         LoginProviderStatus::ContinueLogin
     }
-
 }
 
-pub trait LoginProviderClient {
-}
+pub trait LoginProviderClient {}

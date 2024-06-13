@@ -4,14 +4,12 @@ use crate::packets::login::LoginPacket;
 use crate::packets::network_settings::NetworkSettingsPacket;
 use crate::packets::network_settings_request::NetworkSettingsRequestPacket;
 
-pub struct DefaultLoginProvider {
-
-}
+pub struct DefaultLoginProvider {}
 
 impl DefaultLoginProvider {
-    pub fn new() -> Self {Self{
-
-    }}
+    pub fn new() -> Self {
+        Self {}
+    }
 }
 
 impl LoginProviderServer for DefaultLoginProvider {
@@ -23,7 +21,10 @@ impl LoginProviderServer for DefaultLoginProvider {
         false
     }
 
-    fn on_network_settings_request_pk(&self, pk: &mut NetworkSettingsRequestPacket) -> LoginProviderStatus {
+    fn on_network_settings_request_pk(
+        &self,
+        pk: &mut NetworkSettingsRequestPacket,
+    ) -> LoginProviderStatus {
         println!("{:#?}", pk);
         LoginProviderStatus::ContinueLogin
     }
