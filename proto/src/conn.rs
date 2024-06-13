@@ -96,12 +96,22 @@ impl Connection {
         Ok(())
     }
 
+    pub async fn send_raw(&mut self, data: &Vec<u8>) -> Result<(), ConnectionError> {
+        // Send the data
+        match self.connection.send(&Cursor::new(data)).await {
+            Ok(_) => {}
+            Err(e) => return Err(ConnectionError::TransportError(e)),
+        }
+
+        Ok(())
+    }
+
     pub async fn recv(&mut self) -> Result<Vec<GamePacket>, ConnectionError> {
         let mut stream = ByteStreamWrite::new();
 
         // Receive data and turn it into cursor
         match self.connection.recv(&mut stream).await {
-            Ok(v) => v,
+            Ok(_) => {},
             Err(e) => return Err(ConnectionError::TransportError(e)),
         };
 
@@ -158,5 +168,17 @@ impl Connection {
         }
 
         Ok(gamepackets)
+    }
+
+    pub async fn recv_raw(&mut self) -> Result<Vec<u8>, ConnectionError> {
+        let mut stream = vec![];
+
+        // Send the data
+        match self.connection.recv(&mut stream).await {
+            Ok(_) => {}
+            Err(e) => return Err(ConnectionError::TransportError(e)),
+        }
+
+        Ok(stream)
     }
 }
