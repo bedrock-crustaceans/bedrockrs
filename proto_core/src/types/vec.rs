@@ -1,5 +1,4 @@
 use std::convert::TryInto;
-use std::io::{Read, Write};
 
 use bedrock_core::read::ByteStreamRead;
 use bedrock_core::write::ByteStreamWrite;

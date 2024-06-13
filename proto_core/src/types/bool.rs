@@ -1,5 +1,3 @@
-use std::io::{Read, Write};
-
 use bedrock_core::read::ByteStreamRead;
 use bedrock_core::write::ByteStreamWrite;
 use bedrock_core::LE;
