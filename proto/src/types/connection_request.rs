@@ -186,7 +186,8 @@ impl ProtoCodec for ConnectionRequestType {
             };
 
             let mut jwt_validation = Validation::new(jwt_header.alg);
-            // TODO: This definitely is not right. Even Zuri-MC doesn't understand this.. I may understand it.. I do understand it
+            // TODO: This definitely is not right. Even Zuri-MC doesn't understand this.. I may understand it.. I do understand it, update I don't.
+            // TODO: Someone else should find out how this works
             jwt_validation.insecure_disable_signature_validation();
             jwt_validation.set_required_spec_claims::<&str>(&[]);
 
