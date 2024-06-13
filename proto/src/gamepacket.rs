@@ -329,14 +329,14 @@ macro_rules! ser_packet {
         // let header = "";
 
         // Write the PacketID to the packet streamfer
-        match VAR::<u16>::write(&VAR::new($packet_id), $stream) {
+        match VAR::<u16>::write(&VAR::new($packet_id), &mut pk_stream) {
             Ok(_) => {}
             Err(e) => {
                 return Err(ProtoCodecError::IOError(e));
             }
         }
 
-        // Write the packet data to the packet streamfer
+        // Write the packet data to the packet stream
         match $packet_data.proto_serialize(&mut pk_stream) {
             Ok(_) => {}
             Err(e) => {
@@ -825,7 +825,7 @@ impl GamePacket {
         stream: &mut ByteStreamRead,
     ) -> Result<(GamePacket, u8, u8), ProtoCodecError> {
         // Read the game packet length
-        // We don't need it, yet
+        // We don't need it, yet?
         // TODO: Use this to possibly async the packet handling
         match VAR::<u32>::read(stream) {
             Ok(_) => {}
