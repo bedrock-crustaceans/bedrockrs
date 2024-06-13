@@ -1,11 +1,19 @@
+use std::fmt::{Debug, Formatter};
 use std::io::{self, Read, Write};
 
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 
-#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 #[repr(transparent)]
 pub struct BE<T> {
     num: T,
+}
+
+impl<T: Debug> Debug for BE<T> {
+    #[inline]
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self.num)
+    }
 }
 
 impl<T> BE<T> {

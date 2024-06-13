@@ -1,12 +1,20 @@
+use std::fmt::{Debug, Formatter, write};
 use std::io;
 use std::io::{Read, Write};
 
 use varint_rs::{VarintReader, VarintWriter};
 
-#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 #[repr(transparent)]
 pub struct VAR<T> {
     num: T,
+}
+
+impl<T: Debug> Debug for VAR<T> {
+    #[inline]
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self.num)
+    }
 }
 
 impl<T> VAR<T> {
