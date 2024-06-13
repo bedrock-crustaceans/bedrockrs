@@ -28,7 +28,7 @@ impl TransportLayerConn {
                     Err(e) => return Err(TransportLayerError::IOError(e)),
                 };
 
-                match final_stream.write(stream.get_ref().as_slice()) {
+                match final_stream.write_all(stream.get_ref().as_slice()) {
                     Ok(_) => {}
                     Err(e) => return Err(TransportLayerError::IOError(e)),
                 };
