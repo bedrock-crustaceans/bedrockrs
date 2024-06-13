@@ -1,4 +1,4 @@
 pub enum LoginProviderStatus {
     ContinueLogin,
-    AbortLogin
+    AbortLogin { reason: String }
 }

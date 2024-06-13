@@ -33,6 +33,7 @@ pub enum CompressionError {
 #[derive(Debug)]
 pub enum LoginError {
     ConnError(ConnectionError),
+    Abort { reason: String },
     WrongProtocolVersion { client: i32, server: Vec<i32> },
     FormatError(String),
 }
