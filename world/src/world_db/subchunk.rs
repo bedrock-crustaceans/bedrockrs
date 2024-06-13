@@ -1,5 +1,4 @@
 use std::io::Cursor;
-
 use byteorder::ReadBytesExt;
 use paletted_storage::PalettedStorage;
 
@@ -26,8 +25,7 @@ impl SubChunk {
                     // );
                 }
 
-                for i in 0..storage_layers {
-                    println!("layer: {}, count: {}", i, storage_layers);
+                for _ in 0..storage_layers {
                     out.paletted_storage.push(PalettedStorage::decode(&mut cur));
                 }
 
@@ -49,7 +47,7 @@ impl SubChunk {
         out.push(8u8);
         out.push(self.paletted_storage.len() as u8);
         for ps in &self.paletted_storage {
-            out.extend(ps.encode());
+            out.extend(ps.encode(false));
         }
         out
     }
