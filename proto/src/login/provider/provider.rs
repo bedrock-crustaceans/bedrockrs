@@ -7,6 +7,7 @@ use crate::packets::network_settings_request::NetworkSettingsRequestPacket;
 pub trait LoginProviderServer {
     fn compression(&self) -> Compression;
     fn encryption_enabled(&self) -> bool;
+    fn auth_enabled(&self) -> bool;
 
     fn on_network_settings_request_pk(
         &self,

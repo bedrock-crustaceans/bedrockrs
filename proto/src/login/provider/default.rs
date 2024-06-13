@@ -21,6 +21,10 @@ impl LoginProviderServer for DefaultLoginProvider {
         false
     }
 
+    fn auth_enabled(&self) -> bool {
+        false
+    }
+
     fn on_network_settings_request_pk(
         &self,
         pk: &mut NetworkSettingsRequestPacket,

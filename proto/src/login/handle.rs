@@ -82,7 +82,7 @@ pub async fn login_to_server(
         compression_algorithm: LE::new(0xFFFF),
         // TODO What do these 3 fields do?
         client_throttle_enabled: false,
-        client_throttle_threshold: LE::new(0),
+        client_throttle_threshold: 0,
         client_throttle_scalar: LE::new(0.0),
     };
 
@@ -95,11 +95,13 @@ pub async fn login_to_server(
         on_network_settings_pk
     );
 
-    // conn.send_raw(&[12, 143, 1, 0, 0, 255, 255, 0, 0, 0, 0, 0, 0]).await.unwrap();
-
     conn.compression = Some(compression);
 
     let _login = recv_single_packet!(conn, Login, "Login", provider, on_login_pk);
+
+    if provider.auth_enabled() {
+        todo!("impl xbox auth with data from login pk")
+    }
 
     Ok(())
 }
@@ -108,5 +110,5 @@ pub async fn login_to_client(
     conn: &mut Connection,
     provider: impl LoginProviderClient,
 ) -> Result<(), LoginError> {
-    Ok(())
+    todo!()
 }
