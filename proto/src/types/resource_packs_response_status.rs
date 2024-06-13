@@ -21,7 +21,7 @@ impl ProtoCodec for ResourcePacksResponseStatus {
         Self: Sized,
     {
         let status = match self.to_u8() {
-            Some(v) => LE::new(v),
+            Some(v) => v,
             None => {
                 return Err(ProtoCodecError::InvalidEnumID);
             }
@@ -37,8 +37,8 @@ impl ProtoCodec for ResourcePacksResponseStatus {
     where
         Self: Sized,
     {
-        match LE::<u8>::proto_deserialize(stream) {
-            Ok(v) => match ResourcePacksResponseStatus::from_u8(v.into_inner()) {
+        match u8::proto_deserialize(stream) {
+            Ok(v) => match ResourcePacksResponseStatus::from_u8(v) {
                 None => return Err(ProtoCodecError::InvalidEnumID),
                 Some(v) => Ok(v),
             },

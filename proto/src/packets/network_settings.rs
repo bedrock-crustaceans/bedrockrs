@@ -15,6 +15,6 @@ pub struct NetworkSettingsPacket {
     /// All 3 compression Algorithms are supported
     pub compression_algorithm: LE<u16>,
     pub client_throttle_enabled: bool,
-    pub client_throttle_threshold: LE<u8>,
+    pub client_throttle_threshold: u8,
     pub client_throttle_scalar: LE<f32>,
 }
