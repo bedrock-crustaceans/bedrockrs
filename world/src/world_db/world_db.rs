@@ -45,7 +45,7 @@ impl WorldDB {
 
         match self
             .db
-            .get(READ_OPTIONS, str_to_ascii_i8(&str).unwrap().as_slice())
+            .get(READ_OPTIONS, str.as_bytes())
         {
             Ok(maybe_bytes) => match maybe_bytes {
                 Some(bytes) => {
@@ -66,16 +66,6 @@ impl WorldDB {
         }
     }
 
-    pub fn get_entities(&self, x: i32, z: i32, dimension: Dimension) -> Result<Option<HashMap<String, NbtTag>>, DBError> {
-        let data = self.db.get(READ_OPTIONS, &create_key(x, z, dimension, RecordType::Entity))?;
-        match data {
-            Some(bytes) => {
-                bytes.get().to_vec()
-            }
-            None => Ok(None)
-        } 
-    }
-
     /// Set a player's NBT data for this world
     pub fn set_player(
         &mut self,
@@ -85,16 +75,14 @@ impl WorldDB {
         let tag = NbtTag::Compound(data);
         match tag.nbt_serialize_vec::<NbtLittleEndian>("") {
             Ok(sertag) => {
-                let byte_nbt = vec_u8_into_i8(sertag);
-
                 let mut str = uuid.to_string();
                 str.insert_str(0, "player_");
 
                 let mut wb = WriteBatch::new();
 
                 wb.put(
-                    str_to_ascii_i8(&str).unwrap().as_slice(),
-                    byte_nbt.as_slice(),
+                    str.as_bytes(),
+                    &sertag,
                 );
 
                 match self.db.write(WRITE_OPTIONS, wb) {
@@ -134,25 +122,12 @@ impl WorldDB {
         let mut wb = WriteBatch::new();
         wb.put(
             &create_key(x, z, dimension, RecordType::SubChunkPrefix { y }),
-            &vec_u8_into_i8(subchunk.save()),
+            &subchunk.save(),
         );
         self.db.write(WRITE_OPTIONS, wb)?;
 
         Ok(())
     }
-}
-
-pub fn str_to_ascii_i8(s: &str) -> Result<Vec<i8>, &'static str> {
-    // TODO: Private
-    if !s.is_ascii() {
-        return Err("Input string contains non-ASCII characters");
-    }
-
-    let bytes = s.as_bytes();
-
-    let ascii_i8: Vec<i8> = bytes.iter().map(|&b| b as i8).collect();
-
-    Ok(ascii_i8)
 }
 
 pub fn vec_i8_into_u8(v: Vec<i8>) -> Vec<u8> {

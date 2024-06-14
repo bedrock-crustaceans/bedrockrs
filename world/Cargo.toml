@@ -8,6 +8,6 @@ bedrock_core = { path = "../bedrock_core" }
 paletted_storage = { path = "../paletted_storage" }
 nbt = { path = "../nbt" }
 
-mojang-leveldb = "0.2"
+mojang-leveldb = "0.3"
 thiserror = "1.0"
 byteorder = "1.5"
