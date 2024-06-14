@@ -12,7 +12,7 @@ use super::subchunk::SubChunk;
 use super::{create_key, RecordType};
 
 pub struct WorldDB {
-    pub db: DB,
+    db: DB,
 }
 
 const READ_OPTIONS: ReadOptions = ReadOptions {
@@ -66,6 +66,16 @@ impl WorldDB {
         }
     }
 
+    pub fn get_entities(&self, x: i32, z: i32, dimension: Dimension) -> Result<Option<HashMap<String, NbtTag>>, DBError> {
+        let data = self.db.get(READ_OPTIONS, &create_key(x, z, dimension, RecordType::Entity))?;
+        match data {
+            Some(bytes) => {
+                bytes.get().to_vec()
+            }
+            None => Ok(None)
+        } 
+    }
+
     /// Set a player's NBT data for this world
     pub fn set_player(
         &mut self,
@@ -105,13 +115,7 @@ impl WorldDB {
     ) -> Result<Option<SubChunk>, DBError> {
         let bytes = self.db.get(
             READ_OPTIONS,
-            vec_u8_into_i8(create_key(
-                x,
-                z,
-                dimension,
-                RecordType::SubChunkPrefix { y },
-            ))
-            .as_slice(),
+            create_key(x, z, dimension, RecordType::SubChunkPrefix { y }).as_slice(),
         )?;
         Ok(match bytes {
             Some(x) => Some(SubChunk::load(&vec_i8_into_u8(x.get().to_vec()))), // TODO: to_vec copies, free manually and return a vec from leveldb
@@ -129,12 +133,7 @@ impl WorldDB {
     ) -> Result<(), DBError> {
         let mut wb = WriteBatch::new();
         wb.put(
-            &vec_u8_into_i8(create_key(
-                x,
-                z,
-                dimension,
-                RecordType::SubChunkPrefix { y },
-            )),
+            &create_key(x, z, dimension, RecordType::SubChunkPrefix { y }),
             &vec_u8_into_i8(subchunk.save()),
         );
         self.db.write(WRITE_OPTIONS, wb)?;
