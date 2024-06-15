@@ -49,7 +49,7 @@ impl WorldDB {
         {
             Ok(maybe_bytes) => match maybe_bytes {
                 Some(bytes) => {
-                    let u8_bytes = vec_i8_into_u8(bytes.get().into());
+                    let u8_bytes = bytes.get().into();
                     match NbtTag::nbt_deserialize_vec::<NbtLittleEndian>(&u8_bytes) {
                         Ok((_, tag)) => match tag {
                             NbtTag::Compound(ctag) => Ok(Some(ctag)),
@@ -106,7 +106,7 @@ impl WorldDB {
             create_key(x, z, dimension, RecordType::SubChunkPrefix { y }).as_slice(),
         )?;
         Ok(match bytes {
-            Some(x) => Some(SubChunk::load(&vec_i8_into_u8(x.get().to_vec()))), // TODO: to_vec copies, free manually and return a vec from leveldb
+            Some(x) => Some(SubChunk::load(&(x.get().to_vec()))), // TODO: to_vec copies, free manually and return a vec from leveldb
             None => None,
         })
     }
@@ -128,26 +128,6 @@ impl WorldDB {
 
         Ok(())
     }
-}
-
-pub fn vec_i8_into_u8(v: Vec<i8>) -> Vec<u8> {
-    let mut v = std::mem::ManuallyDrop::new(v);
-
-    let p = v.as_mut_ptr();
-    let len = v.len();
-    let cap = v.capacity();
-
-    unsafe { Vec::from_raw_parts(p as *mut u8, len, cap) }
-}
-
-pub fn vec_u8_into_i8(v: Vec<u8>) -> Vec<i8> {
-    let mut v = std::mem::ManuallyDrop::new(v);
-
-    let p = v.as_mut_ptr();
-    let len = v.len();
-    let cap = v.capacity();
-
-    unsafe { Vec::from_raw_parts(p as *mut i8, len, cap) }
 }
 
 impl Debug for WorldDB {
