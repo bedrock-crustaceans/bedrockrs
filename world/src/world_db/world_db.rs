@@ -12,7 +12,7 @@ use super::subchunk::SubChunk;
 use super::{create_key, RecordType};
 
 pub struct WorldDB {
-    pub db: DB,
+    db: DB,
 }
 
 const READ_OPTIONS: ReadOptions = ReadOptions {
@@ -45,7 +45,7 @@ impl WorldDB {
 
         match self
             .db
-            .get(READ_OPTIONS, str_to_ascii_i8(&str).unwrap().as_slice())
+            .get(READ_OPTIONS, str.as_bytes())
         {
             Ok(maybe_bytes) => match maybe_bytes {
                 Some(bytes) => {
@@ -75,16 +75,14 @@ impl WorldDB {
         let tag = NbtTag::Compound(data);
         match tag.nbt_serialize_vec::<NbtLittleEndian>("") {
             Ok(sertag) => {
-                let byte_nbt = vec_u8_into_i8(sertag);
-
                 let mut str = uuid.to_string();
                 str.insert_str(0, "player_");
 
                 let mut wb = WriteBatch::new();
 
                 wb.put(
-                    str_to_ascii_i8(&str).unwrap().as_slice(),
-                    byte_nbt.as_slice(),
+                    str.as_bytes(),
+                    &sertag,
                 );
 
                 match self.db.write(WRITE_OPTIONS, wb) {
@@ -105,13 +103,7 @@ impl WorldDB {
     ) -> Result<Option<SubChunk>, DBError> {
         let bytes = self.db.get(
             READ_OPTIONS,
-            vec_u8_into_i8(create_key(
-                x,
-                z,
-                dimension,
-                RecordType::SubChunkPrefix { y },
-            ))
-            .as_slice(),
+            create_key(x, z, dimension, RecordType::SubChunkPrefix { y }).as_slice(),
         )?;
         Ok(match bytes {
             Some(x) => Some(SubChunk::load(&vec_i8_into_u8(x.get().to_vec()))), // TODO: to_vec copies, free manually and return a vec from leveldb
@@ -129,31 +121,13 @@ impl WorldDB {
     ) -> Result<(), DBError> {
         let mut wb = WriteBatch::new();
         wb.put(
-            &vec_u8_into_i8(create_key(
-                x,
-                z,
-                dimension,
-                RecordType::SubChunkPrefix { y },
-            )),
-            &vec_u8_into_i8(subchunk.save()),
+            &create_key(x, z, dimension, RecordType::SubChunkPrefix { y }),
+            &subchunk.save(),
         );
         self.db.write(WRITE_OPTIONS, wb)?;
 
         Ok(())
     }
-}
-
-pub fn str_to_ascii_i8(s: &str) -> Result<Vec<i8>, &'static str> {
-    // TODO: Private
-    if !s.is_ascii() {
-        return Err("Input string contains non-ASCII characters");
-    }
-
-    let bytes = s.as_bytes();
-
-    let ascii_i8: Vec<i8> = bytes.iter().map(|&b| b as i8).collect();
-
-    Ok(ascii_i8)
 }
 
 pub fn vec_i8_into_u8(v: Vec<i8>) -> Vec<u8> {
