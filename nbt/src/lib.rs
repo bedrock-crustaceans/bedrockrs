@@ -316,7 +316,7 @@ impl NbtTag {
     /// println!("{:#?}: {:#?}", name, tag);
     /// ```
     pub fn nbt_deserialize<T: NbtByteOrder>(
-        stream: &mut ByteStreamRead,
+        stream: &mut Cursor<&[u8]>,
     ) -> Result<(String, Self), NbtError> {
         let id = match T::read_u8(stream) {
             Ok(v) => v,
@@ -344,14 +344,14 @@ impl NbtTag {
     /// Simpler alternative to [NbtTag::nbt_deserialize].
     #[inline]
     pub fn nbt_deserialize_vec<T: NbtByteOrder>(vec: &Vec<u8>) -> Result<(String, Self), NbtError> {
-        NbtTag::nbt_deserialize::<T>(&mut ByteStreamRead::from(Cursor::new(vec)))
+        NbtTag::nbt_deserialize::<T>(&mut Cursor::new(vec.as_slice()))
     }
 
     /// Deserializes a given val without reading any tag name notation.
     /// Should only be used by the [NbtTag::nbt_deserialize] function internally.
     #[inline]
     fn nbt_deserialize_val<T: NbtByteOrder>(
-        stream: &mut ByteStreamRead,
+        stream: &mut Cursor<&[u8]>,
         id: u8,
     ) -> Result<Self, NbtError> {
         let tag = match id {
