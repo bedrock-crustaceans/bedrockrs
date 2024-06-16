@@ -15,7 +15,7 @@ pub struct PalettedStorage {
 impl PalettedStorage {
     // https://www.reddit.com/r/technicalminecraft/comments/x3pzb7/bedrock_leveldb_subchunk_format/
     // I have no idea how this actually works tbh
-    pub fn decode(cur: &mut Cursor<&Vec<u8>>) -> PalettedStorage {
+    pub fn decode(cur: &mut Cursor<&[u8]>) -> PalettedStorage {
         let mut out = PalettedStorage {
             blocks: [0; 4096],
             palette: Vec::new(),
