@@ -6,7 +6,7 @@ use proto_core::ProtoCodec;
 
 use crate::types::resource_packs_response_status::ResourcePacksResponseStatus;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ResourcePacksResponsePacket {
     pub response: ResourcePacksResponseStatus,
     /// The packs that are downloaded/getting downloaded

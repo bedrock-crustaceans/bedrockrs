@@ -3,7 +3,7 @@ use bedrock_core::stream::write::ByteStreamWrite;
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PackURL {
     uuid: String,
     version: String,

@@ -6,7 +6,7 @@ use proto_core::ProtoCodec;
 
 use crate::types::experiment::Experiment;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Experiments {
     pub experiments: Vec<Experiment>,
     pub ever_toggled: bool,

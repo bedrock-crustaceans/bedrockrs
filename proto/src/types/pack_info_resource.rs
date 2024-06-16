@@ -1,7 +1,7 @@
 use bedrock_core::LE;
 use proto_derive::ProtoCodec;
 
-#[derive(Debug, ProtoCodec)]
+#[derive(Debug, Clone, ProtoCodec)]
 pub struct ResourcePackInfoType {
     id: String,
     version: String,

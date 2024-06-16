@@ -8,7 +8,7 @@ use crate::types::pack_info_behavior::BehaviorPackInfoType;
 use crate::types::pack_info_resource::ResourcePackInfoType;
 use crate::types::pack_url::PackURL;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ResourcePacksInfoPacket {
     pub resource_pack_required: bool,
     pub has_addon_packs: bool,

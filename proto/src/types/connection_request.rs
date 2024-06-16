@@ -11,7 +11,7 @@ use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
 use serde_json::Value;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ConnectionRequestType {
     /// Array of Base64 encoded JSON Web Token certificates to authenticate the player.
     ///

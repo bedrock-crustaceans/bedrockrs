@@ -3,7 +3,8 @@ use bedrock_core::stream::write::ByteStreamWrite;
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
+#[repr(transparent)]
 pub struct BaseGameVersion(pub String);
 
 impl ProtoCodec for BaseGameVersion {

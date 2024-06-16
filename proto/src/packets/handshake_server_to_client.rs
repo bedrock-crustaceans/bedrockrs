@@ -6,7 +6,7 @@ use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
 use serde_json::Value;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct HandshakeServerToClientPacket {
     pub handshake_jwt: BTreeMap<String, Value>,
 }

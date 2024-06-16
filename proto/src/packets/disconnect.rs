@@ -4,7 +4,7 @@ use bedrock_core::VAR;
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DisconnectPacket {
     /// TODO: Convert into enum, if possible
     ///
