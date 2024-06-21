@@ -1,1 +1,1 @@
-pub mod pack;
+pub mod resource_pack;
