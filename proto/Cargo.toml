@@ -11,6 +11,9 @@ proto_core = { path = "../proto_core" }
 proto_derive = { path = "../proto_derive" }
 nbt = { path = "../nbt" }
 
+thiserror = "1.0"
+dyn-clone = "1.0"
+
 s2n-quic = "1.37"
 
 jsonwebtoken = "9.3"

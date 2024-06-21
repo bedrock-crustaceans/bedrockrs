@@ -1,5 +1,6 @@
 use std::io;
 use std::io::Write;
+use std::sync::Arc;
 
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
@@ -87,7 +88,7 @@ impl Compression {
 
                 match encoder.write_all(src.get_ref().as_slice()) {
                     Ok(_) => Ok(()),
-                    Err(e) => Err(CompressionError::ZlibError(Box::new(e))),
+                    Err(e) => Err(CompressionError::ZlibError(Arc::new(e))),
                 }
             }
             Compression::Snappy { .. } => {
@@ -95,14 +96,14 @@ impl Compression {
 
                 match io::copy(&mut src.get_ref().as_slice(), &mut encoder) {
                     Ok(_) => Ok(()),
-                    Err(e) => Err(CompressionError::SnappyError(e)),
+                    Err(e) => Err(CompressionError::SnappyError(Arc::new(e))),
                 }
             }
             Compression::None => {
                 // unnecessary copying, this fn shouldn't be called when `compression_needed` returns false
                 match dst.write_all(src.get_ref().as_slice()) {
                     Ok(_) => Ok(()),
-                    Err(e) => Err(CompressionError::IOError(e)),
+                    Err(e) => Err(CompressionError::IOError(Arc::new(e))),
                 }
             }
         }
@@ -122,7 +123,7 @@ impl Compression {
 
                 match io::copy(&mut decoder, dst) {
                     Ok(_) => Ok(()),
-                    Err(e) => Err(CompressionError::ZlibError(Box::new(e))),
+                    Err(e) => Err(CompressionError::ZlibError(Arc::new(e))),
                 }
             }
             Compression::Snappy { .. } => {
@@ -130,14 +131,14 @@ impl Compression {
 
                 match io::copy(&mut decoder, dst) {
                     Ok(_) => Ok(()),
-                    Err(e) => Err(CompressionError::SnappyError(e)),
+                    Err(e) => Err(CompressionError::SnappyError(Arc::new(e))),
                 }
             }
             Compression::None => {
                 // unnecessary copying, this fn shouldn't be called when `compression_needed` returns false
                 match dst.write_all(src.get_ref().as_slice()) {
                     Ok(_) => Ok(()),
-                    Err(e) => Err(CompressionError::IOError(e)),
+                    Err(e) => Err(CompressionError::IOError(Arc::new(e))),
                 }
             }
         }

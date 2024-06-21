@@ -1,6 +1,7 @@
 use std::io::Error as IOError;
 use std::num::TryFromIntError;
 use std::string::FromUtf8Error;
+use std::sync::Arc;
 
 use base64::DecodeError as Base64DecodeError;
 use jsonwebtoken::errors::Error as JwtError;
@@ -8,10 +9,10 @@ use nbt::error::NbtError;
 use serde_json::error::Error as JsonError;
 use thiserror::Error;
 
-#[derive(Debug, Error)]
+#[derive(Error, Debug, Clone)]
 pub enum ProtoCodecError {
     #[error("IOError occurred: {0}")]
-    IOError(#[from] IOError),
+    IOError(#[from] Arc<IOError>),
     #[error("NbtError: {0}")]
     NbtError(#[from] NbtError),
     #[error("Error while reading UTF8 encoded String: {0}")]
@@ -19,7 +20,7 @@ pub enum ProtoCodecError {
     #[error("Error while converting integers: {0}")]
     FromIntError(#[from] TryFromIntError),
     #[error("Json Error: {0}")]
-    JsonError(#[from] JsonError),
+    JsonError(#[from] Arc<JsonError>),
     #[error("Jwt Error: {0}")]
     JwtError(#[from] JwtError),
     #[error("Base64 decoding Error: {0}")]

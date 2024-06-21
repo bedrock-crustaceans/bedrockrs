@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use bedrock_core::read::ByteStreamRead;
 use bedrock_core::write::ByteStreamWrite;
 use bedrock_core::LE;
@@ -13,11 +14,11 @@ impl ProtoCodec for bool {
         match self {
             true => match LE::<u8>::new(1).write(buf) {
                 Ok(_) => Ok(()),
-                Err(e) => Err(ProtoCodecError::IOError(e)),
+                Err(e) => Err(ProtoCodecError::IOError(Arc::new(e))),
             },
             false => match LE::<u8>::new(0).write(buf) {
                 Ok(_) => Ok(()),
-                Err(e) => Err(ProtoCodecError::IOError(e)),
+                Err(e) => Err(ProtoCodecError::IOError(Arc::new(e))),
             },
         }
     }
@@ -36,7 +37,7 @@ impl ProtoCodec for bool {
                     _ => Ok(true),
                 }
             }
-            Err(e) => Err(ProtoCodecError::IOError(e)),
+            Err(e) => Err(ProtoCodecError::IOError(Arc::new(e))),
         };
     }
 }

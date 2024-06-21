@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 use std::io::Read;
+use std::sync::Arc;
 
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
@@ -102,13 +103,13 @@ impl ProtoCodec for ConnectionRequestType {
         // can be ignored, other lengths are provided
         match VAR::<u32>::read(stream) {
             Ok(_) => {}
-            Err(e) => return Err(ProtoCodecError::IOError(e)),
+            Err(e) => return Err(ProtoCodecError::IOError(Arc::new(e))),
         };
 
         // read length of certificate_chain vec
         let certificate_chain_len = match LE::<i32>::read(stream) {
             Ok(l) => l.into_inner(),
-            Err(e) => return Err(ProtoCodecError::IOError(e)),
+            Err(e) => return Err(ProtoCodecError::IOError(Arc::new(e))),
         };
 
         let certificate_chain_len = match certificate_chain_len.try_into() {
@@ -123,7 +124,7 @@ impl ProtoCodec for ConnectionRequestType {
         // read string data (certificate_chain)
         match stream.read_exact(&mut certificate_chain_buf) {
             Ok(_) => {}
-            Err(e) => return Err(ProtoCodecError::IOError(e)),
+            Err(e) => return Err(ProtoCodecError::IOError(Arc::new(e))),
         };
 
         // transform into string
@@ -135,7 +136,7 @@ impl ProtoCodec for ConnectionRequestType {
         // parse certificate chain string into json
         let certificate_chain_json = match serde_json::from_str(certificate_chain_string.as_str()) {
             Ok(v) => v,
-            Err(e) => return Err(ProtoCodecError::JsonError(e)),
+            Err(e) => return Err(ProtoCodecError::JsonError(Arc::new(e))),
         };
 
         let certificate_chain_json_jwts = match certificate_chain_json {
@@ -237,7 +238,7 @@ impl ProtoCodec for ConnectionRequestType {
         // read length of certificate_chain vec
         let raw_token_len = match LE::<i32>::read(stream) {
             Ok(v) => v.into_inner(),
-            Err(e) => return Err(ProtoCodecError::IOError(e)),
+            Err(e) => return Err(ProtoCodecError::IOError(Arc::new(e))),
         };
 
         let raw_token_len = match raw_token_len.try_into() {
@@ -252,7 +253,7 @@ impl ProtoCodec for ConnectionRequestType {
         // read string data (certificate_chain)
         match stream.read_exact(&mut raw_token_buf) {
             Ok(_) => {}
-            Err(e) => return Err(ProtoCodecError::IOError(e)),
+            Err(e) => return Err(ProtoCodecError::IOError(Arc::new(e))),
         };
 
         // transform into string

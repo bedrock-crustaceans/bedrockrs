@@ -1,14 +1,19 @@
 use std::io::Write;
+use std::pin::Pin;
+use std::sync::Arc;
+use std::task::{Context, Poll};
 
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
 use bedrock_core::LE;
+use tokio::io::{AsyncRead, AsyncReadExt, ReadBuf};
+use tokio::net;
 
 use crate::error::{RaknetError, TransportLayerError};
 use crate::info::RAKNET_GAME_PACKET_ID;
 
 ///
-pub enum TransportLayerConn {
+pub enum TransportLayerConnection {
     RaknetUDP(rak_rs::connection::Connection),
     // TODO RaknetTCP(...),
     NetherNet(/* TODO */),
@@ -17,20 +22,20 @@ pub enum TransportLayerConn {
     // TODO Udp(net::UdpSocket)
 }
 
-impl TransportLayerConn {
+impl TransportLayerConnection {
     pub async fn send(&mut self, stream: &ByteStreamRead<'_>) -> Result<(), TransportLayerError> {
         match self {
-            TransportLayerConn::RaknetUDP(conn) => {
+            TransportLayerConnection::RaknetUDP(conn) => {
                 let mut final_stream = ByteStreamWrite::new();
 
                 match LE::<u8>::write(&LE::new(RAKNET_GAME_PACKET_ID), &mut final_stream) {
                     Ok(_) => {}
-                    Err(e) => return Err(TransportLayerError::IOError(e)),
+                    Err(e) => return Err(TransportLayerError::IOError(Arc::new(e))),
                 };
 
                 match final_stream.write_all(stream.get_ref().as_slice()) {
                     Ok(_) => {}
-                    Err(e) => return Err(TransportLayerError::IOError(e)),
+                    Err(e) => return Err(TransportLayerError::IOError(Arc::new(e))),
                 };
 
                 // TODO Find out if immediate: true should be used
@@ -51,7 +56,7 @@ impl TransportLayerConn {
 
     pub async fn recv(&mut self, stream: &mut ByteStreamWrite) -> Result<(), TransportLayerError> {
         match self {
-            TransportLayerConn::RaknetUDP(conn) => {
+            TransportLayerConnection::RaknetUDP(conn) => {
                 let mut recv_stream = match conn.recv().await {
                     Ok(v) => v,
                     Err(e) => {
@@ -76,30 +81,13 @@ impl TransportLayerConn {
                         }
                     },
                     Err(e) => {
-                        return Err(TransportLayerError::IOError(e));
+                        return Err(TransportLayerError::IOError(Arc::new(e)));
                     }
                 };
 
                 match stream.write_all(recv_stream.into_inner()) {
                     Ok(_) => Ok(()),
-                    Err(e) => Err(TransportLayerError::IOError(e)),
-                }
-            }
-
-            TransportLayerConn::Tcp(stream) => {
-
-                let mut recv_buf = [0; 4096];
-
-                let n = match stream.read(&mut recv_buf) {
-                    Ok(n) => n,
-                    Err(e) => {
-                        return Err(TransportLayerError::IOError(e));
-                    }
-                };
-
-                match stream.write_all(&recv_buf[..n]) {
-                    Ok(_) => Ok(()),
-                    Err(e) => Err(TransportLayerError::IOError(e)),
+                    Err(e) => Err(TransportLayerError::IOError(Arc::new(e))),
                 }
             }
             
@@ -109,3 +97,4 @@ impl TransportLayerConn {
         }
     }
 }
+

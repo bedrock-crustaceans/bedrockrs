@@ -1,5 +1,5 @@
 pub mod compression;
-pub mod conn;
+pub mod connection;
 pub mod encryption;
 pub mod error;
 pub mod gamepacket;

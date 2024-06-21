@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
 use bedrock_core::*;
@@ -10,14 +11,14 @@ impl ProtoCodec for u8 {
     fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError> {
         match stream.write_u8(*self) {
             Ok(_) => { Ok(()) }
-            Err(e) => { Err(ProtoCodecError::IOError(e)) }
+            Err(e) => { Err(ProtoCodecError::IOError(Arc::new(e))) }
         }
     }
 
     fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError> {
         match stream.read_u8() {
             Ok(v) => { Ok(v) }
-            Err(e) => { Err(ProtoCodecError::IOError(e)) }
+            Err(e) => { Err(ProtoCodecError::IOError(Arc::new(e))) }
         }
     }
 }
@@ -26,14 +27,14 @@ impl ProtoCodec for i8 {
     fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError> {
         match stream.write_i8(*self) {
             Ok(_) => { Ok(()) }
-            Err(e) => { Err(ProtoCodecError::IOError(e)) }
+            Err(e) => { Err(ProtoCodecError::IOError(Arc::new(e))) }
         }
     }
 
     fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError> {
         match stream.read_i8() {
             Ok(v) => { Ok(v) }
-            Err(e) => { Err(ProtoCodecError::IOError(e)) }
+            Err(e) => { Err(ProtoCodecError::IOError(Arc::new(e))) }
         }
     }
 }
@@ -44,14 +45,14 @@ macro_rules! impl_proto_codec {
             fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError> {
                 match $wrapper::<$int>::write(self, stream) {
                     Ok(_) => Ok(()),
-                    Err(e) => Err(ProtoCodecError::IOError(e)),
+                    Err(e) => Err(ProtoCodecError::IOError(Arc::new(e))),
                 }
             }
 
             fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError> {
                 match $wrapper::<$int>::read(stream) {
                     Ok(v) => Ok(v),
-                    Err(e) => Err(ProtoCodecError::IOError(e)),
+                    Err(e) => Err(ProtoCodecError::IOError(Arc::new(e))),
                 }
             }
         }

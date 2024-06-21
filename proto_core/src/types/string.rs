@@ -1,5 +1,6 @@
 use std::convert::TryInto;
 use std::io::{Read, Write};
+use std::sync::Arc;
 
 use bedrock_core::read::ByteStreamRead;
 use bedrock_core::write::ByteStreamWrite;
@@ -22,12 +23,12 @@ impl ProtoCodec for String {
 
         match VAR::<u32>::new(len).write(buf) {
             Ok(_) => {}
-            Err(e) => return Err(ProtoCodecError::IOError(e)),
+            Err(e) => return Err(ProtoCodecError::IOError(Arc::new(e))),
         };
 
         match buf.write_all(self.as_bytes()) {
             Ok(_) => {}
-            Err(e) => return Err(ProtoCodecError::IOError(e)),
+            Err(e) => return Err(ProtoCodecError::IOError(Arc::new(e))),
         };
 
         Ok(())
@@ -40,7 +41,7 @@ impl ProtoCodec for String {
         let len = match VAR::<u32>::read(stream) {
             Ok(v) => v.into_inner(),
             Err(e) => {
-                return Err(ProtoCodecError::IOError(e));
+                return Err(ProtoCodecError::IOError(Arc::new(e)));
             }
         };
 
@@ -56,7 +57,7 @@ impl ProtoCodec for String {
         match stream.read_exact(&mut *string_buf) {
             Ok(_) => {}
             Err(e) => {
-                return Err(ProtoCodecError::IOError(e));
+                return Err(ProtoCodecError::IOError(Arc::new(e)));
             }
         }
 

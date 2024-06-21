@@ -1,4 +1,5 @@
 use std::convert::TryInto;
+use std::sync::Arc;
 
 use bedrock_core::read::ByteStreamRead;
 use bedrock_core::write::ByteStreamWrite;
@@ -21,7 +22,7 @@ impl<T: ProtoCodec> ProtoCodec for Vec<T> {
 
         match VAR::<u32>::new(len).write(buf) {
             Ok(_) => {}
-            Err(e) => return Err(ProtoCodecError::IOError(e)),
+            Err(e) => return Err(ProtoCodecError::IOError(Arc::new(e))),
         };
 
         for item in self {
@@ -41,7 +42,7 @@ impl<T: ProtoCodec> ProtoCodec for Vec<T> {
         let len = match VAR::<u32>::read(stream) {
             Ok(v) => v.into_inner(),
             Err(e) => {
-                return Err(ProtoCodecError::IOError(e));
+                return Err(ProtoCodecError::IOError(Arc::new(e)));
             }
         };
 

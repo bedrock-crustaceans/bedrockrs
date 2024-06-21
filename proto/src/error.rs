@@ -1,33 +1,55 @@
+use crate::info::RAKNET_GAME_PACKET_ID;
+use io::Error as IOError;
+use std::error::Error;
+use std::io;
+use std::sync::Arc;
+use dyn_clone::DynClone;
 use proto_core::error::ProtoCodecError;
 use rak_rs::connection::queue::SendQueueError;
 use rak_rs::connection::RecvError;
 use rak_rs::error::server::ServerError;
+use thiserror::Error;
 
-#[derive(Debug)]
+#[derive(Error, Debug)]
 pub enum ListenerError {
+    #[error("Address bind error")]
     AddrBindError,
+    #[error("Already Online")]
     AlreadyOnline,
+    #[error("Not Listening")]
     NotListening,
-    TransportListenerError(TransportLayerError),
+    #[error("Transport Error: {0}")]
+    TransportListenerError(#[from] TransportLayerError),
 }
 
-#[derive(Debug)]
+#[derive(Error, Debug, Clone)]
 pub enum ConnectionError {
-    IOError(std::io::Error),
-    ProtoCodecError(ProtoCodecError),
+    #[error("IO Error: {0}")]
+    IOError(#[from] Arc<IOError>),
+    #[error("Proto Codec Error: {0}")]
+    ProtoCodecError(#[from] ProtoCodecError),
+    #[error("Connection Closed")]
     ConnectionClosed,
+    #[error("Transport Error: {0}")]
     TransportError(TransportLayerError),
+    #[error("Compression Error: {0}")]
     CompressError(CompressionError),
-    InvalidRakNetHeader,
+    #[error("Invalid RakNet Header, expected: {RAKNET_GAME_PACKET_ID}, got: {0}")]
+    InvalidRakNetHeader(u8),
+    #[error("Unknown Compression method, got: {0}")]
     UnknownCompressionMethod(u8),
-    WrongCompressionMethod,
+    #[error("Wrong Compression method")]
+    WrongCompressionMethod(u8),
 }
 
-#[derive(Debug)]
+#[derive(Error, Debug, Clone)]
 pub enum CompressionError {
-    ZlibError(Box<dyn std::error::Error>),
-    SnappyError(std::io::Error),
-    IOError(std::io::Error),
+    #[error("Zlib Error: {0}")]
+    ZlibError(#[from] Arc<dyn Error + Send + Sync> ),
+    #[error("Snappy Error: {0}")]
+    SnappyError(#[from] Arc<IOError>),
+    #[error("IO Error: {0}")]
+    IOError(Arc<IOError>),
 }
 
 #[derive(Debug)]
@@ -38,16 +60,22 @@ pub enum LoginError {
     FormatError(String),
 }
 
-#[derive(Debug)]
+#[derive(Error, Debug, Clone)]
 pub enum TransportLayerError {
-    IOError(std::io::Error),
-    RaknetUDPError(RaknetError),
+    #[error("IO Error: {0}")]
+    IOError(#[from] Arc<IOError>),
+    #[error("Raknet UDP Error: {0}")]
+    RaknetUDPError(#[from] RaknetError),
 }
 
-#[derive(Debug)]
+#[derive(Error, Debug, Clone)]
 pub enum RaknetError {
-    RecvError(RecvError),
+    #[error("Error while Receive: {0}")]
+    RecvError(#[from] RecvError),
+    #[error("Error while Send: {0}")]
     SendError(SendQueueError),
-    ServerError(ServerError),
+    #[error("Server Error: {0}")]
+    ServerError(#[from] ServerError),
+    #[error("Format Error: {0}")]
     FormatError(String),
 }

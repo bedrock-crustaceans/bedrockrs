@@ -31,3 +31,7 @@ pub mod world {
 pub mod form {
     pub use ::form::*;
 }
+
+pub mod text {
+    pub use ::text::*;
+}

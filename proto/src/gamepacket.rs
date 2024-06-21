@@ -18,9 +18,10 @@ use crate::packets::play_status::PlayStatusPacket;
 use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
 use crate::packets::resource_packs_response::ResourcePacksResponsePacket;
 use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
+use std::sync::Arc;
 
 #[repr(u16)]
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone)]
 pub enum GamePacket {
     Login(LoginPacket),
     PlayStatus(PlayStatusPacket),
@@ -332,7 +333,7 @@ macro_rules! ser_packet {
         match VAR::<u16>::write(&VAR::new($packet_id), &mut pk_stream) {
             Ok(_) => {}
             Err(e) => {
-                return Err(ProtoCodecError::IOError(e));
+                return Err(ProtoCodecError::IOError(Arc::new(e)));
             }
         }
 
@@ -349,7 +350,7 @@ macro_rules! ser_packet {
         match VAR::<u32>::write(&VAR::new(pk_stream.len() as u32), $stream) {
             Ok(_) => {}
             Err(e) => {
-                return Err(ProtoCodecError::IOError(e));
+                return Err(ProtoCodecError::IOError(Arc::new(e)));
             }
         }
 
@@ -357,7 +358,7 @@ macro_rules! ser_packet {
         match $stream.write_all(pk_stream.as_slice()) {
             Ok(_) => {}
             Err(e) => {
-                return Err(ProtoCodecError::IOError(e));
+                return Err(ProtoCodecError::IOError(Arc::new(e)));
             }
         }
 
@@ -829,7 +830,7 @@ impl GamePacket {
         // TODO: Use this to possibly async the packet handling
         match VAR::<u32>::read(stream) {
             Ok(_) => {}
-            Err(e) => return Err(ProtoCodecError::IOError(e)),
+            Err(e) => return Err(ProtoCodecError::IOError(Arc::new(e))),
         };
 
         // Read the game packet header and parse it into an u16
@@ -840,7 +841,7 @@ impl GamePacket {
                     return Err(ProtoCodecError::FromIntError(e));
                 }
             },
-            Err(e) => return Err(ProtoCodecError::IOError(e)),
+            Err(e) => return Err(ProtoCodecError::IOError(Arc::new(e))),
         };
 
         // Get the first 10 bits as the packet id

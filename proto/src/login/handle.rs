@@ -1,6 +1,6 @@
 use bedrock_core::LE;
 
-use crate::conn::Connection;
+use crate::connection::Connection;
 use crate::error::LoginError;
 use crate::gamepacket::GamePacket;
 use crate::login::provider::LoginProviderStatus;
@@ -78,8 +78,8 @@ pub async fn login_to_server(
     let compression = provider.compression();
 
     let mut network_settings = NetworkSettingsPacket {
-        compression_threshold: LE::new(0),
-        compression_algorithm: LE::new(0xFFFF),
+        compression_threshold: LE::new(compression.threshold()),
+        compression_algorithm: LE::new(compression.id_u16()),
         // TODO What do these 3 fields do?
         client_throttle_enabled: false,
         client_throttle_threshold: 0,

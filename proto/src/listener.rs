@@ -5,25 +5,32 @@ use rak_rs::mcpe::motd::Gamemode;
 use rak_rs::Motd;
 use rand::RngCore;
 
-use crate::conn::Connection;
+use crate::connection::Connection;
 use crate::error::{ListenerError, RaknetError, TransportLayerError};
 use crate::info::{MINECRAFT_EDITION_MOTD, MINECRAFT_VERSION, PROTOCOL_VERSION};
 use crate::transport_layer::TransportLaterListener;
 
 pub struct Listener {
     listener: TransportLaterListener,
-    pub config: ListenerConfig,
-    socket_addr_v4: SocketAddrV4,
+    name: String,
+    sub_name: String,
+    player_count_max: u32,
+    player_count_current: u32,
+    socket_addr: SocketAddr,
     guid: u64,
 }
 
 impl Listener {
     pub async fn new_raknet(
-        listener_config: ListenerConfig,
-        socket_addr_v4: SocketAddrV4,
+        name: String,
+        sub_name: String,
+        player_count_max: u32,
+        player_count_current: u32,
+        socket_addr: SocketAddr,
+        nintendo_limited: bool,
     ) -> Result<Self, ListenerError> {
         // Bind the Raknet Listener
-        let rak_listener = rak_rs::Listener::bind(SocketAddr::V4(socket_addr_v4.clone())).await;
+        let rak_listener = rak_rs::Listener::bind(socket_addr.clone()).await;
 
         // Check for success
         let mut rak_listener = match rak_listener {
@@ -41,25 +48,26 @@ impl Listener {
         // Setup the motd
         rak_listener.motd = Motd {
             edition: String::from(MINECRAFT_EDITION_MOTD),
-            // Prevent String no impl copy
-            name: listener_config.name.as_str().to_string(),
-            sub_name: listener_config.sub_name.as_str().to_string(),
-            protocol: PROTOCOL_VERSION as u16,
             version: String::from(MINECRAFT_VERSION),
+            name: name.clone(),
+            sub_name: sub_name.clone(),
+            player_max: player_count_max,
+            player_count: player_count_current,
+            protocol: PROTOCOL_VERSION as u16,
             server_guid: guid,
             gamemode: Gamemode::Survival,
-            port: Some(socket_addr_v4.clone().port().to_string()),
-            // TODO: Add this when ipv6 is supported by rak-rs
-            ipv6_port: Some(socket_addr_v4.clone().port().to_string()),
-            player_max: listener_config.player_count_max,
-            player_count: listener_config.player_count_current,
-            nintendo_limited: Some(listener_config.nintendo_limited),
+            port: Some(socket_addr.clone().port().to_string()),
+            ipv6_port: Some(socket_addr.clone().port().to_string()),
+            nintendo_limited: Some(nintendo_limited),
         };
 
         Ok(Self {
             listener: TransportLaterListener::RaknetUDP(rak_listener),
-            config: listener_config,
-            socket_addr_v4,
+            name,
+            sub_name,
+            player_count_max,
+            player_count_current,
+            socket_addr,
             guid,
         })
     }
@@ -79,13 +87,4 @@ impl Listener {
 
         Ok(Connection::new(rak_conn))
     }
-}
-
-#[derive(Debug, Eq, PartialEq)]
-pub struct ListenerConfig {
-    pub name: String,
-    pub sub_name: String,
-    pub player_count_max: u32,
-    pub player_count_current: u32,
-    pub nintendo_limited: bool,
 }
