@@ -16,8 +16,6 @@ pub mod vec;
 
 pub mod stream;
 
-pub mod uuid;
-
 pub mod difficulty;
 pub mod dimension;
 pub mod permissions_level;
