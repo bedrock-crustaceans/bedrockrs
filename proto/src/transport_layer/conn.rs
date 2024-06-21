@@ -1,13 +1,10 @@
 use std::io::Write;
-use std::pin::Pin;
 use std::sync::Arc;
-use std::task::{Context, Poll};
 
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
 use bedrock_core::LE;
-use tokio::io::{AsyncRead, AsyncReadExt, ReadBuf};
-use tokio::net;
+use tokio::io::AsyncReadExt;
 
 use crate::error::{RaknetError, TransportLayerError};
 use crate::info::RAKNET_GAME_PACKET_ID;
@@ -90,11 +87,10 @@ impl TransportLayerConnection {
                     Err(e) => Err(TransportLayerError::IOError(Arc::new(e))),
                 }
             }
-            
+
             _ => {
                 todo!()
             }
         }
     }
 }
-

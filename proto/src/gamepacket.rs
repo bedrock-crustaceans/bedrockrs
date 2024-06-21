@@ -1,6 +1,7 @@
 #![allow(non_upper_case_globals)]
 
 use std::io::Write;
+use std::sync::Arc;
 
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
@@ -18,7 +19,6 @@ use crate::packets::play_status::PlayStatusPacket;
 use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
 use crate::packets::resource_packs_response::ResourcePacksResponsePacket;
 use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
-use std::sync::Arc;
 
 #[repr(u16)]
 #[derive(Debug, Clone)]

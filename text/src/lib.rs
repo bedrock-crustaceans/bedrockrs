@@ -3,7 +3,7 @@ use std::ops::Add;
 
 use html_parser::Node;
 use quote::quote;
-use syn::{ExprTuple, LitStr, parse_macro_input};
+use syn::{parse_macro_input, ExprTuple, LitStr};
 
 use crate::map::COLOR_CODE_MINECRAFT_MAP;
 
@@ -82,7 +82,6 @@ pub fn colorf(input: TokenStream) -> TokenStream {
     // for child in dom.children {
     //     text += parse_node(child, vec![]).as_str();
     // }
-
 
     TokenStream::from(quote! {
         #text

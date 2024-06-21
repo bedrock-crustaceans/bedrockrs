@@ -1,5 +1,7 @@
 use std::path::Path;
+
 use uuid::Uuid;
+
 use crate::error::PackError;
 use crate::pack::Pack;
 
@@ -10,7 +12,10 @@ pub struct BehaviorPack {
 }
 
 impl Pack for BehaviorPack {
-    fn load(path: impl AsRef<Path>) -> Result<Self, PackError> where Self: Sized {
+    fn load(path: impl AsRef<Path>) -> Result<Self, PackError>
+    where
+        Self: Sized,
+    {
         todo!()
     }
 

@@ -1,4 +1,5 @@
 use std::io::Cursor;
+
 use byteorder::ReadBytesExt;
 use paletted_storage::PalettedStorage;
 

@@ -187,7 +187,8 @@ impl Connection {
 
     pub async fn to_connection_shard(mut self, flush_interval: Duration) -> ConnectionShard {
         let (shard_pk_sender, mut task_pk_receiver) = channel::<GamePacket>(128);
-        let (task_pk_sender, shard_pk_receiver) = channel::<Result<GamePacket, ConnectionError>>(128);
+        let (task_pk_sender, shard_pk_receiver) =
+            channel::<Result<GamePacket, ConnectionError>>(128);
 
         let (shard_close_sender, task_close_receiver) = channel::<()>(1);
 
@@ -220,7 +221,8 @@ impl Connection {
                         send_buffer = vec![];
                     }
                 }
-        }});
+            }
+        });
 
         ConnectionShard {
             pk_sender: shard_pk_sender,
@@ -239,15 +241,15 @@ pub struct ConnectionShard {
 impl ConnectionShard {
     pub fn send(&mut self, pk: GamePacket) -> Result<(), ConnectionError> {
         match self.pk_sender.send(pk) {
-            Ok(_) => { Ok(()) }
-            Err(_) => { Err(ConnectionError::ConnectionClosed) }
+            Ok(_) => Ok(()),
+            Err(_) => Err(ConnectionError::ConnectionClosed),
         }
     }
 
     pub async fn recv(&mut self) -> Result<GamePacket, ConnectionError> {
         match self.pk_receiver.recv().await {
-            Ok(pk) => { pk }
-            Err(_) => { Err(ConnectionError::ConnectionClosed) }
+            Ok(pk) => pk,
+            Err(_) => Err(ConnectionError::ConnectionClosed),
         }
     }
 

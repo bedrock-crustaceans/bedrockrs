@@ -1,4 +1,5 @@
 use std::sync::Arc;
+
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
 use bedrock_core::*;
@@ -10,15 +11,15 @@ use crate::ProtoCodec;
 impl ProtoCodec for u8 {
     fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError> {
         match stream.write_u8(*self) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(ProtoCodecError::IOError(Arc::new(e))) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(ProtoCodecError::IOError(Arc::new(e))),
         }
     }
 
     fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError> {
         match stream.read_u8() {
-            Ok(v) => { Ok(v) }
-            Err(e) => { Err(ProtoCodecError::IOError(Arc::new(e))) }
+            Ok(v) => Ok(v),
+            Err(e) => Err(ProtoCodecError::IOError(Arc::new(e))),
         }
     }
 }
@@ -26,15 +27,15 @@ impl ProtoCodec for u8 {
 impl ProtoCodec for i8 {
     fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError> {
         match stream.write_i8(*self) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(ProtoCodecError::IOError(Arc::new(e))) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(ProtoCodecError::IOError(Arc::new(e))),
         }
     }
 
     fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError> {
         match stream.read_i8() {
-            Ok(v) => { Ok(v) }
-            Err(e) => { Err(ProtoCodecError::IOError(Arc::new(e))) }
+            Ok(v) => Ok(v),
+            Err(e) => Err(ProtoCodecError::IOError(Arc::new(e))),
         }
     }
 }

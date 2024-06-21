@@ -2,14 +2,14 @@ use std::io::Cursor;
 
 use bedrock_core::LE;
 use byteorder::ReadBytesExt;
-use nbt::NbtTag;
 use nbt::endian::little_endian::NbtLittleEndian;
 use nbt::endian::little_endian_network::NbtLittleEndianNetwork;
+use nbt::NbtTag;
 
 #[derive(Debug)]
 pub struct PalettedStorage {
     blocks: [u32; 4096],
-    palette: Vec<NbtTag>
+    palette: Vec<NbtTag>,
 }
 
 impl PalettedStorage {
@@ -46,7 +46,8 @@ impl PalettedStorage {
         }
 
         let palette_count = LE::<i32>::read(cur)
-            .expect("Missing palette count").into_inner();
+            .expect("Missing palette count")
+            .into_inner();
 
         for _ in 0..palette_count {
             match network {
@@ -56,7 +57,7 @@ impl PalettedStorage {
                             .expect("Bad NBT Tag in palette")
                             .1,
                     );
-                },
+                }
                 _ => {
                     out.palette.push(
                         NbtTag::nbt_deserialize::<NbtLittleEndianNetwork>(cur)
@@ -74,8 +75,8 @@ impl PalettedStorage {
         let mut out = Vec::new();
         let palette_type: u8 = network.into();
         let bits_per_block = bits_needed_to_store(self.palette.len() as u32);
-        
-        let combined = ((bits_per_block << 1) as u8 ) + palette_type;
+
+        let combined = ((bits_per_block << 1) as u8) + palette_type;
 
         out.push(combined);
 
@@ -101,16 +102,15 @@ impl PalettedStorage {
 
         for nbt in &self.palette {
             if network {
-                nbt.nbt_serialize::<NbtLittleEndianNetwork>("", &mut out).unwrap();
+                nbt.nbt_serialize::<NbtLittleEndianNetwork>("", &mut out)
+                    .unwrap();
             } else {
                 nbt.nbt_serialize::<NbtLittleEndian>("", &mut out).unwrap();
             }
         }
 
         out
-
     }
-
 }
 
 fn bits_needed_to_store(n: u32) -> u32 {

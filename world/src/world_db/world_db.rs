@@ -43,10 +43,7 @@ impl WorldDB {
         let mut str = uuid.to_string();
         str.insert_str(0, "player_");
 
-        match self
-            .db
-            .get(READ_OPTIONS, str.as_bytes())
-        {
+        match self.db.get(READ_OPTIONS, str.as_bytes()) {
             Ok(maybe_bytes) => match maybe_bytes {
                 Some(bytes) => {
                     let u8_bytes = bytes.get().into();
@@ -80,10 +77,7 @@ impl WorldDB {
 
                 let mut wb = WriteBatch::new();
 
-                wb.put(
-                    str.as_bytes(),
-                    &sertag,
-                );
+                wb.put(str.as_bytes(), &sertag);
 
                 match self.db.write(WRITE_OPTIONS, wb) {
                     Ok(()) => Ok(()),

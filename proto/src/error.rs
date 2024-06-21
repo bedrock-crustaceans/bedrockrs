@@ -1,14 +1,15 @@
-use crate::info::RAKNET_GAME_PACKET_ID;
 use io::Error as IOError;
 use std::error::Error;
 use std::io;
 use std::sync::Arc;
-use dyn_clone::DynClone;
+
 use proto_core::error::ProtoCodecError;
 use rak_rs::connection::queue::SendQueueError;
 use rak_rs::connection::RecvError;
 use rak_rs::error::server::ServerError;
 use thiserror::Error;
+
+use crate::info::RAKNET_GAME_PACKET_ID;
 
 #[derive(Error, Debug)]
 pub enum ListenerError {
@@ -45,7 +46,7 @@ pub enum ConnectionError {
 #[derive(Error, Debug, Clone)]
 pub enum CompressionError {
     #[error("Zlib Error: {0}")]
-    ZlibError(#[from] Arc<dyn Error + Send + Sync> ),
+    ZlibError(#[from] Arc<dyn Error + Send + Sync>),
     #[error("Snappy Error: {0}")]
     SnappyError(#[from] Arc<IOError>),
     #[error("IO Error: {0}")]

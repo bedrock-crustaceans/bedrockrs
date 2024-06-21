@@ -1,5 +1,4 @@
 use core::net::SocketAddr;
-use core::net::SocketAddrV4;
 
 use rak_rs::mcpe::motd::Gamemode;
 use rak_rs::Motd;
