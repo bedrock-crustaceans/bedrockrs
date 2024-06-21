@@ -18,6 +18,7 @@ packs = { path = "packs" }
 world = { path = "world", optional = true }
 
 form = { path = "form" }
+text = { path = "text" }
 
 paletted_storage = { path = "paletted_storage", optional = true }
 
