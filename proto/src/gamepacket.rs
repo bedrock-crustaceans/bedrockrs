@@ -20,7 +20,7 @@ use crate::packets::resource_packs_response::ResourcePacksResponsePacket;
 use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
 
 #[repr(u16)]
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum GamePacket {
     Login(LoginPacket),
     PlayStatus(PlayStatusPacket),
