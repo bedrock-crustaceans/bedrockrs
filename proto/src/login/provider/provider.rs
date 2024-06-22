@@ -3,6 +3,7 @@ use crate::login::provider::status::LoginProviderStatus;
 use crate::packets::login::LoginPacket;
 use crate::packets::network_settings::NetworkSettingsPacket;
 use crate::packets::network_settings_request::NetworkSettingsRequestPacket;
+use crate::packets::play_status::PlayStatusPacket;
 
 pub trait LoginProviderServer {
     fn compression(&self) -> Compression;
@@ -21,6 +22,9 @@ pub trait LoginProviderServer {
     }
 
     fn on_login_pk(&self, pk: &mut LoginPacket) -> LoginProviderStatus {
+        LoginProviderStatus::ContinueLogin
+    }
+    fn on_play_status_pk(&self, pk: &mut PlayStatusPacket) -> LoginProviderStatus {
         LoginProviderStatus::ContinueLogin
     }
 }
