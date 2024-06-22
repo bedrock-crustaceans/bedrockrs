@@ -195,12 +195,12 @@ impl Connection {
         let (task_pk_sender, shard_pk_receiver) =
             broadcast::channel::<Result<GamePacket, ConnectionError>>(packet_buffer_size);
 
-        let (shard_close_sender, task_close_receiver) = mpsc::channel::<()>(1);
+        let (shard_close_sender, task_close_receiver) = watch::channel::<()>(());
 
         let (shard_compression_sender, mut task_compression_receiver) =
-            mpsc::channel::<Option<Compression>>(1);
+            watch::channel::<Option<Compression>>(self.compression.clone());
         let (shard_encryption_sender, mut task_encryption_receiver) =
-            mpsc::channel::<Option<Encryption>>(1);
+            watch::channel::<Option<Encryption>>(self.encryption.clone());
 
         let (shard_compression_request_sender, mut task_compression_request_receiver) =
             watch::channel(());
@@ -236,17 +236,11 @@ impl Connection {
                             Err(_) => {}
                         };
                     }
-                    res = task_compression_receiver.recv() => {
-                        match res {
-                            Some(compression) => { self.compression = compression; }
-                            None => { panic!("TODO: panic message"); }
-                        };
+                    _ = task_compression_receiver.changed() => {
+                        self.compression = task_compression_receiver.borrow_and_update().to_owned();
                     }
-                    res = task_encryption_receiver.recv() => {
-                        match res {
-                            Some(encryption) => { self.encryption = encryption; }
-                            None => { panic!("TODO: panic message"); }
-                        };
+                    _ = task_encryption_receiver.changed() => {
+                        self.encryption = task_encryption_receiver.borrow_and_update().to_owned();
                     }
                     _ = task_compression_request_receiver.changed() => {
                         task_compression_sender.send(self.compression.clone()).expect("TODO: panic message");
@@ -279,9 +273,9 @@ impl Connection {
 pub struct ConnectionShard {
     pk_sender: broadcast::Sender<GamePacket>,
     pk_receiver: broadcast::Receiver<Result<GamePacket, ConnectionError>>,
-    close_sender: mpsc::Sender<()>,
-    compression_sender: mpsc::Sender<Option<Compression>>,
-    encryption_sender: mpsc::Sender<Option<Encryption>>,
+    close_sender: watch::Sender<()>,
+    compression_sender: watch::Sender<Option<Compression>>,
+    encryption_sender: watch::Sender<Option<Encryption>>,
     compression_request_sender: watch::Sender<()>,
     compression_receiver: watch::Receiver<Option<Compression>>,
     encryption_request_sender: watch::Sender<()>,
@@ -303,8 +297,8 @@ impl ConnectionShard {
         }
     }
 
-    pub async fn close(&mut self) {
-        match self.close_sender.send(()).await {
+    pub fn close(&mut self) {
+        match self.close_sender.send(()) {
             Ok(_) => { /* has been closed successfully */ }
             Err(_) => { /* has already been closed */ }
         }
@@ -314,7 +308,7 @@ impl ConnectionShard {
         &mut self,
         compression: Option<Compression>,
     ) -> Result<(), ConnectionError> {
-        match self.compression_sender.send(compression).await {
+        match self.compression_sender.send(compression) {
             Ok(_) => Ok(()),
             Err(_) => Err(ConnectionError::ConnectionClosed),
         }
@@ -340,7 +334,7 @@ impl ConnectionShard {
         &mut self,
         encryption: Option<Encryption>,
     ) -> Result<(), ConnectionError> {
-        match self.encryption_sender.send(encryption).await {
+        match self.encryption_sender.send(encryption) {
             Ok(_) => Ok(()),
             Err(_) => Err(ConnectionError::ConnectionClosed),
         }
