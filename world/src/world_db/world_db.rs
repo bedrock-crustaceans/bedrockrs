@@ -1,8 +1,7 @@
 use std::fmt::{Debug, Formatter};
 use std::{collections::HashMap, path::PathBuf};
 
-use bedrock_core::uuid::UUID;
-use bedrock_core::Dimension;
+use bedrock_core::{Dimension, Uuid};
 use mojang_leveldb::{error::DBError, Options, ReadOptions, WriteBatch, WriteOptions, DB};
 use nbt::{endian::little_endian::NbtLittleEndian, NbtTag};
 
@@ -39,7 +38,7 @@ impl WorldDB {
     }
 
     /// Read a player's NBT data for this world
-    pub fn get_player(&self, uuid: UUID) -> Result<Option<HashMap<String, NbtTag>>, WorldError> {
+    pub fn get_player(&self, uuid: Uuid) -> Result<Option<HashMap<String, NbtTag>>, WorldError> {
         let mut str = uuid.to_string();
         str.insert_str(0, "player_");
 
@@ -66,7 +65,7 @@ impl WorldDB {
     /// Set a player's NBT data for this world
     pub fn set_player(
         &mut self,
-        uuid: UUID,
+        uuid: Uuid,
         data: HashMap<String, NbtTag>,
     ) -> Result<(), WorldError> {
         let tag = NbtTag::Compound(data);

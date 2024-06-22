@@ -3,7 +3,7 @@ use std::ops::Add;
 
 use html_parser::Node;
 use quote::quote;
-use syn::{parse_macro_input, ExprTuple, LitStr};
+use syn::{parse_macro_input, LitStr};
 
 use crate::map::COLOR_CODE_MINECRAFT_MAP;
 

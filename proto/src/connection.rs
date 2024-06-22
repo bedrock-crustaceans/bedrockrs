@@ -192,8 +192,10 @@ impl Connection {
 
         let (shard_close_sender, task_close_receiver) = channel::<()>(1);
 
-        let (shard_compression_sender, mut task_compression_receiver) = channel::<Option<Compression>>(1);
-        let (shard_encryption_sender, mut task_encryption_receiver) = channel::<Option<Encryption>>(1);
+        let (shard_compression_sender, mut task_compression_receiver) =
+            channel::<Option<Compression>>(1);
+        let (shard_encryption_sender, mut task_encryption_receiver) =
+            channel::<Option<Encryption>>(1);
 
         tokio::spawn(async move {
             let mut flush_interval = interval(flush_interval);
@@ -279,17 +281,23 @@ impl ConnectionShard {
         }
     }
 
-    pub fn set_compression(&mut self, compression: Option<Compression>) -> Result<(), ConnectionError> {
+    pub fn set_compression(
+        &mut self,
+        compression: Option<Compression>,
+    ) -> Result<(), ConnectionError> {
         match self.compression_sender.send(compression) {
-            Ok(_) => { Ok(()) }
-            Err(_) => { Err(ConnectionError::ConnectionClosed) }
+            Ok(_) => Ok(()),
+            Err(_) => Err(ConnectionError::ConnectionClosed),
         }
     }
 
-    pub fn set_encryption(&mut self, encryption: Option<Encryption>) -> Result<(), ConnectionError> {
+    pub fn set_encryption(
+        &mut self,
+        encryption: Option<Encryption>,
+    ) -> Result<(), ConnectionError> {
         match self.encryption_sender.send(encryption) {
-            Ok(_) => { Ok(()) }
-            Err(_) => { Err(ConnectionError::ConnectionClosed) }
+            Ok(_) => Ok(()),
+            Err(_) => Err(ConnectionError::ConnectionClosed),
         }
     }
 }
