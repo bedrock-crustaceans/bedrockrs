@@ -1,7 +1,7 @@
-pub use conn::*;
+pub use connection::*;
 pub use listener::*;
 
-pub mod conn;
+pub mod connection;
 pub mod listener;
 
 pub enum TransportLayerType {
