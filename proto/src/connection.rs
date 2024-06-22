@@ -202,7 +202,7 @@ impl Connection {
         let (shard_flush_request_sender, mut task_flush_request_receiver) = watch::channel::<()>(());
         let (task_flush_complete_sender, mut shard_flush_complete_receiver) = watch::channel::<()>(());
 
-        let (shard_close_sender, task_close_receiver) = watch::channel::<()>(());
+        let (shard_close_sender, mut task_close_receiver) = watch::channel::<()>(());
 
         let (shard_compression_sender, mut task_compression_receiver) =
             watch::channel::<Option<Compression>>(self.compression.clone());
@@ -225,6 +225,9 @@ impl Connection {
 
             'select_loop: loop {
                 select! {
+                    _ = task_close_receiver.changed() => {
+                        break 'select_loop
+                    }
                     res = task_compression_receiver.changed() => {
                         if let Err(_) = res {
                             break 'select_loop
@@ -312,6 +315,8 @@ impl Connection {
                     }
                 }
             }
+
+            self.connection.close().await;
         });
 
         ConnectionShard {
