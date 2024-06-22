@@ -1,7 +1,6 @@
 use std::io::{Cursor, Read, Write};
 use std::sync::Arc;
 
-use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::{LE, VAR};
 
 use crate::byte_order::NbtByteOrder;

@@ -118,7 +118,6 @@ impl LevelDat {
         let mut new_cur = Cursor::new(stream.into_inner().as_slice());
         new_cur.set_position(pos);
 
-
         let (_, nbt) = match NbtTag::nbt_deserialize::<NbtLittleEndian>(&mut new_cur) {
             Ok(v) => v,
             Err(e) => {
