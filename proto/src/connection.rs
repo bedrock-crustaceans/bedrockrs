@@ -361,7 +361,7 @@ impl ConnectionShard {
 
     pub async fn flush(&mut self) -> Result<(), ConnectionError> {
         match self.flush_sender.send(()) {
-            Ok(_) => { }
+            Ok(_) => {}
             Err(_) => { return Err(ConnectionError::ConnectionClosed) }
         }
 
@@ -383,7 +383,7 @@ impl ConnectionShard {
         compression: Option<Compression>,
     ) -> Result<(), ConnectionError> {
         match self.compression_sender.send(compression) {
-            Ok(_) => { Ok(()) },
+            Ok(_) => { Ok(()) }
             Err(_) => Err(ConnectionError::ConnectionClosed),
         }
     }

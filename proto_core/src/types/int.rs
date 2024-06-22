@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
+use bedrock_core::*;
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
-use bedrock_core::*;
 use byteorder::{ReadBytesExt, WriteBytesExt};
 
 use crate::error::ProtoCodecError;

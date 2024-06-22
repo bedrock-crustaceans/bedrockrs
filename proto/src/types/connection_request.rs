@@ -2,11 +2,11 @@ use std::collections::BTreeMap;
 use std::io::Read;
 use std::sync::Arc;
 
-use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
+use base64::prelude::BASE64_STANDARD;
+use bedrock_core::{LE, VAR};
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
-use bedrock_core::{LE, VAR};
 use jsonwebtoken::{DecodingKey, Validation};
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;

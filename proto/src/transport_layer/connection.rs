@@ -1,9 +1,9 @@
 use std::io::Write;
 use std::sync::Arc;
 
+use bedrock_core::LE;
 use bedrock_core::stream::read::ByteStreamRead;
 use bedrock_core::stream::write::ByteStreamWrite;
-use bedrock_core::LE;
 use tokio::io::AsyncReadExt;
 
 use crate::error::{RaknetError, TransportLayerError};

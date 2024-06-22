@@ -1,12 +1,10 @@
-use std::time::Duration;
 use bedrock_core::LE;
-use rak_rs::util::sleep;
 
 use crate::connection::{Connection, ConnectionShard};
-use crate::error::{ConnectionError, LoginError};
+use crate::error::LoginError;
 use crate::gamepacket::GamePacket;
-use crate::login::provider::LoginProviderStatus;
 use crate::login::provider::{LoginProviderClient, LoginProviderServer};
+use crate::login::provider::LoginProviderStatus;
 use crate::packets::network_settings::NetworkSettingsPacket;
 use crate::packets::play_status::PlayStatusPacket;
 use crate::types::play_status::PlayStatusType;

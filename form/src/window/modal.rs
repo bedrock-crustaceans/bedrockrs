@@ -20,6 +20,6 @@ impl Form for ModalForm {
             "button1": self.button1.elem_serialize(),
             "button2": self.button2.elem_serialize(),
         })
-        .to_string()
+            .to_string()
     }
 }
