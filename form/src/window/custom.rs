@@ -21,6 +21,6 @@ impl Form for CustomForm {
             "title": self.title,
             "content": elems_strings,
         })
-            .to_string()
+        .to_string()
     }
 }

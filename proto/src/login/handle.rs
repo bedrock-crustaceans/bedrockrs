@@ -3,8 +3,8 @@ use bedrock_core::LE;
 use crate::connection::{Connection, ConnectionShard};
 use crate::error::LoginError;
 use crate::gamepacket::GamePacket;
-use crate::login::provider::{LoginProviderClient, LoginProviderServer};
 use crate::login::provider::LoginProviderStatus;
+use crate::login::provider::{LoginProviderClient, LoginProviderServer};
 use crate::packets::network_settings::NetworkSettingsPacket;
 use crate::packets::play_status::PlayStatusPacket;
 use crate::types::play_status::PlayStatusType;
@@ -72,12 +72,12 @@ pub async fn login_to_server(
 
     match conn.flush().await {
         Ok(_) => {}
-        Err(e) => { return Err(LoginError::ConnError(e)) }
+        Err(e) => return Err(LoginError::ConnError(e)),
     }
 
     match conn.set_compression(Some(compression)).await {
         Ok(_) => {}
-        Err(e) => { return Err(LoginError::ConnError(e)) }
+        Err(e) => return Err(LoginError::ConnError(e)),
     };
 
     //////////////////////////////////////
@@ -110,17 +110,14 @@ pub async fn login_to_server(
 
     handle_packet!(provider, on_play_status_pk, play_status);
 
-    match conn
-        .send(GamePacket::PlayStatus(play_status))
-        .await
-    {
+    match conn.send(GamePacket::PlayStatus(play_status)).await {
         Ok(_) => {}
         Err(e) => return Err(LoginError::ConnError(e)),
     }
 
     match conn.flush().await {
         Ok(_) => {}
-        Err(e) => { return Err(LoginError::ConnError(e)) }
+        Err(e) => return Err(LoginError::ConnError(e)),
     }
 
     Ok(())

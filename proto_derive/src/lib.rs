@@ -1,7 +1,7 @@
 use de::proto_build_de;
 use quote::quote;
 use ser::proto_build_ser;
-use syn::{DeriveInput, parse_macro_input};
+use syn::{parse_macro_input, DeriveInput};
 
 mod de;
 mod ser;

@@ -13,10 +13,10 @@ pub mod proto {
 }
 
 pub mod nbt {
-    pub use ::nbt::*;
     pub use ::nbt::byte_order::*;
     pub use ::nbt::endian::*;
     pub use ::nbt::error::*;
+    pub use ::nbt::*;
 }
 
 pub mod packs {

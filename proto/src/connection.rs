@@ -3,8 +3,8 @@ use std::io::{Cursor, Write};
 use std::sync::Arc;
 use std::time::Duration;
 
-use bedrock_core::LE;
 use bedrock_core::stream::write::ByteStreamWrite;
+use bedrock_core::LE;
 use tokio::select;
 use tokio::sync::{broadcast, watch};
 use tokio::time::interval;
@@ -199,8 +199,10 @@ impl Connection {
         let (task_pk_sender, shard_pk_receiver) =
             broadcast::channel::<Result<GamePacket, ConnectionError>>(packet_buffer_size);
 
-        let (shard_flush_request_sender, mut task_flush_request_receiver) = watch::channel::<()>(());
-        let (task_flush_complete_sender, mut shard_flush_complete_receiver) = watch::channel::<()>(());
+        let (shard_flush_request_sender, mut task_flush_request_receiver) =
+            watch::channel::<()>(());
+        let (task_flush_complete_sender, mut shard_flush_complete_receiver) =
+            watch::channel::<()>(());
 
         let (shard_close_sender, mut task_close_receiver) = watch::channel::<()>(());
 
@@ -362,12 +364,12 @@ impl ConnectionShard {
     pub async fn flush(&mut self) -> Result<(), ConnectionError> {
         match self.flush_sender.send(()) {
             Ok(_) => {}
-            Err(_) => { return Err(ConnectionError::ConnectionClosed) }
+            Err(_) => return Err(ConnectionError::ConnectionClosed),
         }
 
         match self.flush_receiver.changed().await {
-            Ok(_) => { Ok(()) }
-            Err(_) => { Err(ConnectionError::ConnectionClosed) }
+            Ok(_) => Ok(()),
+            Err(_) => Err(ConnectionError::ConnectionClosed),
         }
     }
 
@@ -383,7 +385,7 @@ impl ConnectionShard {
         compression: Option<Compression>,
     ) -> Result<(), ConnectionError> {
         match self.compression_sender.send(compression) {
-            Ok(_) => { Ok(()) }
+            Ok(_) => Ok(()),
             Err(_) => Err(ConnectionError::ConnectionClosed),
         }
     }

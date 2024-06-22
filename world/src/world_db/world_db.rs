@@ -1,14 +1,14 @@
-use std::{collections::HashMap, path::PathBuf};
 use std::fmt::{Debug, Formatter};
+use std::{collections::HashMap, path::PathBuf};
 
 use bedrock_core::{Dimension, Uuid};
-use mojang_leveldb::{DB, error::DBError, Options, ReadOptions, WriteBatch, WriteOptions};
+use mojang_leveldb::{error::DBError, Options, ReadOptions, WriteBatch, WriteOptions, DB};
 use nbt::{endian::little_endian::NbtLittleEndian, NbtTag};
 
 use crate::error::WorldError;
 
-use super::{create_key, RecordType};
 use super::subchunk::SubChunk;
+use super::{create_key, RecordType};
 
 pub struct WorldDB {
     db: DB,

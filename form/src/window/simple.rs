@@ -24,6 +24,6 @@ impl Form for SimpleForm {
             "content": self.body,
             "buttons": buttons_strings
         })
-            .to_string()
+        .to_string()
     }
 }
