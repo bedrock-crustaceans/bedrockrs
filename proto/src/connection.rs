@@ -3,10 +3,10 @@ use std::io::{Cursor, Write};
 use std::sync::Arc;
 use std::time::Duration;
 
-use bedrock_core::stream::write::ByteStreamWrite;
 use bedrock_core::LE;
+use bedrock_core::stream::write::ByteStreamWrite;
 use tokio::select;
-use tokio::sync::{broadcast, mpsc, watch};
+use tokio::sync::{broadcast, watch};
 use tokio::time::interval;
 
 use crate::compression::Compression;
@@ -185,6 +185,10 @@ impl Connection {
         Ok(stream)
     }
 
+    pub async fn close(self) {
+        self.connection.close().await;
+    }
+
     pub async fn into_shard(
         mut self,
         flush_interval: Duration,
@@ -194,6 +198,9 @@ impl Connection {
             broadcast::channel::<GamePacket>(packet_buffer_size);
         let (task_pk_sender, shard_pk_receiver) =
             broadcast::channel::<Result<GamePacket, ConnectionError>>(packet_buffer_size);
+
+        let (shard_flush_request_sender, mut task_flush_request_receiver) = watch::channel::<()>(());
+        let (task_flush_complete_sender, mut shard_flush_complete_receiver) = watch::channel::<()>(());
 
         let (shard_close_sender, task_close_receiver) = watch::channel::<()>(());
 
@@ -216,41 +223,92 @@ impl Connection {
             let mut flush_interval = interval(flush_interval);
             let mut send_buffer = vec![];
 
-            loop {
+            'select_loop: loop {
                 select! {
+                    res = task_compression_receiver.changed() => {
+                        if let Err(_) = res {
+                            break 'select_loop
+                        }
+
+                        println!("CHANGE");
+                        self.compression = task_compression_receiver.borrow_and_update().to_owned();
+                        println!("CHANGED");
+                    }
+                    res = task_encryption_receiver.changed() => {
+                        if let Err(_) = res {
+                            break 'select_loop
+                        }
+
+                        self.encryption = task_encryption_receiver.borrow_and_update().to_owned();
+                    }
+                    res = task_compression_request_receiver.changed() => {
+                        if let Err(_) = res {
+                            break 'select_loop
+                        }
+
+                        if let Err(_) = task_compression_sender.send(self.compression.clone()) {
+                            break 'select_loop
+                        }
+                    }
+                    res = task_encryption_request_receiver.changed() => {
+                        if let Err(_) = task_encryption_sender.send(self.encryption.clone()) {
+                            break 'select_loop
+                        }
+                    }
                     res = self.recv() => {
                         match res {
                             Ok(pks) => {
                                 for pk in pks {
-                                    task_pk_sender.send(Ok(pk)).expect("TODO: panic message");
+                                    if let Err(_) = task_pk_sender.send(Ok(pk)) {
+                                        break 'select_loop
+                                    }
                                 }
                             }
                             Err(e) => {
-                                task_pk_sender.send(Err(e)).expect("TODO: panic message");
+                                if let Err(_) = task_pk_sender.send(Err(e)) {
+                                    break 'select_loop
+                                }
                             }
                         }
                     }
                     res = task_pk_receiver.recv() => {
+                        if let Err(_) = res {
+                            break 'select_loop
+                        }
+
                         match res {
                             Ok(pk) => { send_buffer.push(pk); }
-                            Err(_) => {}
+                            Err(e) => { break 'select_loop }
                         };
                     }
-                    _ = task_compression_receiver.changed() => {
-                        self.compression = task_compression_receiver.borrow_and_update().to_owned();
-                    }
-                    _ = task_encryption_receiver.changed() => {
-                        self.encryption = task_encryption_receiver.borrow_and_update().to_owned();
-                    }
-                    _ = task_compression_request_receiver.changed() => {
-                        task_compression_sender.send(self.compression.clone()).expect("TODO: panic message");
-                    }
-                    _ = task_encryption_request_receiver.changed() => {
-                        task_encryption_sender.send(self.encryption.clone()).expect("TODO: panic message");
+                    res = task_flush_request_receiver.changed() => {
+                        if let Err(_) = res {
+                            break 'select_loop
+                        }
+
+                        if !send_buffer.is_empty() {
+                            println!("SENDING");
+                            if let Err(_) = self.send(send_buffer).await {
+                                break 'select_loop
+                            }
+                            println!("SEND");
+
+                            if let Err(_) = task_flush_complete_sender.send(()) {
+                                break 'select_loop
+                            }
+
+                            send_buffer = vec![];
+                        }
                     }
                     _ = flush_interval.tick() => {
-                        self.send(send_buffer).await.expect("TODO: panic message");
-                        send_buffer = vec![];
+                        println!("TICK");
+                        if !send_buffer.is_empty() {
+                            if let Err(_) = self.send(send_buffer).await {
+                                break 'select_loop
+                            }
+
+                            send_buffer = vec![];
+                        }
                     }
                 }
             }
@@ -259,6 +317,8 @@ impl Connection {
         ConnectionShard {
             pk_sender: shard_pk_sender,
             pk_receiver: shard_pk_receiver,
+            flush_sender: shard_flush_request_sender,
+            flush_receiver: shard_flush_complete_receiver,
             close_sender: shard_close_sender,
             compression_sender: shard_compression_sender,
             encryption_sender: shard_encryption_sender,
@@ -273,6 +333,8 @@ impl Connection {
 pub struct ConnectionShard {
     pk_sender: broadcast::Sender<GamePacket>,
     pk_receiver: broadcast::Receiver<Result<GamePacket, ConnectionError>>,
+    flush_sender: watch::Sender<()>,
+    flush_receiver: watch::Receiver<()>,
     close_sender: watch::Sender<()>,
     compression_sender: watch::Sender<Option<Compression>>,
     encryption_sender: watch::Sender<Option<Encryption>>,
@@ -297,7 +359,19 @@ impl ConnectionShard {
         }
     }
 
-    pub fn close(&mut self) {
+    pub async fn flush(&mut self) -> Result<(), ConnectionError> {
+        match self.flush_sender.send(()) {
+            Ok(_) => { }
+            Err(_) => { return Err(ConnectionError::ConnectionClosed) }
+        }
+
+        match self.flush_receiver.changed().await {
+            Ok(_) => { Ok(()) }
+            Err(_) => { Err(ConnectionError::ConnectionClosed) }
+        }
+    }
+
+    pub fn close(self) {
         match self.close_sender.send(()) {
             Ok(_) => { /* has been closed successfully */ }
             Err(_) => { /* has already been closed */ }
@@ -309,7 +383,7 @@ impl ConnectionShard {
         compression: Option<Compression>,
     ) -> Result<(), ConnectionError> {
         match self.compression_sender.send(compression) {
-            Ok(_) => Ok(()),
+            Ok(_) => { Ok(()) },
             Err(_) => Err(ConnectionError::ConnectionClosed),
         }
     }
@@ -362,6 +436,8 @@ impl Clone for ConnectionShard {
         Self {
             pk_sender: self.pk_sender.clone(),
             pk_receiver: self.pk_receiver.resubscribe(),
+            flush_sender: self.flush_sender.clone(),
+            flush_receiver: self.flush_receiver.clone(),
             close_sender: self.close_sender.clone(),
             compression_sender: self.compression_sender.clone(),
             encryption_sender: self.encryption_sender.clone(),
