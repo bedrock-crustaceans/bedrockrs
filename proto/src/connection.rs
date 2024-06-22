@@ -13,6 +13,7 @@ use crate::compression::Compression;
 use crate::encryption::Encryption;
 use crate::error::ConnectionError;
 use crate::gamepacket::GamePacket;
+use crate::packets::client_cache_status::ClientCacheStatusPacket;
 use crate::transport_layer::TransportLayerConnection;
 
 pub struct Connection {
@@ -25,6 +26,7 @@ pub struct Connection {
     /// Represents the connections encryption, the encryption gets initialized in the
     /// login process, if encryption is allowed.
     pub encryption: Option<Encryption>,
+    pub cache_supported: bool,
 }
 
 impl Connection {
@@ -33,6 +35,7 @@ impl Connection {
             connection: conn,
             compression: None,
             encryption: None,
+            cache_supported: false,
         }
     }
 
@@ -200,26 +203,32 @@ impl Connection {
             broadcast::channel::<Result<GamePacket, ConnectionError>>(packet_buffer_size);
 
         let (shard_flush_request_sender, mut task_flush_request_receiver) =
-            watch::channel::<()>(());
+            watch::channel(());
         let (task_flush_complete_sender, mut shard_flush_complete_receiver) =
-            watch::channel::<()>(());
+            watch::channel(());
 
-        let (shard_close_sender, mut task_close_receiver) = watch::channel::<()>(());
+        let (shard_close_sender, mut task_close_receiver) = watch::channel(());
 
         let (shard_compression_sender, mut task_compression_receiver) =
-            watch::channel::<Option<Compression>>(self.compression.clone());
-        let (shard_encryption_sender, mut task_encryption_receiver) =
-            watch::channel::<Option<Encryption>>(self.encryption.clone());
-
+            watch::channel(self.compression.clone());
         let (shard_compression_request_sender, mut task_compression_request_receiver) =
             watch::channel(());
         let (mut task_compression_sender, shard_compression_receiver) =
             watch::channel(self.compression.clone());
 
+        let (shard_encryption_sender, mut task_encryption_receiver) =
+            watch::channel(self.encryption.clone());
         let (shard_encryption_request_sender, mut task_encryption_request_receiver) =
             watch::channel(());
         let (mut task_encryption_sender, shard_encryption_receiver) =
             watch::channel(self.encryption.clone());
+
+        let (shard_cache_supported_sender, mut task_cache_supported_receiver) =
+            watch::channel(self.cache_supported.clone());
+        let (shard_cache_supported_request_sender, mut task_cache_supported_request_receiver) =
+            watch::channel(());
+        let (mut task_cache_supported_sender, shard_cache_supported_receiver) =
+            watch::channel(self.cache_supported.clone());
 
         tokio::spawn(async move {
             let mut flush_interval = interval(flush_interval);
@@ -244,6 +253,13 @@ impl Connection {
 
                         self.encryption = task_encryption_receiver.borrow_and_update().to_owned();
                     }
+                    res = task_cache_supported_receiver.changed() => {
+                        if let Err(_) = res {
+                            break 'select_loop
+                        }
+
+                        self.cache_supported = task_cache_supported_receiver.borrow_and_update().to_owned();
+                    }
                     res = task_compression_request_receiver.changed() => {
                         if let Err(_) = res {
                             break 'select_loop
@@ -254,7 +270,20 @@ impl Connection {
                         }
                     }
                     res = task_encryption_request_receiver.changed() => {
+                        if let Err(_) = res {
+                            break 'select_loop
+                        }
+
                         if let Err(_) = task_encryption_sender.send(self.encryption.clone()) {
+                            break 'select_loop
+                        }
+                    }
+                    res = task_cache_supported_request_receiver.changed() => {
+                        if let Err(_) = res {
+                            break 'select_loop
+                        }
+
+                        if let Err(_) = task_cache_supported_sender.send(self.cache_supported.clone()) {
                             break 'select_loop
                         }
                     }
@@ -319,15 +348,23 @@ impl Connection {
         ConnectionShard {
             pk_sender: shard_pk_sender,
             pk_receiver: shard_pk_receiver,
+
             flush_sender: shard_flush_request_sender,
             flush_receiver: shard_flush_complete_receiver,
+
             close_sender: shard_close_sender,
+
             compression_sender: shard_compression_sender,
-            encryption_sender: shard_encryption_sender,
             compression_request_sender: shard_compression_request_sender,
             compression_receiver: shard_compression_receiver,
+
+            encryption_sender: shard_encryption_sender,
             encryption_request_sender: shard_encryption_request_sender,
             encryption_receiver: shard_encryption_receiver,
+
+            cache_supported_sender: shard_cache_supported_sender,
+            cache_supported_request_sender: shard_cache_supported_request_sender,
+            cache_supported_receiver: shard_cache_supported_receiver,
         }
     }
 }
@@ -335,15 +372,23 @@ impl Connection {
 pub struct ConnectionShard {
     pk_sender: broadcast::Sender<GamePacket>,
     pk_receiver: broadcast::Receiver<Result<GamePacket, ConnectionError>>,
+
     flush_sender: watch::Sender<()>,
     flush_receiver: watch::Receiver<()>,
+
     close_sender: watch::Sender<()>,
+
     compression_sender: watch::Sender<Option<Compression>>,
-    encryption_sender: watch::Sender<Option<Encryption>>,
     compression_request_sender: watch::Sender<()>,
     compression_receiver: watch::Receiver<Option<Compression>>,
+
+    encryption_sender: watch::Sender<Option<Encryption>>,
     encryption_request_sender: watch::Sender<()>,
     encryption_receiver: watch::Receiver<Option<Encryption>>,
+
+    cache_supported_sender: watch::Sender<bool>,
+    cache_supported_request_sender: watch::Sender<()>,
+    cache_supported_receiver: watch::Receiver<bool>,
 }
 
 impl ConnectionShard {
@@ -438,6 +483,32 @@ impl ConnectionShard {
             Err(_) => Err(ConnectionError::ConnectionClosed),
         }
     }
+
+    pub async fn set_cache_supported(
+        &mut self,
+        cache_supported: bool,
+    ) -> Result<(), ConnectionError> {
+        match self.cache_supported_sender.send(cache_supported) {
+            Ok(_) => Ok(()),
+            Err(_) => Err(ConnectionError::ConnectionClosed),
+        }
+    }
+
+    pub async fn get_cache_supported(&mut self) -> Result<bool, ConnectionError> {
+        match self.cache_supported_request_sender.send(()) {
+            Ok(_) => {}
+            Err(_) => return Err(ConnectionError::ConnectionClosed),
+        };
+
+        match self.cache_supported_receiver.changed().await {
+            Ok(_) => Ok(self
+                .cache_supported_receiver
+                .borrow_and_update()
+                .clone()
+                .to_owned()),
+            Err(_) => Err(ConnectionError::ConnectionClosed),
+        }
+    }
 }
 
 impl Clone for ConnectionShard {
@@ -445,15 +516,23 @@ impl Clone for ConnectionShard {
         Self {
             pk_sender: self.pk_sender.clone(),
             pk_receiver: self.pk_receiver.resubscribe(),
+
             flush_sender: self.flush_sender.clone(),
             flush_receiver: self.flush_receiver.clone(),
+
             close_sender: self.close_sender.clone(),
+
             compression_sender: self.compression_sender.clone(),
-            encryption_sender: self.encryption_sender.clone(),
             compression_request_sender: self.compression_request_sender.clone(),
             compression_receiver: self.compression_receiver.clone(),
+
+            encryption_sender: self.encryption_sender.clone(),
             encryption_request_sender: self.compression_request_sender.clone(),
             encryption_receiver: self.encryption_receiver.clone(),
+
+            cache_supported_sender: self.cache_supported_sender.clone(),
+            cache_supported_request_sender: self.cache_supported_request_sender.clone(),
+            cache_supported_receiver: self.cache_supported_receiver.clone(),
         }
     }
 }
