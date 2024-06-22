@@ -93,4 +93,11 @@ impl TransportLayerConnection {
             }
         }
     }
+
+    pub async fn close(self) {
+        match self {
+            TransportLayerConnection::RaknetUDP(conn) => { conn.close().await; }
+            _ => { todo!() }
+        }
+    }
 }
