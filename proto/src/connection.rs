@@ -6,7 +6,7 @@ use std::time::Duration;
 use bedrock_core::stream::write::ByteStreamWrite;
 use bedrock_core::LE;
 use tokio::select;
-use tokio::sync::broadcast::{channel, Receiver, Sender};
+use tokio::sync::{broadcast, mpsc, watch};
 use tokio::time::interval;
 
 use crate::compression::Compression;
@@ -185,17 +185,32 @@ impl Connection {
         Ok(stream)
     }
 
-    pub async fn into_shard(mut self, flush_interval: Duration) -> ConnectionShard {
-        let (shard_pk_sender, mut task_pk_receiver) = channel::<GamePacket>(128);
+    pub async fn into_shard(
+        mut self,
+        flush_interval: Duration,
+        packet_buffer_size: usize,
+    ) -> ConnectionShard {
+        let (shard_pk_sender, mut task_pk_receiver) =
+            broadcast::channel::<GamePacket>(packet_buffer_size);
         let (task_pk_sender, shard_pk_receiver) =
-            channel::<Result<GamePacket, ConnectionError>>(128);
+            broadcast::channel::<Result<GamePacket, ConnectionError>>(packet_buffer_size);
 
-        let (shard_close_sender, task_close_receiver) = channel::<()>(1);
+        let (shard_close_sender, task_close_receiver) = mpsc::channel::<()>(1);
 
         let (shard_compression_sender, mut task_compression_receiver) =
-            channel::<Option<Compression>>(1);
+            mpsc::channel::<Option<Compression>>(1);
         let (shard_encryption_sender, mut task_encryption_receiver) =
-            channel::<Option<Encryption>>(1);
+            mpsc::channel::<Option<Encryption>>(1);
+
+        let (shard_compression_request_sender, mut task_compression_request_receiver) =
+            watch::channel(());
+        let (mut task_compression_sender, shard_compression_receiver) =
+            watch::channel(self.compression.clone());
+
+        let (shard_encryption_request_sender, mut task_encryption_request_receiver) =
+            watch::channel(());
+        let (mut task_encryption_sender, shard_encryption_receiver) =
+            watch::channel(self.encryption.clone());
 
         tokio::spawn(async move {
             let mut flush_interval = interval(flush_interval);
@@ -223,15 +238,21 @@ impl Connection {
                     }
                     res = task_compression_receiver.recv() => {
                         match res {
-                            Ok(compression) => { self.compression = compression; }
-                            Err(_) => {}
+                            Some(compression) => { self.compression = compression; }
+                            None => { panic!("TODO: panic message"); }
                         };
                     }
                     res = task_encryption_receiver.recv() => {
                         match res {
-                            Ok(encryption) => { self.encryption = encryption; }
-                            Err(_) => {}
+                            Some(encryption) => { self.encryption = encryption; }
+                            None => { panic!("TODO: panic message"); }
                         };
+                    }
+                    _ = task_compression_request_receiver.changed() => {
+                        task_compression_sender.send(self.compression.clone()).expect("TODO: panic message");
+                    }
+                    _ = task_encryption_request_receiver.changed() => {
+                        task_encryption_sender.send(self.encryption.clone()).expect("TODO: panic message");
                     }
                     _ = flush_interval.tick() => {
                         self.send(send_buffer).await.expect("TODO: panic message");
@@ -247,16 +268,24 @@ impl Connection {
             close_sender: shard_close_sender,
             compression_sender: shard_compression_sender,
             encryption_sender: shard_encryption_sender,
+            compression_request_sender: shard_compression_request_sender,
+            compression_receiver: shard_compression_receiver,
+            encryption_request_sender: shard_encryption_request_sender,
+            encryption_receiver: shard_encryption_receiver,
         }
     }
 }
 
 pub struct ConnectionShard {
-    pk_sender: Sender<GamePacket>,
-    pk_receiver: Receiver<Result<GamePacket, ConnectionError>>,
-    close_sender: Sender<()>,
-    compression_sender: Sender<Option<Compression>>,
-    encryption_sender: Sender<Option<Encryption>>,
+    pk_sender: broadcast::Sender<GamePacket>,
+    pk_receiver: broadcast::Receiver<Result<GamePacket, ConnectionError>>,
+    close_sender: mpsc::Sender<()>,
+    compression_sender: mpsc::Sender<Option<Compression>>,
+    encryption_sender: mpsc::Sender<Option<Encryption>>,
+    compression_request_sender: watch::Sender<()>,
+    compression_receiver: watch::Receiver<Option<Compression>>,
+    encryption_request_sender: watch::Sender<()>,
+    encryption_receiver: watch::Receiver<Option<Encryption>>,
 }
 
 impl ConnectionShard {
@@ -274,29 +303,61 @@ impl ConnectionShard {
         }
     }
 
-    pub fn close(&mut self) {
-        match self.close_sender.send(()) {
+    pub async fn close(&mut self) {
+        match self.close_sender.send(()).await {
             Ok(_) => { /* has been closed successfully */ }
             Err(_) => { /* has already been closed */ }
         }
     }
 
-    pub fn set_compression(
+    pub async fn set_compression(
         &mut self,
         compression: Option<Compression>,
     ) -> Result<(), ConnectionError> {
-        match self.compression_sender.send(compression) {
+        match self.compression_sender.send(compression).await {
             Ok(_) => Ok(()),
             Err(_) => Err(ConnectionError::ConnectionClosed),
         }
     }
 
-    pub fn set_encryption(
+    pub async fn get_compression(&mut self) -> Result<Option<Compression>, ConnectionError> {
+        match self.compression_request_sender.send(()) {
+            Ok(_) => {}
+            Err(_) => return Err(ConnectionError::ConnectionClosed),
+        };
+
+        match self.compression_receiver.changed().await {
+            Ok(_) => Ok(self
+                .compression_receiver
+                .borrow_and_update()
+                .clone()
+                .to_owned()),
+            Err(_) => Err(ConnectionError::ConnectionClosed),
+        }
+    }
+
+    pub async fn set_encryption(
         &mut self,
         encryption: Option<Encryption>,
     ) -> Result<(), ConnectionError> {
-        match self.encryption_sender.send(encryption) {
+        match self.encryption_sender.send(encryption).await {
             Ok(_) => Ok(()),
+            Err(_) => Err(ConnectionError::ConnectionClosed),
+        }
+    }
+
+    pub async fn get_encryption(&mut self) -> Result<Option<Encryption>, ConnectionError> {
+        match self.encryption_request_sender.send(()) {
+            Ok(_) => {}
+            Err(_) => return Err(ConnectionError::ConnectionClosed),
+        };
+
+        match self.encryption_receiver.changed().await {
+            Ok(_) => Ok(self
+                .encryption_receiver
+                .borrow_and_update()
+                .clone()
+                .to_owned()),
             Err(_) => Err(ConnectionError::ConnectionClosed),
         }
     }
@@ -310,6 +371,10 @@ impl Clone for ConnectionShard {
             close_sender: self.close_sender.clone(),
             compression_sender: self.compression_sender.clone(),
             encryption_sender: self.encryption_sender.clone(),
+            compression_request_sender: self.compression_request_sender.clone(),
+            compression_receiver: self.compression_receiver.clone(),
+            encryption_request_sender: self.compression_request_sender.clone(),
+            encryption_receiver: self.encryption_receiver.clone(),
         }
     }
 }
