@@ -1,11 +1,15 @@
 use bedrock_core::LE;
+
 use crate::connection::ConnectionShard;
 use crate::error::LoginError;
 use crate::gamepacket::GamePacket;
 use crate::login::provider::{LoginProviderServer, LoginProviderStatus};
 use crate::packets::network_settings::NetworkSettingsPacket;
 
-pub async fn network_settings(conn: &mut ConnectionShard, provider: &impl LoginProviderServer) -> Result<(), LoginError> {
+pub async fn network_settings(
+    conn: &mut ConnectionShard,
+    provider: &impl LoginProviderServer,
+) -> Result<(), LoginError> {
     //////////////////////////////////////
     // Network Settings Request Packet
     //////////////////////////////////////

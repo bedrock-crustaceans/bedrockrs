@@ -376,7 +376,7 @@ impl ConnectionShard {
     pub async fn close(mut self) -> Result<(), ConnectionError> {
         match self.flush().await {
             Ok(_) => {}
-            Err(e) => { return Err(e) }
+            Err(e) => return Err(e),
         }
 
         match self.close_sender.send(()) {

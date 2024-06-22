@@ -1,13 +1,13 @@
 use crate::compression::Compression;
-use crate::login::provider::{LoginProviderServer, LoginProviderStatus};
 use crate::login::provider::packs::LoginProviderPacks;
+use crate::login::provider::{LoginProviderServer, LoginProviderStatus};
 use crate::packets::login::LoginPacket;
 use crate::packets::network_settings::NetworkSettingsPacket;
 use crate::packets::network_settings_request::NetworkSettingsRequestPacket;
 use crate::packets::play_status::PlayStatusPacket;
 
 pub struct DefaultLoginProvider {
-    packs: LoginProviderPacks
+    packs: LoginProviderPacks,
 }
 
 impl DefaultLoginProvider {
@@ -15,8 +15,8 @@ impl DefaultLoginProvider {
         Self {
             packs: LoginProviderPacks::CDN {
                 behavior_packs: vec![],
-                resource_packs: vec![]
-            }
+                resource_packs: vec![],
+            },
         }
     }
 }

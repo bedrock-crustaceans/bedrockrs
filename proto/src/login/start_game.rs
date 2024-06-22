@@ -5,7 +5,10 @@ use crate::login::provider::{LoginProviderServer, LoginProviderStatus};
 use crate::packets::play_status::PlayStatusPacket;
 use crate::types::play_status::PlayStatusType;
 
-pub async fn play_status_login(conn: &mut ConnectionShard, provider: &impl LoginProviderServer) -> Result<(), LoginError> {
+pub async fn play_status_login(
+    conn: &mut ConnectionShard,
+    provider: &impl LoginProviderServer,
+) -> Result<(), LoginError> {
     //////////////////////////////////////
     // Play Status Packet (Login)
     //////////////////////////////////////

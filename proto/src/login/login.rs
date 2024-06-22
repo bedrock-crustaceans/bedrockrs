@@ -3,7 +3,10 @@ use crate::error::LoginError;
 use crate::gamepacket::GamePacket;
 use crate::login::provider::{LoginProviderServer, LoginProviderStatus};
 
-pub async fn login(conn: &mut ConnectionShard, provider: &impl LoginProviderServer) -> Result<(), LoginError> {
+pub async fn login(
+    conn: &mut ConnectionShard,
+    provider: &impl LoginProviderServer,
+) -> Result<(), LoginError> {
     //////////////////////////////////////
     // Login Packet
     //////////////////////////////////////
