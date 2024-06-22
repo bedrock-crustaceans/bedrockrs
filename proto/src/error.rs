@@ -57,9 +57,9 @@ pub enum CompressionError {
 pub enum LoginError {
     #[error("Connection Error: {0}")]
     ConnError(#[from] ConnectionError),
-    #[error("Login aborted, reason: {0}")]
+    #[error("Login aborted, reason: {reason}")]
     Abort { reason: String },
-    #[error("Wrong protocol version (client: {0}, server: {1})")]
+    #[error("Wrong protocol version (client: {client}, server: {server:?})")]
     WrongProtocolVersion { client: i32, server: Vec<i32> },
     #[error("Format Error: {0}")]
     FormatError(String),
