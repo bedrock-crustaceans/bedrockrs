@@ -6,6 +6,8 @@ use crate::gamepacket::GamePacket;
 use crate::login::provider::LoginProviderStatus;
 use crate::login::provider::{LoginProviderClient, LoginProviderServer};
 use crate::packets::network_settings::NetworkSettingsPacket;
+use crate::packets::play_status::PlayStatusPacket;
+use crate::types::play_status::PlayStatusType;
 
 macro_rules! handle_packet {
     ($provider:ident, $handler:ident, $pk:ident) => {
@@ -68,10 +70,10 @@ pub async fn login_to_server(
         Err(e) => return Err(LoginError::ConnError(e)),
     }
 
-    // match conn.set_compression(Some(compression)) {
-    //     Ok(_) => {}
-    //     Err(e) => { return Err(LoginError::ConnError(e)) }
-    // };
+    match conn.set_compression(Some(compression)).await {
+        Ok(_) => {}
+        Err(e) => { return Err(LoginError::ConnError(e)) }
+    };
 
     //////////////////////////////////////
     // Login Packet
@@ -91,6 +93,24 @@ pub async fn login_to_server(
 
     if provider.auth_enabled() {
         todo!("impl xbox auth with data from login pk")
+    }
+
+    //////////////////////////////////////
+    // Play Status Packet
+    //////////////////////////////////////
+
+    let mut play_status = PlayStatusPacket {
+        status: PlayStatusType::LoginSuccess,
+    };
+
+    handle_packet!(provider, on_play_status_pk, play_status);
+
+    match conn
+        .send(GamePacket::PlayStatus(play_status))
+        .await
+    {
+        Ok(_) => {}
+        Err(e) => return Err(LoginError::ConnError(e)),
     }
 
     Ok(())
