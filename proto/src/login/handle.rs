@@ -1,7 +1,9 @@
+use std::time::Duration;
 use bedrock_core::LE;
+use rak_rs::util::sleep;
 
 use crate::connection::{Connection, ConnectionShard};
-use crate::error::LoginError;
+use crate::error::{ConnectionError, LoginError};
 use crate::gamepacket::GamePacket;
 use crate::login::provider::LoginProviderStatus;
 use crate::login::provider::{LoginProviderClient, LoginProviderServer};
@@ -70,6 +72,11 @@ pub async fn login_to_server(
         Err(e) => return Err(LoginError::ConnError(e)),
     }
 
+    match conn.flush().await {
+        Ok(_) => {}
+        Err(e) => { return Err(LoginError::ConnError(e)) }
+    }
+
     match conn.set_compression(Some(compression)).await {
         Ok(_) => {}
         Err(e) => { return Err(LoginError::ConnError(e)) }
@@ -111,6 +118,11 @@ pub async fn login_to_server(
     {
         Ok(_) => {}
         Err(e) => return Err(LoginError::ConnError(e)),
+    }
+
+    match conn.flush().await {
+        Ok(_) => {}
+        Err(e) => { return Err(LoginError::ConnError(e)) }
     }
 
     Ok(())
