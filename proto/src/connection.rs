@@ -233,9 +233,7 @@ impl Connection {
                             break 'select_loop
                         }
 
-                        println!("CHANGE");
                         self.compression = task_compression_receiver.borrow_and_update().to_owned();
-                        println!("CHANGED");
                     }
                     res = task_encryption_receiver.changed() => {
                         if let Err(_) = res {
@@ -290,11 +288,9 @@ impl Connection {
                         }
 
                         if !send_buffer.is_empty() {
-                            println!("SENDING");
                             if let Err(_) = self.send(send_buffer).await {
                                 break 'select_loop
                             }
-                            println!("SEND");
 
                             if let Err(_) = task_flush_complete_sender.send(()) {
                                 break 'select_loop
@@ -304,7 +300,6 @@ impl Connection {
                         }
                     }
                     _ = flush_interval.tick() => {
-                        println!("TICK");
                         if !send_buffer.is_empty() {
                             if let Err(_) = self.send(send_buffer).await {
                                 break 'select_loop
