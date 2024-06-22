@@ -99,7 +99,7 @@ impl WorldDB {
             create_key(x, z, dimension, RecordType::SubChunkPrefix { y }).as_slice(),
         )?;
         Ok(match bytes {
-            Some(x) => Some(SubChunk::load(&(x.get().to_vec()))), // TODO: to_vec copies, free manually and return a vec from leveldb
+            Some(x) => Some(SubChunk::load(&(x.get()))),
             None => None,
         })
     }
