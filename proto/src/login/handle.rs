@@ -1,52 +1,15 @@
+use std::future::Future;
 use bedrock_core::LE;
 
-use crate::connection::Connection;
-use crate::error::LoginError;
+use crate::connection::{Connection, ConnectionShard};
+use crate::error::{ConnectionError, LoginError};
 use crate::gamepacket::GamePacket;
 use crate::login::provider::LoginProviderStatus;
 use crate::login::provider::{LoginProviderClient, LoginProviderServer};
 use crate::packets::network_settings::NetworkSettingsPacket;
 
-macro_rules! recv_single_packet {
-    ($conn:ident, $pk:ident, $pk_name:expr, $provider:ident, $handler:ident) => {{
-        // Receive a packet from the connection
-        let packet = match $conn.recv().await {
-            // Extract the first packet from the vector
-            Ok(mut vec) => match vec.into_iter().next() {
-                None => {
-                    return Err(LoginError::FormatError(format!(
-                        "Recieved empty gamepacket vec, at {}",
-                        $pk_name
-                    )))
-                }
-                Some(v) => v,
-            },
-            Err(e) => return Err(LoginError::ConnError(e)),
-        };
-
-        // Match the received packet to the expected packet type
-        match packet {
-            GamePacket::$pk(mut packet) => {
-                // Handle the packet using the provided handler
-                match $provider.$handler(&mut packet) {
-                    LoginProviderStatus::ContinueLogin => packet,
-                    LoginProviderStatus::AbortLogin { reason } => {
-                        return Err(LoginError::Abort { reason });
-                    }
-                }
-            }
-            other => {
-                return Err(LoginError::FormatError(format!(
-                    "Expected {}, got {:?}",
-                    $pk_name, other
-                )))
-            }
-        }
-    }};
-}
-
-macro_rules! send_single_packet {
-    ($conn:ident, $pk:ident, $pk_type:ident, $pk_name:expr, $provider:ident, $handler:ident) => {{
+macro_rules! handle_packet {
+    ($provider:ident, $handler:ident, $pk:ident) => {
         // Handle the packet using the provided handler
         match $provider.$handler(&mut $pk) {
             LoginProviderStatus::ContinueLogin => {}
@@ -54,26 +17,28 @@ macro_rules! send_single_packet {
                 return Err(LoginError::Abort { reason });
             }
         };
-
-        // Send the packet via the connection
-        match $conn.send(vec![GamePacket::$pk_type($pk)]).await {
-            Ok(_) => {}
-            Err(e) => return Err(LoginError::ConnError(e)),
-        }
-    }};
+    };
 }
 
 pub async fn login_to_server(
-    conn: &mut Connection,
+    conn: &mut ConnectionShard,
     provider: impl LoginProviderServer,
 ) -> Result<(), LoginError> {
-    let _network_settings_request = recv_single_packet!(
-        conn,
-        RequestNetworkSettings,
-        "RequestNetworkSettings",
-        provider,
-        on_network_settings_request_pk
-    );
+    //////////////////////////////////////
+    // Network Settings Request Packet
+    //////////////////////////////////////
+
+    let mut network_settings_request = match conn.recv().await {
+        Ok(GamePacket::RequestNetworkSettings(pk)) => { pk }
+        Ok(other) => { return Err(LoginError::FormatError(format!("Expected RequestNetworkSettings packet, got: {other:?}"))) }
+        Err(e) => { return Err(LoginError::ConnError(e)) }
+    };
+
+    handle_packet!(provider, on_network_settings_request_pk, network_settings_request);
+
+    //////////////////////////////////////
+    // Network Settings Packet
+    //////////////////////////////////////
 
     let compression = provider.compression();
 
@@ -86,18 +51,29 @@ pub async fn login_to_server(
         client_throttle_scalar: LE::new(0.0),
     };
 
-    send_single_packet!(
-        conn,
-        network_settings,
-        NetworkSettings,
-        "NetworkSettings",
-        provider,
-        on_network_settings_pk
-    );
+    handle_packet!(provider, on_network_settings_pk, network_settings);
 
-    conn.compression = Some(compression);
+    match conn.send(GamePacket::NetworkSettings(network_settings)).await {
+        Ok(_) => {}
+        Err(e) => { return Err(LoginError::ConnError(e)) }
+    }
 
-    let _login = recv_single_packet!(conn, Login, "Login", provider, on_login_pk);
+    // match conn.set_compression(Some(compression)) {
+    //     Ok(_) => {}
+    //     Err(e) => { return Err(LoginError::ConnError(e)) }
+    // };
+
+    //////////////////////////////////////
+    // Login Packet
+    //////////////////////////////////////
+
+    let mut login = match conn.recv().await {
+        Ok(GamePacket::Login(pk)) => { pk }
+        Ok(other) => { return Err(LoginError::FormatError(format!("Expected Login packet, got: {other:?}"))) }
+        Err(e) => { return Err(LoginError::ConnError(e)) }
+    };
+
+    handle_packet!(provider, on_login_pk, login);
 
     if provider.auth_enabled() {
         todo!("impl xbox auth with data from login pk")

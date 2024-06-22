@@ -7,6 +7,7 @@ use bedrock_core::stream::write::ByteStreamWrite;
 
 use crate::error::CompressionError;
 
+#[derive(Clone)]
 pub enum Compression {
     Zlib {
         threshold: u16,

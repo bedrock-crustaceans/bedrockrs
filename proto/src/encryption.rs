@@ -1,3 +1,4 @@
+#[derive(Clone)]
 pub struct Encryption {
     send_counter: u64,
     buf: [u8; 8],
