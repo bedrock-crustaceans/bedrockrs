@@ -65,25 +65,3 @@ pub fn color(input: TokenStream) -> TokenStream {
         #text
     })
 }
-
-#[proc_macro]
-pub fn colorf(input: TokenStream) -> TokenStream {
-    let input = parse_macro_input!(input as ExprTuple);
-
-    // let dom = match html_parser::Dom::parse(input.value().as_str()) {
-    //     Ok(v) => v,
-    //     Err(e) => {
-    //         panic!("Error while parsing html: {}", e)
-    //     }
-    // };
-
-    let mut text = String::new();
-
-    // for child in dom.children {
-    //     text += parse_node(child, vec![]).as_str();
-    // }
-
-    TokenStream::from(quote! {
-        #text
-    })
-}
