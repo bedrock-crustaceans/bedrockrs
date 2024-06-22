@@ -10,6 +10,7 @@ bedrock_core = { path = "../bedrock_core" }
 proto_core = { path = "../proto_core" }
 proto_derive = { path = "../proto_derive" }
 nbt = { path = "../nbt" }
+packs = { path = "../packs" }
 
 thiserror = "1.0"
 dyn-clone = "1.0"

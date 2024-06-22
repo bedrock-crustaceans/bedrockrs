@@ -1,4 +1,5 @@
 use crate::compression::Compression;
+use crate::login::provider::packs::LoginProviderPacks;
 use crate::login::provider::status::LoginProviderStatus;
 use crate::packets::login::LoginPacket;
 use crate::packets::network_settings::NetworkSettingsPacket;
@@ -9,6 +10,8 @@ pub trait LoginProviderServer {
     fn compression(&self) -> Compression;
     fn encryption_enabled(&self) -> bool;
     fn auth_enabled(&self) -> bool;
+
+    fn packs(&self) -> &LoginProviderPacks;
 
     fn on_network_settings_request_pk(
         &self,
