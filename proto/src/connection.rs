@@ -373,11 +373,18 @@ impl ConnectionShard {
         }
     }
 
-    pub fn close(self) {
+    pub async fn close(mut self) -> Result<(), ConnectionError> {
+        match self.flush().await {
+            Ok(_) => {}
+            Err(e) => { return Err(e) }
+        }
+
         match self.close_sender.send(()) {
             Ok(_) => { /* has been closed successfully */ }
             Err(_) => { /* has already been closed */ }
-        }
+        };
+
+        Ok(())
     }
 
     pub async fn set_compression(
