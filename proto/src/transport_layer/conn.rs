@@ -15,7 +15,7 @@ pub enum TransportLayerConnection {
     // TODO RaknetTCP(...),
     NetherNet(/* TODO */),
     // TODO Quic(s2n_quic::connection::Connection),
-    // TODO Tcp(net::TcpStream),
+    Tcp(net::TcpStream),
     // TODO Udp(net::UdpSocket)
 }
 
