@@ -1,10 +1,14 @@
 use crate::compression::Compression;
 use crate::login::provider::packs::LoginProviderPacks;
 use crate::login::provider::status::LoginProviderStatus;
+use crate::packets::client_cache_status::ClientCacheStatusPacket;
 use crate::packets::login::LoginPacket;
 use crate::packets::network_settings::NetworkSettingsPacket;
 use crate::packets::network_settings_request::NetworkSettingsRequestPacket;
 use crate::packets::play_status::PlayStatusPacket;
+use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
+use crate::packets::resource_packs_response::ResourcePacksResponsePacket;
+use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
 
 pub trait LoginProviderServer {
     fn compression(&self) -> Compression;
@@ -14,20 +18,30 @@ pub trait LoginProviderServer {
     fn packs(&self) -> &LoginProviderPacks;
 
     fn on_network_settings_request_pk(
-        &self,
+        &mut self,
         pk: &mut NetworkSettingsRequestPacket,
     ) -> LoginProviderStatus {
         LoginProviderStatus::ContinueLogin
     }
-
-    fn on_network_settings_pk(&self, pk: &mut NetworkSettingsPacket) -> LoginProviderStatus {
+    fn on_network_settings_pk(&mut self, pk: &mut NetworkSettingsPacket) -> LoginProviderStatus {
         LoginProviderStatus::ContinueLogin
     }
-
-    fn on_login_pk(&self, pk: &mut LoginPacket) -> LoginProviderStatus {
+    fn on_login_pk(&mut self, pk: &mut LoginPacket) -> LoginProviderStatus {
         LoginProviderStatus::ContinueLogin
     }
-    fn on_play_status_pk(&self, pk: &mut PlayStatusPacket) -> LoginProviderStatus {
+    fn on_play_status_pk(&mut self, pk: &mut PlayStatusPacket) -> LoginProviderStatus {
+        LoginProviderStatus::ContinueLogin
+    }
+    fn on_resource_packs_info_pk(&mut self, pk: &mut ResourcePacksInfoPacket) -> LoginProviderStatus {
+        LoginProviderStatus::ContinueLogin
+    }
+    fn on_resource_packs_stack_pk(&mut self, pk: &mut ResourcePacksStackPacket) -> LoginProviderStatus {
+        LoginProviderStatus::ContinueLogin
+    }
+    fn on_resource_packs_response_pk(&mut self, pk: &mut ResourcePacksResponsePacket) -> LoginProviderStatus {
+        LoginProviderStatus::ContinueLogin
+    }
+    fn on_client_cache_status_pk(&self, pk: &mut ClientCacheStatusPacket) -> LoginProviderStatus {
         LoginProviderStatus::ContinueLogin
     }
 }

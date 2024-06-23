@@ -5,7 +5,7 @@ use crate::login::provider::{LoginProviderServer, LoginProviderStatus};
 
 pub async fn login(
     conn: &mut ConnectionShard,
-    provider: &impl LoginProviderServer,
+    provider: &mut impl LoginProviderServer,
 ) -> Result<(), LoginError> {
     //////////////////////////////////////
     // Login Packet
@@ -18,7 +18,7 @@ pub async fn login(
                 "Expected Login packet, got: {other:?}"
             )))
         }
-        Err(e) => return Err(LoginError::ConnError(e)),
+        Err(e) => return Err(LoginError::ConnectionError(e)),
     };
 
     match provider.on_login_pk(&mut login) {

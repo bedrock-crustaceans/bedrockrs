@@ -8,7 +8,7 @@ use crate::packets::network_settings::NetworkSettingsPacket;
 
 pub async fn network_settings(
     conn: &mut ConnectionShard,
-    provider: &impl LoginProviderServer,
+    provider: &mut impl LoginProviderServer,
 ) -> Result<(), LoginError> {
     //////////////////////////////////////
     // Network Settings Request Packet
@@ -21,7 +21,7 @@ pub async fn network_settings(
                 "Expected RequestNetworkSettings packet, got: {other:?}"
             )))
         }
-        Err(e) => return Err(LoginError::ConnError(e)),
+        Err(e) => return Err(LoginError::ConnectionError(e)),
     };
 
     match provider.on_network_settings_request_pk(&mut network_settings_request) {
@@ -58,17 +58,17 @@ pub async fn network_settings(
         .await
     {
         Ok(_) => {}
-        Err(e) => return Err(LoginError::ConnError(e)),
+        Err(e) => return Err(LoginError::ConnectionError(e)),
     }
 
     match conn.flush().await {
         Ok(_) => {}
-        Err(e) => return Err(LoginError::ConnError(e)),
+        Err(e) => return Err(LoginError::ConnectionError(e)),
     }
 
     match conn.set_compression(Some(compression)).await {
         Ok(_) => {}
-        Err(e) => return Err(LoginError::ConnError(e)),
+        Err(e) => return Err(LoginError::ConnectionError(e)),
     };
 
     Ok(())

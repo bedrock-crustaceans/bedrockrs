@@ -7,7 +7,7 @@ use crate::types::play_status::PlayStatusType;
 
 pub async fn play_status_login(
     conn: &mut ConnectionShard,
-    provider: &impl LoginProviderServer,
+    provider: &mut impl LoginProviderServer,
 ) -> Result<(), LoginError> {
     //////////////////////////////////////
     // Play Status Packet (Login)
@@ -26,12 +26,12 @@ pub async fn play_status_login(
 
     match conn.send(GamePacket::PlayStatus(play_status)).await {
         Ok(_) => {}
-        Err(e) => return Err(LoginError::ConnError(e)),
+        Err(e) => return Err(LoginError::ConnectionError(e)),
     }
 
     match conn.flush().await {
         Ok(_) => {}
-        Err(e) => return Err(LoginError::ConnError(e)),
+        Err(e) => return Err(LoginError::ConnectionError(e)),
     };
 
     Ok(())

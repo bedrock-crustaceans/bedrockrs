@@ -56,7 +56,7 @@ pub enum CompressionError {
 #[derive(Error, Debug)]
 pub enum LoginError {
     #[error("Connection Error: {0}")]
-    ConnError(#[from] ConnectionError),
+    ConnectionError(#[from] ConnectionError),
     #[error("Login aborted, reason: {reason}")]
     Abort { reason: String },
     #[error("Wrong protocol version (client: {client}, server: {server:?})")]

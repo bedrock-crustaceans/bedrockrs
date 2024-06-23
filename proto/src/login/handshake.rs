@@ -4,7 +4,7 @@ use crate::login::provider::LoginProviderServer;
 
 pub async fn handshake(
     conn: &mut ConnectionShard,
-    provider: &impl LoginProviderServer,
+    provider: &mut impl LoginProviderServer,
 ) -> Result<(), LoginError> {
     if !provider.encryption_enabled() {
         return Ok(())
