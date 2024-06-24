@@ -15,8 +15,6 @@ packs = { path = "../packs" }
 thiserror = "1.0"
 dyn-clone = "1.0"
 
-s2n-quic = "1.37"
-
 jsonwebtoken = "9.3"
 ring = { version = "0.17" }
 rand = "0.8"
