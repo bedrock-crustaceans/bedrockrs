@@ -1,8 +1,7 @@
 use de::proto_build_de_struct;
-use proc_macro2::TokenStream;
 use quote::quote;
 use ser::proto_build_ser_struct;
-use syn::{parse_macro_input, DeriveInput, Data, Expr, Lit};
+use syn::{parse_macro_input, Data, DeriveInput};
 
 mod de;
 mod ser;
@@ -39,7 +38,6 @@ pub fn proto_codec(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
         Data::Enum(_) => {
             // Unions are not supported
             panic!("ProtoCodec macro only supports named/unnamed structs, got enum: {name:?}.")
-
         }
         Data::Union(_) => {
             // Unions are not supported

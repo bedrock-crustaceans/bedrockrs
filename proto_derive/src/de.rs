@@ -1,6 +1,6 @@
-use proc_macro2::{Ident, TokenStream};
+use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
-use syn::{Attribute, Data, DataEnum, DataStruct, Expr, Fields, Lit, LitInt, Index};
+use syn::{DataStruct, Fields, Index};
 
 pub fn proto_build_de_struct(struct_data: &DataStruct) -> TokenStream {
     let fields = &struct_data.fields;
@@ -40,7 +40,9 @@ pub fn proto_build_de_struct(struct_data: &DataStruct) -> TokenStream {
         }
         Fields::Unit => {
             // Unit structs are empty and not supported
-            panic!("ProtoCodec macro only supports named/unnamed structs and enums, got unit struct.")
+            panic!(
+                "ProtoCodec macro only supports named/unnamed structs and enums, got unit struct."
+            )
         }
     };
 

@@ -7,7 +7,7 @@ pub async fn handshake(
     provider: &mut impl LoginProviderServer,
 ) -> Result<(), LoginError> {
     if !provider.encryption_enabled() {
-        return Ok(())
+        return Ok(());
     };
 
     todo!("impl the handshake")

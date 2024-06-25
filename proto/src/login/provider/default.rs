@@ -64,15 +64,24 @@ impl LoginProviderServer for DefaultLoginProvider {
         println!("{:#?}", pk);
         LoginProviderStatus::ContinueLogin
     }
-    fn on_resource_packs_info_pk(&mut self, pk: &mut ResourcePacksInfoPacket) -> LoginProviderStatus {
+    fn on_resource_packs_info_pk(
+        &mut self,
+        pk: &mut ResourcePacksInfoPacket,
+    ) -> LoginProviderStatus {
         println!("{:#?}", pk);
         LoginProviderStatus::ContinueLogin
     }
-    fn on_resource_packs_stack_pk(&mut self, pk: &mut ResourcePacksStackPacket) -> LoginProviderStatus {
+    fn on_resource_packs_stack_pk(
+        &mut self,
+        pk: &mut ResourcePacksStackPacket,
+    ) -> LoginProviderStatus {
         println!("{:#?}", pk);
         LoginProviderStatus::ContinueLogin
     }
-    fn on_resource_packs_response_pk(&mut self, pk: &mut ResourcePacksResponsePacket) -> LoginProviderStatus {
+    fn on_resource_packs_response_pk(
+        &mut self,
+        pk: &mut ResourcePacksResponsePacket,
+    ) -> LoginProviderStatus {
         println!("{:#?}", pk);
         LoginProviderStatus::ContinueLogin
     }

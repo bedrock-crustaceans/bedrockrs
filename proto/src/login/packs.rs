@@ -1,13 +1,11 @@
 use crate::connection::ConnectionShard;
-use crate::error::{ConnectionError, LoginError};
+use crate::error::LoginError;
 use crate::gamepacket::GamePacket;
 use crate::login::provider::{LoginProviderPacks, LoginProviderServer, LoginProviderStatus};
 use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
 use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
 use crate::types::base_game_version::BaseGameVersion;
 use crate::types::experiments::Experiments;
-use crate::types::resource_packs_response_status::ResourcePacksResponseStatus;
-use crate::types::resource_packs_stack_pack::ResourcePacksStackPack;
 
 pub async fn packs(
     conn: &mut ConnectionShard,
@@ -17,7 +15,7 @@ pub async fn packs(
         LoginProviderPacks::CDN {
             behavior_packs,
             resource_packs,
-            cdn_urls
+            cdn_urls,
         } => {
             //////////////////////////////////////
             // Resource Packs Info Packet
@@ -41,8 +39,9 @@ pub async fn packs(
                 }
             };
 
-            match conn.send(GamePacket::ResourcePacksInfo(resource_packs_info))
-            .await
+            match conn
+                .send(GamePacket::ResourcePacksInfo(resource_packs_info))
+                .await
             {
                 Ok(_) => {}
                 Err(e) => return Err(LoginError::ConnectionError(e)),
@@ -68,7 +67,7 @@ pub async fn packs(
                     };
 
                     if let Err(e) = conn.set_cache_supported(client_cache_status.cache_supported).await {
-                        return Err(LoginError::ConnectionError(e))
+                        return Err(LoginError::ConnectionError(e));
                     }
 
                     match conn.recv().await {
@@ -116,7 +115,7 @@ pub async fn packs(
                 base_game_version: BaseGameVersion(String::from("1.0")),
                 experiments: Experiments {
                     experiments: vec![],
-                    ever_toggled: false
+                    ever_toggled: false,
                 },
                 include_editor_packs: false,
             };
@@ -128,7 +127,8 @@ pub async fn packs(
                 }
             };
 
-            match conn.send(GamePacket::ResourcePackStack(resource_packs_stack))
+            match conn
+                .send(GamePacket::ResourcePackStack(resource_packs_stack))
                 .await
             {
                 Ok(_) => {}
@@ -146,7 +146,8 @@ pub async fn packs(
 
             match conn.recv().await {
                 Ok(GamePacket::ResourcePackClientResponse(mut resource_pack_client_response)) => {
-                    match provider.on_resource_packs_response_pk(&mut resource_pack_client_response) {
+                    match provider.on_resource_packs_response_pk(&mut resource_pack_client_response)
+                    {
                         LoginProviderStatus::ContinueLogin => {}
                         LoginProviderStatus::AbortLogin { reason } => {
                             return Err(LoginError::Abort { reason });
@@ -158,13 +159,13 @@ pub async fn packs(
                         "Expected ResourcePackClientResponse packet, got: {other:?}"
                     )))
                 }
-                Err(e) => { return Err(LoginError::ConnectionError(e)) }
+                Err(e) => return Err(LoginError::ConnectionError(e)),
             }
         }
         LoginProviderPacks::DirectNetworkTransfer { .. } => {
             todo!("impl LoginProviderPacks::DirectNetworkTransfer in login process")
         }
     };
-    
+
     Ok(())
 }

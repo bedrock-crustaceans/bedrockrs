@@ -32,13 +32,22 @@ pub trait LoginProviderServer {
     fn on_play_status_pk(&mut self, pk: &mut PlayStatusPacket) -> LoginProviderStatus {
         LoginProviderStatus::ContinueLogin
     }
-    fn on_resource_packs_info_pk(&mut self, pk: &mut ResourcePacksInfoPacket) -> LoginProviderStatus {
+    fn on_resource_packs_info_pk(
+        &mut self,
+        pk: &mut ResourcePacksInfoPacket,
+    ) -> LoginProviderStatus {
         LoginProviderStatus::ContinueLogin
     }
-    fn on_resource_packs_stack_pk(&mut self, pk: &mut ResourcePacksStackPacket) -> LoginProviderStatus {
+    fn on_resource_packs_stack_pk(
+        &mut self,
+        pk: &mut ResourcePacksStackPacket,
+    ) -> LoginProviderStatus {
         LoginProviderStatus::ContinueLogin
     }
-    fn on_resource_packs_response_pk(&mut self, pk: &mut ResourcePacksResponsePacket) -> LoginProviderStatus {
+    fn on_resource_packs_response_pk(
+        &mut self,
+        pk: &mut ResourcePacksResponsePacket,
+    ) -> LoginProviderStatus {
         LoginProviderStatus::ContinueLogin
     }
     fn on_client_cache_status_pk(&self, pk: &mut ClientCacheStatusPacket) -> LoginProviderStatus {

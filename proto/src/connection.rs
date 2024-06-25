@@ -13,7 +13,6 @@ use crate::compression::Compression;
 use crate::encryption::Encryption;
 use crate::error::ConnectionError;
 use crate::gamepacket::GamePacket;
-use crate::packets::client_cache_status::ClientCacheStatusPacket;
 use crate::transport_layer::TransportLayerConnection;
 
 pub struct Connection {
@@ -202,10 +201,8 @@ impl Connection {
         let (task_pk_sender, shard_pk_receiver) =
             broadcast::channel::<Result<GamePacket, ConnectionError>>(packet_buffer_size);
 
-        let (shard_flush_request_sender, mut task_flush_request_receiver) =
-            watch::channel(());
-        let (task_flush_complete_sender, mut shard_flush_complete_receiver) =
-            watch::channel(());
+        let (shard_flush_request_sender, mut task_flush_request_receiver) = watch::channel(());
+        let (task_flush_complete_sender, mut shard_flush_complete_receiver) = watch::channel(());
 
         let (shard_close_sender, mut task_close_receiver) = watch::channel(());
 
