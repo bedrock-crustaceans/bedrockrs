@@ -1,26 +1,47 @@
-use proc_macro2::TokenStream;
-use quote::quote;
-use syn::Data;
+use proc_macro2::{Ident, TokenStream};
+use quote::{quote, ToTokens};
+use syn::{Attribute, Data, DataEnum, DataStruct, Expr, Fields, Lit, LitInt, Index};
 
-pub fn proto_build_de(data: &Data) -> TokenStream {
-    let fields = match *data {
-        Data::Struct(ref data) => &data.fields,
-        _ => panic!("Serialize macro only supports structs"),
-    };
+pub fn proto_build_de_struct(struct_data: &DataStruct) -> TokenStream {
+    let fields = &struct_data.fields;
 
-    let field_de_calls = fields.iter().map(|field| {
-        let field_name = field.ident.as_ref().expect("Field has no name");
+    let expand = match fields {
+        Fields::Named(ref fields) => {
+            let calls = fields.named.iter().map(|f| {
+                let field_name = f.ident.clone();
 
-        quote! {
-            #field_name: match proto_core::ProtoCodec::proto_deserialize(stream) {
-                Ok(v) => { v },
-                Err(e) => { return Err(e) }
-            },
+                quote! {
+                    #field_name: match proto_core::ProtoCodec::proto_deserialize(stream) {
+                        Ok(v) => { v },
+                        Err(e) => { return Err(e) }
+                    },
+                }
+            });
+
+            quote! {
+                #(#calls)*
+            }
         }
-    });
+        Fields::Unnamed(ref fields) => {
+            let calls = fields.unnamed.iter().enumerate().map(|(i, f)| {
+                let index = Index::from(i);
 
-    let expand = quote! {
-        #(#field_de_calls)*
+                quote! {
+                    #index: match proto_core::ProtoCodec::proto_deserialize(stream) {
+                        Ok(v) => { v },
+                        Err(e) => { return Err(e) }
+                    },
+                }
+            });
+
+            quote! {
+                #(#calls)*
+            }
+        }
+        Fields::Unit => {
+            // Unit structs are empty and not supported
+            panic!("ProtoCodec macro only supports named/unnamed structs and enums, got unit struct.")
+        }
     };
 
     TokenStream::from(expand)
