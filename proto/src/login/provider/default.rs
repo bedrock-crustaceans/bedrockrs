@@ -46,47 +46,39 @@ impl LoginProviderServer for DefaultLoginProvider {
         &mut self,
         pk: &mut NetworkSettingsRequestPacket,
     ) -> LoginProviderStatus {
-        println!("{:#?}", pk);
         LoginProviderStatus::ContinueLogin
     }
 
     fn on_network_settings_pk(&mut self, pk: &mut NetworkSettingsPacket) -> LoginProviderStatus {
-        println!("{:#?}", pk);
         LoginProviderStatus::ContinueLogin
     }
 
     fn on_login_pk(&mut self, pk: &mut LoginPacket) -> LoginProviderStatus {
-        println!("{:#?}", pk);
         LoginProviderStatus::ContinueLogin
     }
 
     fn on_play_status_pk(&mut self, pk: &mut PlayStatusPacket) -> LoginProviderStatus {
-        println!("{:#?}", pk);
         LoginProviderStatus::ContinueLogin
     }
     fn on_resource_packs_info_pk(
         &mut self,
         pk: &mut ResourcePacksInfoPacket,
     ) -> LoginProviderStatus {
-        println!("{:#?}", pk);
         LoginProviderStatus::ContinueLogin
     }
     fn on_resource_packs_stack_pk(
         &mut self,
         pk: &mut ResourcePacksStackPacket,
     ) -> LoginProviderStatus {
-        println!("{:#?}", pk);
         LoginProviderStatus::ContinueLogin
     }
     fn on_resource_packs_response_pk(
         &mut self,
         pk: &mut ResourcePacksResponsePacket,
     ) -> LoginProviderStatus {
-        println!("{:#?}", pk);
         LoginProviderStatus::ContinueLogin
     }
     fn on_client_cache_status_pk(&self, pk: &mut ClientCacheStatusPacket) -> LoginProviderStatus {
-        println!("{:#?}", pk);
         LoginProviderStatus::ContinueLogin
     }
 }
