@@ -13,5 +13,5 @@ bedrock_core = { path = "../bedrock_core" }
 proto_core = { path = "../proto_core" }
 
 proc-macro2 = "1.0"
-syn = "2.0"
+syn = { version = "2.0", features = ["full"] }
 quote = "1.0"

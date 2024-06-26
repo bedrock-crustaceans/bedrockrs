@@ -1,6 +1,7 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{DataStruct, Fields, Index};
+use syn::{DataStruct, Expr, ExprLit, Fields, Index, Meta, parenthesized};
+use syn::meta::ParseNestedMeta;
 
 pub fn proto_build_ser_struct(struct_data: &DataStruct) -> TokenStream {
     let fields = &struct_data.fields;
@@ -10,11 +11,45 @@ pub fn proto_build_ser_struct(struct_data: &DataStruct) -> TokenStream {
             let calls = fields.named.iter().map(|f| {
                 let field_name = f.ident.clone();
 
-                quote! {
-                    match proto_core::ProtoCodec::proto_serialize(&self.#field_name, stream) {
-                        Ok(_) => { },
-                        Err(e) => { return Err(e) }
-                    };
+                let mut quote = None;
+
+                for attr in &f.attrs {
+                    if attr.path().is_ident("len_type") {
+                        let int_type: Expr = attr.parse_args().expect(format!("Given attribute meta for field {field_name:?} could not be parsed").as_str());
+
+                        quote = Some(quote! {
+                            {
+                                match #int_type::new(match Vec::len(&self.#field_name).try_into() {
+                                    Ok(v) => { v },
+                                    Err(e) => { return Err(proto_core::error::ProtoCodecError::FromIntError(e.into())) }
+                                }).write(stream) {
+                                    Ok(_) => { },
+                                    Err(e) => { return Err(proto_core::error::ProtoCodecError::IOError(std::sync::Arc::new(e))) }
+                                };
+
+                                for i in &self.#field_name {
+                                    match proto_core::ProtoCodec::proto_serialize(i, stream) {
+                                        Ok(_) => { },
+                                        Err(e) => { return Err(e) }
+                                    };
+                                }
+                            };
+                        });
+                    }
+                }
+
+                match quote {
+                    None => {
+                        quote! {
+                            match proto_core::ProtoCodec::proto_serialize(&self.#field_name, stream) {
+                                Ok(_) => { },
+                                Err(e) => { return Err(e) }
+                            };
+                        }
+                    }
+                    Some(v) => {
+                        v
+                    }
                 }
             });
 
@@ -25,6 +60,33 @@ pub fn proto_build_ser_struct(struct_data: &DataStruct) -> TokenStream {
         Fields::Unnamed(ref fields) => {
             let calls = fields.unnamed.iter().enumerate().map(|(i, f)| {
                 let index = Index::from(i);
+
+                let mut quote = None;
+
+                for attr in &f.attrs {
+                    if attr.path().is_ident("len_type") {
+                        let int_type: Expr = attr.parse_args().expect(format!("Given attribute meta for field self.{index:?} could not be parsed").as_str());
+
+                        quote = Some(quote! {
+                            {
+                                match #int_type::new(match Vec::len(&self.#index).try_into() {
+                                    Ok(v) => { v },
+                                    Err(e) => { return Err(proto_core::error::ProtoCodecError::FromIntError(e.into())) }
+                                }).write(stream) {
+                                    Ok(_) => { },
+                                    Err(e) => { return Err(proto_core::error::ProtoCodecError::IOError(std::sync::Arc::new(e))) }
+                                };
+
+                                for i in &self.#index {
+                                    match proto_core::ProtoCodec::proto_serialize(i, stream) {
+                                        Ok(_) => { },
+                                        Err(e) => { return Err(e) }
+                                    };
+                                }
+                            };
+                        });
+                    }
+                }
 
                 quote! {
                     match proto_core::ProtoCodec::proto_serialize(&self.#index, stream) {

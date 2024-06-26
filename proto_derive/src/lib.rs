@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use de::proto_build_de_struct;
 use quote::quote;
 use ser::proto_build_ser_struct;
@@ -37,6 +38,7 @@ pub fn proto_codec(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
         }
         Data::Enum(_) => {
             // Unions are not supported
+            Arc::new(1);
             panic!("ProtoCodec macro only supports named/unnamed structs, got enum: {name:?}.")
         }
         Data::Union(_) => {

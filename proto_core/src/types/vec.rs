@@ -26,7 +26,7 @@ impl<T: ProtoCodec> ProtoCodec for Vec<T> {
         };
 
         for item in self {
-            match item.proto_serialize(buf) {
+            match ProtoCodec::proto_serialize(item, buf) {
                 Ok(_) => {}
                 Err(e) => return Err(e),
             };
