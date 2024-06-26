@@ -15,6 +15,7 @@ use crate::packets::handshake_server_to_client::HandshakeServerToClientPacket;
 use crate::packets::login::LoginPacket;
 use crate::packets::network_settings::NetworkSettingsPacket;
 use crate::packets::network_settings_request::NetworkSettingsRequestPacket;
+use crate::packets::packet_violation_warning::PacketViolationWarningPacket;
 use crate::packets::play_status::PlayStatusPacket;
 use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
 use crate::packets::resource_packs_response::ResourcePacksResponsePacket;
@@ -161,7 +162,7 @@ pub enum GamePacket {
     ItemStackRequest(),
     ItemStackResponse(),
     UpdatePlayerGameType(),
-    PacketViolationWarning(),
+    PacketViolationWarning(PacketViolationWarningPacket),
     ItemComponent(),
     FilterTextPacket(),
     UpdateSubChunkBlocksPacket(),
@@ -792,8 +793,8 @@ impl GamePacket {
             GamePacket::UpdatePlayerGameType() => {
                 unimplemented!()
             }
-            GamePacket::PacketViolationWarning() => {
-                unimplemented!()
+            GamePacket::PacketViolationWarning(pk) => {
+                ser_packet!(stream, GamePacket::PacketViolationWarningID, pk)
             }
             GamePacket::ItemComponent() => {
                 unimplemented!()
@@ -1270,7 +1271,7 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::PacketViolationWarningID => {
-                unimplemented!()
+                GamePacket::PacketViolationWarning(de_packet!(stream, PacketViolationWarningPacket))
             }
             GamePacket::ItemComponentID => {
                 unimplemented!()
