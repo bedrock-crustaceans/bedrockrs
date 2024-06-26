@@ -19,10 +19,12 @@ pub fn proto_build_ser_struct(struct_data: &DataStruct) -> TokenStream {
 
                         quote = Some(quote! {
                             {
-                                match #int_type::new(match Vec::len(&self.#field_name).try_into() {
+                                let len = #int_type::new(match Vec::len(&self.#field_name).try_into() {
                                     Ok(v) => { v },
                                     Err(e) => { return Err(proto_core::error::ProtoCodecError::FromIntError(e.into())) }
-                                }).write(stream) {
+                                });
+
+                                match len.write(stream) {
                                     Ok(_) => { },
                                     Err(e) => { return Err(proto_core::error::ProtoCodecError::IOError(std::sync::Arc::new(e))) }
                                 };
@@ -69,10 +71,12 @@ pub fn proto_build_ser_struct(struct_data: &DataStruct) -> TokenStream {
 
                         quote = Some(quote! {
                             {
-                                match #int_type::new(match Vec::len(&self.#index).try_into() {
+                                let len = #int_type::new(match Vec::len(&self.#index).try_into() {
                                     Ok(v) => { v },
                                     Err(e) => { return Err(proto_core::error::ProtoCodecError::FromIntError(e.into())) }
-                                }).write(stream) {
+                                });
+
+                                match len.write(stream) {
                                     Ok(_) => { },
                                     Err(e) => { return Err(proto_core::error::ProtoCodecError::IOError(std::sync::Arc::new(e))) }
                                 };
