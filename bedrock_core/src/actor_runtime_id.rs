@@ -1,3 +1,3 @@
 use crate::VAR;
 
-pub struct ActorUniqueID(VAR<u64>);
+pub struct ActorRuntimeID(VAR<u64>);
