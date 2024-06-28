@@ -12,6 +12,7 @@ pub use vec::vec3::Vec3;
 pub use vec::vec3f::Vec3f;
 pub use actor_unique_id::*;
 pub use actor_runtime_id::*;
+pub use generator_type::*;
 
 pub mod int;
 pub mod vec;
@@ -23,3 +24,4 @@ pub mod dimension;
 pub mod permissions_level;
 pub mod actor_unique_id;
 pub mod actor_runtime_id;
+pub mod generator_type;
