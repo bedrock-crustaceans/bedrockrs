@@ -1,4 +1,4 @@
 #[derive(Debug, Clone)]
-pub enum GeneratorType todo!() {
-
+pub enum GeneratorType {
+    TODO
 }
