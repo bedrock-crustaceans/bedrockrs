@@ -2,7 +2,7 @@ use proto_derive::ProtoCodec;
 
 use crate::types::play_status::PlayStatusType;
 
-#[derive(Debug, Copy, Clone, ProtoCodec)]
+#[derive(ProtoCodec, Debug, Copy, Clone)]
 pub struct PlayStatusPacket {
     pub status: PlayStatusType,
 }

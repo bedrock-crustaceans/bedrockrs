@@ -1,6 +1,6 @@
 use proto_derive::ProtoCodec;
 
-#[derive(Debug, Clone, ProtoCodec)]
+#[derive(ProtoCodec, Debug, Clone)]
 pub struct ResourcePacksStackPack {
     pub id: String,
     pub version: String,

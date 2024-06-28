@@ -1,7 +1,7 @@
 use bedrock_core::LE;
 use proto_derive::ProtoCodec;
 
-#[derive(Debug, Clone, ProtoCodec)]
+#[derive(ProtoCodec, Debug, Clone)]
 pub struct BehaviorPackInfoType {
     id: String,
     version: String,

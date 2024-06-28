@@ -1,6 +1,6 @@
 use proto_derive::ProtoCodec;
 
-#[derive(Debug, Copy, Clone, ProtoCodec)]
+#[derive(ProtoCodec, Debug, Copy, Clone)]
 pub struct ClientCacheStatusPacket {
     pub cache_supported: bool,
 }

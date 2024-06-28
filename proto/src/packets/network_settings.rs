@@ -1,7 +1,7 @@
 use bedrock_core::*;
 use proto_derive::ProtoCodec;
 
-#[derive(Debug, Clone, ProtoCodec)]
+#[derive(ProtoCodec, Debug, Clone)]
 pub struct NetworkSettingsPacket {
     /// Determines the smallest size of raw network payload to compress.
     /// - 0 is "disable compression"
