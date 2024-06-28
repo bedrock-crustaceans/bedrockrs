@@ -25,7 +25,7 @@ impl ProtoCodec for Experiments {
         };
 
         // Write length of downloading packs as an u16le
-        match LE::<u16>::new(len).proto_serialize(stream) {
+        match LE::<u32>::new(len).proto_serialize(stream) {
             Ok(_) => {}
             Err(e) => return Err(e),
         }
