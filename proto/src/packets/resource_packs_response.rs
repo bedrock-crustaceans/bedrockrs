@@ -1,9 +1,7 @@
-use bedrock_core::read::ByteStreamRead;
-use bedrock_core::write::ByteStreamWrite;
-use bedrock_core::{LE, VAR};
-use proto_core::error::ProtoCodecError;
+use bedrock_core::LE;
 use proto_core::ProtoCodec;
 use proto_derive::ProtoCodec;
+
 use crate::types::resource_packs_response_status::ResourcePacksResponseStatus;
 
 #[derive(ProtoCodec, Debug, Clone)]
@@ -11,7 +9,7 @@ pub struct ResourcePacksResponsePacket {
     pub response: ResourcePacksResponseStatus,
     /// The packs that are downloaded/getting downloaded
     /// with their pack name as strings
-    #[len_type(LE::<u16>)]
+    #[len_type(LE::< u16 >)]
     pub downloading_packs: Vec<String>,
 }
 

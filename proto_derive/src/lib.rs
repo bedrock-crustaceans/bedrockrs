@@ -1,4 +1,5 @@
 use std::sync::Arc;
+
 use de::proto_build_de_struct;
 use quote::quote;
 use ser::proto_build_ser_struct;

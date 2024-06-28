@@ -1,7 +1,6 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{DataStruct, Expr, ExprLit, Fields, Index, Meta, parenthesized};
-use syn::meta::ParseNestedMeta;
+use syn::{DataStruct, Expr, Fields, Index};
 
 pub fn proto_build_ser_struct(struct_data: &DataStruct) -> TokenStream {
     let fields = &struct_data.fields;

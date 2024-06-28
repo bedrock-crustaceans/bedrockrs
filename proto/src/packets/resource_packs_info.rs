@@ -1,8 +1,5 @@
-use bedrock_core::VAR;
-use bedrock_core::read::ByteStreamRead;
-use bedrock_core::write::ByteStreamWrite;
 use bedrock_core::LE;
-use proto_core::error::ProtoCodecError;
+use bedrock_core::VAR;
 use proto_core::ProtoCodec;
 use proto_derive::ProtoCodec;
 
@@ -16,11 +13,11 @@ pub struct ResourcePacksInfoPacket {
     pub has_addon_packs: bool,
     pub has_scripts: bool,
     pub force_server_packs_enabled: bool,
-    #[len_type(LE::<u16>)]
+    #[len_type(LE::< u16 >)]
     pub behavior_packs: Vec<BehaviorPackInfoType>,
-    #[len_type(LE::<u16>)]
+    #[len_type(LE::< u16 >)]
     pub resource_packs: Vec<ResourcePackInfoType>,
-    #[len_type(VAR::<u32>)]
+    #[len_type(VAR::< u32 >)]
     pub cdn_urls: Vec<PackURL>,
 }
 
