@@ -12,7 +12,7 @@ pub struct ResourcePack {
 }
 
 impl Pack for ResourcePack {
-    fn load(path: impl AsRef<Path>) -> Result<Self, PackError>
+    fn open(path: impl AsRef<Path>) -> Result<Self, PackError>
     where
         Self: Sized,
     {

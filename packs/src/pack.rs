@@ -5,7 +5,7 @@ use uuid::Uuid;
 use crate::error::PackError;
 
 pub trait Pack {
-    fn load(path: impl AsRef<Path>) -> Result<Self, PackError>
+    fn open(path: impl AsRef<Path>) -> Result<Self, PackError>
     where
         Self: Sized;
 
