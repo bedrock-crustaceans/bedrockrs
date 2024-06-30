@@ -1,8 +1,10 @@
+use std::collections::HashMap;
 use std::path::Path;
 
 use uuid::{Uuid, Version};
 
 use crate::error::PackError;
+use crate::language::Language;
 use crate::pack::Pack;
 
 pub struct BehaviorPack {
@@ -11,6 +13,7 @@ pub struct BehaviorPack {
     description: String,
     uuid: Uuid,
     min_engine_version: Version,
+    languages: HashMap<String, Language>,
 }
 
 impl Pack for BehaviorPack {
