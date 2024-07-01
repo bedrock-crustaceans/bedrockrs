@@ -12,6 +12,7 @@ pub struct ResourcePack {
     name: String,
     description: String,
     uuid: Uuid,
+    version: Version,
     min_engine_version: Version,
     languages: HashMap<String, Language>,
 }
@@ -25,6 +26,9 @@ impl Pack for ResourcePack {
     }
     fn uuid(&self) -> &Uuid {
         &self.uuid
+    }
+    fn version(&self) -> &Version {
+        &self.version
     }
 
     fn import(path: impl AsRef<Path>) -> Result<Self, PackError>
