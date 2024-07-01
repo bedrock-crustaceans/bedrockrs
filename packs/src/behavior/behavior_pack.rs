@@ -17,13 +17,6 @@ pub struct BehaviorPack {
 }
 
 impl Pack for BehaviorPack {
-    fn open(path: impl AsRef<Path>) -> Result<Self, PackError>
-    where
-        Self: Sized,
-    {
-        todo!()
-    }
-
     fn name(&self) -> &str {
         &self.name
     }
@@ -32,5 +25,19 @@ impl Pack for BehaviorPack {
     }
     fn uuid(&self) -> &Uuid {
         &self.uuid
+    }
+
+    fn import(path: impl AsRef<Path>) -> Result<Self, PackError>
+    where
+        Self: Sized
+    {
+        todo!()
+    }
+
+    fn export(path: impl AsRef<Path>) -> Result<Self, PackError>
+    where
+        Self: Sized
+    {
+        todo!()
     }
 }
