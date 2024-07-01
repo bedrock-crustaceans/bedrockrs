@@ -4,7 +4,7 @@ use image::{ImageBuffer, RgbaImage};
 use uuid::{Uuid, Version};
 
 use crate::error::PackError;
-use crate::language::Language;
+use crate::language::{LanguageData, Languages};
 use crate::pack::Pack;
 
 pub struct BehaviorPack {
@@ -15,7 +15,7 @@ pub struct BehaviorPack {
     uuid: Uuid,
     version: Version,
     min_engine_version: Version,
-    languages: HashMap<String, Language>,
+    languages: Languages,
 }
 
 impl Pack for BehaviorPack {
