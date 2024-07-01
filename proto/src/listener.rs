@@ -84,6 +84,6 @@ impl Listener {
             Err(e) => return Err(ListenerError::TransportListenerError(e)),
         };
 
-        Ok(Connection::new(rak_conn))
+        Ok(Connection::from_transport_conn(rak_conn))
     }
 }

@@ -29,7 +29,7 @@ pub struct Connection {
 }
 
 impl Connection {
-    pub fn new(conn: TransportLayerConnection) -> Self {
+    pub fn from_transport_conn(conn: TransportLayerConnection) -> Self {
         Self {
             connection: conn,
             compression: None,
@@ -37,6 +37,8 @@ impl Connection {
             cache_supported: false,
         }
     }
+
+
 
     pub async fn send(&mut self, gamepackets: Vec<GamePacket>) -> Result<(), ConnectionError> {
         let mut pk_stream = ByteStreamWrite::new();
