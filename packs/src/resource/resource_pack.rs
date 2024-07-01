@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::path::Path;
-
+use image::RgbaImage;
 use uuid::{Uuid, Version};
 
 use crate::error::PackError;
@@ -11,6 +11,7 @@ pub struct ResourcePack {
     format_version: Version,
     name: String,
     description: String,
+    icon: Option<RgbaImage>,
     uuid: Uuid,
     version: Version,
     min_engine_version: Version,
