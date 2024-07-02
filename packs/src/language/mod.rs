@@ -1,11 +1,11 @@
-pub mod data;
+pub mod values;
 
 use std::collections::HashMap;
 use std::path::Path;
-pub use data::*;
+pub use values::*;
 use crate::error::PackError;
 
-pub struct Languages(HashMap<String, LanguageData>);
+pub struct Languages(HashMap<String, LanguageValues>);
 
 impl Languages {
     pub fn open(path: impl AsRef<Path>) -> Result<Self, PackError> {
