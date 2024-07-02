@@ -4,7 +4,7 @@ use image::{ImageBuffer, RgbaImage};
 use uuid::{Uuid, Version};
 
 use crate::error::PackError;
-use crate::language::{LanguageData, Languages};
+use crate::language::{LanguageValues, Languages};
 use crate::pack::Pack;
 
 pub struct BehaviorPack {
