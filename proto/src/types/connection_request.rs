@@ -181,7 +181,7 @@ impl ProtoCodec for ConnectionRequestType {
                 }
             };
 
-            let jwt_header = match jsonwebtoken::decode_header(jwt_string.as_str()) {
+            let jwt_header = match jsonwebtoken::decode_header(&jwt_string) {
                 Ok(v) => v,
                 Err(e) => return Err(ProtoCodecError::JwtError(e)),
             };
@@ -211,7 +211,7 @@ impl ProtoCodec for ConnectionRequestType {
 
             // Decode the jwt string into a jwt
             let jwt = match jsonwebtoken::decode::<BTreeMap<String, Value>>(
-                jwt_string.as_str(),
+                &jwt_string,
                 &DecodingKey::from_ec_der(&key_data),
                 &jwt_validation,
             ) {
@@ -225,7 +225,7 @@ impl ProtoCodec for ConnectionRequestType {
                 None => return Err(ProtoCodecError::FormatMismatch(String::from("Expected identityPublicKey field in JWT for validation"))),
                 Some(v) => match v {
                     Value::String(str) => match BASE64_STANDARD.decode(str.as_bytes()) {
-                        Ok(v) => v.clone(),
+                        Ok(v) => v,
                         Err(e) => return Err(ProtoCodecError::Base64DecodeError(e)),
                     },
                     other => return Err(ProtoCodecError::FormatMismatch(format!("Expected identityPublicKey field in JWT to be of type String, got {other:?}"))),
