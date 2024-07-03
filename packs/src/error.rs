@@ -1,4 +1,4 @@
 use thiserror::Error;
 
-#[derive(Error, Clone)]
+#[derive(Error, Debug, Clone)]
 pub enum PackError {}

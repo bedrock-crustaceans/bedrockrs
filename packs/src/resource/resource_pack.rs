@@ -30,7 +30,7 @@ impl Pack for ResourcePack {
     fn uuid(&self) -> &Uuid {
         &self.uuid
     }
-    fn version(&self) -> &Version {
+    fn version(&self) -> &SemVer {
         &self.version
     }
 
