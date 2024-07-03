@@ -8,3 +8,4 @@ bedrock_core = { path = "../bedrock_core" }
 
 uuid = "1.8"
 image = "0.25"
+thiserror = "1.0"
