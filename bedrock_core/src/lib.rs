@@ -19,4 +19,4 @@ pub mod stream;
 pub mod difficulty;
 pub mod dimension;
 pub mod permissions_level;
-mod version;
+mod semver;
