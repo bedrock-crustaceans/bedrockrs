@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::path::Path;
 use crate::error::PackError;
 
+#[derive(Debug, Clone)]
 pub struct LanguageValues(HashMap<String, String>);
 
 impl LanguageValues {

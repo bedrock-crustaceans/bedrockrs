@@ -5,6 +5,7 @@ use std::path::Path;
 pub use values::*;
 use crate::error::PackError;
 
+#[derive(Debug, Clone)]
 pub struct Languages(HashMap<String, LanguageValues>);
 
 impl Languages {

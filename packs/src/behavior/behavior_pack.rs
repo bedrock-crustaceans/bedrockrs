@@ -7,6 +7,7 @@ use crate::error::PackError;
 use crate::language::{LanguageValues, Languages};
 use crate::pack::Pack;
 
+#[derive(Debug, Clone)]
 pub struct BehaviorPack {
     format_version: Version,
     name: String,
