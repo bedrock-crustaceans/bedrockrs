@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::path::Path;
+use bedrock_core::SemVer;
 use image::{ImageBuffer, RgbaImage};
 use uuid::{Uuid, Version};
 
@@ -9,13 +10,13 @@ use crate::pack::Pack;
 
 #[derive(Debug, Clone)]
 pub struct BehaviorPack {
-    format_version: Version,
+    format_version: SemVer,
     name: String,
     description: String,
     icon: Option<RgbaImage>,
     uuid: Uuid,
-    version: Version,
-    min_engine_version: Version,
+    version: SemVer,
+    min_engine_version: SemVer,
     languages: Languages,
 }
 
