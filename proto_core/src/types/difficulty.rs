@@ -1,5 +1,5 @@
 use std::sync::Arc;
-use bedrock_core::{Difficulty, LE};
+use bedrock_core::{Difficulty, LE, VAR};
 use bedrock_core::gamemode::Gamemode;
 use bedrock_core::read::ByteStreamRead;
 use bedrock_core::write::ByteStreamWrite;
@@ -15,7 +15,7 @@ impl ProtoCodec for Difficulty {
             Difficulty::Hard => { 0x03 }
         };
 
-        match LE::<u8>::new(int).write(stream) {
+        match VAR::<i32>::new(int).write(stream) {
             Ok(_) => { Ok(()) }
             Err(e) => { Err(ProtoCodecError::IOError(Arc::new(e))) }
         }

@@ -8,59 +8,6 @@ use bedrock_core::{Vec2, Vec2f, Vec3, Vec3f, LE, VAR};
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 
-impl<T: ProtoCodec> ProtoCodec for Vec<T> {
-    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
-    where
-        Self: Sized,
-    {
-        let len = match self.len().try_into() {
-            Ok(v) => v,
-            Err(e) => {
-                return Err(ProtoCodecError::FromIntError(e));
-            }
-        };
-
-        match VAR::<u32>::new(len).write(buf) {
-            Ok(_) => {}
-            Err(e) => return Err(ProtoCodecError::IOError(Arc::new(e))),
-        };
-
-        for item in self {
-            match ProtoCodec::proto_serialize(item, buf) {
-                Ok(_) => {}
-                Err(e) => return Err(e),
-            };
-        }
-
-        Ok(())
-    }
-
-    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
-    where
-        Self: Sized,
-    {
-        let len = match VAR::<u32>::read(stream) {
-            Ok(v) => v.into_inner(),
-            Err(e) => {
-                return Err(ProtoCodecError::IOError(Arc::new(e)));
-            }
-        };
-
-        let mut array = vec![];
-
-        for _ in 0..len {
-            array.push(match T::proto_deserialize(stream) {
-                Ok(v) => v,
-                Err(e) => {
-                    return Err(e);
-                }
-            })
-        }
-
-        Ok(array)
-    }
-}
-
 impl ProtoCodec for Vec2 {
     fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
