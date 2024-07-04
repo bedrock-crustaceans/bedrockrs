@@ -1,4 +1,4 @@
-use bedrock_core::{ActorRuntimeID, ActorUniqueID, Difficulty, Dimension, GeneratorType, LE, VAR, Vec2, Vec3};
+use bedrock_core::{ActorRuntimeID, ActorUniqueID, Difficulty, Dimension, GeneratorType, LE, Uuid, VAR, Vec2, Vec3};
 use bedrock_core::gamemode::Gamemode;
 use nbt::NbtTag;
 use crate::connection::ConnectionShard;
@@ -69,6 +69,7 @@ pub async fn start_game(conn: &mut ConnectionShard, provider: &mut impl LoginPro
             bonus_chest: false,
             start_with_map: false,
             player_permission: VAR::new(0),
+            server_chunk_tick_radius: LE::new(4),
             locked_behavior_packs: false,
             locked_resource_packs: false,
             from_locked_template: false,
@@ -82,7 +83,7 @@ pub async fn start_game(conn: &mut ConnectionShard, provider: &mut impl LoginPro
             base_game_version: BaseGameVersion(String::from("1.21.0")),
             limited_world_width: LE::new(0),
             limited_world_depth: LE::new(0),
-            nether_type: true,
+            new_nether: true,
             edu_shared_uri_resource: EduSharedResourceUri { button_name: String::from(""), link_uri: String::from("") },
             force_experimental_gameplay: false,
             chat_restriction_level: ChatRestrictionLevel::None,
@@ -93,7 +94,7 @@ pub async fn start_game(conn: &mut ConnectionShard, provider: &mut impl LoginPro
         },
         level_id: String::from(""),
         level_name: String::from(""),
-        template_content_identity: "".to_string(),
+        template_content_identity: String::from(""),
         trial: false,
         movement_settings: PlayerMovementSettings {
             authority_mode: PlayerMovementMode::Client,
@@ -109,7 +110,7 @@ pub async fn start_game(conn: &mut ConnectionShard, provider: &mut impl LoginPro
         server_version: String::from("1.21.0"),
         player_property_data: NbtTag::Empty,
         block_type_registry_checksum: LE::new(0),
-        world_template_id: Default::default(),
+        world_template_id: Uuid::new_v4(),
         enable_clientside_world_generation: false,
         use_block_network_id_hashes: false,
         network_permission: NetworkPermissions {
