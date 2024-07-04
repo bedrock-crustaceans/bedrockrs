@@ -18,7 +18,7 @@ impl ProtoCodec for SpawnBiomeType {
             SpawnBiomeType::UserDefined => { 0x01 }
         };
 
-        match LE::<u8>::new(int).write(stream) {
+        match LE::<i16>::new(int).write(stream) {
             Ok(_) => { Ok(()) }
             Err(e) => { Err(ProtoCodecError::IOError(Arc::new(e))) }
         }
