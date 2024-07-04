@@ -1,6 +1,6 @@
 use std::sync::Arc;
 use bedrock_core::gamemode::Gamemode;
-use bedrock_core::LE;
+use bedrock_core::{LE, VAR};
 use bedrock_core::read::ByteStreamRead;
 use bedrock_core::write::ByteStreamWrite;
 use crate::error::ProtoCodecError;
@@ -18,7 +18,7 @@ impl ProtoCodec for Gamemode {
             Gamemode::Spectator => { 0x06 }
         };
 
-        match LE::<u8>::new(int).write(stream) {
+        match VAR::<i32>::new(int).write(stream) {
             Ok(_) => { Ok(()) }
             Err(e) => { Err(ProtoCodecError::IOError(Arc::new(e))) }
         }
