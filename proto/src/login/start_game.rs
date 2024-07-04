@@ -12,6 +12,7 @@ use crate::types::editor_world_type::EditorWorldType;
 use crate::types::edu_shared_uri_resource::EduSharedResourceUri;
 use crate::types::experiments::Experiments;
 use crate::types::level_settings::LevelSettings;
+use crate::types::network_block_pos::NetworkBlockPos;
 use crate::types::network_permissions::NetworkPermissions;
 use crate::types::player_movement_mode::PlayerMovementMode;
 use crate::types::player_movement_settings::PlayerMovementSettings;
@@ -41,7 +42,11 @@ pub async fn start_game(conn: &mut ConnectionShard, provider: &mut impl LoginPro
             game_type: Gamemode::Survival,
             hardcore: false,
             difficulty: Difficulty::Peaceful,
-            default_spawn_block: Vec3 { x: 0, y: 0, z: 0 },
+            default_spawn_block: NetworkBlockPos {
+                x: VAR::new(0),
+                y: VAR::new(0),
+                z: VAR::new(0)
+            },
             achievements_disabled: false,
             editor_world_type: EditorWorldType::NotEditor,
             created_in_editor: false,
@@ -49,7 +54,7 @@ pub async fn start_game(conn: &mut ConnectionShard, provider: &mut impl LoginPro
             day_cycle_stop_time: VAR::new(0),
             education_edition_offer: VAR::new(0),
             education_features: false,
-            education_product_id: "".to_string(),
+            education_product_id: String::from(""),
             rain_level: LE::new(0.0),
             lightning_level: LE::new(0.0),
             platform_locked_content: false,
@@ -123,5 +128,4 @@ pub async fn start_game(conn: &mut ConnectionShard, provider: &mut impl LoginPro
     };
 
     Ok(())
-
 }

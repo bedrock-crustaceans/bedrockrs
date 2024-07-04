@@ -7,6 +7,7 @@ use crate::types::editor_world_type::EditorWorldType;
 use crate::types::edu_shared_uri_resource::EduSharedResourceUri;
 use crate::types::experiments::Experiments;
 use crate::types::game_rule::GameRule;
+use crate::types::network_block_pos::NetworkBlockPos;
 use crate::types::spawn_settings::SpawnSettings;
 
 #[derive(ProtoCodec, Debug, Clone)]
@@ -17,7 +18,7 @@ pub struct LevelSettings {
     pub game_type: Gamemode,
     pub hardcore: bool,
     pub difficulty: Difficulty,
-    pub default_spawn_block: Vec3,
+    pub default_spawn_block: NetworkBlockPos,
     pub achievements_disabled: bool,
     pub editor_world_type: EditorWorldType,
     pub created_in_editor: bool,
