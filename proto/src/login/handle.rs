@@ -5,7 +5,8 @@ use crate::login::login::login;
 use crate::login::network_settings::network_settings;
 use crate::login::packs::packs;
 use crate::login::provider::{LoginProviderClient, LoginProviderServer};
-use crate::login::start_game::play_status_login;
+use crate::login::play_status::play_status_login;
+use crate::login::start_game::start_game;
 
 pub async fn login_to_server(
     conn: &mut ConnectionShard,
@@ -19,6 +20,8 @@ pub async fn login_to_server(
     handshake(conn, &mut provider).await?;
 
     packs(conn, &mut provider).await?;
+
+    start_game(conn, &mut provider).await?;
 
     Ok(())
 }

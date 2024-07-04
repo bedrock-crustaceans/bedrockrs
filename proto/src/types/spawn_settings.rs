@@ -5,7 +5,7 @@ use crate::types::spawn_biome_type::SpawnBiomeType;
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct SpawnSettings {
-    biome_type: SpawnBiomeType,
-    user_defined_biome_name: String,
-    dimension: Dimension,
+    pub biome_type: SpawnBiomeType,
+    pub user_defined_biome_name: String,
+    pub dimension: Dimension,
 }
