@@ -1,11 +1,11 @@
-use std::collections::HashMap;
 use std::path::Path;
+
 use bedrock_core::SemVer;
 use image::RgbaImage;
-use uuid::{Uuid, Version};
+use uuid::Uuid;
 
 use crate::error::PackError;
-use crate::language::{LanguageValues, Languages};
+use crate::language::Languages;
 use crate::pack::Pack;
 
 #[derive(Debug, Clone)]
@@ -36,14 +36,14 @@ impl Pack for ResourcePack {
 
     fn import(path: impl AsRef<Path>) -> Result<Self, PackError>
     where
-        Self: Sized
+        Self: Sized,
     {
         todo!()
     }
 
     fn export(path: impl AsRef<Path>) -> Result<Self, PackError>
     where
-        Self: Sized
+        Self: Sized,
     {
         todo!()
     }

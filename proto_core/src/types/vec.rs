@@ -1,9 +1,6 @@
-use std::convert::TryInto;
-use std::sync::Arc;
-
 use bedrock_core::read::ByteStreamRead;
 use bedrock_core::write::ByteStreamWrite;
-use bedrock_core::{Vec2, Vec2f, Vec3, Vec3f, LE, VAR};
+use bedrock_core::{Vec2, Vec2f, Vec3, Vec3f, LE};
 
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;

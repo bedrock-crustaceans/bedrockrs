@@ -1,9 +1,11 @@
-pub mod values;
-
 use std::collections::HashMap;
 use std::path::Path;
+
 pub use values::*;
+
 use crate::error::PackError;
+
+pub mod values;
 
 #[derive(Debug, Clone)]
 pub struct Languages(HashMap<String, LanguageValues>);
@@ -14,8 +16,6 @@ impl Languages {
     }
 
     pub fn languages(&self) -> Vec<String> {
-        self.0.keys().map(|f| {
-            f.clone()
-        }).collect()
+        self.0.keys().map(|f| f.clone()).collect()
     }
 }

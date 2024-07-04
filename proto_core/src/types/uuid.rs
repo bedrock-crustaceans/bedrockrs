@@ -1,6 +1,7 @@
-use bedrock_core::{LE, Uuid};
 use bedrock_core::read::ByteStreamRead;
 use bedrock_core::write::ByteStreamWrite;
+use bedrock_core::{Uuid, LE};
+
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 

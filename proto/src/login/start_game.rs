@@ -1,10 +1,13 @@
-use bedrock_core::{ActorRuntimeID, ActorUniqueID, Difficulty, Dimension, GeneratorType, LE, Uuid, VAR, Vec2, Vec3};
 use bedrock_core::gamemode::Gamemode;
+use bedrock_core::{
+    ActorRuntimeID, ActorUniqueID, Difficulty, Dimension, GeneratorType, Uuid, Vec2, Vec3, LE, VAR,
+};
 use nbt::NbtTag;
+
 use crate::connection::ConnectionShard;
 use crate::error::LoginError;
 use crate::gamepacket::GamePacket;
-use crate::login::provider::{LoginProviderServer, LoginProviderStatus};
+use crate::login::provider::LoginProviderServer;
 use crate::packets::start_game::StartGamePacket;
 use crate::types::base_game_version::BaseGameVersion;
 use crate::types::chat_restriction_level::ChatRestrictionLevel;
@@ -19,13 +22,15 @@ use crate::types::player_movement_settings::PlayerMovementSettings;
 use crate::types::spawn_biome_type::SpawnBiomeType;
 use crate::types::spawn_settings::SpawnSettings;
 
-pub async fn start_game(conn: &mut ConnectionShard, provider: &mut impl LoginProviderServer,
+pub async fn start_game(
+    conn: &mut ConnectionShard,
+    provider: &mut impl LoginProviderServer,
 ) -> Result<(), LoginError> {
     //////////////////////////////////////
     // Start Game Packet
     //////////////////////////////////////
 
-    let start_game = StartGamePacket{
+    let start_game = StartGamePacket {
         target_actor_id: ActorUniqueID(1),
         target_runtime_id: ActorRuntimeID(1),
         actor_game_type: Gamemode::Survival,
@@ -45,7 +50,7 @@ pub async fn start_game(conn: &mut ConnectionShard, provider: &mut impl LoginPro
             default_spawn_block: NetworkBlockPos {
                 x: VAR::new(0),
                 y: VAR::new(0),
-                z: VAR::new(0)
+                z: VAR::new(0),
             },
             achievements_disabled: false,
             editor_world_type: EditorWorldType::NotEditor,
@@ -65,7 +70,10 @@ pub async fn start_game(conn: &mut ConnectionShard, provider: &mut impl LoginPro
             commands_enabled: false,
             texture_pack_required: false,
             rules: vec![],
-            experiments: Experiments { experiments: vec![], ever_toggled: false },
+            experiments: Experiments {
+                experiments: vec![],
+                ever_toggled: false,
+            },
             bonus_chest: false,
             start_with_map: false,
             player_permission: VAR::new(0),
@@ -84,7 +92,10 @@ pub async fn start_game(conn: &mut ConnectionShard, provider: &mut impl LoginPro
             limited_world_width: LE::new(0),
             limited_world_depth: LE::new(0),
             new_nether: true,
-            edu_shared_uri_resource: EduSharedResourceUri { button_name: String::from(""), link_uri: String::from("") },
+            edu_shared_uri_resource: EduSharedResourceUri {
+                button_name: String::from(""),
+                link_uri: String::from(""),
+            },
             force_experimental_gameplay: Some(false),
             chat_restriction_level: ChatRestrictionLevel::None,
             disable_player_interactions: false,

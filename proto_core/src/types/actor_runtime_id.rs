@@ -1,8 +1,8 @@
-use bedrock_core::{ActorRuntimeID, VAR};
-use bedrock_core::read::ByteStreamRead;
-use bedrock_core::write::ByteStreamWrite;
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
+use bedrock_core::read::ByteStreamRead;
+use bedrock_core::write::ByteStreamWrite;
+use bedrock_core::{ActorRuntimeID, VAR};
 
 impl ProtoCodec for ActorRuntimeID {
     fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError> {

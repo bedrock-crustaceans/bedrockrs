@@ -1,7 +1,8 @@
 use std::sync::Arc;
-use bedrock_core::{LE, VAR};
+
 use bedrock_core::read::ByteStreamRead;
 use bedrock_core::write::ByteStreamWrite;
+use bedrock_core::VAR;
 use proto_core::error::ProtoCodecError;
 use proto_core::ProtoCodec;
 
@@ -15,14 +16,14 @@ pub enum EditorWorldType {
 impl ProtoCodec for EditorWorldType {
     fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError> {
         let int = match self {
-            EditorWorldType::NotEditor => { 0x00 }
-            EditorWorldType::Project => { 0x01 }
-            EditorWorldType::TestLevel => { 0x02 }
+            EditorWorldType::NotEditor => 0x00,
+            EditorWorldType::Project => 0x01,
+            EditorWorldType::TestLevel => 0x02,
         };
 
         match VAR::<i32>::new(int).write(stream) {
-            Ok(_) => { Ok(()) }
-            Err(e) => { Err(ProtoCodecError::IOError(Arc::new(e))) }
+            Ok(_) => Ok(()),
+            Err(e) => Err(ProtoCodecError::IOError(Arc::new(e))),
         }
     }
 

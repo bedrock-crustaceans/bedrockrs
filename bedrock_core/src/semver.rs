@@ -10,7 +10,11 @@ pub struct SemVer {
 
 impl Debug for SemVer {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}.{}.{}.{}", self.major, self.minor, self.patch, self.build)
+        write!(
+            f,
+            "{}.{}.{}.{}",
+            self.major, self.minor, self.patch, self.build
+        )
     }
 }
 

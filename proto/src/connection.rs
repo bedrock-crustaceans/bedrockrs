@@ -38,8 +38,6 @@ impl Connection {
         }
     }
 
-
-
     pub async fn send(&mut self, gamepackets: Vec<GamePacket>) -> Result<(), ConnectionError> {
         let mut pk_stream = ByteStreamWrite::new();
 

@@ -1,6 +1,7 @@
-use bedrock_core::{Difficulty, GeneratorType, LE, VAR, Vec3};
 use bedrock_core::gamemode::Gamemode;
+use bedrock_core::{Difficulty, GeneratorType, LE, VAR};
 use proto_derive::ProtoCodec;
+
 use crate::types::base_game_version::BaseGameVersion;
 use crate::types::chat_restriction_level::ChatRestrictionLevel;
 use crate::types::editor_world_type::EditorWorldType;
@@ -36,7 +37,7 @@ pub struct LevelSettings {
     pub broadcasting_settings_platform: VAR<i32>,
     pub commands_enabled: bool,
     pub texture_pack_required: bool,
-    #[len_type(VAR::<u32>)]
+    #[len_type(VAR::< u32 >)]
     pub rules: Vec<GameRule>,
     pub experiments: Experiments,
     pub bonus_chest: bool,

@@ -1,6 +1,7 @@
-use bedrock_core::{ActorRuntimeID, ActorUniqueID, VAR};
 use bedrock_core::read::ByteStreamRead;
 use bedrock_core::write::ByteStreamWrite;
+use bedrock_core::{ActorUniqueID, VAR};
+
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 

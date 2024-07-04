@@ -1,6 +1,7 @@
 use std::path::Path;
+
 use bedrock_core::SemVer;
-use uuid::{Uuid, Version};
+use uuid::Uuid;
 
 use crate::error::PackError;
 
