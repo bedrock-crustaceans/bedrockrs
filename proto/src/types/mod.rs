@@ -18,3 +18,4 @@ pub mod chat_restriction_level;
 pub mod editor_world_type;
 pub mod spawn_biome_type;
 pub mod player_movement_mode;
+pub mod network_block_pos;
