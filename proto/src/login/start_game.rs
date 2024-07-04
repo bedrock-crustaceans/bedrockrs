@@ -85,7 +85,7 @@ pub async fn start_game(conn: &mut ConnectionShard, provider: &mut impl LoginPro
             limited_world_depth: LE::new(0),
             new_nether: true,
             edu_shared_uri_resource: EduSharedResourceUri { button_name: String::from(""), link_uri: String::from("") },
-            force_experimental_gameplay: false,
+            force_experimental_gameplay: Some(false),
             chat_restriction_level: ChatRestrictionLevel::None,
             disable_player_interactions: false,
             server_id: String::from(""),
