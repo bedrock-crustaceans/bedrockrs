@@ -18,13 +18,13 @@ use crate::types::player_movement_settings::PlayerMovementSettings;
 use crate::types::spawn_biome_type::SpawnBiomeType;
 use crate::types::spawn_settings::SpawnSettings;
 
-pub fn start_game(conn: &mut ConnectionShard, provider: &mut impl LoginProviderServer,
+pub async fn start_game(conn: &mut ConnectionShard, provider: &mut impl LoginProviderServer,
 ) -> Result<(), LoginError> {
     //////////////////////////////////////
     // Start Game Packet
     //////////////////////////////////////
 
-    conn.send(GamePacket::StartGame(StartGamePacket{
+    let start_game = StartGamePacket{
         target_actor_id: ActorUniqueID(1),
         target_runtime_id: ActorRuntimeID(1),
         actor_game_type: Gamemode::Survival,
@@ -110,6 +110,18 @@ pub fn start_game(conn: &mut ConnectionShard, provider: &mut impl LoginProviderS
         network_permission: NetworkPermissions {
             server_auth_sound_enabled: false,
         },
-    }))
+    };
+
+    match conn.send(GamePacket::StartGame(start_game)).await {
+        Ok(_) => {}
+        Err(e) => return Err(LoginError::ConnectionError(e)),
+    }
+
+    match conn.flush().await {
+        Ok(_) => {}
+        Err(e) => return Err(LoginError::ConnectionError(e)),
+    };
+
+    Ok(())
 
 }
