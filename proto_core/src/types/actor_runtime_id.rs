@@ -10,6 +10,6 @@ impl ProtoCodec for ActorRuntimeID {
     }
 
     fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError> {
-        Ok(Self(VAR::<u64>::proto_deserialize(stream)?.into_inner()))
+        Ok(Self(VAR::proto_deserialize(stream)?.into_inner()))
     }
 }
