@@ -1,5 +1,5 @@
 use std::sync::Arc;
-use bedrock_core::{GeneratorType, LE};
+use bedrock_core::{GeneratorType, LE, VAR};
 use bedrock_core::read::ByteStreamRead;
 use bedrock_core::write::ByteStreamWrite;
 use crate::error::ProtoCodecError;
@@ -16,7 +16,7 @@ impl ProtoCodec for GeneratorType {
             GeneratorType::Void => { 0x05 }
         };
 
-        match LE::<u8>::new(int).write(stream) {
+        match VAR::<i32>::new(int).write(stream) {
             Ok(_) => { Ok(()) }
             Err(e) => { Err(ProtoCodecError::IOError(Arc::new(e))) }
         }
