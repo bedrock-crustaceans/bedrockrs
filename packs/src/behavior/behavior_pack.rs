@@ -43,17 +43,11 @@ impl Pack for BehaviorPack {
         // Convert the given path into a PathBuf
         let directory: PathBuf = path.as_ref().to_path_buf();
 
-        let text = match std::fs::read(directory.join("manifest.json")) {
-            Ok(v) => { v }
-            Err(_) => { todo!() }
-        };
+        let manifest_content = std::fs::read(directory.join("manifest.json")).map_err(|e| { todo!() })?;
 
-        let text = match String::from_utf8(text) {
-            Ok(v) => { v }
-            Err(_) => { todo!() }
-        };
+        let text = String::from_utf8(manifest_content).map_err(|e| { todo!() })?;
 
-        let json: serde_json::Value = match serde_json::from_str(&text) {
+        let json: Value = match serde_json::from_str(&text) {
             Ok(v) => { v }
             Err(e) => { todo!() }
         };

@@ -26,4 +26,5 @@ pub mod permissions_level;
 pub mod actor_unique_id;
 pub mod actor_runtime_id;
 pub mod generator_type;
+pub mod gamemode;
 pub mod semver;

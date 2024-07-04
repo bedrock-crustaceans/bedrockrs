@@ -1,4 +1,9 @@
 #[derive(Debug, Clone)]
 pub enum GeneratorType {
-    TODO
+    Legacy,
+    Overworld,
+    Flat,
+    Nether,
+    End,
+    Void,
 }

@@ -1,3 +1,4 @@
 use crate::VAR;
 
-pub struct ActorRuntimeID(VAR<u64>);
+#[derive(Debug, Clone)]
+pub struct ActorRuntimeID(pub VAR<u64>);

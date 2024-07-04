@@ -1,10 +1,11 @@
-use bedrock_core::{Dimension, LE};
+use bedrock_core::Dimension;
 use proto_derive::ProtoCodec;
+
+use crate::types::spawn_biome_type::SpawnBiomeType;
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct SpawnSettings {
-    // What type is this, I assume biome type... docs just say "type"
-    biome_type: LE<u16>,
+    biome_type: SpawnBiomeType,
     user_defined_biome_name: String,
     dimension: Dimension,
 }
