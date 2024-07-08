@@ -850,6 +850,7 @@ impl GamePacket {
 
         // Get the first 10 bits as the packet id
         // Can never be more than a 16-bit integer due to being 10 bits big
+        // Gamepacket IDs through 200-299 are used for spin-offs, they are free to use for custom packets
         let game_packet_id = game_packet_header & 0b0000_0011_1111_1111;
 
         // Get the next 2 bits as the sub client sender id
