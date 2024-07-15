@@ -33,6 +33,7 @@ pub struct LevelSettings {
     pub platform_locked_content: bool,
     pub multiplayer_intended: bool,
     pub lan_broadcasting_intended: bool,
+    // TODO turn into enum
     pub broadcasting_settings_xbox_live: VAR<i32>,
     pub broadcasting_settings_platform: VAR<i32>,
     pub commands_enabled: bool,
