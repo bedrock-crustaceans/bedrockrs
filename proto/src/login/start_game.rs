@@ -1,7 +1,5 @@
 use bedrock_core::gamemode::Gamemode;
-use bedrock_core::{
-    ActorRuntimeID, ActorUniqueID, Difficulty, Dimension, GeneratorType, Uuid, Vec2, Vec3, LE, VAR,
-};
+use bedrock_core::{ActorRuntimeID, ActorUniqueID, Difficulty, Dimension, GeneratorType, Uuid, Vec2, Vec3, LE, VAR, Vec3f, Vec2f};
 use nbt::NbtTag;
 
 use crate::connection::ConnectionShard;
@@ -34,8 +32,8 @@ pub async fn start_game(
         target_actor_id: ActorUniqueID(1),
         target_runtime_id: ActorRuntimeID(1),
         actor_game_type: Gamemode::Survival,
-        position: Vec3 { x: 0, y: 0, z: 0 },
-        rotation: Vec2 { x: 0, z: 0 },
+        position: Vec3f { x: 0.0, y: 0.0, z: 0.0 },
+        rotation: Vec2f { x: 0.0, z: 0.0 },
         settings: LevelSettings {
             seed: LE::new(80085),
             spawn_settings: SpawnSettings {
@@ -88,9 +86,9 @@ pub async fn start_game(
             persona_disabled: false,
             custom_skins_disabled: false,
             emote_chat_muted: false,
-            base_game_version: BaseGameVersion(String::from("1.21.0")),
-            limited_world_width: LE::new(0),
-            limited_world_depth: LE::new(0),
+            base_game_version: BaseGameVersion(String::from("*")),
+            limited_world_width: LE::new(16),
+            limited_world_depth: LE::new(16),
             new_nether: true,
             edu_shared_uri_resource: EduSharedResourceUri {
                 button_name: String::from(""),
