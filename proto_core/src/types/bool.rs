@@ -28,7 +28,7 @@ impl ProtoCodec for bool {
     where
         Self: Sized,
     {
-        // a bool is represented as a byte
+        // a Bool is represented as a byte
         return match LE::<u8>::read(stream) {
             Ok(v) => {
                 match v.into_inner() {

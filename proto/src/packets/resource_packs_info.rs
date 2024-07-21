@@ -26,25 +26,25 @@ pub struct ResourcePacksInfoPacket {
 //     where
 //         Self: Sized,
 //     {
-//         // Serialize resource_pack_required as a bool
+//         // Serialize resource_pack_required as a Bool
 //         match self.resource_pack_required.proto_serialize(stream) {
 //             Ok(_) => {}
 //             Err(e) => return Err(e),
 //         }
 //
-//         // Serialize has_addon_packs as a bool
+//         // Serialize has_addon_packs as a Bool
 //         match self.has_addon_packs.proto_serialize(stream) {
 //             Ok(_) => {}
 //             Err(e) => return Err(e),
 //         }
 //
-//         // Serialize has_scripts as a bool
+//         // Serialize has_scripts as a Bool
 //         match self.has_scripts.proto_serialize(stream) {
 //             Ok(_) => {}
 //             Err(e) => return Err(e),
 //         }
 //
-//         // Serialize force_server_packs_enabled as a bool
+//         // Serialize force_server_packs_enabled as a Bool
 //         match self.force_server_packs_enabled.proto_serialize(stream) {
 //             Ok(_) => {}
 //             Err(e) => return Err(e),
