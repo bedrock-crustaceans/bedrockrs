@@ -1,5 +1,5 @@
 use bedrock_core::gamemode::Gamemode;
-use bedrock_core::{ActorRuntimeID, ActorUniqueID, Uuid, Vec2, Vec3, LE, VAR, Vec2f, Vec3f};
+use bedrock_core::{ActorRuntimeID, ActorUniqueID, Uuid, Vec2f, Vec3f, LE, VAR};
 use nbt::NbtTag;
 use proto_derive::ProtoCodec;
 
@@ -23,10 +23,10 @@ pub struct StartGamePacket {
     pub current_level_time: LE<u64>,
     pub enchantment_seed: VAR<i32>,
     // TODO Add real value
-    #[len_type(VAR::<u32>)]
+    #[len_type(VAR::< u32 >)]
     pub block_properties: Vec<u8>,
     // TODO Add real value
-    #[len_type(VAR::<u32>)]
+    #[len_type(VAR::< u32 >)]
     pub items: Vec<u8>,
     pub multiplayer_correlation_id: String,
     pub enable_item_stack_net_manager: bool,

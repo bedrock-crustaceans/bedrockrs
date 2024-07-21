@@ -1,5 +1,10 @@
+use std::collections::HashMap;
+
 use bedrock_core::gamemode::Gamemode;
-use bedrock_core::{ActorRuntimeID, ActorUniqueID, Difficulty, Dimension, GeneratorType, Uuid, Vec2, Vec3, LE, VAR, Vec3f, Vec2f};
+use bedrock_core::{
+    ActorRuntimeID, ActorUniqueID, Difficulty, Dimension, GeneratorType, Uuid, Vec2f, Vec3f, LE,
+    VAR,
+};
 use nbt::NbtTag;
 
 use crate::connection::ConnectionShard;
@@ -19,7 +24,6 @@ use crate::types::player_movement_mode::PlayerMovementMode;
 use crate::types::player_movement_settings::PlayerMovementSettings;
 use crate::types::spawn_biome_type::SpawnBiomeType;
 use crate::types::spawn_settings::SpawnSettings;
-use std::collections::HashMap;
 
 pub async fn start_game(
     conn: &mut ConnectionShard,
@@ -33,7 +37,11 @@ pub async fn start_game(
         target_actor_id: ActorUniqueID(0),
         target_runtime_id: ActorRuntimeID(0),
         actor_game_type: Gamemode::Survival,
-        position: Vec3f { x: 0.0, y: 0.0, z: 0.0 },
+        position: Vec3f {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        },
         rotation: Vec2f { x: 0.0, z: 0.0 },
         settings: LevelSettings {
             seed: LE::new(80085),
