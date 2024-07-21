@@ -5,7 +5,7 @@ pub mod editor_world_type;
 pub mod edu_shared_uri_resource;
 pub mod experiment;
 pub mod experiments;
-pub mod game_rule;
+pub mod gamerule;
 pub mod level_settings;
 pub mod network_block_pos;
 pub mod network_permissions;

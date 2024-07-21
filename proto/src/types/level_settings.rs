@@ -7,7 +7,7 @@ use crate::types::chat_restriction_level::ChatRestrictionLevel;
 use crate::types::editor_world_type::EditorWorldType;
 use crate::types::edu_shared_uri_resource::EduSharedResourceUri;
 use crate::types::experiments::Experiments;
-use crate::types::game_rule::GameRule;
+use crate::types::gamerule::GameRule;
 use crate::types::network_block_pos::NetworkBlockPos;
 use crate::types::spawn_settings::SpawnSettings;
 
@@ -39,7 +39,7 @@ pub struct LevelSettings {
     pub commands_enabled: bool,
     pub texture_pack_required: bool,
     #[len_type(VAR::< u32 >)]
-    pub rules: Vec<GameRule>,
+    pub gamerules: Vec<GameRule>,
     pub experiments: Experiments,
     pub bonus_chest: bool,
     pub start_with_map: bool,
