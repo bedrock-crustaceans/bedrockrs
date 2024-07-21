@@ -19,6 +19,7 @@ use crate::types::player_movement_mode::PlayerMovementMode;
 use crate::types::player_movement_settings::PlayerMovementSettings;
 use crate::types::spawn_biome_type::SpawnBiomeType;
 use crate::types::spawn_settings::SpawnSettings;
+use std::collections::HashMap;
 
 pub async fn start_game(
     conn: &mut ConnectionShard,
@@ -29,8 +30,8 @@ pub async fn start_game(
     //////////////////////////////////////
 
     let start_game = StartGamePacket {
-        target_actor_id: ActorUniqueID(1),
-        target_runtime_id: ActorRuntimeID(1),
+        target_actor_id: ActorUniqueID(0),
+        target_runtime_id: ActorRuntimeID(0),
         actor_game_type: Gamemode::Survival,
         position: Vec3f { x: 0.0, y: 0.0, z: 0.0 },
         rotation: Vec2f { x: 0.0, z: 0.0 },
@@ -61,13 +62,13 @@ pub async fn start_game(
             rain_level: LE::new(0.0),
             lightning_level: LE::new(0.0),
             platform_locked_content: false,
-            multiplayer_intended: false,
-            lan_broadcasting_intended: false,
-            broadcasting_settings_xbox_live: VAR::new(0),
-            broadcasting_settings_platform: VAR::new(0),
+            multiplayer_intended: true,
+            lan_broadcasting_intended: true,
+            broadcasting_settings_xbox_live: VAR::new(4),
+            broadcasting_settings_platform: VAR::new(4),
             commands_enabled: false,
             texture_pack_required: false,
-            rules: vec![],
+            gamerules: vec![],
             experiments: Experiments {
                 experiments: vec![],
                 ever_toggled: false,
@@ -117,7 +118,7 @@ pub async fn start_game(
         multiplayer_correlation_id: String::from(""),
         enable_item_stack_net_manager: false,
         server_version: String::from("1.21.0"),
-        player_property_data: NbtTag::Empty,
+        player_property_data: NbtTag::Compound(HashMap::new()),
         block_type_registry_checksum: LE::new(0),
         world_template_id: Uuid::new_v4(),
         enable_clientside_world_generation: false,
