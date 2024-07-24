@@ -9,3 +9,5 @@ uuid = { version = "1.8", features = ["v4"] }
 bytes = "1.6"
 byteorder = "1.5"
 varint-rs = "2.2"
+
+serde = "1.0"

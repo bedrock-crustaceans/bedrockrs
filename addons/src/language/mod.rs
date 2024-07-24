@@ -3,7 +3,7 @@ use std::path::Path;
 
 pub use values::*;
 
-use crate::error::PackError;
+use crate::error::AddonError;
 
 pub mod values;
 
@@ -11,7 +11,7 @@ pub mod values;
 pub struct Languages(HashMap<String, LanguageValues>);
 
 impl Languages {
-    pub fn open(path: impl AsRef<Path>) -> Result<Self, PackError> {
+    pub fn open(path: impl AsRef<Path>) -> Result<Self, AddonError> {
         todo!()
     }
 

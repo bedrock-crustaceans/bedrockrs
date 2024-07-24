@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 use std::path::Path;
 
-use crate::error::PackError;
+use crate::error::AddonError;
 
 #[derive(Debug, Clone)]
 pub struct LanguageValues(HashMap<String, String>);
 
 impl LanguageValues {
-    pub fn open(path: impl AsRef<Path>) -> Result<Self, PackError> {
+    pub fn open(path: impl AsRef<Path>) -> Result<Self, AddonError> {
         let data = match std::fs::read(path) {
             Ok(v) => v,
             Err(e) => {
