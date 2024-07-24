@@ -2,8 +2,7 @@ use std::collections::HashMap;
 
 use bedrockrs_core::gamemode::Gamemode;
 use bedrockrs_core::{
-    ActorRuntimeID, ActorUniqueID, Difficulty, Dimension, GeneratorType, Uuid, Vec2f, Vec3f, LE,
-    VAR,
+    ActorRuntimeID, ActorUniqueID, Difficulty, Dimension, GeneratorType, Uuid, Vec2, Vec3, LE, VAR,
 };
 use bedrockrs_nbt::NbtTag;
 
@@ -37,12 +36,15 @@ pub async fn start_game(
         target_actor_id: ActorUniqueID(0),
         target_runtime_id: ActorRuntimeID(0),
         actor_game_type: Gamemode::Survival,
-        position: Vec3f {
-            x: 0.0,
-            y: 0.0,
-            z: 0.0,
+        position: Vec3 {
+            x: LE::new(0.0),
+            y: LE::new(0.0),
+            z: LE::new(0.0),
         },
-        rotation: Vec2f { x: 0.0, z: 0.0 },
+        rotation: Vec2 {
+            x: LE::new(0.0),
+            y: LE::new(0.0),
+        },
         settings: LevelSettings {
             seed: LE::new(80085),
             spawn_settings: SpawnSettings {

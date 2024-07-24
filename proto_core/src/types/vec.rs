@@ -1,28 +1,17 @@
 use bedrockrs_core::read::ByteStreamRead;
 use bedrockrs_core::write::ByteStreamWrite;
-use bedrockrs_core::{Vec2, Vec2f, Vec3, Vec3f, LE};
+use bedrockrs_core::{Vec2, Vec3};
 
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 
-impl ProtoCodec for Vec2 {
+impl<T: ProtoCodec> ProtoCodec for Vec2<T> {
     fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match LE::<i32>::proto_serialize(&LE::new(self.x), stream) {
-            Ok(_) => {}
-            Err(e) => {
-                return Err(e);
-            }
-        }
-
-        match LE::<i32>::proto_serialize(&LE::new(self.z), stream) {
-            Ok(_) => {}
-            Err(e) => {
-                return Err(e);
-            }
-        }
+        T::proto_serialize(&self.x, stream)?;
+        T::proto_serialize(&self.y, stream)?;
 
         Ok(())
     }
@@ -32,40 +21,20 @@ impl ProtoCodec for Vec2 {
         Self: Sized,
     {
         Ok(Self {
-            x: match LE::<i32>::proto_deserialize(stream) {
-                Ok(v) => v.into_inner(),
-                Err(e) => {
-                    return Err(e);
-                }
-            },
-            z: match LE::<i32>::proto_deserialize(stream) {
-                Ok(v) => v.into_inner(),
-                Err(e) => {
-                    return Err(e);
-                }
-            },
+            x: T::proto_deserialize(stream)?,
+            y: T::proto_deserialize(stream)?,
         })
     }
 }
 
-impl ProtoCodec for Vec2f {
+impl<T: ProtoCodec> ProtoCodec for Vec3<T> {
     fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match LE::<f32>::proto_serialize(&LE::new(self.x), stream) {
-            Ok(_) => {}
-            Err(e) => {
-                return Err(e);
-            }
-        }
-
-        match LE::<f32>::proto_serialize(&LE::new(self.z), stream) {
-            Ok(_) => {}
-            Err(e) => {
-                return Err(e);
-            }
-        }
+        T::proto_serialize(&self.x, stream)?;
+        T::proto_serialize(&self.y, stream)?;
+        T::proto_serialize(&self.z, stream)?;
 
         Ok(())
     }
@@ -75,130 +44,9 @@ impl ProtoCodec for Vec2f {
         Self: Sized,
     {
         Ok(Self {
-            x: match LE::<f32>::proto_deserialize(stream) {
-                Ok(v) => v.into_inner(),
-                Err(e) => {
-                    return Err(e);
-                }
-            },
-            z: match LE::<f32>::proto_deserialize(stream) {
-                Ok(v) => v.into_inner(),
-                Err(e) => {
-                    return Err(e);
-                }
-            },
-        })
-    }
-}
-
-impl ProtoCodec for Vec3 {
-    fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
-    where
-        Self: Sized,
-    {
-        match LE::<i32>::proto_serialize(&LE::new(self.x), stream) {
-            Ok(_) => {}
-            Err(e) => {
-                return Err(e);
-            }
-        }
-
-        match LE::<i32>::proto_serialize(&LE::new(self.y), stream) {
-            Ok(_) => {}
-            Err(e) => {
-                return Err(e);
-            }
-        }
-
-        match LE::<i32>::proto_serialize(&LE::new(self.z), stream) {
-            Ok(_) => {}
-            Err(e) => {
-                return Err(e);
-            }
-        }
-
-        Ok(())
-    }
-
-    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
-    where
-        Self: Sized,
-    {
-        Ok(Self {
-            x: match LE::<i32>::proto_deserialize(stream) {
-                Ok(v) => v.into_inner(),
-                Err(e) => {
-                    return Err(e);
-                }
-            },
-            y: match LE::<i32>::proto_deserialize(stream) {
-                Ok(v) => v.into_inner(),
-                Err(e) => {
-                    return Err(e);
-                }
-            },
-            z: match LE::<i32>::proto_deserialize(stream) {
-                Ok(v) => v.into_inner(),
-                Err(e) => {
-                    return Err(e);
-                }
-            },
-        })
-    }
-}
-
-impl ProtoCodec for Vec3f {
-    fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
-    where
-        Self: Sized,
-    {
-        match LE::<f32>::proto_serialize(&LE::new(self.x), stream) {
-            Ok(_) => {}
-            Err(e) => {
-                return Err(e);
-            }
-        }
-
-        match LE::<f32>::proto_serialize(&LE::new(self.y), stream) {
-            Ok(_) => {}
-            Err(e) => {
-                return Err(e);
-            }
-        }
-
-        match LE::<f32>::proto_serialize(&LE::new(self.z), stream) {
-            Ok(_) => {}
-            Err(e) => {
-                return Err(e);
-            }
-        }
-
-        Ok(())
-    }
-
-    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
-    where
-        Self: Sized,
-    {
-        Ok(Self {
-            x: match LE::<f32>::proto_deserialize(stream) {
-                Ok(v) => v.into_inner(),
-                Err(e) => {
-                    return Err(e);
-                }
-            },
-            y: match LE::<f32>::proto_deserialize(stream) {
-                Ok(v) => v.into_inner(),
-                Err(e) => {
-                    return Err(e);
-                }
-            },
-            z: match LE::<f32>::proto_deserialize(stream) {
-                Ok(v) => v.into_inner(),
-                Err(e) => {
-                    return Err(e);
-                }
-            },
+            x: T::proto_deserialize(stream)?,
+            y: T::proto_deserialize(stream)?,
+            z: T::proto_deserialize(stream)?,
         })
     }
 }

@@ -1,5 +1,5 @@
 use bedrockrs_core::gamemode::Gamemode;
-use bedrockrs_core::{ActorRuntimeID, ActorUniqueID, Uuid, Vec2f, Vec3f, LE, VAR};
+use bedrockrs_core::{ActorRuntimeID, ActorUniqueID, Uuid, Vec2, Vec3, LE, VAR};
 use bedrockrs_nbt::NbtTag;
 use bedrockrs_proto_derive::ProtoCodec;
 
@@ -12,8 +12,8 @@ pub struct StartGamePacket {
     pub target_actor_id: ActorUniqueID,
     pub target_runtime_id: ActorRuntimeID,
     pub actor_game_type: Gamemode,
-    pub position: Vec3f,
-    pub rotation: Vec2f,
+    pub position: Vec3<LE<f32>>,
+    pub rotation: Vec2<LE<f32>>,
     pub settings: LevelSettings,
     pub level_id: String,
     pub level_name: String,

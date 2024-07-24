@@ -2,131 +2,144 @@ use std::ops::{
     Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
 };
 
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
+
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
-pub struct Vec2 {
-    pub x: i32,
-    pub z: i32,
+pub struct Vec2<T> {
+    pub x: T,
+    pub y: T,
 }
 
-impl Add for Vec2 {
+impl<T: Add<Output = T>> Add for Vec2<T> {
     type Output = Self;
 
     #[inline]
-    #[track_caller]
     fn add(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x + rhs.x,
-            z: self.z + rhs.z,
+            y: self.y + rhs.y,
         }
     }
 }
 
-impl AddAssign for Vec2 {
+impl<T: AddAssign> AddAssign for Vec2<T> {
     #[inline]
-    #[track_caller]
     fn add_assign(&mut self, rhs: Self) {
         self.x += rhs.x;
-        self.z += rhs.z;
+        self.y += rhs.y;
     }
 }
 
-impl Sub for Vec2 {
+impl<T: Sub<Output = T>> Sub for Vec2<T> {
     type Output = Self;
 
     #[inline]
-    #[track_caller]
     fn sub(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x - rhs.x,
-            z: self.z - rhs.z,
+            y: self.y - rhs.y,
         }
     }
 }
 
-impl SubAssign for Vec2 {
+impl<T: SubAssign> SubAssign for Vec2<T> {
     #[inline]
-    #[track_caller]
     fn sub_assign(&mut self, rhs: Self) {
         self.x -= rhs.x;
-        self.z -= rhs.z;
+        self.y -= rhs.y;
     }
 }
 
-impl Mul for Vec2 {
+impl<T: Mul<Output = T>> Mul for Vec2<T> {
     type Output = Self;
 
     #[inline]
-    #[track_caller]
     fn mul(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x * rhs.x,
-            z: self.z * rhs.z,
+            y: self.y * rhs.y,
         }
     }
 }
 
-impl MulAssign for Vec2 {
+impl<T: MulAssign> MulAssign for Vec2<T> {
     #[inline]
-    #[track_caller]
     fn mul_assign(&mut self, rhs: Self) {
         self.x *= rhs.x;
-        self.z *= rhs.z;
+        self.y *= rhs.y;
     }
 }
 
-impl Div for Vec2 {
+impl<T: Div<Output = T>> Div for Vec2<T> {
     type Output = Self;
 
     #[inline]
-    #[track_caller]
     fn div(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x / rhs.x,
-            z: self.z / rhs.z,
+            y: self.y / rhs.y,
         }
     }
 }
 
-impl DivAssign for Vec2 {
+impl<T: DivAssign> DivAssign for Vec2<T> {
     #[inline]
-    #[track_caller]
     fn div_assign(&mut self, rhs: Self) {
         self.x /= rhs.x;
-        self.z /= rhs.z;
+        self.y /= rhs.y;
     }
 }
 
-impl Rem for Vec2 {
+impl<T: Rem<Output = T>> Rem for Vec2<T> {
     type Output = Self;
 
     #[inline]
-    #[track_caller]
     fn rem(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x % rhs.x,
-            z: self.z % rhs.z,
+            y: self.y % rhs.y,
         }
     }
 }
 
-impl RemAssign for Vec2 {
+impl<T: RemAssign> RemAssign for Vec2<T> {
     #[inline]
-    #[track_caller]
     fn rem_assign(&mut self, rhs: Self) {
         self.x %= rhs.x;
-        self.z %= rhs.z;
+        self.y %= rhs.y;
     }
 }
 
-impl Neg for Vec2 {
+impl<T: Neg<Output = T>> Neg for Vec2<T> {
     type Output = Self;
 
     #[inline]
-    #[track_caller]
     fn neg(self) -> Self::Output {
         Self {
             x: -self.x,
-            z: -self.z,
+            y: -self.y,
         }
+    }
+}
+
+// Serde
+
+impl<T: Serialize> Serialize for Vec2<T> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        <[&T; 2]>::serialize(&[&self.x, &self.y], serializer)
+    }
+}
+
+impl<'de, T: Deserialize<'de>> Deserialize<'de> for Vec2<T> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let [x, y] = <[T; 2]>::deserialize(deserializer)?;
+
+        Ok(Self { x, y })
     }
 }
