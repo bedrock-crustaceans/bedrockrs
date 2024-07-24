@@ -1,5 +1,5 @@
-use bedrock_core::VAR;
-use proto_derive::ProtoCodec;
+use bedrockrs_core::VAR;
+use bedrockrs_proto_derive::ProtoCodec;
 
 use crate::types::base_game_version::BaseGameVersion;
 use crate::types::experiments::Experiments;

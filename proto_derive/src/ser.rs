@@ -20,16 +20,16 @@ pub fn proto_build_ser_struct(struct_data: &DataStruct) -> TokenStream {
                             {
                                 let len = #int_type::new(match Vec::len(&self.#field_name).try_into() {
                                     Ok(v) => { v },
-                                    Err(e) => { return Err(proto_core::error::ProtoCodecError::FromIntError(e.into())) }
+                                    Err(e) => { return Err(bedrockrs_proto_core::error::ProtoCodecError::FromIntError(e.into())) }
                                 });
 
                                 match len.write(stream) {
                                     Ok(_) => { },
-                                    Err(e) => { return Err(proto_core::error::ProtoCodecError::IOError(std::sync::Arc::new(e))) }
+                                    Err(e) => { return Err(bedrockrs_proto_core::error::ProtoCodecError::IOError(std::sync::Arc::new(e))) }
                                 };
 
                                 for i in &self.#field_name {
-                                    match proto_core::ProtoCodec::proto_serialize(i, stream) {
+                                    match bedrockrs_proto_core::ProtoCodec::proto_serialize(i, stream) {
                                         Ok(_) => { },
                                         Err(e) => { return Err(e) }
                                     };
@@ -42,7 +42,7 @@ pub fn proto_build_ser_struct(struct_data: &DataStruct) -> TokenStream {
                 match quote {
                     None => {
                         quote! {
-                            match proto_core::ProtoCodec::proto_serialize(&self.#field_name, stream) {
+                            match bedrockrs_proto_core::ProtoCodec::proto_serialize(&self.#field_name, stream) {
                                 Ok(_) => { },
                                 Err(e) => { return Err(e) }
                             };
@@ -72,16 +72,16 @@ pub fn proto_build_ser_struct(struct_data: &DataStruct) -> TokenStream {
                             {
                                 let len = #int_type::new(match Vec::len(&self.#index).try_into() {
                                     Ok(v) => { v },
-                                    Err(e) => { return Err(proto_core::error::ProtoCodecError::FromIntError(e.into())) }
+                                    Err(e) => { return Err(bedrockrs_proto_core::error::ProtoCodecError::FromIntError(e.into())) }
                                 });
 
                                 match len.write(stream) {
                                     Ok(_) => { },
-                                    Err(e) => { return Err(proto_core::error::ProtoCodecError::IOError(std::sync::Arc::new(e))) }
+                                    Err(e) => { return Err(bedrockrs_proto_core::error::ProtoCodecError::IOError(std::sync::Arc::new(e))) }
                                 };
 
                                 for i in &self.#index {
-                                    match proto_core::ProtoCodec::proto_serialize(i, stream) {
+                                    match bedrockrs_proto_core::ProtoCodec::proto_serialize(i, stream) {
                                         Ok(_) => { },
                                         Err(e) => { return Err(e) }
                                     };
@@ -92,7 +92,7 @@ pub fn proto_build_ser_struct(struct_data: &DataStruct) -> TokenStream {
                 }
 
                 quote! {
-                    match proto_core::ProtoCodec::proto_serialize(&self.#index, stream) {
+                    match bedrockrs_proto_core::ProtoCodec::proto_serialize(&self.#index, stream) {
                         Ok(_) => { },
                         Err(e) => { return Err(e) }
                     };

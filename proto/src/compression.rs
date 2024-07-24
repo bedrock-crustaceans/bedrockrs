@@ -2,8 +2,8 @@ use std::io;
 use std::io::Write;
 use std::sync::Arc;
 
-use bedrock_core::stream::read::ByteStreamRead;
-use bedrock_core::stream::write::ByteStreamWrite;
+use bedrockrs_core::stream::read::ByteStreamRead;
+use bedrockrs_core::stream::write::ByteStreamWrite;
 
 use crate::error::CompressionError;
 

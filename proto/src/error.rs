@@ -3,7 +3,7 @@ use std::error::Error;
 use std::io;
 use std::sync::Arc;
 
-use proto_core::error::ProtoCodecError;
+use bedrockrs_proto_core::error::ProtoCodecError;
 use rak_rs::connection::queue::SendQueueError;
 use rak_rs::connection::RecvError;
 use rak_rs::error::server::ServerError;

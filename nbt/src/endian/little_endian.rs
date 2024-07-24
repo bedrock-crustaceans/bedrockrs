@@ -1,7 +1,7 @@
 use std::io::{Cursor, Read, Write};
 use std::sync::Arc;
 
-use bedrock_core::LE;
+use bedrockrs_core::LE;
 
 use crate::byte_order::NbtByteOrder;
 use crate::error::NbtError;

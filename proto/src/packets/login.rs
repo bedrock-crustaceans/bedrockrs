@@ -1,5 +1,5 @@
-use bedrock_core::*;
-use proto_derive::ProtoCodec;
+use bedrockrs_core::*;
+use bedrockrs_proto_derive::ProtoCodec;
 
 use crate::types::connection_request::ConnectionRequestType;
 

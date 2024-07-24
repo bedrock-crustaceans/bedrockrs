@@ -1,7 +1,7 @@
-use bedrock_core::gamemode::Gamemode;
-use bedrock_core::{ActorRuntimeID, ActorUniqueID, Uuid, Vec2f, Vec3f, LE, VAR};
-use nbt::NbtTag;
-use proto_derive::ProtoCodec;
+use bedrockrs_core::gamemode::Gamemode;
+use bedrockrs_core::{ActorRuntimeID, ActorUniqueID, Uuid, Vec2f, Vec3f, LE, VAR};
+use bedrockrs_nbt::NbtTag;
+use bedrockrs_proto_derive::ProtoCodec;
 
 use crate::types::level_settings::LevelSettings;
 use crate::types::network_permissions::NetworkPermissions;

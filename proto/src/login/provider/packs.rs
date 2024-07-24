@@ -1,5 +1,5 @@
-use packs::behavior::behavior_pack::BehaviorPack;
-use packs::resource::resource_pack::ResourcePack;
+use bedrockrs_addons::behavior::behavior_pack::BehaviorPack;
+use bedrockrs_addons::resource::resource_pack::ResourcePack;
 
 use crate::types::pack_url::PackURL;
 

@@ -1,4 +1,4 @@
-use bedrock_core::LE;
+use bedrockrs_core::LE;
 
 use crate::connection::ConnectionShard;
 use crate::error::LoginError;

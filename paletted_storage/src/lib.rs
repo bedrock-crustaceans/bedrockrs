@@ -1,10 +1,10 @@
 use std::io::Cursor;
 
-use bedrock_core::LE;
+use bedrockrs_core::LE;
 use byteorder::ReadBytesExt;
-use nbt::endian::little_endian::NbtLittleEndian;
-use nbt::endian::little_endian_network::NbtLittleEndianNetwork;
-use nbt::NbtTag;
+use bedrockrs_nbt::endian::little_endian::NbtLittleEndian;
+use bedrockrs_nbt::endian::little_endian_network::NbtLittleEndianNetwork;
+use bedrockrs_nbt::NbtTag;
 
 #[derive(Debug)]
 pub struct PalettedStorage {

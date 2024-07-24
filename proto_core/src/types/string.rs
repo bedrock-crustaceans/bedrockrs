@@ -2,9 +2,9 @@ use std::convert::TryInto;
 use std::io::{Read, Write};
 use std::sync::Arc;
 
-use bedrock_core::read::ByteStreamRead;
-use bedrock_core::write::ByteStreamWrite;
-use bedrock_core::VAR;
+use bedrockrs_core::read::ByteStreamRead;
+use bedrockrs_core::write::ByteStreamWrite;
+use bedrockrs_core::VAR;
 
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;

@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
-use bedrock_core::gamemode::Gamemode;
-use bedrock_core::{
+use bedrockrs_core::gamemode::Gamemode;
+use bedrockrs_core::{
     ActorRuntimeID, ActorUniqueID, Difficulty, Dimension, GeneratorType, Uuid, Vec2f, Vec3f, LE,
     VAR,
 };
-use nbt::NbtTag;
+use bedrockrs_nbt::NbtTag;
 
 use crate::connection::ConnectionShard;
 use crate::error::LoginError;

@@ -1,6 +1,6 @@
-use bedrock_core::gamemode::Gamemode;
-use bedrock_core::{Difficulty, GeneratorType, LE, VAR};
-use proto_derive::ProtoCodec;
+use bedrockrs_core::gamemode::Gamemode;
+use bedrockrs_core::{Difficulty, GeneratorType, LE, VAR};
+use bedrockrs_proto_derive::ProtoCodec;
 
 use crate::types::base_game_version::BaseGameVersion;
 use crate::types::chat_restriction_level::ChatRestrictionLevel;

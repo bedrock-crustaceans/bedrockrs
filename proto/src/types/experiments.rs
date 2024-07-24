@@ -1,6 +1,6 @@
-use bedrock_core::LE;
-use proto_core::ProtoCodec;
-use proto_derive::ProtoCodec;
+use bedrockrs_core::LE;
+use bedrockrs_proto_core::ProtoCodec;
+use bedrockrs_proto_derive::ProtoCodec;
 
 use crate::types::experiment::Experiment;
 

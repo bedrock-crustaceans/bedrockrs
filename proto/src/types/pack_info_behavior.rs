@@ -1,5 +1,5 @@
-use bedrock_core::LE;
-use proto_derive::ProtoCodec;
+use bedrockrs_core::LE;
+use bedrockrs_proto_derive::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct BehaviorPackInfoType {

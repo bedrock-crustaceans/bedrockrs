@@ -1,9 +1,9 @@
 use std::io::Cursor;
 
-use bedrock_core::read::ByteStreamRead;
-use bedrock_core::write::ByteStreamWrite;
-use nbt::endian::little_endian_network::NbtLittleEndianNetwork;
-use nbt::NbtTag;
+use bedrockrs_core::read::ByteStreamRead;
+use bedrockrs_core::write::ByteStreamWrite;
+use bedrockrs_nbt::endian::little_endian_network::NbtLittleEndianNetwork;
+use bedrockrs_nbt::NbtTag;
 
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;

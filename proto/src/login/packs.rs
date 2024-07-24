@@ -1,7 +1,8 @@
 use crate::connection::ConnectionShard;
 use crate::error::LoginError;
 use crate::gamepacket::GamePacket;
-use crate::login::provider::{LoginProviderPacks, LoginProviderServer, LoginProviderStatus};
+use crate::login::provider::{LoginProviderClient, LoginProviderServer, LoginProviderStatus};
+use crate::login::provider::packs::LoginProviderPacks;
 use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
 use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
 use crate::types::base_game_version::BaseGameVersion;
@@ -163,7 +164,7 @@ pub async fn packs(
             }
         }
         LoginProviderPacks::DirectNetworkTransfer { .. } => {
-            todo!("impl LoginProviderPacks::DirectNetworkTransfer in login process")
+            todo!("impl LoginProviderbedrockrs_addons::DirectNetworkTransfer in login process")
         }
     };
 

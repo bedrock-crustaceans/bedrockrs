@@ -1,7 +1,7 @@
-use bedrock_core::LE;
-use bedrock_core::VAR;
-use proto_core::ProtoCodec;
-use proto_derive::ProtoCodec;
+use bedrockrs_core::LE;
+use bedrockrs_core::VAR;
+use bedrockrs_proto_core::ProtoCodec;
+use bedrockrs_proto_derive::ProtoCodec;
 
 use crate::types::pack_info_behavior::BehaviorPackInfoType;
 use crate::types::pack_info_resource::ResourcePackInfoType;

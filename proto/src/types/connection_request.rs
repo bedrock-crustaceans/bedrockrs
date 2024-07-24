@@ -4,12 +4,12 @@ use std::sync::Arc;
 
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
-use bedrock_core::stream::read::ByteStreamRead;
-use bedrock_core::stream::write::ByteStreamWrite;
-use bedrock_core::{LE, VAR};
+use bedrockrs_core::stream::read::ByteStreamRead;
+use bedrockrs_core::stream::write::ByteStreamWrite;
+use bedrockrs_core::{LE, VAR};
 use jsonwebtoken::{DecodingKey, Validation};
-use proto_core::error::ProtoCodecError;
-use proto_core::ProtoCodec;
+use bedrockrs_proto_core::error::ProtoCodecError;
+use bedrockrs_proto_core::ProtoCodec;
 use serde_json::Value;
 
 #[derive(Debug, Clone)]

@@ -1,10 +1,10 @@
-use bedrock_core::stream::read::ByteStreamRead;
-use bedrock_core::stream::write::ByteStreamWrite;
-use bedrock_core::BE;
+use bedrockrs_core::stream::read::ByteStreamRead;
+use bedrockrs_core::stream::write::ByteStreamWrite;
+use bedrockrs_core::BE;
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::{FromPrimitive, ToPrimitive};
-use proto_core::error::ProtoCodecError;
-use proto_core::ProtoCodec;
+use bedrockrs_proto_core::error::ProtoCodecError;
+use bedrockrs_proto_core::ProtoCodec;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, FromPrimitive, ToPrimitive)]
 pub enum PlayStatusType {

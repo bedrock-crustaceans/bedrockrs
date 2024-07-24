@@ -1,5 +1,5 @@
-use bedrock_core::VAR;
-use proto_derive::ProtoCodec;
+use bedrockrs_core::VAR;
+use bedrockrs_proto_derive::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct PacketViolationWarningPacket {

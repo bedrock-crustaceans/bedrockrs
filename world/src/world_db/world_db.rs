@@ -1,9 +1,9 @@
 use std::fmt::{Debug, Formatter};
 use std::{collections::HashMap, path::PathBuf};
 
-use bedrock_core::{Dimension, Uuid};
+use bedrockrs_core::{Dimension, Uuid};
 use mojang_leveldb::{error::DBError, Options, ReadOptions, WriteBatch, WriteOptions, DB};
-use nbt::{endian::little_endian::NbtLittleEndian, NbtTag};
+use bedrockrs_nbt::{endian::little_endian::NbtLittleEndian, NbtTag};
 
 use crate::error::WorldError;
 

@@ -1,4 +1,4 @@
-use nbt::error::NbtError;
+use bedrockrs_nbt::error::NbtError;
 use thiserror::Error;
 
 #[derive(Error, Debug)]

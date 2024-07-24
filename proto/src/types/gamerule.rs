@@ -1,8 +1,8 @@
-use bedrock_core::read::ByteStreamRead;
-use bedrock_core::write::ByteStreamWrite;
-use proto_core::error::ProtoCodecError;
-use proto_core::ProtoCodec;
-use proto_derive::ProtoCodec;
+use bedrockrs_core::read::ByteStreamRead;
+use bedrockrs_core::write::ByteStreamWrite;
+use bedrockrs_proto_core::error::ProtoCodecError;
+use bedrockrs_proto_core::ProtoCodec;
+use bedrockrs_proto_derive::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct GameRule {

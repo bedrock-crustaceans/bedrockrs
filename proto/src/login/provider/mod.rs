@@ -1,5 +1,5 @@
 pub use default::*;
-pub use packs::*;
+pub use bedrockrs_addons::*;
 pub use provider::*;
 pub use status::*;
 

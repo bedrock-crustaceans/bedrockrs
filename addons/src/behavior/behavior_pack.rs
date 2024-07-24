@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use bedrock_core::SemVer;
+use bedrockrs_core::SemVer;
 use image::RgbaImage;
 use serde_json::Value;
 use uuid::Uuid;

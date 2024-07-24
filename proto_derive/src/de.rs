@@ -20,16 +20,16 @@ pub fn proto_build_de_struct(struct_data: &DataStruct) -> TokenStream {
                             #field_name: {
                                 let len = match #int_type::read(stream) {
                                     Ok(v) => { v.into_inner() },
-                                    Err(e) => { return Err(proto_core::error::ProtoCodecError::IOError(std::sync::Arc::new(e))) }
+                                    Err(e) => { return Err(bedrockrs_proto_core::error::ProtoCodecError::IOError(std::sync::Arc::new(e))) }
                                 };
 
                                 let mut vec = Vec::with_capacity(match len.try_into() {
                                     Ok(v) => { v },
-                                    Err(e) => { return Err(proto_core::error::ProtoCodecError::FromIntError(e.into())) }
+                                    Err(e) => { return Err(bedrockrs_proto_core::error::ProtoCodecError::FromIntError(e.into())) }
                                 });
 
                                 for _ in 0..len {
-                                    vec.push(match proto_core::ProtoCodec::proto_deserialize(stream) {
+                                    vec.push(match bedrockrs_proto_core::ProtoCodec::proto_deserialize(stream) {
                                         Ok(v) => { v },
                                         Err(e) => { return Err(e) }
                                     });
@@ -44,7 +44,7 @@ pub fn proto_build_de_struct(struct_data: &DataStruct) -> TokenStream {
                 match quote {
                     None => {
                         quote! {
-                            #field_name: match proto_core::ProtoCodec::proto_deserialize(stream) {
+                            #field_name: match bedrockrs_proto_core::ProtoCodec::proto_deserialize(stream) {
                                 Ok(v) => { v },
                                 Err(e) => { return Err(e) }
                             },
@@ -74,16 +74,16 @@ pub fn proto_build_de_struct(struct_data: &DataStruct) -> TokenStream {
                             #index: {
                                 let len = match #int_type::read(stream) {
                                     Ok(v) => { v.into_inner() },
-                                    Err(e) => { return Err(proto_core::error::ProtoCodecError::IOError(std::sync::Arc::new(e))) }
+                                    Err(e) => { return Err(bedrockrs_proto_core::error::ProtoCodecError::IOError(std::sync::Arc::new(e))) }
                                 };
 
                                 let mut vec = Vec::with_capacity( match len.try_into() {
                                     Ok(v) => { v },
-                                    Err(e) => { return Err(proto_core::error::ProtoCodecError::FromIntError(e.into())) }
+                                    Err(e) => { return Err(bedrockrs_proto_core::error::ProtoCodecError::FromIntError(e.into())) }
                                 });
 
                                 for _ in 0..len {
-                                    vec.push(match proto_core::ProtoCodec::proto_deserialize(stream) {
+                                    vec.push(match bedrockrs_proto_core::ProtoCodec::proto_deserialize(stream) {
                                         Ok(v) => { v },
                                         Err(e) => { return Err(e) }
                                     });
@@ -98,7 +98,7 @@ pub fn proto_build_de_struct(struct_data: &DataStruct) -> TokenStream {
                 match quote {
                     None => {
                         quote! {
-                            #index: match proto_core::ProtoCodec::proto_deserialize(stream) {
+                            #index: match bedrockrs_proto_core::ProtoCodec::proto_deserialize(stream) {
                                 Ok(v) => { v },
                                 Err(e) => { return Err(e) }
                             },

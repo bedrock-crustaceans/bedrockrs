@@ -3,8 +3,8 @@ use std::io::{Cursor, Write};
 use std::sync::Arc;
 use std::time::Duration;
 
-use bedrock_core::stream::write::ByteStreamWrite;
-use bedrock_core::LE;
+use bedrockrs_core::stream::write::ByteStreamWrite;
+use bedrockrs_core::LE;
 use tokio::select;
 use tokio::sync::{broadcast, watch};
 use tokio::time::interval;

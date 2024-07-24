@@ -1,7 +1,7 @@
-use bedrock_core::stream::read::ByteStreamRead;
-use bedrock_core::stream::write::ByteStreamWrite;
-use proto_core::error::ProtoCodecError;
-use proto_core::ProtoCodec;
+use bedrockrs_core::stream::read::ByteStreamRead;
+use bedrockrs_core::stream::write::ByteStreamWrite;
+use bedrockrs_proto_core::error::ProtoCodecError;
+use bedrockrs_proto_core::ProtoCodec;
 
 #[derive(Debug, Clone)]
 pub struct PackURL {

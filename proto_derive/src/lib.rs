@@ -23,13 +23,13 @@ pub fn proto_codec(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
             let de = proto_build_de_struct(&struct_data);
 
             quote! {
-                impl #impl_generics proto_core::ProtoCodec for #name #ty_generics #where_clause {
-                    fn proto_serialize(&self, stream: &mut bedrock_core::stream::write::ByteStreamWrite) -> Result<(), proto_core::error::ProtoCodecError> where Self: Sized {
+                impl #impl_generics bedrockrs_proto_core::ProtoCodec for #name #ty_generics #where_clause {
+                    fn proto_serialize(&self, stream: &mut bedrockrs_core::stream::write::ByteStreamWrite) -> Result<(), bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {
                         #ser
                         Ok(())
                     }
 
-                    fn proto_deserialize(stream: &mut bedrock_core::stream::read::ByteStreamRead) -> Result<Self, proto_core::error::ProtoCodecError> where Self: Sized {
+                    fn proto_deserialize(stream: &mut bedrockrs_core::stream::read::ByteStreamRead) -> Result<Self, bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {
                         Ok(Self{
                             #de
                         })

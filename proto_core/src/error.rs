@@ -5,7 +5,7 @@ use std::sync::Arc;
 
 use base64::DecodeError as Base64DecodeError;
 use jsonwebtoken::errors::Error as JwtError;
-use nbt::error::NbtError;
+use bedrockrs_nbt::error::NbtError;
 use serde_json::error::Error as JsonError;
 use thiserror::Error;
 
