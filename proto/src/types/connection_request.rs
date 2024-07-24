@@ -7,9 +7,9 @@ use base64::Engine;
 use bedrockrs_core::stream::read::ByteStreamRead;
 use bedrockrs_core::stream::write::ByteStreamWrite;
 use bedrockrs_core::{LE, VAR};
-use jsonwebtoken::{DecodingKey, Validation};
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
+use jsonwebtoken::{DecodingKey, Validation};
 use serde_json::Value;
 
 #[derive(Debug, Clone)]

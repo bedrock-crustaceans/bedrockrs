@@ -11,9 +11,7 @@ pub use semver::*;
 pub use stream::*;
 pub use uuid::*;
 pub use vec::vec2::Vec2;
-pub use vec::vec2f::Vec2f;
 pub use vec::vec3::Vec3;
-pub use vec::vec3f::Vec3f;
 
 pub mod int;
 pub mod vec;

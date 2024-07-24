@@ -1,8 +1,8 @@
 use crate::connection::ConnectionShard;
 use crate::error::LoginError;
 use crate::gamepacket::GamePacket;
-use crate::login::provider::{LoginProviderClient, LoginProviderServer, LoginProviderStatus};
 use crate::login::provider::packs::LoginProviderPacks;
+use crate::login::provider::{LoginProviderServer, LoginProviderStatus};
 use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
 use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
 use crate::types::base_game_version::BaseGameVersion;
