@@ -1,9 +1,9 @@
 [package]
-name = "nbt"
+name = "bedrockrs_nbt"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bedrock_core = { path = "../bedrock_core" }
+bedrockrs_core = { path = "../core" }
 
 thiserror = "1.0"

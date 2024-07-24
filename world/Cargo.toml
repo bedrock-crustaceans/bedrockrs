@@ -1,12 +1,12 @@
 [package]
-name = "world"
+name = "bedrockrs_world"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bedrock_core = { path = "../bedrock_core" }
-paletted_storage = { path = "../paletted_storage" }
-nbt = { path = "../nbt" }
+bedrockrs_core = { path = "../core" }
+bedrockrs_nbt = { path = "../nbt" }
+bedrockrs_paletted_storage = { path = "../paletted_storage" }
 
 mojang-leveldb = "0.4"
 thiserror = "1.0"

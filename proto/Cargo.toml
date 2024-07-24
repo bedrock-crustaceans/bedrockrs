@@ -1,16 +1,14 @@
 [package]
-name = "proto"
+name = "bedrockrs_proto"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-bedrock_core = { path = "../bedrock_core" }
-proto_core = { path = "../proto_core" }
-proto_derive = { path = "../proto_derive" }
-nbt = { path = "../nbt" }
-packs = { path = "../packs" }
+bedrockrs_core = { path = "../core" }
+bedrockrs_nbt = { path = "../nbt" }
+bedrockrs_proto_core = { path = "../proto_core" }
+bedrockrs_proto_derive = { path = "../proto_derive" }
+bedrockrs_addons = { path = "../addons" }
 
 thiserror = "1.0"
 dyn-clone = "1.0"

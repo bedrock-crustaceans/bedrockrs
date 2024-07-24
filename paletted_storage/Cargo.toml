@@ -1,9 +1,10 @@
 [package]
-name = "paletted_storage"
+name = "bedrockrs_paletted_storage"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-nbt = { path = "../nbt" }
+bedrockrs_core = { path = "../core" }
+bedrockrs_nbt = { path = "../nbt" }
+
 byteorder = "1.5"
-bedrock_core = { path = "../bedrock_core" }

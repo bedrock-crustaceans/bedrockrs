@@ -7,7 +7,7 @@ use crate::types::resource_packs_response_status::ResourcePacksResponseStatus;
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct ResourcePacksResponsePacket {
     pub response: ResourcePacksResponseStatus,
-    /// The packs that are downloaded/getting downloaded
+    /// The addons that are downloaded/getting downloaded
     /// with their pack name as strings
     #[len_type(LE::< u16 >)]
     pub downloading_packs: Vec<String>,
@@ -30,7 +30,7 @@ pub struct ResourcePacksResponsePacket {
 //             }
 //         };
 //
-//         // Write length of downloading packs as an u16le
+//         // Write length of downloading addons as an u16le
 //         match LE::<u16>::new(len).proto_serialize(stream) {
 //             Ok(_) => {}
 //             Err(e) => return Err(e),

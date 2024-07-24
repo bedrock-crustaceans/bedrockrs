@@ -57,7 +57,7 @@ pub struct ResourcePacksInfoPacket {
 //             }
 //         };
 //
-//         // Write length of behavior packs as an u16le
+//         // Write length of behavior addons as an u16le
 //         match LE::<u16>::new(len).proto_serialize(stream) {
 //             Ok(_) => {}
 //             Err(e) => return Err(e),
@@ -78,7 +78,7 @@ pub struct ResourcePacksInfoPacket {
 //             }
 //         };
 //
-//         // Write length of resource packs as an u16le
+//         // Write length of resource addons as an u16le
 //         match LE::<u16>::new(len).proto_serialize(stream) {
 //             Ok(_) => {}
 //             Err(e) => return Err(e),
