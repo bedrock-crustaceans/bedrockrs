@@ -36,10 +36,8 @@ pub enum AddonDynamicVersion {
 impl Debug for AddonDynamicVersion {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            AddonDynamicVersion::Vector(v) => {
-                f.debug_list().entries([v.x, v.y, v.z]).finish()
-            }
-            AddonDynamicVersion::SemVer(v) => { v.fmt(f) }
+            AddonDynamicVersion::Vector(v) => f.debug_list().entries([v.x, v.y, v.z]).finish(),
+            AddonDynamicVersion::SemVer(v) => v.fmt(f),
         }
     }
 }
