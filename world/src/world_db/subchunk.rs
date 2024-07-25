@@ -1,7 +1,7 @@
 use std::io::Cursor;
 
 use byteorder::ReadBytesExt;
-use paletted_storage::PalettedStorage;
+use bedrockrs_paletted_storage::PalettedStorage;
 
 #[derive(Debug)]
 pub struct SubChunk {
