@@ -4,32 +4,6 @@ use uuid::Uuid;
 
 use crate::language::Languages;
 
-#[derive(Debug, Clone)]
-pub struct BehaviorPack {
-    format_version: u32,
-    name: String,
-    description: String,
-    uuid: Uuid,
-    version: SemVer,
-    icon: Option<RgbaImage>,
-    min_engine_version: SemVer,
-    languages: Languages,
-}
-
-// impl Pack for BehaviorPack {
-//     fn name(&self) -> &str {
-//         &self.name
-//     }
-//     fn description(&self) -> &str {
-//         &self.description
-//     }
-//     fn uuid(&self) -> &Uuid {
-//         &self.uuid
-//     }
-//     fn version(&self) -> &SemVer {
-//         &self.version
-//     }
-//
 //     fn import(path: impl AsRef<Path>) -> Result<Self, AddonError>
 //     where
 //         Self: Sized,
