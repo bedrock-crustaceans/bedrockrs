@@ -8,11 +8,11 @@ bedrockrs_core = { path = "core" }
 
 bedrockrs_nbt = { path = "nbt" }
 
-bedrockrs_proto = { path = "proto" }
-bedrockrs_proto_core = { path = "proto_core" }
-bedrockrs_proto_derive = { path = "proto_derive" }
+bedrockrs_proto = { path = "proto", optional = true }
+bedrockrs_proto_core = { path = "proto_core", optional = true }
+bedrockrs_proto_derive = { path = "proto_derive", optional = true }
 
-bedrockrs_addons = { path = "addons" }
+bedrockrs_addons = { path = "addons", optional = true }
 
 bedrockrs_form = { path = "form" }
 
@@ -20,5 +20,7 @@ bedrockrs_world = { path = "world", optional = true }
 bedrockrs_paletted_storage = { path = "paletted_storage", optional = true }
 
 [features]
-default = []
+default = [ "addons", "proto" ]
+addons = ["dep:bedrockrs_addons"]
+proto = ["dep:bedrockrs_proto", "dep:bedrockrs_proto_core", "dep:bedrockrs_proto_derive"]
 world = ["dep:bedrockrs_world", "dep:bedrockrs_paletted_storage"]
