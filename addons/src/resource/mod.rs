@@ -7,12 +7,13 @@ use crate::Addon;
 
 #[derive(Debug, Clone)]
 pub struct ResourcePack {
+    manifest: AddonManifest,
     languages: Languages,
 }
 
 impl Addon for ResourcePack {
     fn manifest(&self) -> &AddonManifest {
-        todo!()
+        &self.manifest
     }
 
     fn import(path: impl AsRef<Path>) -> Result<Self, AddonError>
