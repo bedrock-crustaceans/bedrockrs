@@ -16,15 +16,8 @@ impl ProtoCodec for PackURL {
     {
         let uuid_version = format!("{}_{}", self.uuid, self.version);
 
-        match uuid_version.proto_serialize(stream) {
-            Ok(_) => {}
-            Err(e) => return Err(e),
-        }
-
-        match self.url.proto_serialize(stream) {
-            Ok(_) => {}
-            Err(e) => return Err(e),
-        }
+        uuid_version.proto_serialize(stream)?;
+        self.url.proto_serialize(stream)?;
 
         Ok(())
     }

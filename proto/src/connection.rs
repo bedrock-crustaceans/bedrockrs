@@ -42,10 +42,7 @@ impl Connection {
         // Batch all game packets together
         for game_packet in gamepackets {
             // Write a game packet
-            match game_packet.pk_serialize(&mut pk_stream) {
-                Ok(_) => {}
-                Err(e) => return Err(ConnectionError::ProtoCodecError(e)),
-            }
+            game_packet.pk_serialize(&mut pk_stream).map_err(|e| ConnectionError::ProtoCodecError(e))?
         }
 
         // Compress the data depending on compression method
@@ -53,27 +50,12 @@ impl Connection {
             Some(compression) => {
                 let mut compressed_stream = vec![];
 
-                match LE::<u8>::write(&LE::new(compression.id_u8()), &mut compressed_stream) {
-                    Ok(_) => {}
-                    Err(e) => return Err(ConnectionError::IOError(Arc::new(e))),
-                };
+                LE::<u8>::write(&LE::new(compression.id_u8()), &mut compressed_stream).map_err(|e| ConnectionError::IOError(Arc::new(e)))?;
 
-                if compression.compression_needed()
-                    && pk_stream.len() as u16 > compression.threshold()
-                {
-                    match compression.compress(pk_stream.as_slice(), &mut compressed_stream) {
-                        Ok(_) => {}
-                        Err(e) => {
-                            return Err(ConnectionError::CompressError(e));
-                        }
-                    };
+                if compression.needed() && pk_stream.len() as u16 > compression.threshold() {
+                    compression.compress(pk_stream.as_slice(), &mut compressed_stream).map_err(|e| ConnectionError::CompressError(e))?;
                 } else {
-                    match compressed_stream.write(pk_stream.as_slice()) {
-                        Ok(_) => {}
-                        Err(e) => {
-                            return Err(ConnectionError::IOError(Arc::new(e)));
-                        }
-                    }
+                    compressed_stream.write(pk_stream.as_slice()).map_err(|e| ConnectionError::IOError(Arc::new(e)))?;
                 };
 
                 compressed_stream
@@ -91,12 +73,7 @@ impl Connection {
         };
 
         // Send the data
-        match self.connection.send(&Cursor::new(&encrypted_stream)).await {
-            Ok(_) => {}
-            Err(e) => return Err(ConnectionError::TransportError(e)),
-        }
-
-        Ok(())
+        self.connection.send(&Cursor::new(&encrypted_stream)).await.map_err(|e| ConnectionError::TransportError(e))
     }
 
     pub async fn send_raw(&mut self, data: &Vec<u8>) -> Result<(), ConnectionError> {

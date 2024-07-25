@@ -11,60 +11,39 @@ pub struct NbtLittleEndian;
 impl NbtByteOrder for NbtLittleEndian {
     #[inline]
     fn write_u8(buf: &mut Vec<u8>, byte: u8) -> Result<(), NbtError> {
-        match LE::<u8>::write(&LE::new(byte), buf) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(Arc::new(e))),
-        }
+        LE::<u8>::write(&LE::new(byte), buf).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
     fn write_i16(buf: &mut Vec<u8>, int16: i16) -> Result<(), NbtError> {
-        match LE::<i16>::write(&LE::new(int16), buf) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(Arc::new(e))),
-        }
+        LE::<i16>::write(&LE::new(int16), buf).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
     fn write_i32(buf: &mut Vec<u8>, int32: i32) -> Result<(), NbtError> {
-        match LE::<i32>::write(&LE::new(int32), buf) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(Arc::new(e))),
-        }
+        LE::<i32>::write(&LE::new(int32), buf).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
     fn write_i64(buf: &mut Vec<u8>, int64: i64) -> Result<(), NbtError> {
-        match LE::<i64>::write(&LE::new(int64), buf) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(Arc::new(e))),
-        }
+        LE::<i64>::write(&LE::new(int64), buf).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
     fn write_f32(buf: &mut Vec<u8>, float32: f32) -> Result<(), NbtError> {
-        match LE::<f32>::write(&LE::new(float32), buf) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(Arc::new(e))),
-        }
+        LE::<f32>::write(&LE::new(float32), buf).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
     fn write_f64(buf: &mut Vec<u8>, float64: f64) -> Result<(), NbtError> {
-        match LE::<f64>::write(&LE::new(float64), buf) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(Arc::new(e))),
-        }
+        LE::<f64>::write(&LE::new(float64), buf).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
     fn write_string(buf: &mut Vec<u8>, string: String) -> Result<(), NbtError> {
         Self::write_i16(
             buf,
-            match string.len().try_into() {
-                Ok(v) => v,
-                Err(e) => return Err(NbtError::IntError(e)),
-            },
+            string.len().try_into().map_err(|e| NbtError::IntError(e))?,
         )?;
 
         buf.write_all(string.as_bytes()).map_err(|e| NbtError::IOError(Arc::new(e)))

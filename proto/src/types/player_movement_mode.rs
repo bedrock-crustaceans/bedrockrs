@@ -15,16 +15,11 @@ pub enum PlayerMovementMode {
 
 impl ProtoCodec for PlayerMovementMode {
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
-        let int = match self {
+        VAR::<i32>::new(match self {
             PlayerMovementMode::Client => 0x00,
             PlayerMovementMode::Server => 0x01,
             PlayerMovementMode::ServerWithRewind => 0x02,
-        };
-
-        match VAR::<i32>::new(int).write(stream) {
-            Ok(_) => Ok(()),
-            Err(e) => Err(ProtoCodecError::IOError(Arc::new(e))),
-        }
+        }).write(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
     }
 
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {

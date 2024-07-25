@@ -11,69 +11,42 @@ pub struct NbtLittleEndianNetwork;
 impl NbtByteOrder for NbtLittleEndianNetwork {
     #[inline]
     fn write_u8(buf: &mut Vec<u8>, byte: u8) -> Result<(), NbtError> {
-        match LE::<u8>::write(&LE::new(byte), buf) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(Arc::new(e))),
-        }
+        LE::<u8>::write(&LE::new(byte), buf).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
     fn write_i16(buf: &mut Vec<u8>, int16: i16) -> Result<(), NbtError> {
-        match LE::<i16>::write(&LE::new(int16), buf) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(Arc::new(e))),
-        }
+        LE::<i16>::write(&LE::new(int16), buf).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
     fn write_i32(buf: &mut Vec<u8>, int32: i32) -> Result<(), NbtError> {
-        match VAR::<i32>::write(&VAR::new(int32), buf) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(Arc::new(e))),
-        }
+        VAR::<i32>::write(&VAR::new(int32), buf).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
     fn write_i64(buf: &mut Vec<u8>, int64: i64) -> Result<(), NbtError> {
-        match VAR::<i64>::write(&VAR::new(int64), buf) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(Arc::new(e))),
-        }
+        VAR::<i64>::write(&VAR::new(int64), buf).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
     fn write_f32(buf: &mut Vec<u8>, float32: f32) -> Result<(), NbtError> {
-        match LE::<f32>::write(&LE::new(float32), buf) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(Arc::new(e))),
-        }
+        LE::<f32>::write(&LE::new(float32), buf).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
     fn write_f64(buf: &mut Vec<u8>, float64: f64) -> Result<(), NbtError> {
-        match LE::<f64>::write(&LE::new(float64), buf) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(Arc::new(e))),
-        }
+        LE::<f64>::write(&LE::new(float64), buf).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
     fn write_string(buf: &mut Vec<u8>, string: String) -> Result<(), NbtError> {
-        match Self::write_i16(
+        Self::write_i16(
             buf,
-            match string.len().try_into() {
-                Ok(v) => v,
-                Err(e) => return Err(NbtError::IntError(e)),
-            },
-        ) {
-            Ok(_) => {}
-            Err(e) => return Err(e),
-        }
+            match string.len().try_into().map_err(|e| NbtError::IntError(e))?,
+        )?;
 
-        match buf.write_all(string.as_bytes()) {
-            Ok(_) => Ok(()),
-            Err(e) => Err(NbtError::IOError(Arc::new(e))),
-        }
+        buf.write_all(string.as_bytes()).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
@@ -126,33 +99,15 @@ impl NbtByteOrder for NbtLittleEndianNetwork {
 
     #[inline]
     fn read_string(buf: &mut Cursor<&[u8]>) -> Result<String, NbtError> {
-        let len = match Self::read_i16(buf) {
-            Ok(v) => v,
-            Err(e) => return Err(e),
-        };
+        let len = Self::read_i16(buf)?;
 
         let mut string_buf = vec![
             0;
-            match len.try_into() {
-                Ok(v) => {
-                    v
-                }
-                Err(e) => {
-                    return Err(NbtError::IntError(e));
-                }
-            }
+            len.try_into().map_err(|e| NbtError::IntError(e))?
         ];
 
-        match buf.read_exact(&mut string_buf) {
-            Ok(_) => {}
-            Err(e) => {
-                return Err(NbtError::IOError(Arc::new(e)));
-            }
-        };
+        buf.read_exact(&mut string_buf).map_err(|e| NbtError::IOError(Arc::new(e)))?;
 
-        match String::from_utf8(string_buf) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::Utf8Error(e)),
-        }
+        String::from_utf8(string_buf).map_err(|e| NbtError::Utf8Error(e))
     }
 }

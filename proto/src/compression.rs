@@ -48,7 +48,7 @@ impl Compression {
     /// Specifies if functions like [`Self::compress`] and [`Self::decompress`] need to be used.
     /// This is needed for optimizing compression.
     #[inline]
-    pub const fn compression_needed(&self) -> bool {
+    pub const fn needed(&self) -> bool {
         match self {
             Compression::Zlib { .. } => true,
             Compression::Snappy { .. } => true,

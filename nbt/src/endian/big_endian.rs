@@ -11,60 +11,39 @@ pub struct NbtBigEndian;
 impl NbtByteOrder for NbtBigEndian {
     #[inline]
     fn write_u8(buf: &mut Vec<u8>, byte: u8) -> Result<(), NbtError> {
-        match BE::<u8>::write(&BE::new(byte), buf) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(Arc::new(e))),
-        }
+        BE::<u8>::write(&BE::new(byte), buf).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
     fn write_i16(buf: &mut Vec<u8>, int16: i16) -> Result<(), NbtError> {
-        match BE::<i16>::write(&BE::new(int16), buf) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(Arc::new(e))),
-        }
+        BE::<i16>::write(&BE::new(int16), buf).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
     fn write_i32(buf: &mut Vec<u8>, int32: i32) -> Result<(), NbtError> {
-        match BE::<i32>::write(&BE::new(int32), buf) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(Arc::new(e))),
-        }
+        BE::<i32>::write(&BE::new(int32), buf).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
     fn write_i64(buf: &mut Vec<u8>, int64: i64) -> Result<(), NbtError> {
-        match BE::<i64>::write(&BE::new(int64), buf) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(Arc::new(e))),
-        }
+        BE::<i64>::write(&BE::new(int64), buf).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
     fn write_f32(buf: &mut Vec<u8>, float32: f32) -> Result<(), NbtError> {
-        match BE::<f32>::write(&BE::new(float32), buf) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(Arc::new(e))),
-        }
+        BE::<f32>::write(&BE::new(float32), buf).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
     fn write_f64(buf: &mut Vec<u8>, float64: f64) -> Result<(), NbtError> {
-        match BE::<f64>::write(&BE::new(float64), buf) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(NbtError::IOError(Arc::new(e))),
-        }
+        BE::<f64>::write(&BE::new(float64), buf).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
     fn write_string(buf: &mut Vec<u8>, string: String) -> Result<(), NbtError> {
         Self::write_i16(
             buf,
-            match string.len().try_into() {
-                Ok(v) => v,
-                Err(e) => return Err(NbtError::IntError(e)),
-            },
+            string.len().try_into().map_err(|e| NbtError::IntError(e))?,
         )?;
 
         buf.write_all(string.as_bytes()).map_err(|e| NbtError::IOError(Arc::new(e)))
@@ -120,28 +99,15 @@ impl NbtByteOrder for NbtBigEndian {
 
     #[inline]
     fn read_string(buf: &mut Cursor<&[u8]>) -> Result<String, NbtError> {
-        let len = match Self::read_i16(buf) {
-            Ok(v) => v,
-            Err(e) => return Err(e),
-        };
+        let len = Self::read_i16(buf)?;
 
         let mut string_buf = vec![
             0;
-            match len.try_into() {
-                Ok(v) => {
-                    v
-                }
-                Err(e) => {
-                    return Err(NbtError::IntError(e));
-                }
-            }
+            len.try_into().map_err(|e| NbtError::IntError(e))?
         ];
 
         buf.read_exact(&mut string_buf).map_err(|e| NbtError::IOError(Arc::new(e)))?;
 
-        match String::from_utf8(string_buf) {
-            Ok(v) => Ok(v),
-            Err(e) => return Err(NbtError::Utf8Error(e)),
-        }
+        String::from_utf8(string_buf).map_err(|e| NbtError::Utf8Error(e))
     }
 }
