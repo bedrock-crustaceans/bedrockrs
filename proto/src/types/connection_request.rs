@@ -1,11 +1,9 @@
 use std::collections::BTreeMap;
-use std::io::Read;
+use std::io::{Cursor, Read};
 use std::sync::Arc;
 
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
-use bedrockrs_core::stream::read::ByteStreamRead;
-use bedrockrs_core::stream::write::ByteStreamWrite;
 use bedrockrs_core::{LE, VAR};
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
@@ -83,7 +81,7 @@ pub struct ConnectionRequestType {
 }
 
 impl ProtoCodec for ConnectionRequestType {
-    fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
@@ -91,7 +89,7 @@ impl ProtoCodec for ConnectionRequestType {
     }
 
     // TODO: Add microsoft auth
-    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {

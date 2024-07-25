@@ -1,16 +1,15 @@
-use bedrockrs_core::read::ByteStreamRead;
-use bedrockrs_core::write::ByteStreamWrite;
+use std::io::Cursor;
 use bedrockrs_core::{ActorUniqueID, VAR};
 
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 
 impl ProtoCodec for ActorUniqueID {
-    fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError> {
+    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         VAR::new(self.0).proto_serialize(stream)
     }
 
-    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError> {
+    fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
         Ok(Self(VAR::proto_deserialize(stream)?.into_inner()))
     }
 }

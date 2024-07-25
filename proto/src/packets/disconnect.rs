@@ -1,5 +1,4 @@
-use bedrockrs_core::read::ByteStreamRead;
-use bedrockrs_core::write::ByteStreamWrite;
+use std::io::Cursor;
 use bedrockrs_core::VAR;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
@@ -15,7 +14,7 @@ pub struct DisconnectPacket {
 }
 
 impl ProtoCodec for DisconnectPacket {
-    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
@@ -57,7 +56,7 @@ impl ProtoCodec for DisconnectPacket {
         Ok(())
     }
 
-    fn proto_deserialize(cursor: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(cursor: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {

@@ -1,7 +1,7 @@
+use std::io::Cursor;
 use std::sync::Arc;
 
-use bedrockrs_core::read::ByteStreamRead;
-use bedrockrs_core::write::ByteStreamWrite;
+
 use bedrockrs_core::VAR;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
@@ -14,7 +14,7 @@ pub enum EditorWorldType {
 }
 
 impl ProtoCodec for EditorWorldType {
-    fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError> {
+    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         let int = match self {
             EditorWorldType::NotEditor => 0x00,
             EditorWorldType::Project => 0x01,
@@ -27,7 +27,7 @@ impl ProtoCodec for EditorWorldType {
         }
     }
 
-    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError> {
+    fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
         todo!()
     }
 }

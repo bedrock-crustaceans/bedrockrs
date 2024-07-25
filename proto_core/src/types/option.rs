@@ -1,11 +1,9 @@
-use bedrockrs_core::read::ByteStreamRead;
-use bedrockrs_core::write::ByteStreamWrite;
-
+use std::io::Cursor;
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 
 impl<T: ProtoCodec> ProtoCodec for Option<T> {
-    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
@@ -28,7 +26,7 @@ impl<T: ProtoCodec> ProtoCodec for Option<T> {
         }
     }
 
-    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {

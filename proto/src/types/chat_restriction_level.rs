@@ -1,7 +1,6 @@
+use std::io::Cursor;
 use std::sync::Arc;
 
-use bedrockrs_core::read::ByteStreamRead;
-use bedrockrs_core::write::ByteStreamWrite;
 use bedrockrs_core::LE;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
@@ -14,7 +13,7 @@ pub enum ChatRestrictionLevel {
 }
 
 impl ProtoCodec for ChatRestrictionLevel {
-    fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError> {
+    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         let int = match self {
             ChatRestrictionLevel::None => 0x00,
             ChatRestrictionLevel::Dropped => 0x01,
@@ -27,7 +26,7 @@ impl ProtoCodec for ChatRestrictionLevel {
         }
     }
 
-    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError> {
+    fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
         todo!()
     }
 }

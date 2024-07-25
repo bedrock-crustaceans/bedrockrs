@@ -1,9 +1,6 @@
 use std::io;
-use std::io::Write;
+use std::io::{Cursor, Write};
 use std::sync::Arc;
-
-use bedrockrs_core::stream::read::ByteStreamRead;
-use bedrockrs_core::stream::write::ByteStreamWrite;
 
 use crate::error::CompressionError;
 
@@ -74,8 +71,8 @@ impl Compression {
     #[inline]
     pub fn compress(
         &self,
-        src: &ByteStreamRead,
-        dst: &mut ByteStreamWrite,
+        src: &[u8],
+        dst: &mut Vec<u8>,
     ) -> Result<(), CompressionError> {
         match self {
             Compression::Zlib {
@@ -87,25 +84,16 @@ impl Compression {
                     flate2::Compression::new(*compression_level as u32),
                 );
 
-                match encoder.write_all(src.get_ref().as_slice()) {
-                    Ok(_) => Ok(()),
-                    Err(e) => Err(CompressionError::ZlibError(Arc::new(e))),
-                }
+                encoder.write_all(src).map_err(|e| CompressionError::ZlibError(Arc::new(e)))
             }
             Compression::Snappy { .. } => {
                 let mut encoder = snap::write::FrameEncoder::new(dst);
 
-                match io::copy(&mut src.get_ref().as_slice(), &mut encoder) {
-                    Ok(_) => Ok(()),
-                    Err(e) => Err(CompressionError::SnappyError(Arc::new(e))),
-                }
+                encoder.write_all(src).map_err(|e| CompressionError::SnappyError(Arc::new(e)))
             }
             Compression::None => {
                 // unnecessary copying, this fn shouldn't be called when `compression_needed` returns false
-                match dst.write_all(src.get_ref().as_slice()) {
-                    Ok(_) => Ok(()),
-                    Err(e) => Err(CompressionError::IOError(Arc::new(e))),
-                }
+                dst.write_all(src).map_err(|e| CompressionError::IOError(Arc::new(e)))
             }
         }
     }
@@ -115,12 +103,12 @@ impl Compression {
     #[inline]
     pub fn decompress(
         &self,
-        src: &ByteStreamRead,
-        dst: &mut ByteStreamWrite,
+        src: &[u8],
+        dst: &mut Vec<u8>,
     ) -> Result<(), CompressionError> {
         match self {
             Compression::Zlib { .. } => {
-                let mut decoder = flate2::read::DeflateDecoder::new(src.get_ref().as_slice());
+                let mut decoder = flate2::read::DeflateDecoder::new(src);
 
                 match io::copy(&mut decoder, dst) {
                     Ok(_) => Ok(()),
@@ -128,7 +116,7 @@ impl Compression {
                 }
             }
             Compression::Snappy { .. } => {
-                let mut decoder = snap::read::FrameDecoder::new(src.get_ref().as_slice());
+                let mut decoder = snap::read::FrameDecoder::new(src);
 
                 match io::copy(&mut decoder, dst) {
                     Ok(_) => Ok(()),
@@ -137,7 +125,7 @@ impl Compression {
             }
             Compression::None => {
                 // unnecessary copying, this fn shouldn't be called when `compression_needed` returns false
-                match dst.write_all(src.get_ref().as_slice()) {
+                match dst.write_all(src) {
                     Ok(_) => Ok(()),
                     Err(e) => Err(CompressionError::IOError(Arc::new(e))),
                 }

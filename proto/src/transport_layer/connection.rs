@@ -1,10 +1,7 @@
-use std::io::Write;
+use std::io::{Cursor, Write};
 use std::sync::Arc;
 
-use bedrockrs_core::stream::read::ByteStreamRead;
-use bedrockrs_core::stream::write::ByteStreamWrite;
 use bedrockrs_core::LE;
-use tokio::io::AsyncReadExt;
 
 use crate::error::{RaknetError, TransportLayerError};
 use crate::info::RAKNET_GAME_PACKET_ID;
@@ -20,30 +17,17 @@ pub enum TransportLayerConnection {
 }
 
 impl TransportLayerConnection {
-    pub async fn send(&mut self, stream: &ByteStreamRead<'_>) -> Result<(), TransportLayerError> {
+    pub async fn send(&mut self, stream: &Cursor<&[u8]>) -> Result<(), TransportLayerError> {
         match self {
             TransportLayerConnection::RaknetUDP(conn) => {
-                let mut final_stream = ByteStreamWrite::new();
+                let mut final_stream = vec![];
 
-                match LE::<u8>::write(&LE::new(RAKNET_GAME_PACKET_ID), &mut final_stream) {
-                    Ok(_) => {}
-                    Err(e) => return Err(TransportLayerError::IOError(Arc::new(e))),
-                };
+                LE::<u8>::write(&LE::new(RAKNET_GAME_PACKET_ID), &mut final_stream).map_err(|e| TransportLayerError::IOError(Arc::new(e)))?;
 
-                match final_stream.write_all(stream.get_ref().as_slice()) {
-                    Ok(_) => {}
-                    Err(e) => return Err(TransportLayerError::IOError(Arc::new(e))),
-                };
+                final_stream.write_all(stream.get_ref()).map_err(|e| TransportLayerError::IOError(Arc::new(e)))?;
 
                 // TODO Find out if immediate: true should be used
-                match conn.send(final_stream.as_slice(), true).await {
-                    Ok(_) => Ok(()),
-                    Err(e) => {
-                        return Err(TransportLayerError::RaknetUDPError(RaknetError::SendError(
-                            e,
-                        )));
-                    }
-                }
+                conn.send(final_stream.as_slice(), true).await.map_err(|e| TransportLayerError::RaknetUDPError(RaknetError::SendError(e)))
             }
             _ => {
                 todo!()
@@ -51,41 +35,26 @@ impl TransportLayerConnection {
         }
     }
 
-    pub async fn recv(&mut self, stream: &mut ByteStreamWrite) -> Result<(), TransportLayerError> {
+    pub async fn recv(&mut self, stream: &mut Vec<u8>) -> Result<(), TransportLayerError> {
         match self {
             TransportLayerConnection::RaknetUDP(conn) => {
-                let mut recv_stream = match conn.recv().await {
-                    Ok(v) => v,
-                    Err(e) => {
-                        return Err(TransportLayerError::RaknetUDPError(RaknetError::RecvError(
-                            e,
-                        )));
+                let mut recv_stream = conn.recv().await.map_err(|e| TransportLayerError::RaknetUDPError(RaknetError::RecvError(e)))?;
+
+                let mut recv_stream = Cursor::new(recv_stream.as_slice());
+
+                match LE::<u8>::read(&mut recv_stream).map_err(|e| TransportLayerError::IOError(Arc::new(e)))?.into_inner() {
+                    RAKNET_GAME_PACKET_ID => {}
+                    other => {
+                        return Err(TransportLayerError::RaknetUDPError(
+                            RaknetError::FormatError(format!(
+                                "Expected Raknet Game Packet ID ({:?}), got: {:?}",
+                                RAKNET_GAME_PACKET_ID, other
+                            )),
+                        ));
                     }
                 };
 
-                let mut recv_stream = ByteStreamRead::new(&recv_stream);
-
-                match LE::<u8>::read(&mut recv_stream) {
-                    Ok(v) => match v.into_inner() {
-                        RAKNET_GAME_PACKET_ID => {}
-                        other => {
-                            return Err(TransportLayerError::RaknetUDPError(
-                                RaknetError::FormatError(format!(
-                                    "Expected Raknet Game Packet ID ({:?}), got: {:?}",
-                                    RAKNET_GAME_PACKET_ID, other
-                                )),
-                            ));
-                        }
-                    },
-                    Err(e) => {
-                        return Err(TransportLayerError::IOError(Arc::new(e)));
-                    }
-                };
-
-                match stream.write_all(recv_stream.into_inner()) {
-                    Ok(_) => Ok(()),
-                    Err(e) => Err(TransportLayerError::IOError(Arc::new(e))),
-                }
+                Ok(stream.write_all(recv_stream.into_inner()).map_err(|e| TransportLayerError::IOError(Arc::new(e)))?)
             }
 
             _ => {

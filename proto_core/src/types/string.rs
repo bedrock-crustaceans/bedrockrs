@@ -1,16 +1,15 @@
 use std::convert::TryInto;
-use std::io::{Read, Write};
+use std::io::{Cursor, Read, Write};
 use std::sync::Arc;
 
-use bedrockrs_core::read::ByteStreamRead;
-use bedrockrs_core::write::ByteStreamWrite;
+
 use bedrockrs_core::VAR;
 
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 
 impl ProtoCodec for String {
-    fn proto_serialize(&self, buf: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
@@ -34,7 +33,7 @@ impl ProtoCodec for String {
         Ok(())
     }
 
-    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {

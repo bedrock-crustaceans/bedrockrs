@@ -2,8 +2,6 @@ use std::future::Future;
 use std::io::{Cursor, Write};
 use std::sync::Arc;
 use std::time::Duration;
-
-use bedrockrs_core::stream::write::ByteStreamWrite;
 use bedrockrs_core::LE;
 use tokio::select;
 use tokio::sync::{broadcast, watch};
@@ -39,7 +37,7 @@ impl Connection {
     }
 
     pub async fn send(&mut self, gamepackets: Vec<GamePacket>) -> Result<(), ConnectionError> {
-        let mut pk_stream = ByteStreamWrite::new();
+        let mut pk_stream = vec![];
 
         // Batch all game packets together
         for game_packet in gamepackets {
@@ -53,7 +51,7 @@ impl Connection {
         // Compress the data depending on compression method
         let compressed_stream = match &self.compression {
             Some(compression) => {
-                let mut compressed_stream = ByteStreamWrite::new();
+                let mut compressed_stream = vec![];
 
                 match LE::<u8>::write(&LE::new(compression.id_u8()), &mut compressed_stream) {
                     Ok(_) => {}
@@ -63,7 +61,7 @@ impl Connection {
                 if compression.compression_needed()
                     && pk_stream.len() as u16 > compression.threshold()
                 {
-                    match compression.compress(&Cursor::new(&pk_stream), &mut compressed_stream) {
+                    match compression.compress(pk_stream.as_slice(), &mut compressed_stream) {
                         Ok(_) => {}
                         Err(e) => {
                             return Err(ConnectionError::CompressError(e));
@@ -112,7 +110,7 @@ impl Connection {
     }
 
     pub async fn recv(&mut self) -> Result<Vec<GamePacket>, ConnectionError> {
-        let mut stream = ByteStreamWrite::new();
+        let mut stream = vec![];
 
         // Receive data and turn it into cursor
         match self.connection.recv(&mut stream).await {
@@ -120,7 +118,7 @@ impl Connection {
             Err(e) => return Err(ConnectionError::TransportError(e)),
         };
 
-        let stream = Cursor::new(&stream);
+        let stream = Cursor::new(stream.as_slice());
 
         let mut decrypted_stream = match &self.encryption {
             Some(encryption) => {
@@ -129,7 +127,7 @@ impl Connection {
             None => stream,
         };
 
-        let mut decompressed_stream = ByteStreamWrite::new();
+        let mut decompressed_stream = vec![];
 
         // Decompress data
         let mut decompressed_stream = match &self.compression {
@@ -143,14 +141,9 @@ impl Connection {
                     Err(_) => {}
                 };
 
-                match compression.decompress(&mut decrypted_stream, &mut decompressed_stream) {
-                    Ok(_) => {}
-                    Err(e) => {
-                        return Err(ConnectionError::CompressError(e));
-                    }
-                };
+                compression.decompress(decrypted_stream.into_inner(), &mut decompressed_stream).map_err(|e| ConnectionError::CompressError(e))?;
 
-                Cursor::new(&decompressed_stream)
+                Cursor::new(decompressed_stream.as_slice())
             }
             None => decrypted_stream,
         };

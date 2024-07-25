@@ -59,23 +59,15 @@ impl NbtByteOrder for NbtBigEndian {
 
     #[inline]
     fn write_string(buf: &mut Vec<u8>, string: String) -> Result<(), NbtError> {
-        match Self::write_i16(
+        Self::write_i16(
             buf,
             match string.len().try_into() {
                 Ok(v) => v,
                 Err(e) => return Err(NbtError::IntError(e)),
             },
-        ) {
-            Ok(_) => {}
-            Err(e) => return Err(e),
-        }
+        )?;
 
-        match buf.write_all(string.as_bytes()) {
-            Ok(_) => {}
-            Err(e) => return Err(NbtError::IOError(Arc::new(e))),
-        }
-
-        Ok(())
+        buf.write_all(string.as_bytes()).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
@@ -145,12 +137,7 @@ impl NbtByteOrder for NbtBigEndian {
             }
         ];
 
-        match buf.read_exact(&mut string_buf) {
-            Ok(_) => {}
-            Err(e) => {
-                return Err(NbtError::IOError(Arc::new(e)));
-            }
-        };
+        buf.read_exact(&mut string_buf).map_err(|e| NbtError::IOError(Arc::new(e)))?;
 
         match String::from_utf8(string_buf) {
             Ok(v) => Ok(v),

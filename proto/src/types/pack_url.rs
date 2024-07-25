@@ -1,5 +1,4 @@
-use bedrockrs_core::stream::read::ByteStreamRead;
-use bedrockrs_core::stream::write::ByteStreamWrite;
+use std::io::Cursor;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 
@@ -11,7 +10,7 @@ pub struct PackURL {
 }
 
 impl ProtoCodec for PackURL {
-    fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
@@ -30,7 +29,7 @@ impl ProtoCodec for PackURL {
         Ok(())
     }
 
-    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError> {
+    fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
         let (uuid, version) = match String::proto_deserialize(stream) {
             Ok(v) => match v.split_once("_") {
                 None => {

@@ -1,7 +1,6 @@
+use std::io::Cursor;
 use std::sync::Arc;
 
-use bedrockrs_core::stream::read::ByteStreamRead;
-use bedrockrs_core::stream::write::ByteStreamWrite;
 use bedrockrs_core::*;
 use byteorder::{ReadBytesExt, WriteBytesExt};
 
@@ -9,14 +8,14 @@ use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 
 impl ProtoCodec for u8 {
-    fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError> {
+    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         match stream.write_u8(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(Arc::new(e))),
         }
     }
 
-    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError> {
+    fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
         match stream.read_u8() {
             Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(Arc::new(e))),
@@ -25,14 +24,14 @@ impl ProtoCodec for u8 {
 }
 
 impl ProtoCodec for i8 {
-    fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError> {
+    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         match stream.write_i8(*self) {
             Ok(_) => Ok(()),
             Err(e) => Err(ProtoCodecError::IOError(Arc::new(e))),
         }
     }
 
-    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError> {
+    fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
         match stream.read_i8() {
             Ok(v) => Ok(v),
             Err(e) => Err(ProtoCodecError::IOError(Arc::new(e))),
@@ -43,14 +42,14 @@ impl ProtoCodec for i8 {
 macro_rules! impl_proto_codec {
     ($wrapper:ident, $int:ty) => {
         impl ProtoCodec for $wrapper<$int> {
-            fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError> {
+            fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
                 match $wrapper::<$int>::write(self, stream) {
                     Ok(_) => Ok(()),
                     Err(e) => Err(ProtoCodecError::IOError(Arc::new(e))),
                 }
             }
 
-            fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError> {
+            fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
                 match $wrapper::<$int>::read(stream) {
                     Ok(v) => Ok(v),
                     Err(e) => Err(ProtoCodecError::IOError(Arc::new(e))),

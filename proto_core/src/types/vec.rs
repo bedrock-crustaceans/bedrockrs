@@ -1,12 +1,11 @@
-use bedrockrs_core::read::ByteStreamRead;
-use bedrockrs_core::write::ByteStreamWrite;
+use std::io::Cursor;
 use bedrockrs_core::{Vec2, Vec3};
 
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 
 impl<T: ProtoCodec> ProtoCodec for Vec2<T> {
-    fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
@@ -16,7 +15,7 @@ impl<T: ProtoCodec> ProtoCodec for Vec2<T> {
         Ok(())
     }
 
-    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
@@ -28,7 +27,7 @@ impl<T: ProtoCodec> ProtoCodec for Vec2<T> {
 }
 
 impl<T: ProtoCodec> ProtoCodec for Vec3<T> {
-    fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
@@ -39,7 +38,7 @@ impl<T: ProtoCodec> ProtoCodec for Vec3<T> {
         Ok(())
     }
 
-    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
+    fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {

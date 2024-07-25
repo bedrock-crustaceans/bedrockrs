@@ -1,10 +1,8 @@
 #![allow(non_upper_case_globals)]
 
-use std::io::Write;
+use std::io::{Cursor, Write};
 use std::sync::Arc;
 
-use bedrockrs_core::stream::read::ByteStreamRead;
-use bedrockrs_core::stream::write::ByteStreamWrite;
 use bedrockrs_core::VAR;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
@@ -326,7 +324,7 @@ impl GamePacket {
 
 macro_rules! ser_packet {
     ($stream:expr, $packet_id:expr, $packet_data:expr) => {{
-        let mut pk_stream = ByteStreamWrite::new();
+        let mut pk_stream = vec![];
 
         println!("[SEND] {:#?}", $packet_data);
 
@@ -380,7 +378,7 @@ macro_rules! de_packet {
 }
 
 impl GamePacket {
-    pub fn pk_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError> {
+    pub fn pk_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         match self {
             GamePacket::Login(pk) => {
                 ser_packet!(stream, GamePacket::Login as u16, pk)
@@ -827,7 +825,7 @@ impl GamePacket {
     }
 
     pub fn pk_deserialize(
-        stream: &mut ByteStreamRead,
+        stream: &mut Cursor<&[u8]>,
     ) -> Result<(GamePacket, u8, u8), ProtoCodecError> {
         // Read the game packet length
         // We don't need it, yet?

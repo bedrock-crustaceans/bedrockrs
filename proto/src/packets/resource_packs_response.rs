@@ -14,7 +14,7 @@ pub struct ResourcePacksResponsePacket {
 }
 
 // impl ProtoCodec for ResourcePacksResponsePacket {
-//     fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError>
+//     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError>
 //     where
 //         Self: Sized,
 //     {
@@ -46,7 +46,7 @@ pub struct ResourcePacksResponsePacket {
 //         Ok(())
 //     }
 //
-//     fn proto_deserialize(cursor: &mut ByteStreamRead) -> Result<Self, ProtoCodecError>
+//     fn proto_deserialize(cursor: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError>
 //     where
 //         Self: Sized,
 //     {

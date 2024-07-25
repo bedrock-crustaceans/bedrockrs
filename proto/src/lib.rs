@@ -1,3 +1,5 @@
+extern crate core;
+
 pub mod compression;
 pub mod connection;
 pub mod encryption;

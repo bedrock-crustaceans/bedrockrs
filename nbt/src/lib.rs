@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
 use std::io::Cursor;
 
-use bedrockrs_core::write::ByteStreamWrite;
 pub use error::NbtError;
 
 use crate::byte_order::NbtByteOrder;
@@ -137,21 +136,10 @@ impl NbtTag {
     pub fn nbt_serialize<T: NbtByteOrder>(
         &self,
         root_tag_name: impl Into<String>,
-        stream: &mut ByteStreamWrite,
+        stream: &mut Vec<u8>,
     ) -> Result<(), NbtError> {
-        match T::write_u8(stream, self.get_id()) {
-            Ok(_) => {}
-            Err(e) => {
-                return Err(e);
-            }
-        }
-
-        match T::write_string(stream, root_tag_name.into()) {
-            Ok(_) => {}
-            Err(e) => {
-                return Err(e);
-            }
-        }
+        T::write_u8(stream, self.get_id())?;
+        T::write_string(stream, root_tag_name.into())?;
 
         self.nbt_serialize_val::<T>(stream)
     }
@@ -165,10 +153,9 @@ impl NbtTag {
     ) -> Result<Vec<u8>, NbtError> {
         let mut buf = vec![];
 
-        match NbtTag::nbt_serialize::<T>(self, key, &mut buf) {
-            Ok(_) => Ok(buf),
-            Err(e) => Err(e),
-        }
+        NbtTag::nbt_serialize::<T>(self, key, &mut buf)?;
+
+        Ok(buf)
     }
 
     /// Serializes a given val without any root tag name or type notation.
@@ -176,51 +163,16 @@ impl NbtTag {
     #[inline]
     fn nbt_serialize_val<T: NbtByteOrder>(
         &self,
-        buf: &mut ByteStreamWrite,
+        buf: &mut Vec<u8>,
     ) -> Result<(), NbtError> {
         match self {
-            NbtTag::Byte(v) => match T::write_u8(buf, *v) {
-                Ok(_) => {}
-                Err(e) => {
-                    return Err(e);
-                }
-            },
-            NbtTag::Int16(v) => match T::write_i16(buf, *v) {
-                Ok(_) => {}
-                Err(e) => {
-                    return Err(e);
-                }
-            },
-            NbtTag::Int32(v) => match T::write_i32(buf, *v) {
-                Ok(_) => {}
-                Err(e) => {
-                    return Err(e);
-                }
-            },
-            NbtTag::Int64(v) => match T::write_i64(buf, *v) {
-                Ok(_) => {}
-                Err(e) => {
-                    return Err(e);
-                }
-            },
-            NbtTag::Float32(v) => match T::write_f32(buf, *v) {
-                Ok(_) => {}
-                Err(e) => {
-                    return Err(e);
-                }
-            },
-            NbtTag::Float64(v) => match T::write_f64(buf, *v) {
-                Ok(_) => {}
-                Err(e) => {
-                    return Err(e);
-                }
-            },
-            NbtTag::String(v) => match T::write_string(buf, v.to_string()) {
-                Ok(_) => {}
-                Err(e) => {
-                    return Err(e);
-                }
-            },
+            NbtTag::Byte(v) => T::write_u8(buf, *v)?,
+            NbtTag::Int16(v) => T::write_i16(buf, *v)?,
+            NbtTag::Int32(v) => T::write_i32(buf, *v)?,
+            NbtTag::Int64(v) => T::write_i64(buf, *v)?,
+            NbtTag::Float32(v) => T::write_f32(buf, *v)?,
+            NbtTag::Float64(v) => T::write_f64(buf, *v)?,
+            NbtTag::String(v) => T::write_string(buf, v.to_string())?,
             NbtTag::List(v) => {
                 let list_type = if v.is_empty() {
                     Self::BYTE_ID
@@ -228,53 +180,24 @@ impl NbtTag {
                     v[0].get_id()
                 };
 
-                match T::write_u8(buf, list_type) {
-                    Ok(_) => {}
-                    Err(e) => {
-                        return Err(e);
-                    }
-                }
-
-                match T::write_i32(
+                T::write_u8(buf, list_type)?;
+                T::write_i32(
                     buf,
-                    match v.len().try_into() {
-                        Ok(v) => v,
-                        Err(e) => return Err(NbtError::IntError(e)),
-                    },
-                ) {
-                    Ok(_) => {}
-                    Err(e) => {
-                        return Err(e);
-                    }
-                }
+                    v.len().try_into().map_err(|e| NbtError::IntError(e))?
+                )?;
 
                 for tag in v {
-                    match tag.nbt_serialize_val::<T>(buf) {
-                        Ok(_) => {}
-                        Err(e) => {
-                            return Err(e);
-                        }
-                    }
+                    tag.nbt_serialize_val::<T>(buf)?;
                 }
             }
             NbtTag::Compound(v) => {
                 let iter = v.iter();
 
                 for (tag_name, v) in iter {
-                    match v.nbt_serialize::<T>(tag_name, buf) {
-                        Ok(_) => {}
-                        Err(e) => {
-                            return Err(e);
-                        }
-                    }
+                    v.nbt_serialize::<T>(tag_name, buf)?;
                 }
 
-                match T::write_u8(buf, Self::EMPTY_ID) {
-                    Ok(_) => {}
-                    Err(e) => {
-                        return Err(e);
-                    }
-                }
+                T::write_u8(buf, Self::EMPTY_ID)?;
             }
             NbtTag::Empty => {}
         }
@@ -292,12 +215,11 @@ impl NbtTag {
     /// # Example:
     /// ```no_run
     /// use std::io::Cursor;
-    /// use bedrockrs_core::stream::read::ByteStreamRead;
     /// use bedrockrs_nbt::endian::little_endian::NbtLittleEndian;
     /// use bedrockrs_nbt::NbtTag;
     ///
     /// // Data generated by the NbtTag::serialize function's example
-    /// let  data = [
+    /// let data = [
     ///     10, 6, 0, 109, 121, 32, 110, 98, 116,
     ///     8, 7, 0, 77, 121, 32, 84, 101, 120, 116,
     ///     15, 0, 84, 104, 105, 115, 32, 105, 115,
@@ -307,7 +229,7 @@ impl NbtTag {
     /// ];
     ///
     /// // Create the stream
-    /// let mut stream = Cursor::new(&data);
+    /// let mut stream = Cursor::new(data.as_slice());
     ///
     /// // Read the nbt tag and its name
     /// let (tag, name) = NbtTag::nbt_deserialize::<NbtLittleEndian>(&mut stream).unwrap();

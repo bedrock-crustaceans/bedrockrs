@@ -1,15 +1,15 @@
+use std::io::Cursor;
 use std::sync::Arc;
 
 use bedrockrs_core::gamemode::Gamemode;
-use bedrockrs_core::read::ByteStreamRead;
-use bedrockrs_core::write::ByteStreamWrite;
+
 use bedrockrs_core::VAR;
 
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 
 impl ProtoCodec for Gamemode {
-    fn proto_serialize(&self, stream: &mut ByteStreamWrite) -> Result<(), ProtoCodecError> {
+    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         let int = match self {
             Gamemode::Survival => 0x00,
             Gamemode::Creative => 0x01,
@@ -26,7 +26,7 @@ impl ProtoCodec for Gamemode {
         }
     }
 
-    fn proto_deserialize(stream: &mut ByteStreamRead) -> Result<Self, ProtoCodecError> {
+    fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
         todo!()
     }
 }

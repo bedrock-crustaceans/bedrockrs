@@ -24,12 +24,12 @@ pub fn proto_codec(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
 
             quote! {
                 impl #impl_generics bedrockrs_proto_core::ProtoCodec for #name #ty_generics #where_clause {
-                    fn proto_serialize(&self, stream: &mut bedrockrs_core::stream::write::ByteStreamWrite) -> Result<(), bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {
+                    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {
                         #ser
                         Ok(())
                     }
 
-                    fn proto_deserialize(stream: &mut bedrockrs_core::stream::read::ByteStreamRead) -> Result<Self, bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {
+                    fn proto_deserialize(stream: &mut std::io::Cursor<&[u8]>) -> Result<Self, bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {
                         Ok(Self{
                             #de
                         })
