@@ -43,7 +43,7 @@ impl NbtByteOrder for NbtLittleEndianNetwork {
     fn write_string(buf: &mut Vec<u8>, string: String) -> Result<(), NbtError> {
         Self::write_i16(
             buf,
-            match string.len().try_into().map_err(|e| NbtError::IntError(e))?,
+            string.len().try_into().map_err(|e| NbtError::IntError(e))?,
         )?;
 
         buf.write_all(string.as_bytes()).map_err(|e| NbtError::IOError(Arc::new(e)))
