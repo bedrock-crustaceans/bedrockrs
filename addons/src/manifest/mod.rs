@@ -67,7 +67,7 @@ pub struct AddonManifestDependency {
     #[serde(rename = "module_name")]
     name: Option<String>,
     /// This is the unique identifier of the pack that this pack depends on. It needs to be the exact same UUID that the pack has defined in the header section of its manifest file.
-    uuid: Uuid,
+    uuid: Option<Uuid>,
     /// This is the specific version of the pack that your pack depends on. Should match the version the other pack has in its manifest file.
     version: AddonDynamicVersion,
 }
