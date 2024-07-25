@@ -9,7 +9,7 @@ use crate::manifest::AddonManifest;
 pub mod behavior;
 pub mod error;
 pub mod language;
-mod manifest;
+pub mod manifest;
 pub mod resource;
 
 pub trait Addon {
