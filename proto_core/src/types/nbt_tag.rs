@@ -1,6 +1,4 @@
-
 use std::io::Cursor;
-
 
 use bedrockrs_nbt::endian::little_endian_network::NbtLittleEndianNetwork;
 use bedrockrs_nbt::NbtTag;

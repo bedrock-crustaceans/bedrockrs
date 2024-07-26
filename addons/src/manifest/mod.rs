@@ -1,6 +1,7 @@
 use bedrockrs_core::Vec3;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+
 use crate::version::AddonDynamicVersion;
 
 /// The manifest file contains all the basic information about the pack that Minecraft needs to identify it.

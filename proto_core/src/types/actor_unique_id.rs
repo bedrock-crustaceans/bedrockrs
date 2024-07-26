@@ -1,4 +1,5 @@
 use std::io::Cursor;
+
 use bedrockrs_core::{ActorUniqueID, VAR};
 
 use crate::error::ProtoCodecError;

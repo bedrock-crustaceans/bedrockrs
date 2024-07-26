@@ -1,7 +1,6 @@
 use std::io::Cursor;
 use std::sync::Arc;
 
-
 use bedrockrs_core::LE;
 
 use crate::error::ProtoCodecError;

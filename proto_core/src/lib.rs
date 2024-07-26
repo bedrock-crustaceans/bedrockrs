@@ -1,6 +1,7 @@
 extern crate core;
 
 use std::io::Cursor;
+
 use crate::error::ProtoCodecError;
 
 pub mod error;

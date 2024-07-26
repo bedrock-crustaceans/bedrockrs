@@ -1,7 +1,6 @@
-use std::fmt::{Debug, Formatter};
+use std::fmt::Debug;
 use std::path::Path;
 
-use bedrockrs_core::Vec3;
 use serde::{Deserialize, Serialize};
 
 use crate::error::AddonError;
@@ -9,11 +8,11 @@ use crate::manifest::AddonManifest;
 
 pub mod behavior;
 pub mod error;
+mod identifier;
 pub mod language;
 pub mod manifest;
 pub mod resource;
 mod version;
-mod identifier;
 
 pub trait Addon {
     fn manifest(&self) -> &AddonManifest;
@@ -26,4 +25,3 @@ pub trait Addon {
     where
         Self: Sized;
 }
-

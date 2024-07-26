@@ -2,7 +2,6 @@ use std::convert::TryInto;
 use std::io::{Cursor, Read, Write};
 use std::sync::Arc;
 
-
 use bedrockrs_core::VAR;
 
 use crate::error::ProtoCodecError;

@@ -2,7 +2,6 @@ use std::io::Cursor;
 use std::sync::Arc;
 
 use bedrockrs_core::gamemode::Gamemode;
-
 use bedrockrs_core::VAR;
 
 use crate::error::ProtoCodecError;

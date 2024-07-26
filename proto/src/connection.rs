@@ -2,6 +2,7 @@ use std::future::Future;
 use std::io::{Cursor, Write};
 use std::sync::Arc;
 use std::time::Duration;
+
 use bedrockrs_core::LE;
 use tokio::select;
 use tokio::sync::{broadcast, watch};
@@ -42,7 +43,9 @@ impl Connection {
         // Batch all game packets together
         for game_packet in gamepackets {
             // Write a game packet
-            game_packet.pk_serialize(&mut pk_stream).map_err(|e| ConnectionError::ProtoCodecError(e))?
+            game_packet
+                .pk_serialize(&mut pk_stream)
+                .map_err(|e| ConnectionError::ProtoCodecError(e))?
         }
 
         // Compress the data depending on compression method
@@ -50,12 +53,17 @@ impl Connection {
             Some(compression) => {
                 let mut compressed_stream = vec![];
 
-                LE::<u8>::write(&LE::new(compression.id_u8()), &mut compressed_stream).map_err(|e| ConnectionError::IOError(Arc::new(e)))?;
+                LE::<u8>::write(&LE::new(compression.id_u8()), &mut compressed_stream)
+                    .map_err(|e| ConnectionError::IOError(Arc::new(e)))?;
 
                 if compression.needed() && pk_stream.len() as u16 > compression.threshold() {
-                    compression.compress(pk_stream.as_slice(), &mut compressed_stream).map_err(|e| ConnectionError::CompressError(e))?;
+                    compression
+                        .compress(pk_stream.as_slice(), &mut compressed_stream)
+                        .map_err(|e| ConnectionError::CompressError(e))?;
                 } else {
-                    compressed_stream.write(pk_stream.as_slice()).map_err(|e| ConnectionError::IOError(Arc::new(e)))?;
+                    compressed_stream
+                        .write(pk_stream.as_slice())
+                        .map_err(|e| ConnectionError::IOError(Arc::new(e)))?;
                 };
 
                 compressed_stream
@@ -73,7 +81,10 @@ impl Connection {
         };
 
         // Send the data
-        self.connection.send(&Cursor::new(&encrypted_stream)).await.map_err(|e| ConnectionError::TransportError(e))
+        self.connection
+            .send(&Cursor::new(&encrypted_stream))
+            .await
+            .map_err(|e| ConnectionError::TransportError(e))
     }
 
     pub async fn send_raw(&mut self, data: &Vec<u8>) -> Result<(), ConnectionError> {
@@ -118,7 +129,9 @@ impl Connection {
                     Err(_) => {}
                 };
 
-                compression.decompress(decrypted_stream.into_inner(), &mut decompressed_stream).map_err(|e| ConnectionError::CompressError(e))?;
+                compression
+                    .decompress(decrypted_stream.into_inner(), &mut decompressed_stream)
+                    .map_err(|e| ConnectionError::CompressError(e))?;
 
                 Cursor::new(decompressed_stream.as_slice())
             }

@@ -1,5 +1,5 @@
 use std::io;
-use std::io::{Cursor, Write};
+use std::io::Write;
 use std::sync::Arc;
 
 use crate::error::CompressionError;
@@ -69,11 +69,7 @@ impl Compression {
     /// Compress the given uncompressed src stream into the given dst stream
     /// with the compressed data
     #[inline]
-    pub fn compress(
-        &self,
-        src: &[u8],
-        dst: &mut Vec<u8>,
-    ) -> Result<(), CompressionError> {
+    pub fn compress(&self, src: &[u8], dst: &mut Vec<u8>) -> Result<(), CompressionError> {
         match self {
             Compression::Zlib {
                 threshold: _,
@@ -84,16 +80,21 @@ impl Compression {
                     flate2::Compression::new(*compression_level as u32),
                 );
 
-                encoder.write_all(src).map_err(|e| CompressionError::ZlibError(Arc::new(e)))
+                encoder
+                    .write_all(src)
+                    .map_err(|e| CompressionError::ZlibError(Arc::new(e)))
             }
             Compression::Snappy { .. } => {
                 let mut encoder = snap::write::FrameEncoder::new(dst);
 
-                encoder.write_all(src).map_err(|e| CompressionError::SnappyError(Arc::new(e)))
+                encoder
+                    .write_all(src)
+                    .map_err(|e| CompressionError::SnappyError(Arc::new(e)))
             }
             Compression::None => {
                 // unnecessary copying, this fn shouldn't be called when `compression_needed` returns false
-                dst.write_all(src).map_err(|e| CompressionError::IOError(Arc::new(e)))
+                dst.write_all(src)
+                    .map_err(|e| CompressionError::IOError(Arc::new(e)))
             }
         }
     }
@@ -101,11 +102,7 @@ impl Compression {
     /// Decompress the given compressed src stream into the given dst stream
     /// with the decompressed data
     #[inline]
-    pub fn decompress(
-        &self,
-        src: &[u8],
-        dst: &mut Vec<u8>,
-    ) -> Result<(), CompressionError> {
+    pub fn decompress(&self, src: &[u8], dst: &mut Vec<u8>) -> Result<(), CompressionError> {
         match self {
             Compression::Zlib { .. } => {
                 let mut decoder = flate2::read::DeflateDecoder::new(src);

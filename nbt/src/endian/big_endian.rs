@@ -46,7 +46,8 @@ impl NbtByteOrder for NbtBigEndian {
             string.len().try_into().map_err(|e| NbtError::IntError(e))?,
         )?;
 
-        buf.write_all(string.as_bytes()).map_err(|e| NbtError::IOError(Arc::new(e)))
+        buf.write_all(string.as_bytes())
+            .map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
@@ -101,12 +102,10 @@ impl NbtByteOrder for NbtBigEndian {
     fn read_string(buf: &mut Cursor<&[u8]>) -> Result<String, NbtError> {
         let len = Self::read_i16(buf)?;
 
-        let mut string_buf = vec![
-            0;
-            len.try_into().map_err(|e| NbtError::IntError(e))?
-        ];
+        let mut string_buf = vec![0; len.try_into().map_err(|e| NbtError::IntError(e))?];
 
-        buf.read_exact(&mut string_buf).map_err(|e| NbtError::IOError(Arc::new(e)))?;
+        buf.read_exact(&mut string_buf)
+            .map_err(|e| NbtError::IOError(Arc::new(e)))?;
 
         String::from_utf8(string_buf).map_err(|e| NbtError::Utf8Error(e))
     }

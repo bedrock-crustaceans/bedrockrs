@@ -9,21 +9,29 @@ use crate::ProtoCodec;
 
 impl ProtoCodec for u8 {
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
-        stream.write_u8(*self).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
+        stream
+            .write_u8(*self)
+            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
     }
 
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
-        stream.read_u8().map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
+        stream
+            .read_u8()
+            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
     }
 }
 
 impl ProtoCodec for i8 {
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
-        stream.write_i8(*self).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
+        stream
+            .write_i8(*self)
+            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
     }
 
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
-        stream.read_i8().map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
+        stream
+            .read_i8()
+            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
     }
 }
 
@@ -31,7 +39,8 @@ macro_rules! impl_proto_codec {
     ($wrapper:ident, $int:ty) => {
         impl ProtoCodec for $wrapper<$int> {
             fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
-                $wrapper::<$int>::write(self, stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
+                $wrapper::<$int>::write(self, stream)
+                    .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
             }
 
             fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {

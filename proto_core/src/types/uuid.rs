@@ -1,5 +1,5 @@
-use std::io::Cursor;
 use bedrockrs_core::{Uuid, LE};
+use std::io::Cursor;
 
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;

@@ -22,12 +22,17 @@ impl TransportLayerConnection {
             TransportLayerConnection::RaknetUDP(conn) => {
                 let mut final_stream = vec![];
 
-                LE::<u8>::write(&LE::new(RAKNET_GAME_PACKET_ID), &mut final_stream).map_err(|e| TransportLayerError::IOError(Arc::new(e)))?;
+                LE::<u8>::write(&LE::new(RAKNET_GAME_PACKET_ID), &mut final_stream)
+                    .map_err(|e| TransportLayerError::IOError(Arc::new(e)))?;
 
-                final_stream.write_all(stream.get_ref()).map_err(|e| TransportLayerError::IOError(Arc::new(e)))?;
+                final_stream
+                    .write_all(stream.get_ref())
+                    .map_err(|e| TransportLayerError::IOError(Arc::new(e)))?;
 
                 // TODO Find out if immediate: true should be used
-                conn.send(final_stream.as_slice(), true).await.map_err(|e| TransportLayerError::RaknetUDPError(RaknetError::SendError(e)))
+                conn.send(final_stream.as_slice(), true)
+                    .await
+                    .map_err(|e| TransportLayerError::RaknetUDPError(RaknetError::SendError(e)))
             }
             _ => {
                 todo!()
@@ -38,11 +43,17 @@ impl TransportLayerConnection {
     pub async fn recv(&mut self, stream: &mut Vec<u8>) -> Result<(), TransportLayerError> {
         match self {
             TransportLayerConnection::RaknetUDP(conn) => {
-                let mut recv_stream = conn.recv().await.map_err(|e| TransportLayerError::RaknetUDPError(RaknetError::RecvError(e)))?;
+                let mut recv_stream = conn
+                    .recv()
+                    .await
+                    .map_err(|e| TransportLayerError::RaknetUDPError(RaknetError::RecvError(e)))?;
 
                 let mut recv_stream = Cursor::new(recv_stream.as_slice());
 
-                match LE::<u8>::read(&mut recv_stream).map_err(|e| TransportLayerError::IOError(Arc::new(e)))?.into_inner() {
+                match LE::<u8>::read(&mut recv_stream)
+                    .map_err(|e| TransportLayerError::IOError(Arc::new(e)))?
+                    .into_inner()
+                {
                     RAKNET_GAME_PACKET_ID => {}
                     other => {
                         return Err(TransportLayerError::RaknetUDPError(
@@ -54,7 +65,9 @@ impl TransportLayerConnection {
                     }
                 };
 
-                Ok(stream.write_all(recv_stream.into_inner()).map_err(|e| TransportLayerError::IOError(Arc::new(e)))?)
+                Ok(stream
+                    .write_all(recv_stream.into_inner())
+                    .map_err(|e| TransportLayerError::IOError(Arc::new(e)))?)
             }
 
             _ => {

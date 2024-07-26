@@ -1,7 +1,6 @@
 use std::io::Cursor;
 use std::sync::Arc;
 
-
 use bedrockrs_core::LE;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
@@ -19,7 +18,9 @@ impl ProtoCodec for SpawnBiomeType {
             SpawnBiomeType::UserDefined => 0x01,
         };
 
-        LE::<i16>::new(int).write(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
+        LE::<i16>::new(int)
+            .write(stream)
+            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
     }
 
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {

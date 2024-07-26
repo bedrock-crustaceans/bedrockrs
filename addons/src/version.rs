@@ -1,4 +1,5 @@
 use std::fmt::{Debug, Formatter};
+
 use bedrockrs_core::Vec3;
 use serde::{Deserialize, Serialize};
 

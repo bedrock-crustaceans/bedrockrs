@@ -1,10 +1,12 @@
-mod traits;
-mod components;
-
 use std::collections::HashMap;
-use serde::{Deserialize, Serialize, Serializer};
+
 use serde::ser::SerializeStruct;
+use serde::{Deserialize, Serialize, Serializer};
+
 use crate::identifier::AddonIdentifier;
+
+mod components;
+mod traits;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AddonBlock {
@@ -28,13 +30,11 @@ pub struct AddonBlockDescription {
     identifier: AddonIdentifier,
     /// Map of key/value pairs that maps the state name (key) to an array of all possible values for that state (value). Learn how to use block states in Block States and Permutations.
     states: Option<Vec<AddonBlockState>>,
-    menu_category: Option<AddonBlockMenuCategory>
+    menu_category: Option<AddonBlockMenuCategory>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct AddonBlockState {
-
-}
+pub struct AddonBlockState {}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AddonBlockMenuCategory {

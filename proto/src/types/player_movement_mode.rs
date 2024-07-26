@@ -1,7 +1,6 @@
 use std::io::Cursor;
 use std::sync::Arc;
 
-
 use bedrockrs_core::VAR;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
@@ -19,7 +18,9 @@ impl ProtoCodec for PlayerMovementMode {
             PlayerMovementMode::Client => 0x00,
             PlayerMovementMode::Server => 0x01,
             PlayerMovementMode::ServerWithRewind => 0x02,
-        }).write(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
+        })
+        .write(stream)
+        .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
     }
 
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
