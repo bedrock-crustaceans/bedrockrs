@@ -1,13 +1,13 @@
 use bedrockrs_core::Vec3;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-
-use crate::AddonDynamicVersion;
+use crate::version::AddonDynamicVersion;
 
 /// The manifest file contains all the basic information about the pack that Minecraft needs to identify it.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AddonManifest {
-    /// The syntax version used in the manifest file. This may be 1 for skin packs or 2 for resource, behavior, and world templates.
+    /// The syntax version used in the manifest file.
+    /// This may be one for skin packs or 2 for resource, behavior, and world templates.
     format_version: u32,
     /// Section containing information regarding the name of the pack, description, and other features that are public facing.
     header: AddonManifestHeader,
