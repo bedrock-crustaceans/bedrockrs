@@ -2,7 +2,7 @@ use bedrockrs_core::Vec3;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::version::AddonDynamicVersion;
+use crate::version::AddonSemanticVersion;
 
 /// The manifest file contains all the basic information about the pack that Minecraft needs to identify it.
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -30,7 +30,7 @@ pub struct AddonManifestHeader {
     /// This is a short description of the pack. It will appear in the game below the name of the pack. We recommend keeping it to 1-2 lines.
     description: Option<String>,
     /// This is the version of your pack in the format [majorVersion, minorVersion, revision]. The version number is used when importing a pack that has been imported before. The new pack will replace the old one if the version is higher, and ignored if it's the same or lower.
-    version: AddonDynamicVersion,
+    version: AddonSemanticVersion,
     /// This is a special type of identifier that uniquely identifies this pack from any other pack. UUIDs are written in the format xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx where each x is a hexadecimal value (0-9 or a-f). We recommend using an online service to generate this and guarantee their uniqueness.
     uuid: Uuid,
     /// This option will generate a random seed every time a template is loaded and allow the player to change the seed before creating a new world. (world template manifest JSON only)
@@ -56,7 +56,7 @@ pub struct AddonManifestModule {
     /// This is a unique identifier for the module in the same format as the pack's UUID in the header. This should be different from the pack's UUID, and different for every module.
     uuid: Uuid,
     /// This is the version of the module in the same format as the pack's version in the header. This can be used to further identify changes in your pack.
-    version: AddonDynamicVersion,
+    version: AddonSemanticVersion,
     /// Only present if `type`(`module_type`) is `script`. This indicates the language in which scripts are written in the pack. The only supported value is `javascript`.
     language: Option<String>,
 }
@@ -70,7 +70,7 @@ pub struct AddonManifestDependency {
     /// This is the unique identifier of the pack that this pack depends on. It needs to be the exact same UUID that the pack has defined in the header section of its manifest file.
     uuid: Option<Uuid>,
     /// This is the specific version of the pack that your pack depends on. Should match the version the other pack has in its manifest file.
-    version: AddonDynamicVersion,
+    version: AddonSemanticVersion,
 }
 
 /// Section containing the metadata about the file such as authors and licensing information.
