@@ -2,16 +2,16 @@ use std::collections::HashMap;
 
 use serde::ser::SerializeStruct;
 use serde::{Deserialize, Serialize, Serializer};
-
+use crate::behavior::menu_category::AddonMenuCategory;
 use crate::identifier::AddonIdentifier;
 
-mod components;
-mod traits;
+pub mod components;
+pub mod traits;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AddonBlock {
     /// Specifies the version of the game this block was made in. If the version is lower than the current version, any changes made to the entity in the vanilla version will be applied to it.
-    format_version: semver::Version,
+    format_version: String,
     #[serde(rename = "minecraft:block")]
     definition: AddonBlockDefinition,
 }
@@ -29,19 +29,11 @@ pub struct AddonBlockDescription {
     /// The identifier for this block. The name must include a namespace and must not use the Minecraft namespace unless overriding a Vanilla block.
     identifier: AddonIdentifier,
     /// Map of key/value pairs that maps the state name (key) to an array of all possible values for that state (value). Learn how to use block states in Block States and Permutations.
-    states: Option<Vec<AddonBlockState>>,
-    menu_category: Option<AddonBlockMenuCategory>,
+    states: Option<HashMap<String, AddonBlockState>>,
+    /// Specifies the menu category and group for the block, which determine where this block is placed in the inventory and crafting table container screens. If this field is omitted, the block will not appear in the inventory or crafting table container screens.
+    menu_category: Option<AddonMenuCategory>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct AddonBlockState {}
+pub struct AddonBlockState(Vec<serde_json::Value>);
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct AddonBlockMenuCategory {
-    /// Determines which category this block will be placed under in the inventory and crafting table container screens. Options are "construction", "nature", "equipment", "items", and "none". If omitted or "none" is specified, the block will not appear in the inventory or crafting table container screens.
-    category: String,
-    /// Specifies the language file key that maps to which expandable/collapsible group this block will be a part of within a category. If this field is omitted, or there is no group whose name matches the loc string, this block will be placed standalone in the given category.
-    group: String,
-    /// Determines whether this block can be used with commands. Commands can use blocks by default, but you may use this to disable that functionality.
-    hidden_in_commands: bool,
-}
