@@ -1,6 +1,7 @@
+use std::io::Cursor;
+
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
-use std::io::Cursor;
 
 impl<T: ProtoCodec> ProtoCodec for Option<T> {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>

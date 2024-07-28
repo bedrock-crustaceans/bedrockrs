@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use serde::ser::SerializeStruct;
 use serde::{Deserialize, Serialize, Serializer};
+
 use crate::behavior::menu_category::AddonMenuCategory;
 use crate::identifier::AddonIdentifier;
 
@@ -36,4 +37,3 @@ pub struct AddonBlockDescription {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AddonBlockState(Vec<serde_json::Value>);
-

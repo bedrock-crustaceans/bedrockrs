@@ -1,9 +1,11 @@
-mod components;
-
 use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
+
 use crate::behavior::menu_category::AddonMenuCategory;
 use crate::identifier::AddonIdentifier;
+
+mod components;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AddonItem {

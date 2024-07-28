@@ -1,4 +1,5 @@
 use std::fmt::{Debug, Formatter};
+
 use bedrockrs_core::Vec2;
 use serde::{Deserialize, Serialize};
 
@@ -12,8 +13,12 @@ pub enum LanguageCode {
 impl Debug for LanguageCode {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            LanguageCode::VanillaCode(v) => { write!(f, "VanillaCode({v})") }
-            LanguageCode::CustomCode(v) => { write!(f, "CustomCode([{}, {}])", v.x, v.y) }
+            LanguageCode::VanillaCode(v) => {
+                write!(f, "VanillaCode({v})")
+            }
+            LanguageCode::CustomCode(v) => {
+                write!(f, "CustomCode([{}, {}])", v.x, v.y)
+            }
         }
     }
 }

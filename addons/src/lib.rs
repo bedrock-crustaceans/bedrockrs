@@ -9,10 +9,10 @@ use crate::manifest::AddonManifest;
 pub mod behavior;
 pub mod error;
 pub mod identifier;
-pub mod version;
 pub mod language;
 pub mod manifest;
 pub mod resource;
+pub mod version;
 
 pub trait Addon {
     fn manifest(&self) -> &AddonManifest;

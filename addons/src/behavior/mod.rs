@@ -1,18 +1,19 @@
 use std::collections::HashMap;
-use std::{fs, io};
-use std::fs::FileType;
+use std::fs;
 use std::hash::Hash;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
+
 use json_comments::CommentSettings;
 use walkdir::WalkDir;
-use crate::Addon;
+
 use crate::behavior::blocks::AddonBlock;
 use crate::behavior::items::AddonItem;
 use crate::error::AddonError;
 use crate::error::AddonError::{IOError, JsonError};
 use crate::language::Languages;
 use crate::manifest::AddonManifest;
+use crate::Addon;
 
 mod blocks;
 mod items;
@@ -35,14 +36,16 @@ impl Addon for BehaviorPack {
 
     fn import(path: impl AsRef<Path>) -> Result<Self, AddonError>
     where
-        Self: Sized
+        Self: Sized,
     {
         let path = path.as_ref().to_path_buf();
 
         // Manifest
         let manifest_path = path.join("manifest.json");
-        let manifest = fs::read_to_string(&manifest_path).map_err(|e| IOError(Arc::new(e), manifest_path.clone()))?;
-        let manifest: AddonManifest = serde_json::from_str(&manifest).map_err(|e| JsonError(Arc::new(e), manifest_path))?;
+        let manifest = fs::read_to_string(&manifest_path)
+            .map_err(|e| IOError(Arc::new(e), manifest_path.clone()))?;
+        let manifest: AddonManifest =
+            serde_json::from_str(&manifest).map_err(|e| JsonError(Arc::new(e), manifest_path))?;
 
         // Languages
         let languages = Languages::import(path.join("texts"))?;
@@ -53,10 +56,13 @@ impl Addon for BehaviorPack {
 
         // If dir exists read all blocks
         if blocks_path.is_dir() {
-            'blocks_walk: for blocks_entry in WalkDir::new(&blocks_path)
-                .into_iter()
-                .filter(|v| { if let Ok(v) = v { v.file_type().is_file() } else { false } }) {
-
+            'blocks_walk: for blocks_entry in WalkDir::new(&blocks_path).into_iter().filter(|v| {
+                if let Ok(v) = v {
+                    v.file_type().is_file()
+                } else {
+                    false
+                }
+            }) {
                 if let Ok(entry) = blocks_entry {
                     let block_path = entry.path();
 
@@ -85,10 +91,13 @@ impl Addon for BehaviorPack {
 
         // If dir exists read all items
         if items_path.is_dir() {
-            'items_walk: for items_entry in WalkDir::new(&items_path)
-                .into_iter()
-                .filter(|v| { if let Ok(v) = v { v.file_type().is_file() } else { false } }) {
-
+            'items_walk: for items_entry in WalkDir::new(&items_path).into_iter().filter(|v| {
+                if let Ok(v) = v {
+                    v.file_type().is_file()
+                } else {
+                    false
+                }
+            }) {
                 if let Ok(entry) = items_entry {
                     let item_path = entry.path();
 
@@ -117,10 +126,13 @@ impl Addon for BehaviorPack {
 
         // If dir exists read all functions
         if functions_path.is_dir() {
-            for functions_entry in WalkDir::new(&functions_path)
-                .into_iter()
-                .filter(|v| { if let Ok(v) = v { v.file_type().is_file() } else { false } }) {
-
+            for functions_entry in WalkDir::new(&functions_path).into_iter().filter(|v| {
+                if let Ok(v) = v {
+                    v.file_type().is_file()
+                } else {
+                    false
+                }
+            }) {
                 if let Ok(entry) = functions_entry {
                     let function_path = entry.path();
 
@@ -138,10 +150,13 @@ impl Addon for BehaviorPack {
 
         // If dir exists read all scripts
         if scripts_path.is_dir() {
-            for scripts_entry in WalkDir::new(&scripts_path)
-                .into_iter()
-                .filter(|v| { if let Ok(v) = v { v.file_type().is_file() } else { false } }) {
-
+            for scripts_entry in WalkDir::new(&scripts_path).into_iter().filter(|v| {
+                if let Ok(v) = v {
+                    v.file_type().is_file()
+                } else {
+                    false
+                }
+            }) {
                 if let Ok(entry) = scripts_entry {
                     let script_path = entry.path();
 
@@ -159,13 +174,13 @@ impl Addon for BehaviorPack {
             blocks,
             items,
             functions,
-            scripts
+            scripts,
         })
     }
 
     fn export(path: impl AsRef<Path>) -> Result<Self, AddonError>
     where
-        Self: Sized
+        Self: Sized,
     {
         todo!()
     }
