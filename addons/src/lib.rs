@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use crate::error::AddonError;
 use crate::manifest::AddonManifest;
 
