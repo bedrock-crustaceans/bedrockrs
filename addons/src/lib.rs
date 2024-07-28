@@ -1,8 +1,3 @@
-use std::fmt::Debug;
-use std::path::Path;
-
-use serde::{Deserialize, Serialize};
-
 use crate::error::AddonError;
 use crate::manifest::AddonManifest;
 

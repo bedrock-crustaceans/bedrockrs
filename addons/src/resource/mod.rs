@@ -10,8 +10,8 @@ use crate::Addon;
 
 #[derive(Debug, Clone)]
 pub struct ResourcePack {
-    manifest: AddonManifest,
-    languages: Languages,
+    pub manifest: AddonManifest,
+    pub languages: Languages,
 }
 
 impl Addon for ResourcePack {

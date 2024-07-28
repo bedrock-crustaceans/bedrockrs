@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::fs;
-use std::hash::Hash;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
@@ -15,18 +14,18 @@ use crate::language::Languages;
 use crate::manifest::AddonManifest;
 use crate::Addon;
 
-mod blocks;
-mod items;
-mod menu_category;
+pub mod menu_category;
+pub mod blocks;
+pub mod items;
 
 #[derive(Debug, Clone)]
 pub struct BehaviorPack {
-    manifest: AddonManifest,
-    languages: Languages,
-    blocks: HashMap<PathBuf, AddonBlock>,
-    items: HashMap<PathBuf, AddonItem>,
-    functions: HashMap<PathBuf, String>,
-    scripts: HashMap<PathBuf, String>,
+    pub manifest: AddonManifest,
+    pub languages: Languages,
+    pub blocks: HashMap<PathBuf, AddonBlock>,
+    pub items: HashMap<PathBuf, AddonItem>,
+    pub functions: HashMap<PathBuf, String>,
+    pub scripts: HashMap<PathBuf, String>,
 }
 
 impl Addon for BehaviorPack {

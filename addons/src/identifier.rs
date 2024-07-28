@@ -3,8 +3,8 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 #[derive(Debug, Clone, Hash, Ord, PartialOrd, Eq, PartialEq)]
 pub struct AddonIdentifier {
-    namespace: String,
-    name: String,
+    pub namespace: String,
+    pub name: String,
 }
 
 impl Serialize for AddonIdentifier {

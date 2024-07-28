@@ -7,12 +7,12 @@ use crate::error::AddonError;
 use crate::error::AddonError::{FormatError, IOError, JsonError};
 use crate::language::code::LanguageCode;
 
-mod code;
+pub mod code;
 
 #[derive(Debug, Clone)]
 pub struct Languages {
-    texts: HashMap<String, HashMap<String, String>>,
-    codes: Vec<LanguageCode>,
+    pub texts: HashMap<String, HashMap<String, String>>,
+    pub codes: Vec<LanguageCode>,
 }
 
 impl Languages {
