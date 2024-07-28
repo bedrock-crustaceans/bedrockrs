@@ -1,65 +1,81 @@
-use std::collections::HashMap;
-use std::path::PathBuf;
+mod code;
 
+use std::collections::HashMap;
+use std::fs;
+use std::path::PathBuf;
+use std::sync::Arc;
 use crate::error::AddonError;
+use crate::error::AddonError::{FormatError, IOError, JsonError};
+use crate::language::code::LanguageCode;
 
 #[derive(Debug, Clone)]
-pub struct Languages(HashMap<String, (Option<String>, HashMap<String, String>)>);
+pub struct Languages {
+    texts: HashMap<String, HashMap<String, String>>,
+    codes: Vec<LanguageCode>,
+}
 
 impl Languages {
     pub fn import(languages_path: PathBuf) -> Result<Self, AddonError> {
-        todo!()
+        let mut texts = HashMap::new();
+        let codes = vec![];
 
-        // let data = match fs::read(language_file_path) {
-        //     Ok(v) => v,
-        //     Err(e) => {
-        //         todo!()
-        //     }
-        // };
-        //
-        // let lines = match String::from_utf8(data) {
-        //     Ok(v) => v,
-        //     Err(e) => {
-        //         todo!()
-        //     }
-        // };
-        //
-        // let mut map = HashMap::new();
-        //
-        // let line_iter = lines.lines();
-        //
-        // 'lines: for line in line_iter {
-        //     // If line is empty continue
-        //     if line.trim().is_empty() {
-        //         continue 'lines;
-        //     }
-        //
-        //     // Translation comments start with `##` ignore them
-        //     if line.starts_with("##") {
-        //         continue 'lines;
-        //     };
-        //
-        //     // Remove possible inline comments
-        //     let line = match line.split_once("\t##") {
-        //         None => line,
-        //         Some((v, _)) => v,
-        //     };
-        //
-        //     // Split identifier and value
-        //     let (id, val) = match line.split_once("=") {
-        //         None => {
-        //             todo!()
-        //         }
-        //         Some((i, v)) => (String::from(i), String::from(v)),
-        //     };
-        //
-        //     map.insert(id, val);
-        // }
-        //
-        // Ok(Self(map))
-    }
+        if languages_path.is_dir() {
+            let languages_file_path = languages_path.join("languages.json");
 
-    pub fn languages(&self) -> Vec<String> {
-        self.0.keys().map(|f| f.clone()).collect()
+            let languages_file = fs::read_to_string(&languages_file_path).map_err(|e| IOError(Arc::new(e), languages_file_path.clone()))?;
+            let languages_file: Vec<LanguageCode> = serde_json::from_str(&languages_file).map_err(|e| JsonError(Arc::new(e), languages_file_path))?;
+
+            // Parse all the language data in all language files
+            for language in languages_file {
+                let language_code = match language {
+                    LanguageCode::VanillaCode(v) => { v }
+                    LanguageCode::CustomCode(v) => { v.x }
+                };
+
+                let language_path = languages_path.join(format!("{language_code}.lang"));
+
+                let language = fs::read_to_string(&language_path).map_err(|e| IOError(Arc::new(e), language_path.clone()))?;
+
+                let mut language_data = HashMap::new();
+
+                'language_lines: for (line_index, line) in language.lines().enumerate() {
+                    // If line is empty continue
+                    if line.trim().is_empty() {
+                        continue 'language_lines;
+                    }
+
+                    // Translation comments start with `##` ignore them
+                    if line.starts_with("##") {
+                        continue 'language_lines;
+                    };
+
+                    // Remove possible inline comments
+                    let line = match line.split_once("\t##") {
+                        None => line,
+                        Some((v, _)) => v,
+                    };
+
+                    // Split identifier and value
+                    let (id, val) = match line.split_once("=") {
+                        None => { Err(FormatError{
+                            message: String::from("Language data must be split by a \"=\""),
+                            path: language_path.clone(),
+                            line: Some(line_index),
+                            column: None
+                        }) }
+                        Some(v) => { Ok(v) }
+                    }?;
+
+                    language_data.insert(id.to_string(), val.to_string());
+                }
+
+                texts.insert(language_code, language_data);
+            }
+        }
+
+        Ok(Self {
+            texts,
+            codes
+        })
     }
 }
