@@ -9,4 +9,11 @@ pub enum AddonError {
     IOError(Arc<io::Error>, PathBuf),
     #[error("JsonError at {0}: {1}")]
     JsonError(Arc<serde_json::Error>, PathBuf),
+    #[error("FormatError at {line:?}:{column:?} {path}: {message}")]
+    FormatError{
+        message: String,
+        path: PathBuf,
+        line: Option<usize>,
+        column: Option<usize>,
+    },
 }
