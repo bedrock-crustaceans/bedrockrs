@@ -12,22 +12,10 @@ impl ProtoCodec for String {
     where
         Self: Sized,
     {
-        let len = match self.len().try_into() {
-            Ok(v) => v,
-            Err(e) => {
-                return Err(ProtoCodecError::FromIntError(e));
-            }
-        };
+        let len = self.len().try_into().map_err(|e| ProtoCodecError::FromIntError(e))?;
 
-        match VAR::<u32>::new(len).write(buf) {
-            Ok(_) => {}
-            Err(e) => return Err(ProtoCodecError::IOError(Arc::new(e))),
-        };
-
-        match buf.write_all(self.as_bytes()) {
-            Ok(_) => {}
-            Err(e) => return Err(ProtoCodecError::IOError(Arc::new(e))),
-        };
+        VAR::<u32>::new(len).write(buf).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
+        buf.write_all(self.as_bytes()).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
 
         Ok(())
     }
@@ -36,32 +24,12 @@ impl ProtoCodec for String {
     where
         Self: Sized,
     {
-        let len = match VAR::<u32>::read(stream) {
-            Ok(v) => v.into_inner(),
-            Err(e) => {
-                return Err(ProtoCodecError::IOError(Arc::new(e)));
-            }
-        };
-
-        let len = match len.try_into() {
-            Ok(v) => v,
-            Err(e) => {
-                return Err(ProtoCodecError::FromIntError(e));
-            }
-        };
+        let len = VAR::<u32>::read(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?.into_inner();
+        let len = len.try_into().map_err(|e| ProtoCodecError::FromIntError(e))?;
 
         let mut string_buf = vec![0u8; len];
 
-        match stream.read_exact(&mut *string_buf) {
-            Ok(_) => {}
-            Err(e) => {
-                return Err(ProtoCodecError::IOError(Arc::new(e)));
-            }
-        }
-
-        match String::from_utf8(string_buf) {
-            Ok(str) => Ok(str),
-            Err(e) => Err(ProtoCodecError::UTF8Error(e)),
-        }
+        stream.read_exact(&mut *string_buf).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
+        String::from_utf8(string_buf).map_err(|e| ProtoCodecError::UTF8Error(e))
     }
 }

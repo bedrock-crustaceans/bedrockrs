@@ -9,37 +9,23 @@ impl<T: ProtoCodec> ProtoCodec for Option<T> {
         Self: Sized,
     {
         match self {
-            None => match false.proto_serialize(buf) {
-                Ok(_) => Ok(()),
-                Err(e) => Err(e),
-            },
+            None =>  false.proto_serialize(buf)?,
             Some(v) => {
-                match true.proto_serialize(buf) {
-                    Ok(_) => {}
-                    Err(e) => return Err(e),
-                };
-
-                match v.proto_serialize(buf) {
-                    Ok(_) => Ok(()),
-                    Err(e) => Err(e),
-                }
+                true.proto_serialize(buf)?;
+                v.proto_serialize(buf)?;
             }
-        }
+        };
+
+        Ok(())
     }
 
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
     {
-        match bool::proto_deserialize(stream) {
-            Ok(v) => match v {
-                false => Ok(None),
-                true => match T::proto_deserialize(stream) {
-                    Ok(v) => Ok(Some(v)),
-                    Err(e) => Err(e),
-                },
-            },
-            Err(e) => Err(e),
-        }
+        Ok(match bool::proto_deserialize(stream)? {
+            false => None,
+            true => T::proto_deserialize(stream)?
+        })
     }
 }

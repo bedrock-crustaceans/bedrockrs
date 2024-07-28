@@ -12,14 +12,8 @@ impl ProtoCodec for bool {
         Self: Sized,
     {
         match self {
-            true => match LE::<u8>::new(1).write(buf) {
-                Ok(_) => Ok(()),
-                Err(e) => Err(ProtoCodecError::IOError(Arc::new(e))),
-            },
-            false => match LE::<u8>::new(0).write(buf) {
-                Ok(_) => Ok(()),
-                Err(e) => Err(ProtoCodecError::IOError(Arc::new(e))),
-            },
+            true => LE::<u8>::new(1).write(buf).map_err(|e| ProtoCodecError::IOError(Arc::new(e))),
+            false => LE::<u8>::new(0).write(buf).map_err(|e| ProtoCodecError::IOError(Arc::new(e))),
         }
     }
 
@@ -28,16 +22,11 @@ impl ProtoCodec for bool {
         Self: Sized,
     {
         // a Bool is represented as a byte
-        return match LE::<u8>::read(stream) {
-            Ok(v) => {
-                match v.into_inner() {
-                    // 0 is counted as false
-                    0 => Ok(false),
-                    // Anything above 0 is true
-                    _ => Ok(true),
-                }
-            }
-            Err(e) => Err(ProtoCodecError::IOError(Arc::new(e))),
-        };
+        Ok(match LE::<u8>::read(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?.into_inner() {
+            // 0 is counted as false
+            0 => false,
+            // Anything above 0 is true
+            _ => true,
+        })
     }
 }
