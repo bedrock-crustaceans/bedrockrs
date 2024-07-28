@@ -14,9 +14,9 @@ use crate::language::Languages;
 use crate::manifest::AddonManifest;
 use crate::Addon;
 
-pub mod menu_category;
 pub mod blocks;
 pub mod items;
+pub mod menu_category;
 
 #[derive(Debug, Clone)]
 pub struct BehaviorPack {
