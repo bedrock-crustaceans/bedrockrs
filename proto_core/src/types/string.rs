@@ -12,10 +12,16 @@ impl ProtoCodec for String {
     where
         Self: Sized,
     {
-        let len = self.len().try_into().map_err(|e| ProtoCodecError::FromIntError(e))?;
+        let len = self
+            .len()
+            .try_into()
+            .map_err(|e| ProtoCodecError::FromIntError(e))?;
 
-        VAR::<u32>::new(len).write(buf).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
-        buf.write_all(self.as_bytes()).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
+        VAR::<u32>::new(len)
+            .write(buf)
+            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
+        buf.write_all(self.as_bytes())
+            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
 
         Ok(())
     }
@@ -24,12 +30,18 @@ impl ProtoCodec for String {
     where
         Self: Sized,
     {
-        let len = VAR::<u32>::read(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?.into_inner();
-        let len = len.try_into().map_err(|e| ProtoCodecError::FromIntError(e))?;
+        let len = VAR::<u32>::read(stream)
+            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?
+            .into_inner();
+        let len = len
+            .try_into()
+            .map_err(|e| ProtoCodecError::FromIntError(e))?;
 
         let mut string_buf = vec![0u8; len];
 
-        stream.read_exact(&mut *string_buf).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
+        stream
+            .read_exact(&mut *string_buf)
+            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
         String::from_utf8(string_buf).map_err(|e| ProtoCodecError::UTF8Error(e))
     }
 }

@@ -125,16 +125,24 @@ pub fn proto_build_de_struct(struct_data: &DataStruct) -> TokenStream {
     TokenStream::from(expand)
 }
 
-pub fn proto_build_de_enum(enum_data: &DataEnum, attributes: &Vec<Attribute>, enum_name: &Ident) -> TokenStream {
+pub fn proto_build_de_enum(
+    enum_data: &DataEnum,
+    attributes: &Vec<Attribute>,
+    enum_name: &Ident,
+) -> TokenStream {
     let mut int_type: Option<Expr> = None;
 
     for attr in attributes {
         if attr.path().is_ident("enum_repr") {
-            int_type = Some(attr.parse_args().expect(format!("Given attribute meta for enum could not be parsed").as_str()));
+            int_type = Some(
+                attr.parse_args()
+                    .expect(format!("Given attribute meta for enum could not be parsed").as_str()),
+            );
         }
-    };
+    }
 
-    let int_type = int_type.unwrap_or_else(|| panic!("Missing attribute \"enum_repr\" for ProtoCodec macro on Enum"));
+    let int_type = int_type
+        .unwrap_or_else(|| panic!("Missing attribute \"enum_repr\" for ProtoCodec macro on Enum"));
 
     let calls = enum_data.variants.iter().map(|v| {
         let val = v.discriminant.clone().expect("Discriminant needed").1;

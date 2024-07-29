@@ -1,15 +1,14 @@
-use std::sync::Arc;
-
 use de::proto_build_de_struct;
 use quote::quote;
+use ser::proto_build_ser_enum;
 use ser::proto_build_ser_struct;
 use syn::{parse_macro_input, Data, DeriveInput};
-use ser::proto_build_ser_enum;
+
 use crate::de::proto_build_de_enum;
 
 mod de;
-mod ser;
 mod expand;
+mod ser;
 
 #[proc_macro_derive(ProtoCodec, attributes(len_repr, enum_repr))]
 pub fn proto_codec_derive(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
@@ -60,7 +59,9 @@ pub fn proto_codec_derive(item: proc_macro::TokenStream) -> proc_macro::TokenStr
         }
         Data::Union(_) => {
             // Unions are not supported
-            panic!("ProtoCodec derive macro only supports named/unnamed structs, got union: {name:?}.")
+            panic!(
+                "ProtoCodec derive macro only supports named/unnamed structs, got union: {name:?}."
+            )
         }
     };
 

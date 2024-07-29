@@ -4,7 +4,6 @@ use std::sync::Arc;
 use bedrockrs_core::LE;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
-use bedrockrs_proto_derive::ProtoCodec;
 
 #[derive(Debug, Clone)]
 pub enum SpawnBiomeType {

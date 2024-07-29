@@ -9,7 +9,7 @@ impl<T: ProtoCodec> ProtoCodec for Option<T> {
         Self: Sized,
     {
         match self {
-            None =>  false.proto_serialize(buf)?,
+            None => false.proto_serialize(buf)?,
             Some(v) => {
                 true.proto_serialize(buf)?;
                 v.proto_serialize(buf)?;
@@ -25,7 +25,7 @@ impl<T: ProtoCodec> ProtoCodec for Option<T> {
     {
         Ok(match bool::proto_deserialize(stream)? {
             false => None,
-            true => Some(T::proto_deserialize(stream)?)
+            true => Some(T::proto_deserialize(stream)?),
         })
     }
 }
