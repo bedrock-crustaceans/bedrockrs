@@ -25,7 +25,7 @@ impl<T: ProtoCodec> ProtoCodec for Option<T> {
     {
         Ok(match bool::proto_deserialize(stream)? {
             false => None,
-            true => T::proto_deserialize(stream)?
+            true => Some(T::proto_deserialize(stream)?)
         })
     }
 }

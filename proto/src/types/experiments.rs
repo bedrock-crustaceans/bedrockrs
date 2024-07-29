@@ -6,7 +6,7 @@ use crate::types::experiment::Experiment;
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct Experiments {
-    #[len_type(LE::< u32 >)]
+    #[len_repr(LE::< u32 >)]
     pub experiments: Vec<Experiment>,
     pub ever_toggled: bool,
 }

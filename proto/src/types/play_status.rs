@@ -3,10 +3,12 @@ use std::io::Cursor;
 use bedrockrs_core::BE;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
+use bedrockrs_proto_derive::ProtoCodec;
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::{FromPrimitive, ToPrimitive};
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq, FromPrimitive, ToPrimitive)]
+#[derive(ProtoCodec, Debug, Copy, Clone, Eq, PartialEq)]
+#[enum_repr(BE::<i32>)]
 pub enum PlayStatusType {
     /// Sent after Login has been successfully decoded and the player has logged in
     LoginSuccess = 0,
@@ -24,31 +26,4 @@ pub enum PlayStatusType {
     FailedIncompatible = 6,
     /// Displays "Wow this server is popular! Check back later to see if space opens up. Server Full"
     FailedServerFull = 7,
-}
-
-impl ProtoCodec for PlayStatusType {
-    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError>
-    where
-        Self: Sized,
-    {
-        match self.to_i32() {
-            None => {
-                return Err(ProtoCodecError::InvalidEnumID);
-            }
-            Some(v) => BE::<i32>::new(v).proto_serialize(stream),
-        }
-    }
-
-    fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError>
-    where
-        Self: Sized,
-    {
-        match BE::<i32>::proto_deserialize(stream) {
-            Ok(v) => match PlayStatusType::from_i32(v.into_inner()) {
-                None => Err(ProtoCodecError::InvalidEnumID),
-                Some(v) => Ok(v),
-            },
-            Err(e) => return Err(e),
-        }
-    }
 }

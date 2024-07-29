@@ -13,11 +13,11 @@ pub struct ResourcePacksInfoPacket {
     pub has_addon_packs: bool,
     pub has_scripts: bool,
     pub force_server_packs_enabled: bool,
-    #[len_type(LE::< u16 >)]
+    #[len_repr(LE::< u16 >)]
     pub behavior_packs: Vec<BehaviorPackInfoType>,
-    #[len_type(LE::< u16 >)]
+    #[len_repr(LE::< u16 >)]
     pub resource_packs: Vec<ResourcePackInfoType>,
-    #[len_type(VAR::< u32 >)]
+    #[len_repr(VAR::< u32 >)]
     pub cdn_urls: Vec<PackURL>,
 }
 

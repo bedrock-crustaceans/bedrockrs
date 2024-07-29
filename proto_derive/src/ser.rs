@@ -1,6 +1,6 @@
-use proc_macro2::TokenStream;
+use proc_macro2::{Ident, TokenStream};
 use quote::quote;
-use syn::{DataStruct, Expr, Fields, Index};
+use syn::{Attribute, DataEnum, DataStruct, Expr, Fields, Index};
 
 pub fn proto_build_ser_struct(struct_data: &DataStruct) -> TokenStream {
     let fields = &struct_data.fields;
@@ -13,7 +13,7 @@ pub fn proto_build_ser_struct(struct_data: &DataStruct) -> TokenStream {
                 let mut quote = None;
 
                 for attr in &f.attrs {
-                    if attr.path().is_ident("len_type") {
+                    if attr.path().is_ident("len_repr") {
                         let int_type: Expr = attr.parse_args().expect(format!("Given attribute meta for field {field_name:?} could not be parsed").as_str());
 
                         quote = Some(quote! {
@@ -65,7 +65,7 @@ pub fn proto_build_ser_struct(struct_data: &DataStruct) -> TokenStream {
                 let mut quote = None;
 
                 for attr in &f.attrs {
-                    if attr.path().is_ident("len_type") {
+                    if attr.path().is_ident("len_repr") {
                         let int_type: Expr = attr.parse_args().expect(format!("Given attribute meta for field self.{index:?} could not be parsed").as_str());
 
                         quote = Some(quote! {
@@ -81,10 +81,7 @@ pub fn proto_build_ser_struct(struct_data: &DataStruct) -> TokenStream {
                                 };
 
                                 for i in &self.#index {
-                                    match bedrockrs_proto_core::ProtoCodec::proto_serialize(i, stream) {
-                                        Ok(_) => { },
-                                        Err(e) => { return Err(e) }
-                                    };
+                                    bedrockrs_proto_core::ProtoCodec::proto_serialize(i, stream)?;
                                 }
                             };
                         });
@@ -92,10 +89,7 @@ pub fn proto_build_ser_struct(struct_data: &DataStruct) -> TokenStream {
                 }
 
                 quote! {
-                    match bedrockrs_proto_core::ProtoCodec::proto_serialize(&self.#index, stream) {
-                        Ok(_) => { },
-                        Err(e) => { return Err(e) }
-                    };
+                    bedrockrs_proto_core::ProtoCodec::proto_serialize(&self.#index, stream)?;
                 }
             });
 
@@ -112,4 +106,36 @@ pub fn proto_build_ser_struct(struct_data: &DataStruct) -> TokenStream {
     };
 
     TokenStream::from(expand)
+}
+
+pub fn proto_build_ser_enum(enum_data: &DataEnum, attributes: &Vec<Attribute>, enum_name: &Ident) -> TokenStream {
+    let mut int_type: Option<Expr> = None;
+
+    for attr in attributes {
+        if attr.path().is_ident("enum_repr") {
+            int_type = Some(attr.parse_args().expect(format!("Given attribute meta for enum could not be parsed").as_str()));
+        }
+    };
+
+    let int_type = int_type.unwrap_or_else(|| panic!("Missing attribute \"enum_repr\" for ProtoCodec macro on Enum"));
+
+    let calls = enum_data.variants.iter().map(|v| {
+        let val = v.discriminant.clone().expect("Discriminant needed").1;
+        let name = v.ident.clone();
+
+        quote! {
+            #enum_name::#name => #val,
+        }
+    });
+
+    quote! {
+        let int = #int_type::new(match self {
+            #(#calls)*
+        });
+
+        match int.write(stream) {
+            Ok(_) => { },
+            Err(e) => { return Err(bedrockrs_proto_core::error::ProtoCodecError::IOError(std::sync::Arc::new(e))) }
+        };
+    }
 }
