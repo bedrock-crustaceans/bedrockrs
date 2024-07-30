@@ -6,8 +6,6 @@ use bedrockrs_proto_core::ProtoCodec;
 
 #[derive(Debug, Clone)]
 pub struct DisconnectPacket {
-    /// TODO: Convert into enum, if possible
-    ///
     /// Seems to have no effect on the message being shown.
     /// It is just for telemetry.
     pub reason: VAR<i32>,
