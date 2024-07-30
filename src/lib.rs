@@ -1,5 +1,6 @@
 pub mod core {
     pub use ::bedrockrs_core::*;
+    pub use ::bedrockrs_shared::*;
 }
 
 pub mod nbt {
@@ -16,8 +17,6 @@ pub mod proto {
     pub mod codec {
         pub use ::bedrockrs_proto_core::error::ProtoCodecError;
         pub use ::bedrockrs_proto_core::ProtoCodec;
-
-        //pub use ::bedrockrs_proto_derive::ProtoCodec;
     }
 }
 

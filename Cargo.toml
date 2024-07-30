@@ -21,7 +21,8 @@ bedrockrs_world = { path = "world", optional = true }
 bedrockrs_paletted_storage = { path = "paletted_storage", optional = true }
 
 [features]
-default = ["addons", "proto"]
+full = ["addons", "proto", "world"]
+
 addons = ["dep:bedrockrs_addons"]
 proto = ["dep:bedrockrs_proto", "dep:bedrockrs_proto_core", "dep:bedrockrs_proto_derive"]
 world = ["dep:bedrockrs_world", "dep:bedrockrs_paletted_storage"]

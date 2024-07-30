@@ -1,7 +1,6 @@
 use std::io::Cursor;
 use std::sync::Arc;
 
-use bedrockrs_core::*;
 use bedrockrs_core::int::{BE, LE, VAR};
 use byteorder::{ReadBytesExt, WriteBytesExt};
 
