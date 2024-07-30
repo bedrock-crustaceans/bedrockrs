@@ -16,7 +16,7 @@ impl NbtByteOrder for NbtLittleEndianNetwork {
 
     #[inline]
     fn write_i16(buf: &mut Vec<u8>, int16: i16) -> Result<(), NbtError> {
-        LE::<i16>::write(&LE::new(int16), buf).map_err(|e| NbtError::IOError(Arc::new(e)))
+        VAR::<i16>::write(&VAR::new(int16), buf).map_err(|e| NbtError::IOError(Arc::new(e)))
     }
 
     #[inline]
@@ -60,7 +60,7 @@ impl NbtByteOrder for NbtLittleEndianNetwork {
 
     #[inline]
     fn read_i16(buf: &mut Cursor<&[u8]>) -> Result<i16, NbtError> {
-        match LE::<i16>::read(buf) {
+        match VAR::<i16>::read(buf) {
             Ok(v) => Ok(v.into_inner()),
             Err(e) => Err(NbtError::IOError(Arc::new(e))),
         }
