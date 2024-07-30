@@ -89,6 +89,7 @@ impl ProtoCodec for ConnectionRequest {
     }
 
     // TODO: Add microsoft auth
+    // TODO: Validate jwts (This is hard, Zuri nor Vincent could help me)
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError>
     where
         Self: Sized,
