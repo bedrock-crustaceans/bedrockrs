@@ -1,8 +1,9 @@
 use std::io::Cursor;
-
+use std::sync::Arc;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_core::int::{LE, VAR};
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct GameRule {
@@ -14,16 +15,44 @@ pub struct GameRule {
 #[derive(Debug, Clone)]
 pub enum GameRuleValue {
     ValBool(bool),
-    ValI32(i32),
+    ValVarU32(u32),
     ValF32(f32),
 }
 
 impl ProtoCodec for GameRuleValue {
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
-        todo!()
+        let int = VAR::<i32>::new(match self {
+            GameRuleValue::ValBool(v) => {
+                v.proto_serialize(stream)?;
+                1
+            }
+            GameRuleValue::ValVarU32(v) => {
+                VAR::<u32>::new(*v).write(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
+                2
+            }
+            GameRuleValue::ValF32(v) => {
+                LE::<f32>::new(*v).write(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
+                3
+            }
+        });
+
+        int.write(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
     }
 
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
-        todo!()
+        Ok(match VAR::<i32>::read(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?.into_inner() {
+            1 => {
+                GameRuleValue::ValBool(bool::proto_deserialize(stream)?)
+            }
+            2 => {
+                GameRuleValue::ValVarU32(VAR::<u32>::read(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?.into_inner())
+            }
+            3 => {
+                GameRuleValue::ValF32(LE::<f32>::read(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?.into_inner())
+            }
+            _ => {
+                return Err(ProtoCodecError::InvalidEnumID(String::from("GameRuleValue")));
+            }
+        })
     }
 }
