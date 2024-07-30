@@ -23,13 +23,13 @@ pub fn proto_codec_derive(item: proc_macro::TokenStream) -> proc_macro::TokenStr
             let de = proto_build_de_struct(&struct_data);
 
             quote! {
-                impl #impl_generics bedrockrs_proto_core::ProtoCodec for #name #ty_generics #where_clause {
-                    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {
+                impl #impl_generics ::bedrockrs_proto_core::ProtoCodec for #name #ty_generics #where_clause {
+                    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ::bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {
                         #ser
                         Ok(())
                     }
 
-                    fn proto_deserialize(stream: &mut std::io::Cursor<&[u8]>) -> Result<Self, bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {
+                    fn proto_deserialize(stream: &mut ::std::io::Cursor<&[u8]>) -> Result<Self, ::bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {
                         Ok(Self{
                             #de
                         })
@@ -42,13 +42,13 @@ pub fn proto_codec_derive(item: proc_macro::TokenStream) -> proc_macro::TokenStr
             let de = proto_build_de_enum(&enum_data, &input.attrs, &name);
 
             quote! {
-                impl #impl_generics bedrockrs_proto_core::ProtoCodec for #name #ty_generics #where_clause {
-                    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {
+                impl #impl_generics ::bedrockrs_proto_core::ProtoCodec for #name #ty_generics #where_clause {
+                    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ::bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {
                         #ser
                         Ok(())
                     }
 
-                    fn proto_deserialize(stream: &mut std::io::Cursor<&[u8]>) -> Result<Self, bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {
+                    fn proto_deserialize(stream: &mut ::std::io::Cursor<&[u8]>) -> Result<Self, ::bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {
 
                         Ok({#de})
                     }
