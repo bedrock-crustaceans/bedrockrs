@@ -7,7 +7,7 @@ use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_proto_derive::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
-#[repr(LE::<i16>)]
+#[enum_repr(LE::<i16>)]
 pub enum SpawnBiomeType {
     Default = 0,
     UserDefined = 1,
