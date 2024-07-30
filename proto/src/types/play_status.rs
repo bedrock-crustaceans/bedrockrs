@@ -2,7 +2,7 @@ use bedrockrs_core::int::BE;
 use bedrockrs_proto_derive::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Copy, Clone, Eq, PartialEq)]
-#[enum_repr(BE::< i32 >)]
+#[enum_repr(BE::<i32>)]
 pub enum PlayStatusType {
     /// Sent after Login has been successfully decoded and the player has logged in
     LoginSuccess = 0,

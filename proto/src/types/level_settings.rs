@@ -41,7 +41,7 @@ pub struct LevelSettings {
     pub broadcasting_settings_platform: VAR<i32>,
     pub commands_enabled: bool,
     pub texture_pack_required: bool,
-    #[len_repr(VAR::< u32 >)]
+    #[len_repr(VAR::<u32>)]
     pub gamerules: Vec<GameRule>,
     pub experiments: Experiments,
     pub bonus_chest: bool,
