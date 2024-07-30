@@ -1,5 +1,6 @@
-use bedrockrs_shared::world::dimension::Dimension;
 use bedrockrs_proto_derive::ProtoCodec;
+
+use bedrockrs_shared::world::dimension::Dimension;
 
 use crate::types::spawn_biome_type::SpawnBiomeType;
 

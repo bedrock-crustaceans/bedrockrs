@@ -3,11 +3,12 @@ use std::fs::File;
 use std::io::{Cursor, Read};
 use std::path::PathBuf;
 
-use bedrockrs_shared::world::difficulty::Difficulty;
-use bedrockrs_shared::world::dimension::Dimension;
 use bedrockrs_nbt::endian::little_endian::NbtLittleEndian;
 use bedrockrs_nbt::NbtTag;
 use byteorder::{LittleEndian, ReadBytesExt};
+
+use bedrockrs_shared::world::difficulty::Difficulty;
+use bedrockrs_shared::world::dimension::Dimension;
 
 use crate::error::WorldError;
 use crate::level_dat::abilities::LevelDatAbilities;

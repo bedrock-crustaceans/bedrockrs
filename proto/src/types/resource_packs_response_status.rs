@@ -2,7 +2,7 @@ use bedrockrs_core::int::LE;
 use bedrockrs_proto_derive::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Copy, Clone, Eq, PartialEq)]
-#[enum_repr(LE::<u8>)]
+#[enum_repr(LE::< u8 >)]
 pub enum ResourcePacksResponseStatus {
     None = 0,
     Refused = 1,

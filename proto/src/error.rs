@@ -1,18 +1,13 @@
-use bedrockrs_proto_core::error::ProtoCodecError;
 use io::Error as IOError;
 use std::error::Error;
 use std::io;
-use std::num::TryFromIntError;
-use std::string::FromUtf8Error;
 use std::sync::Arc;
+
+use bedrockrs_proto_core::error::ProtoCodecError;
 use rak_rs::connection::queue::SendQueueError;
 use rak_rs::connection::RecvError;
 use rak_rs::error::server::ServerError;
 use thiserror::Error;
-use base64::DecodeError as Base64DecodeError;
-use bedrockrs_nbt::error::NbtError;
-use jsonwebtoken::errors::Error as JwtError;
-use serde_json::error::Error as JsonError;
 
 use crate::info::RAKNET_GAME_PACKET_ID;
 

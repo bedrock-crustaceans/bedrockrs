@@ -1,4 +1,3 @@
-use bedrockrs_core::*;
 use bedrockrs_core::int::LE;
 use bedrockrs_proto_derive::ProtoCodec;
 

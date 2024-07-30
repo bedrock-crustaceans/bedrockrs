@@ -1,4 +1,5 @@
 use std::io::Cursor;
+
 use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
@@ -16,4 +17,3 @@ impl ProtoCodec for ActorUniqueID {
         Ok(Self(VAR::proto_deserialize(stream)?.into_inner()))
     }
 }
-
