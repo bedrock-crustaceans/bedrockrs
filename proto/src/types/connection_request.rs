@@ -107,18 +107,24 @@ impl ProtoCodec for ConnectionRequest {
             Err(e) => return Err(ProtoCodecError::IOError(Arc::new(e))),
         };
 
-        let certificate_chain_len = certificate_chain_len.try_into().map_err(|e| ProtoCodecError::FromIntError(e))?;
+        let certificate_chain_len = certificate_chain_len
+            .try_into()
+            .map_err(|e| ProtoCodecError::FromIntError(e))?;
 
         let mut certificate_chain_buf = vec![0; certificate_chain_len];
 
         // read string data (certificate_chain)
-        stream.read_exact(&mut certificate_chain_buf).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
+        stream
+            .read_exact(&mut certificate_chain_buf)
+            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
 
         // transform into string
-        let certificate_chain_string = String::from_utf8(certificate_chain_buf).map_err(|e| ProtoCodecError::UTF8Error(e))?;
+        let certificate_chain_string =
+            String::from_utf8(certificate_chain_buf).map_err(|e| ProtoCodecError::UTF8Error(e))?;
 
         // parse certificate chain string into json
-        let certificate_chain_json = serde_json::from_str(certificate_chain_string.as_str()).map_err(|e| ProtoCodecError::JsonError(Arc::new(e)))?;
+        let certificate_chain_json = serde_json::from_str(certificate_chain_string.as_str())
+            .map_err(|e| ProtoCodecError::JsonError(Arc::new(e)))?;
 
         let certificate_chain_json_jwts = match certificate_chain_json {
             Value::Object(mut v) => {
@@ -163,7 +169,8 @@ impl ProtoCodec for ConnectionRequest {
             };
 
             // Extract header
-            let jwt_header = jsonwebtoken::decode_header(&jwt_string).map_err(|e| ProtoCodecError::JwtError(e))?;
+            let jwt_header = jsonwebtoken::decode_header(&jwt_string)
+                .map_err(|e| ProtoCodecError::JwtError(e))?;
 
             let mut jwt_validation = Validation::new(jwt_header.alg);
             // TODO: This definitely is not right. Even Zuri-MC doesn't understand this.. I may understand it.. I do understand it, update I don't.
@@ -182,7 +189,9 @@ impl ProtoCodec for ConnectionRequest {
                     Some(ref v) => v.as_bytes(),
                 };
 
-                key_data = BASE64_STANDARD.decode(x5u).map_err(|e| ProtoCodecError::Base64DecodeError(e))?;
+                key_data = BASE64_STANDARD
+                    .decode(x5u)
+                    .map_err(|e| ProtoCodecError::Base64DecodeError(e))?;
             }
 
             // Decode the jwt string into a jwt object
@@ -190,7 +199,8 @@ impl ProtoCodec for ConnectionRequest {
                 &jwt_string,
                 &DecodingKey::from_ec_der(&key_data),
                 &jwt_validation,
-            ).map_err(|e| ProtoCodecError::JwtError(e))?;
+            )
+            .map_err(|e| ProtoCodecError::JwtError(e))?;
 
             key_data = match jwt.claims.get("identityPublicKey") {
                 None => return Err(ProtoCodecError::FormatMismatch(String::from("Expected identityPublicKey field in JWT for validation"))),
@@ -207,20 +217,28 @@ impl ProtoCodec for ConnectionRequest {
         }
 
         // read length of certificate_chain vec
-        let raw_token_len = LE::<i32>::read(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?.into_inner();
+        let raw_token_len = LE::<i32>::read(stream)
+            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?
+            .into_inner();
 
-        let raw_token_len = raw_token_len.try_into().map_err(|e| ProtoCodecError::FromIntError(e))?;
+        let raw_token_len = raw_token_len
+            .try_into()
+            .map_err(|e| ProtoCodecError::FromIntError(e))?;
 
         let mut raw_token_buf = vec![0; raw_token_len];
 
         // read string data (certificate_chain)
-        stream.read_exact(&mut raw_token_buf).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
+        stream
+            .read_exact(&mut raw_token_buf)
+            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
 
         // transform into string
-        let raw_token_string = String::from_utf8(raw_token_buf).map_err(|e| ProtoCodecError::UTF8Error(e))?;
+        let raw_token_string =
+            String::from_utf8(raw_token_buf).map_err(|e| ProtoCodecError::UTF8Error(e))?;
 
         // Extract header
-        let raw_token_jwt_header = jsonwebtoken::decode_header(&raw_token_string).map_err(|e| ProtoCodecError::JwtError(e))?;
+        let raw_token_jwt_header = jsonwebtoken::decode_header(&raw_token_string)
+            .map_err(|e| ProtoCodecError::JwtError(e))?;
 
         let mut jwt_validation = Validation::new(raw_token_jwt_header.alg);
         // TODO: This definitely is not right. Even Zuri-MC doesn't understand this.. I may understand it.. I do understand it, update I don't.
@@ -233,7 +251,8 @@ impl ProtoCodec for ConnectionRequest {
             &raw_token_string,
             &DecodingKey::from_ec_der(&vec![]),
             &jwt_validation,
-        ).map_err(|e| ProtoCodecError::JwtError(e))?;
+        )
+        .map_err(|e| ProtoCodecError::JwtError(e))?;
 
         return Ok(Self {
             certificate_chain,

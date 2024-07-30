@@ -8,4 +8,3 @@ pub enum EditorWorldType {
     Project = 1,
     TestLevel = 2,
 }
-

@@ -19,7 +19,6 @@ use crate::login::provider::LoginProviderServer;
 use crate::packets::start_game::StartGamePacket;
 use crate::types::base_game_version::BaseGameVersion;
 use crate::types::chat_restriction_level::ChatRestrictionLevel;
-use bedrockrs_shared::world::editor_world_type::EditorWorldType;
 use crate::types::edu_shared_uri_resource::EduSharedResourceUri;
 use crate::types::experiments::Experiments;
 use crate::types::level_settings::LevelSettings;
@@ -29,6 +28,7 @@ use crate::types::player_movement_mode::PlayerMovementMode;
 use crate::types::player_movement_settings::PlayerMovementSettings;
 use crate::types::spawn_biome_type::SpawnBiomeType;
 use crate::types::spawn_settings::SpawnSettings;
+use bedrockrs_shared::world::editor_world_type::EditorWorldType;
 
 pub async fn start_game(
     conn: &mut ConnectionShard,

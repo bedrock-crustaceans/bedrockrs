@@ -8,4 +8,3 @@ pub enum PlayerMovementMode {
     Server = 1,
     ServerWithRewind = 2,
 }
-

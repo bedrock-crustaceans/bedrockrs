@@ -1,9 +1,9 @@
-use std::io::Cursor;
-use std::sync::Arc;
+use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_proto_derive::ProtoCodec;
-use bedrockrs_core::int::{LE, VAR};
+use std::io::Cursor;
+use std::sync::Arc;
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct GameRule {
@@ -27,32 +27,46 @@ impl ProtoCodec for GameRuleValue {
                 1
             }
             GameRuleValue::ValVarU32(v) => {
-                VAR::<u32>::new(*v).write(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
+                VAR::<u32>::new(*v)
+                    .write(stream)
+                    .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
                 2
             }
             GameRuleValue::ValF32(v) => {
-                LE::<f32>::new(*v).write(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
+                LE::<f32>::new(*v)
+                    .write(stream)
+                    .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
                 3
             }
         });
 
-        int.write(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
+        int.write(stream)
+            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
     }
 
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
-        Ok(match VAR::<i32>::read(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?.into_inner() {
-            1 => {
-                GameRuleValue::ValBool(bool::proto_deserialize(stream)?)
-            }
-            2 => {
-                GameRuleValue::ValVarU32(VAR::<u32>::read(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?.into_inner())
-            }
-            3 => {
-                GameRuleValue::ValF32(LE::<f32>::read(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?.into_inner())
-            }
-            _ => {
-                return Err(ProtoCodecError::InvalidEnumID(String::from("GameRuleValue")));
-            }
-        })
+        Ok(
+            match VAR::<i32>::read(stream)
+                .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?
+                .into_inner()
+            {
+                1 => GameRuleValue::ValBool(bool::proto_deserialize(stream)?),
+                2 => GameRuleValue::ValVarU32(
+                    VAR::<u32>::read(stream)
+                        .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?
+                        .into_inner(),
+                ),
+                3 => GameRuleValue::ValF32(
+                    LE::<f32>::read(stream)
+                        .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?
+                        .into_inner(),
+                ),
+                _ => {
+                    return Err(ProtoCodecError::InvalidEnumID(String::from(
+                        "GameRuleValue",
+                    )));
+                }
+            },
+        )
     }
 }
