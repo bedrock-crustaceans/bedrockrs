@@ -6,6 +6,7 @@ use std::io::Cursor;
 #[derive(Debug, Clone)]
 pub struct ActorRuntimeID(pub u64);
 
+// ProtoCodec
 impl ProtoCodec for ActorRuntimeID {
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         VAR::new(self.0).proto_serialize(stream)

@@ -5,9 +5,11 @@ edition = "2021"
 
 [dependencies]
 bedrockrs_core = { path = "../core" }
+bedrockrs_shared = { path = "../shared" }
 bedrockrs_nbt = { path = "../nbt" }
 bedrockrs_paletted_storage = { path = "../paletted_storage" }
 
 mojang-leveldb = "0.4"
 thiserror = "1.0"
 byteorder = "1.5"
+uuid = { version = "1.10", features = ["v4"] }

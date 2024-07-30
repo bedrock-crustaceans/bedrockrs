@@ -1,4 +1,4 @@
-use bedrockrs_core::dimension::Dimension;
+use bedrockrs_shared::world::dimension::Dimension;
 
 // don't know what a lot of these mean, some are for world gen that we don't care about
 pub enum RecordType {

@@ -6,6 +6,7 @@ use bedrockrs_proto_core::ProtoCodec;
 #[derive(Debug, Clone)]
 pub struct ActorUniqueID(pub i64);
 
+// ProtoCodec
 impl ProtoCodec for ActorUniqueID {
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         VAR::new(self.0).proto_serialize(stream)

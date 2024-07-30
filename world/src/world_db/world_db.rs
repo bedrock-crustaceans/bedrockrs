@@ -1,7 +1,7 @@
 use std::fmt::{Debug, Formatter};
 use std::{collections::HashMap, path::PathBuf};
-
-use bedrockrs_core::{Dimension, Uuid};
+use uuid::Uuid;
+use bedrockrs_shared::world::dimension::Dimension;
 use bedrockrs_nbt::{endian::little_endian::NbtLittleEndian, NbtTag};
 use mojang_leveldb::{error::DBError, Options, ReadOptions, WriteBatch, WriteOptions, DB};
 
