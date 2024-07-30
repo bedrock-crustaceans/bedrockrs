@@ -144,15 +144,8 @@ pub async fn start_game(
         },
     };
 
-    match conn.send(GamePacket::StartGame(start_game)).await {
-        Ok(_) => {}
-        Err(e) => return Err(LoginError::ConnectionError(e)),
-    }
-
-    match conn.flush().await {
-        Ok(_) => {}
-        Err(e) => return Err(LoginError::ConnectionError(e)),
-    };
+    conn.send(GamePacket::StartGame(start_game)).await.map_err(|e| LoginError::ConnectionError(e))?;
+    conn.flush().await.map_err(|e| LoginError::ConnectionError(e))?;
 
     Ok(())
 }
