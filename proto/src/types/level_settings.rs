@@ -7,7 +7,7 @@ use bedrockrs_shared::world::generator_type::GeneratorType;
 
 use crate::types::base_game_version::BaseGameVersion;
 use crate::types::chat_restriction_level::ChatRestrictionLevel;
-use crate::types::editor_world_type::EditorWorldType;
+use bedrockrs_shared::world::editor_world_type::EditorWorldType;
 use crate::types::edu_shared_uri_resource::EduSharedResourceUri;
 use crate::types::experiments::Experiments;
 use crate::types::gamerule::GameRule;

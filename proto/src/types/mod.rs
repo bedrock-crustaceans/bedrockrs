@@ -1,7 +1,6 @@
 pub mod base_game_version;
 pub mod chat_restriction_level;
 pub mod connection_request;
-pub mod editor_world_type;
 pub mod edu_shared_uri_resource;
 pub mod experiment;
 pub mod experiments;
