@@ -14,43 +14,24 @@ pub struct DisconnectPacket {
     pub message: Option<String>,
 }
 
+// ProtoCodec
 impl ProtoCodec for DisconnectPacket {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {
-        match self.reason.proto_serialize(buf) {
-            Ok(_) => {}
-            Err(e) => {
-                return Err(e);
-            }
-        };
+        self.reason.proto_serialize(buf)?;
 
         match &self.message {
             // Skip message
             None => {
-                match true.proto_serialize(buf) {
-                    Ok(_) => {}
-                    Err(e) => {
-                        return Err(e);
-                    }
-                };
+                bool::proto_serialize(&true, buf)?;
             }
             // Don't skip message
             Some(str) => {
-                match false.proto_serialize(buf) {
-                    Ok(_) => {}
-                    Err(e) => {
-                        return Err(e);
-                    }
-                };
+                bool::proto_serialize(&false, buf)?;
 
-                match str.proto_serialize(buf) {
-                    Ok(_) => {}
-                    Err(e) => {
-                        return Err(e);
-                    }
-                };
+                str.proto_serialize(buf)?;
             }
         }
 
@@ -61,28 +42,13 @@ impl ProtoCodec for DisconnectPacket {
     where
         Self: Sized,
     {
-        let reason = match VAR::<i32>::proto_deserialize(cursor) {
-            Ok(v) => v,
-            Err(e) => {
-                return Err(e);
-            }
-        };
+        let reason = VAR::<i32>::proto_deserialize(cursor)?;
 
-        let skip_message = match bool::proto_deserialize(cursor) {
-            Ok(v) => v,
-            Err(e) => {
-                return Err(e);
-            }
-        };
+        let skip_message = bool::proto_deserialize(cursor)?;
 
         let message = match skip_message {
             true => None,
-            false => match String::proto_deserialize(cursor) {
-                Ok(v) => Some(v),
-                Err(e) => {
-                    return Err(e);
-                }
-            },
+            false => Some(String::proto_deserialize(cursor)?),
         };
 
         Ok(Self { reason, message })
