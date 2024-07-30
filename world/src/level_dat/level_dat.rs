@@ -240,7 +240,7 @@ impl LevelDat {
                     )))?,
                 })?,
                 experiments: {
-                    let mut nbt = get_compound(&mut map, "experiments")?;
+                    let nbt = get_compound(&mut map, "experiments")?;
                     let mut experiments = HashMap::new();
 
                     for (name, tag) in nbt.iter() {
