@@ -1,13 +1,12 @@
 use de::proto_build_de_struct;
+use de::proto_build_de_enum;
 use quote::quote;
 use ser::proto_build_ser_enum;
 use ser::proto_build_ser_struct;
 use syn::{parse_macro_input, Data, DeriveInput};
 
-use crate::de::proto_build_de_enum;
 
 mod de;
-mod expand;
 mod ser;
 
 #[proc_macro_derive(ProtoCodec, attributes(len_repr, enum_repr))]

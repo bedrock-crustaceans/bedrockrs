@@ -1,5 +1,8 @@
 extern crate core;
 
+use std::io::Cursor;
+use bedrockrs_proto_core::error::ProtoCodecError;
+
 pub mod compression;
 pub mod connection;
 pub mod encryption;

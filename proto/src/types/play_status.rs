@@ -1,4 +1,4 @@
-use bedrockrs_core::BE;
+use bedrockrs_core::int::BE;
 use bedrockrs_proto_derive::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Copy, Clone, Eq, PartialEq)]

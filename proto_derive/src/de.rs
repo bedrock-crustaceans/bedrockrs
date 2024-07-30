@@ -1,5 +1,5 @@
 use proc_macro2::{Ident, TokenStream};
-use quote::{quote, ToTokens};
+use quote::quote;
 use syn::{Attribute, DataEnum, DataStruct, Expr, Fields, Index};
 
 pub fn proto_build_de_struct(struct_data: &DataStruct) -> TokenStream {
@@ -68,7 +68,7 @@ pub fn proto_build_de_struct(struct_data: &DataStruct) -> TokenStream {
 
                 for attr in &f.attrs {
                     if attr.path().is_ident("len_repr") {
-                        let int_type: Expr = attr.parse_args().expect(format!("Given attribute meta for field self.{index:?} could not be parsed").as_str());
+                        let int_type: Expr = attr.parse_args().expect(format!("Given attribute meta for field self.{:?} could not be parsed", index.index).as_str());
 
                         quote = Some(quote! {
                             #index: {

@@ -3,7 +3,7 @@ use std::io::{Cursor, Write};
 use std::sync::Arc;
 use std::time::Duration;
 
-use bedrockrs_core::LE;
+use bedrockrs_core::int::LE;
 use tokio::select;
 use tokio::sync::{broadcast, watch};
 use tokio::time::interval;

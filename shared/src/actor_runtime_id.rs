@@ -1,9 +1,10 @@
+use bedrockrs_core::int::VAR;
+use bedrockrs_proto_core::error::ProtoCodecError;
+use bedrockrs_proto_core::ProtoCodec;
 use std::io::Cursor;
 
-use bedrockrs_core::{ActorRuntimeID, VAR};
-
-use crate::error::ProtoCodecError;
-use crate::ProtoCodec;
+#[derive(Debug, Clone)]
+pub struct ActorRuntimeID(pub u64);
 
 impl ProtoCodec for ActorRuntimeID {
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {

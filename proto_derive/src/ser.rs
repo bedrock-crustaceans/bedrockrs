@@ -66,7 +66,7 @@ pub fn proto_build_ser_struct(struct_data: &DataStruct) -> TokenStream {
 
                 for attr in &f.attrs {
                     if attr.path().is_ident("len_repr") {
-                        let int_type: Expr = attr.parse_args().expect(format!("Given attribute meta for field self.{index:?} could not be parsed").as_str());
+                        let int_type: Expr = attr.parse_args().expect(format!("Given attribute meta for field self.{:?} could not be parsed", index.index).as_str());
 
                         quote = Some(quote! {
                             {
@@ -88,8 +88,15 @@ pub fn proto_build_ser_struct(struct_data: &DataStruct) -> TokenStream {
                     }
                 }
 
-                quote! {
-                    bedrockrs_proto_core::ProtoCodec::proto_serialize(&self.#index, stream)?;
+                match quote {
+                    None => {
+                        quote! {
+                            bedrockrs_proto_core::ProtoCodec::proto_serialize(&self.#index, stream)?;
+                        }
+                    }
+                    Some(v) => {
+                        v
+                    }
                 }
             });
 

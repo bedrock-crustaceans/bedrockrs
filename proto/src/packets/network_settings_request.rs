@@ -1,4 +1,5 @@
 use bedrockrs_core::*;
+use bedrockrs_core::int::BE;
 use bedrockrs_proto_derive::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Copy, Clone)]

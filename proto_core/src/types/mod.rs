@@ -1,12 +1,6 @@
-pub mod actor_runtime_id;
-pub mod actor_unique_id;
 pub mod bool;
-pub mod difficulty;
-pub mod dimension;
-pub mod gamemode;
-pub mod generator_type;
 pub mod int;
-mod nbt_tag;
+pub mod nbt_tag;
 pub mod option;
 pub mod string;
 pub mod uuid;

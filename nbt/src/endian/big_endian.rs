@@ -1,8 +1,6 @@
 use std::io::{Cursor, Read, Write};
 use std::sync::Arc;
-
-use bedrockrs_core::BE;
-
+use bedrockrs_core::int::be::BE;
 use crate::byte_order::NbtByteOrder;
 use crate::error::NbtError;
 

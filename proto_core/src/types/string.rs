@@ -2,7 +2,7 @@ use std::convert::TryInto;
 use std::io::{Cursor, Read, Write};
 use std::sync::Arc;
 
-use bedrockrs_core::VAR;
+use bedrockrs_core::int::VAR;
 
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;

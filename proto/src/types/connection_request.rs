@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
-use bedrockrs_core::{LE, VAR};
+use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 use jsonwebtoken::{DecodingKey, Validation};

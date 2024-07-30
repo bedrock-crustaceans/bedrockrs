@@ -1,0 +1,9 @@
+[package]
+name = "bedrockrs_shared"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bedrockrs_core = { path = "../core" }
+bedrockrs_proto_core = { path = "../proto_core" }
+bedrockrs_proto_derive = { path = "../proto_derive" }

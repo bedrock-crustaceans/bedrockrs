@@ -1,4 +1,4 @@
-use bedrockrs_core::VAR;
+use bedrockrs_core::int::VAR;
 use bedrockrs_proto_derive::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]

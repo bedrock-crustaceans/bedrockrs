@@ -1,7 +1,7 @@
 use std::io::{Cursor, Write};
 use std::sync::Arc;
 
-use bedrockrs_core::LE;
+use bedrockrs_core::int::LE;
 
 use crate::error::{RaknetError, TransportLayerError};
 use crate::info::RAKNET_GAME_PACKET_ID;

@@ -1,5 +1,5 @@
-use bedrockrs_core::LE;
-use bedrockrs_core::VAR;
+use bedrockrs_core::int::LE;
+use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_proto_derive::ProtoCodec;
 

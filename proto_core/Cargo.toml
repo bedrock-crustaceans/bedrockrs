@@ -6,9 +6,11 @@ edition = "2021"
 [dependencies]
 bedrockrs_core = { path = "../core" }
 bedrockrs_nbt = { path = "../nbt" }
+bedrockrs_proto_derive = { path = "../proto_derive" }
 
 thiserror = "1.0"
 serde_json = "1.0"
 jsonwebtoken = "9.3"
 base64 = "0.22"
 byteorder = "1.5"
+uuid = { version = "1.10.0", features = ["v4"] }
