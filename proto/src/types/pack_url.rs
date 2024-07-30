@@ -24,26 +24,16 @@ impl ProtoCodec for PackURL {
     }
 
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
-        let (uuid, version) = match String::proto_deserialize(stream) {
-            Ok(v) => match v.split_once("_") {
-                None => {
-                    return Err(ProtoCodecError::FormatMismatch(String::from(
-                        "Expected uuid and version of pack url to be seperated by _",
-                    )));
-                }
-                Some((u, v)) => (u.to_string(), v.to_string()),
-            },
-            Err(e) => {
-                return Err(e);
+        let (uuid, version) = match String::proto_deserialize(stream)?.split_once("_") {
+            None => {
+                return Err(ProtoCodecError::FormatMismatch(String::from(
+                    "Expected uuid and version of pack url to be seperated by _",
+                )));
             }
+            Some((u, v)) => (u.to_string(), v.to_string()),
         };
 
-        let url = match String::proto_deserialize(stream) {
-            Ok(v) => v,
-            Err(e) => {
-                return Err(e);
-            }
-        };
+        let url = String::proto_deserialize(stream)?;
 
         Ok(Self { uuid, version, url })
     }
