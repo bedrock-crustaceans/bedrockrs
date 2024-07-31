@@ -10,6 +10,7 @@ use bedrockrs_proto_core::ProtoCodec;
 use crate::packets::client_cache_status::ClientCacheStatusPacket;
 use crate::packets::disconnect::DisconnectPacket;
 use crate::packets::handshake_server_to_client::HandshakeServerToClientPacket;
+use crate::packets::interact::InteractPacket;
 use crate::packets::login::LoginPacket;
 use crate::packets::network_settings::NetworkSettingsPacket;
 use crate::packets::network_settings_request::NetworkSettingsRequestPacket;
@@ -55,7 +56,7 @@ pub enum GamePacket {
     InventoryTransaction(),
     MobEquipment(),
     MobArmorEquipment(),
-    Interact(),
+    Interact(InteractPacket),
     BlockPickRequest(),
     EntityPickRequest(),
     PlayerAction(),
@@ -312,6 +313,7 @@ impl GamePacket {
     const ItemStackRequestID: u16 = 147;
     const ItemStackResponseID: u16 = 148;
     const UpdatePlayerGameTypeID: u16 = 151;
+    const EmoteListID: u16 = 152;
     const PacketViolationWarningID: u16 = 156;
     const ItemComponentID: u16 = 162;
     const FilterTextPacketID: u16 = 163;
@@ -474,8 +476,8 @@ impl GamePacket {
             GamePacket::MobArmorEquipment() => {
                 unimplemented!()
             }
-            GamePacket::Interact() => {
-                unimplemented!()
+            GamePacket::Interact(pk) => {
+                ser_packet!(stream, GamePacket::InteractID, pk)
             }
             GamePacket::BlockPickRequest() => {
                 unimplemented!()
@@ -951,7 +953,7 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::InteractID => {
-                unimplemented!()
+                GamePacket::Interact(de_packet!(stream, InteractPacket))
             }
             GamePacket::BlockPickRequestID => {
                 unimplemented!()
