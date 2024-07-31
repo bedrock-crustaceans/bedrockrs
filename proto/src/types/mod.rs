@@ -18,3 +18,7 @@ pub mod resource_packs_stack_pack;
 pub mod spawn_biome_type;
 pub mod spawn_settings;
 pub mod interact_action;
+pub mod input_data;
+pub mod input_mode;
+pub mod play_mode;
+pub mod interaction_model;

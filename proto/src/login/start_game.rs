@@ -28,6 +28,8 @@ use crate::types::player_movement_settings::PlayerMovementSettings;
 use crate::types::spawn_biome_type::SpawnBiomeType;
 use crate::types::spawn_settings::SpawnSettings;
 use bedrockrs_shared::world::editor_world_type::EditorWorldType;
+use crate::packets::play_status::PlayStatusPacket;
+use crate::types::play_status::PlayStatusType;
 
 pub async fn start_game(
     conn: &mut ConnectionShard,
@@ -146,6 +148,9 @@ pub async fn start_game(
     };
 
     conn.send(GamePacket::StartGame(start_game)).await.map_err(|e| LoginError::ConnectionError(e))?;
+    conn.send(GamePacket::PlayStatus(PlayStatusPacket{
+        status: PlayStatusType::PlayerSpawn
+    })).await.map_err(|e| LoginError::ConnectionError(e))?;
     conn.flush().await.map_err(|e| LoginError::ConnectionError(e))?;
 
     Ok(())

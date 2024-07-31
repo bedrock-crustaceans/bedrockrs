@@ -17,6 +17,7 @@ use crate::packets::network_settings::NetworkSettingsPacket;
 use crate::packets::network_settings_request::NetworkSettingsRequestPacket;
 use crate::packets::packet_violation_warning::PacketViolationWarningPacket;
 use crate::packets::play_status::PlayStatusPacket;
+use crate::packets::player_auth_input::PlayerAuthInputPacket;
 use crate::packets::request_chunk_radius::RequestChunkRadiusPacket;
 use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
 use crate::packets::resource_packs_response::ResourcePacksResponsePacket;
@@ -158,7 +159,7 @@ pub enum GamePacket {
     ClientCacheBlobStatus(),
     ClientCacheMissResponse(),
     NetworkSettings(NetworkSettingsPacket),
-    PlayerAuthInput(),
+    PlayerAuthInput(PlayerAuthInputPacket),
     CreativeContent(),
     PlayerEnchantOptions(),
     ItemStackRequest(),
@@ -781,8 +782,8 @@ impl GamePacket {
             GamePacket::NetworkSettings(pk) => {
                 ser_packet!(stream, GamePacket::NetworkSettingsID, pk)
             }
-            GamePacket::PlayerAuthInput() => {
-                unimplemented!()
+            GamePacket::PlayerAuthInput(pk) => {
+                ser_packet!(stream, GamePacket::PlayerAuthInputID, pk)
             }
             GamePacket::CreativeContent() => {
                 unimplemented!()
@@ -1259,7 +1260,7 @@ impl GamePacket {
                 GamePacket::NetworkSettings(de_packet!(stream, NetworkSettingsPacket))
             }
             GamePacket::PlayerAuthInputID => {
-                unimplemented!()
+                GamePacket::PlayerAuthInput(de_packet!(stream, PlayerAuthInputPacket))
             }
             GamePacket::CreativeContentID => {
                 unimplemented!()
