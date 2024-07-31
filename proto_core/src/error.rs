@@ -26,9 +26,9 @@ pub enum ProtoCodecError {
     #[error("Base64 decoding Error: {0}")]
     Base64DecodeError(#[from] Base64DecodeError),
     #[error(
-        "Could not convert enum variant to integer or parse integer to enum variant for {0} enum"
+        "parse value `{0}` to enum variant for {1} enum"
     )]
-    InvalidEnumID(String),
+    InvalidEnumID(String, String),
     #[error("Got an unknown/invalid game packet id: {0}")]
     InvalidGamePacketID(u16),
     #[error("Expected format got mismatched: {0}")]

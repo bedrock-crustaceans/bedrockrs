@@ -68,7 +68,7 @@ impl ProtoCodec for InteractPacket {
             6 => {
                 InteractAction::OpenInventory
             }
-            _ => return Err(ProtoCodecError::InvalidEnumID(String::from("InteractAction"))),
+            other => return Err(ProtoCodecError::InvalidEnumID(format!("{other:?}"), String::from("InteractAction"))),
         };
 
         println!("YIPPIE: {:?}", &stream.get_ref()[(stream.position() as usize)..]);

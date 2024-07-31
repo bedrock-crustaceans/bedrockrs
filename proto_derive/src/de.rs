@@ -161,7 +161,7 @@ pub fn proto_build_de_enum(
 
         match int {
             #(#calls)*
-            other => { return Err(::bedrockrs_proto_core::error::ProtoCodecError::InvalidEnumID(String::from(stringify!(#enum_name)))); }
+            other => { return Err(::bedrockrs_proto_core::error::ProtoCodecError::InvalidEnumID(format!("{other:?}"), stringify!(#enum_name).to_string())); }
         }
     }
 }
