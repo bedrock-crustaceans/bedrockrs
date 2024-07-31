@@ -64,7 +64,7 @@ pub struct LevelSettings {
     pub limited_world_depth: LE<i32>,
     pub new_nether: bool,
     pub edu_shared_uri_resource: EduSharedResourceUri,
-    pub force_experimental_gameplay: Option<bool>,
+    pub force_experimental_gameplay: bool,
     pub chat_restriction_level: ChatRestrictionLevel,
     pub disable_player_interactions: bool,
     pub server_id: String,
