@@ -15,6 +15,7 @@ use crate::packets::network_settings::NetworkSettingsPacket;
 use crate::packets::network_settings_request::NetworkSettingsRequestPacket;
 use crate::packets::packet_violation_warning::PacketViolationWarningPacket;
 use crate::packets::play_status::PlayStatusPacket;
+use crate::packets::request_chunk_radius::RequestChunkRadiusPacket;
 use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
 use crate::packets::resource_packs_response::ResourcePacksResponsePacket;
 use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
@@ -89,7 +90,7 @@ pub enum GamePacket {
     SpawnExperienceOrb(),
     ClientboundMapItemData(),
     MapInfoRequest(),
-    RequestChunkRadius(),
+    RequestChunkRadius(RequestChunkRadiusPacket),
     ChunkRadiusUpdate(),
     ItemFrameDropItem(),
     GameRulesChanged(),
@@ -578,8 +579,8 @@ impl GamePacket {
             GamePacket::MapInfoRequest() => {
                 unimplemented!()
             }
-            GamePacket::RequestChunkRadius() => {
-                unimplemented!()
+            GamePacket::RequestChunkRadius(pk) => {
+                ser_packet!(stream, GamePacket::RequestChunkRadiusID, pk)
             }
             GamePacket::ChunkRadiusUpdate() => {
                 unimplemented!()
@@ -1054,9 +1055,7 @@ impl GamePacket {
             GamePacket::MapInfoRequestID => {
                 unimplemented!()
             }
-            GamePacket::RequestChunkRadiusID => {
-                unimplemented!()
-            }
+            GamePacket::RequestChunkRadiusID => GamePacket::RequestChunkRadius(de_packet!(stream, RequestChunkRadiusPacket)),
             GamePacket::ChunkRadiusUpdateID => {
                 unimplemented!()
             }
