@@ -3,6 +3,7 @@ use std::ops::{
 };
 
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use crate::int::{BE, LE, VAR};
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Vec3<T> {
@@ -153,5 +154,65 @@ impl<'de, T: Deserialize<'de>> Deserialize<'de> for Vec3<T> {
         let [x, y, z] = <[T; 3]>::deserialize(deserializer)?;
 
         Ok(Self { x, y, z })
+    }
+}
+
+
+impl<T> Vec3<T> {
+    // LE
+    #[inline]
+    pub fn to_le(self) -> Vec3<LE<T>> {
+        Vec3 {
+            x: LE::new(self.x),
+            y: LE::new(self.y),
+            z: LE::new(self.z),
+        }
+    }
+
+    #[inline]
+    pub fn from_le(le: Vec3<LE<T>>) -> Vec3<T> {
+        Vec3 {
+            x: le.x.into_inner(),
+            y: le.y.into_inner(),
+            z: le.z.into_inner(),
+        }
+    }
+
+    // BE
+    #[inline]
+    pub fn to_be(self) -> Vec3<BE<T>> {
+        Vec3 {
+            x: BE::new(self.x),
+            y: BE::new(self.y),
+            z: BE::new(self.z),
+        }
+    }
+
+    #[inline]
+    pub fn from_be(be: Vec3<BE<T>>) -> Vec3<T> {
+        Vec3 {
+            x: be.x.into_inner(),
+            y: be.y.into_inner(),
+            z: be.z.into_inner(),
+        }
+    }
+
+    // VAR
+    #[inline]
+    pub fn to_var(self) -> Vec3<VAR<T>> {
+        Vec3 {
+            x: VAR::new(self.x),
+            y: VAR::new(self.y),
+            z: VAR::new(self.z),
+        }
+    }
+
+    #[inline]
+    pub fn from_var(var: Vec3<VAR<T>>) -> Vec3<T> {
+        Vec3 {
+            x: var.x.into_inner(),
+            y: var.y.into_inner(),
+            z: var.z.into_inner(),
+        }
     }
 }

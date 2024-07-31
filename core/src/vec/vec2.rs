@@ -3,6 +3,7 @@ use std::ops::{
 };
 
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use crate::int::{BE, LE, VAR};
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Vec2<T> {
@@ -141,5 +142,58 @@ impl<'de, T: Deserialize<'de>> Deserialize<'de> for Vec2<T> {
         let [x, y] = <[T; 2]>::deserialize(deserializer)?;
 
         Ok(Self { x, y })
+    }
+}
+
+impl<T> Vec2<T> {
+    // LE
+    #[inline]
+    pub fn to_le(self) -> Vec2<LE<T>> {
+        Vec2 {
+            x: LE::new(self.x),
+            y: LE::new(self.y),
+        }
+    }
+
+    #[inline]
+    pub fn from_le(le: Vec2<LE<T>>) -> Vec2<T> {
+        Vec2 {
+            x: le.x.into_inner(),
+            y: le.y.into_inner(),
+        }
+    }
+
+    // BE
+    #[inline]
+    pub fn to_be(self) -> Vec2<BE<T>> {
+        Vec2 {
+            x: BE::new(self.x),
+            y: BE::new(self.y),
+        }
+    }
+
+    #[inline]
+    pub fn from_be(be: Vec2<BE<T>>) -> Vec2<T> {
+        Vec2 {
+            x: be.x.into_inner(),
+            y: be.y.into_inner(),
+        }
+    }
+
+    // VAR
+    #[inline]
+    pub fn to_var(self) -> Vec2<VAR<T>> {
+        Vec2 {
+            x: VAR::new(self.x),
+            y: VAR::new(self.y),
+        }
+    }
+
+    #[inline]
+    pub fn from_var(var: Vec2<VAR<T>>) -> Vec2<T> {
+        Vec2 {
+            x: var.x.into_inner(),
+            y: var.y.into_inner(),
+        }
     }
 }
