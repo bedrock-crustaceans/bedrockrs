@@ -17,3 +17,4 @@ pub mod resource_packs_response_status;
 pub mod resource_packs_stack_pack;
 pub mod spawn_biome_type;
 pub mod spawn_settings;
+pub mod interact_action;

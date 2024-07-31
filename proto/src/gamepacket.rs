@@ -9,6 +9,7 @@ use bedrockrs_proto_core::ProtoCodec;
 
 use crate::packets::client_cache_status::ClientCacheStatusPacket;
 use crate::packets::disconnect::DisconnectPacket;
+use crate::packets::emote_list::EmoteListPacket;
 use crate::packets::handshake_server_to_client::HandshakeServerToClientPacket;
 use crate::packets::interact::InteractPacket;
 use crate::packets::login::LoginPacket;
@@ -163,6 +164,7 @@ pub enum GamePacket {
     ItemStackRequest(),
     ItemStackResponse(),
     UpdatePlayerGameType(),
+    EmoteList(EmoteListPacket),
     PacketViolationWarning(PacketViolationWarningPacket),
     ItemComponent(),
     FilterTextPacket(),
@@ -797,6 +799,9 @@ impl GamePacket {
             GamePacket::UpdatePlayerGameType() => {
                 unimplemented!()
             }
+            GamePacket::EmoteList(pk) => {
+                ser_packet!(stream, GamePacket::EmoteListID, pk)
+            }
             GamePacket::PacketViolationWarning(pk) => {
                 ser_packet!(stream, GamePacket::PacketViolationWarningID, pk)
             }
@@ -1270,6 +1275,9 @@ impl GamePacket {
             }
             GamePacket::UpdatePlayerGameTypeID => {
                 unimplemented!()
+            }
+            GamePacket::EmoteListID => {
+                GamePacket::EmoteList(de_packet!(stream, EmoteListPacket))
             }
             GamePacket::PacketViolationWarningID => {
                 GamePacket::PacketViolationWarning(de_packet!(stream, PacketViolationWarningPacket))
