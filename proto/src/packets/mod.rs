@@ -22,3 +22,4 @@ pub mod server_settings_request;
 pub mod server_settings_response;
 pub mod model_form_request;
 pub mod model_form_response;
+pub mod text_message;

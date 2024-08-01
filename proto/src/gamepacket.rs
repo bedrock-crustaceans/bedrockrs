@@ -30,6 +30,7 @@ use crate::packets::set_local_player_as_initialized::SetLocalPlayerAsInitialized
 use crate::packets::start_game::StartGamePacket;
 use crate::packets::player_move::MovePlayerPacket;
 use crate::packets::chunk_radius_updated::ChunkRadiusUpdatedPacket;
+use crate::packets::text_message::TextMessagePacket;
 
 #[repr(u16)]
 #[derive(Debug, Clone)]
@@ -42,7 +43,7 @@ pub enum GamePacket {
     ResourcePacksInfo(ResourcePacksInfoPacket),
     ResourcePackStack(ResourcePacksStackPacket),
     ResourcePackClientResponse(ResourcePacksResponsePacket),
-    Text(),
+    TextMessage(TextMessagePacket),
     SetTime(),
     StartGame(StartGamePacket),
     AddPlayer(),
@@ -193,7 +194,7 @@ impl GamePacket {
     const ResourcePacksInfoID: u16 = 6;
     const ResourcePacksStackID: u16 = 7;
     const ResourcePacksClientResponseID: u16 = 8;
-    const TextID: u16 = 9;
+    const TextMessageID: u16 = 9;
     const SetTimeID: u16 = 10;
     const StartGameID: u16 = 11;
     const AddPlayerID: u16 = 12;
@@ -415,8 +416,8 @@ impl GamePacket {
             GamePacket::ResourcePackClientResponse(pk) => {
                 ser_packet!(stream, GamePacket::ResourcePacksClientResponseID, pk)
             }
-            GamePacket::Text() => {
-                unimplemented!()
+            GamePacket::TextMessage(pk) => {
+                ser_packet!(stream, GamePacket::TextMessageID, pk)
             }
             GamePacket::SetTime() => {
                 unimplemented!()
@@ -896,8 +897,8 @@ impl GamePacket {
             GamePacket::ResourcePacksClientResponseID => GamePacket::ResourcePackClientResponse(
                 de_packet!(stream, ResourcePacksResponsePacket),
             ),
-            GamePacket::TextID => {
-                unimplemented!()
+            GamePacket::TextMessageID => {
+                GamePacket::TextMessage(de_packet!(stream, TextMessagePacket))
             }
             GamePacket::SetTimeID => {
                 unimplemented!()
