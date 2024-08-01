@@ -11,6 +11,7 @@ use crate::packets::disconnect::DisconnectPacket;
 use crate::packets::emote_list::EmoteListPacket;
 use crate::packets::handshake_server_to_client::HandshakeServerToClientPacket;
 use crate::packets::interact::InteractPacket;
+use crate::packets::level_chunk::LevelChunkPacket;
 use crate::packets::login::LoginPacket;
 use crate::packets::model_form_request::ModelFormRequestPacket;
 use crate::packets::model_form_response::ModelFormResponsePacket;
@@ -27,6 +28,8 @@ use crate::packets::server_settings_request::ServerSettingsRequestPacket;
 use crate::packets::server_settings_response::ServerSettingsResponsePacket;
 use crate::packets::set_local_player_as_initialized::SetLocalPlayerAsInitializedPacket;
 use crate::packets::start_game::StartGamePacket;
+use crate::packets::player_move::MovePlayerPacket;
+use crate::packets::chunk_radius_updated::ChunkRadiusUpdatedPacket;
 
 #[repr(u16)]
 #[derive(Debug, Clone)]
@@ -48,7 +51,7 @@ pub enum GamePacket {
     AddItemEntity(),
     TakeItemEntity(),
     MoveEntity(),
-    MovePlayer(),
+    MovePlayer(MovePlayerPacket),
     RiderJump(),
     UpdateBlock(),
     AddPainting(),
@@ -86,7 +89,7 @@ pub enum GamePacket {
     AdventureSettings(),
     BlockEntityData(),
     PlayerInput(),
-    LevelChunk(),
+    LevelChunk(LevelChunkPacket),
     SetCommandsEnabled(),
     SetDifficulty(),
     ChangeDimension(),
@@ -98,7 +101,7 @@ pub enum GamePacket {
     ClientboundMapItemData(),
     MapInfoRequest(),
     RequestChunkRadius(RequestChunkRadiusPacket),
-    ChunkRadiusUpdate(),
+    ChunkRadiusUpdate(ChunkRadiusUpdatedPacket),
     ItemFrameDropItem(),
     GameRulesChanged(),
     Camera(),
@@ -439,8 +442,8 @@ impl GamePacket {
             GamePacket::MoveEntity() => {
                 unimplemented!()
             }
-            GamePacket::MovePlayer() => {
-                unimplemented!()
+            GamePacket::MovePlayer(pk) => {
+                ser_packet!(stream, GamePacket::MovePlayerID, pk)
             }
             GamePacket::RiderJump() => {
                 unimplemented!()
@@ -553,8 +556,8 @@ impl GamePacket {
             GamePacket::PlayerInput() => {
                 unimplemented!()
             }
-            GamePacket::LevelChunk() => {
-                unimplemented!()
+            GamePacket::LevelChunk(pk) => {
+                ser_packet!(stream, GamePacket::LevelChunkID, pk)
             }
             GamePacket::SetCommandsEnabled() => {
                 unimplemented!()
@@ -589,8 +592,8 @@ impl GamePacket {
             GamePacket::RequestChunkRadius(pk) => {
                 ser_packet!(stream, GamePacket::RequestChunkRadiusID, pk)
             }
-            GamePacket::ChunkRadiusUpdate() => {
-                unimplemented!()
+            GamePacket::ChunkRadiusUpdate(pk) => {
+                ser_packet!(stream, GamePacket::ChunkRadiusUpdateID, pk)
             }
             GamePacket::ItemFrameDropItem() => {
                 unimplemented!()
@@ -919,7 +922,7 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::MovePlayerID => {
-                unimplemented!()
+                GamePacket::MovePlayer(de_packet!(stream, MovePlayerPacket))
             }
             GamePacket::RiderJumpID => {
                 unimplemented!()
