@@ -11,19 +11,19 @@ use crate::types::play_mode::PlayMode;
 
 #[derive(Debug, Clone)]
 pub struct PlayerAuthInputPacket {
-    rotation: Vec2<LE<f32>>,
-    position: Vec3<LE<f32>>,
-    move_vec: Vec2<LE<f32>>,
-    head_rotation: LE<f32>,
-    input_data: InputData,
-    input_mode: InputMode,
-    play_mode: PlayMode,
-    interaction_model: InteractionModel,
+    pub rotation: Vec2<LE<f32>>,
+    pub position: Vec3<LE<f32>>,
+    pub move_vec: Vec2<LE<f32>>,
+    pub head_rotation: LE<f32>,
+    pub input_data: InputData,
+    pub input_mode: InputMode,
+    pub play_mode: PlayMode,
+    pub interaction_model: InteractionModel,
     /// Which simulation frame client is on. Used to match corrections
-    client_tick: VAR<u64>,
+    pub client_tick: VAR<u64>,
     /// Velocity
-    pos_delta: Vec3<LE<f32>>,
-    analog_move_vec: Vec2<LE<f32>>,
+    pub pos_delta: Vec3<LE<f32>>,
+    pub analog_move_vec: Vec2<LE<f32>>,
 }
 
 

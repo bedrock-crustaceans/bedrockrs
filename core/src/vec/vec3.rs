@@ -1,6 +1,6 @@
-use std::ops::{
+use std::{fmt, ops::{
     Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
-};
+}};
 
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use crate::int::{BE, LE, VAR};
@@ -214,5 +214,11 @@ impl<T> Vec3<T> {
             y: var.y.into_inner(),
             z: var.z.into_inner(),
         }
+    }
+}
+
+impl<T: fmt::Display> fmt::Display for Vec3<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({}, {}, {})", self.x, self.y, self.z)
     }
 }

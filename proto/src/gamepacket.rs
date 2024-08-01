@@ -333,7 +333,7 @@ macro_rules! ser_packet {
     ($stream:expr, $packet_id:expr, $packet_data:expr) => {{
         let mut pk_stream = vec![];
 
-        println!("[SEND] {:#?}", $packet_data);
+        // println!("[SEND] {:#?}", $packet_data);
 
         // TODO add correct header generation
         // let header = "";
@@ -1313,7 +1313,7 @@ impl GamePacket {
             }
         };
 
-        println!("[RECV] {:#?}", game_packet);
+        // println!("[RECV] {:#?}", game_packet);
 
         Ok((game_packet, sub_client_sender_id, sub_client_target_id))
     }
