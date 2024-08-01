@@ -1,16 +1,16 @@
 use bedrockrs_proto_derive::ProtoCodec;
-use bedrockrs_core::int::VAR;
+use bedrockrs_core::int::{LE, VAR};
+use bedrockrs_core::Vec3;
 
-#[derive(ProtoCodec, Debug, Clone)]
-#[enum_repr(VAR::<u32>)]
-pub enum  PlayMode {
-    Normal = 0,
-    Teaser = 1,
-    Screen = 2,
-    Viewer = 3,
-    Reality = 4,
-    Placement = 5,
-    LivingRoom = 6,
-    ExitLevel = 7,
-    ExitLevelLivingRoom = 8,
+#[derive(Debug, Clone)]
+pub enum PlayMode {
+    Normal,
+    Teaser,
+    Screen,
+    Viewer,
+    Reality(Vec3<LE<f32>>),
+    Placement,
+    LivingRoom,
+    ExitLevel,
+    ExitLevelLivingRoom,
 }

@@ -22,6 +22,7 @@ use crate::packets::request_chunk_radius::RequestChunkRadiusPacket;
 use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
 use crate::packets::resource_packs_response::ResourcePacksResponsePacket;
 use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
+use crate::packets::set_local_player_as_initialized::SetLocalPlayerAsInitializedPacket;
 use crate::packets::start_game::StartGamePacket;
 
 #[repr(u16)]
@@ -137,7 +138,7 @@ pub enum GamePacket {
     UpdateBlockSynced(),
     MoveEntityDelta(),
     SetScoreboardIdentity(),
-    SetLocalPlayerAsInitialized(),
+    SetLocalPlayerAsInitialized(SetLocalPlayerAsInitializedPacket),
     UpdateSoftEnum(),
     NetworkStackLatency(),
     ScriptCustomEvent(),
@@ -716,8 +717,8 @@ impl GamePacket {
             GamePacket::SetScoreboardIdentity() => {
                 unimplemented!()
             }
-            GamePacket::SetLocalPlayerAsInitialized() => {
-                unimplemented!()
+            GamePacket::SetLocalPlayerAsInitialized(pk) => {
+                ser_packet!(stream, GamePacket::SetLocalPlayerAsInitializedID, pk)
             }
             GamePacket::UpdateSoftEnum() => {
                 unimplemented!()
@@ -1194,7 +1195,7 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::SetLocalPlayerAsInitializedID => {
-                unimplemented!()
+                GamePacket::SetLocalPlayerAsInitialized(de_packet!(stream, SetLocalPlayerAsInitializedPacket))
             }
             GamePacket::UpdateSoftEnumID => {
                 unimplemented!()
