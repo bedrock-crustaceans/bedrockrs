@@ -22,4 +22,8 @@ impl Form for ModalForm {
         })
         .to_string()
     }
+
+    fn form_deserialize(form_json: &str) -> Self {
+        todo!()
+    }
 }

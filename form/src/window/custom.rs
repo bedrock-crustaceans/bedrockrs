@@ -4,8 +4,8 @@ use crate::elems::Element;
 use crate::window::Form;
 
 pub struct CustomForm {
-    title: String,
-    elements: Vec<Box<dyn Element>>,
+    pub title: String,
+    pub elements: Vec<Box<dyn Element>>,
 }
 
 impl Form for CustomForm {
@@ -22,5 +22,9 @@ impl Form for CustomForm {
             "content": elems_strings,
         })
         .to_string()
+    }
+
+    fn form_deserialize(form_json: &str) -> Self {
+        todo!()
     }
 }

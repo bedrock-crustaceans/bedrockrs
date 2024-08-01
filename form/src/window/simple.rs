@@ -26,4 +26,8 @@ impl Form for SimpleForm {
         })
         .to_string()
     }
+
+    fn form_deserialize(form_json: &str) -> Self {
+        todo!()
+    }
 }
