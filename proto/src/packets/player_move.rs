@@ -41,7 +41,6 @@ impl ProtoCodec for MovePlayerPacket {
 
         let tick = VAR::<i64>::proto_deserialize(stream)?;
 
-        // let rot = Vec2
         return Ok(Self {
             player_runtime_id,
             position,
