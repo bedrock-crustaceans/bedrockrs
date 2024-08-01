@@ -6,7 +6,7 @@ use bedrockrs_proto_core::ProtoCodec;
 pub struct LevelChunkPacket {
     pub chunk_position: ChunkPos,
     pub dimension_id: VAR<i32>,
-    pub sub_chunk_count: VAR<i32>,
+    pub sub_chunk_count: VAR<u32>,
     pub cache_enabled: bool,
     pub serialized_chunk_data: Vec<u8>,
 
