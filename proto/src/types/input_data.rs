@@ -1,5 +1,8 @@
 use bedrockrs_proto_derive::ProtoCodec;
-use bedrockrs_core::int::VAR;
+use bedrockrs_core::int::{LE, VAR};
+use bedrockrs_core::Vec2;
+use bedrockrs_shared::actor_unique_id::ActorUniqueID;
+use crate::types::inventory_transaction::UseItemTransactionData;
 
 #[derive(Debug, Clone)]
 pub struct InputData {
@@ -48,7 +51,7 @@ pub struct InputData {
     pub start_flying: bool,
     pub stop_flying: bool,
     pub client_ack_server_data: bool,
-    pub is_in_client_predicted_vehicle: bool,
+    pub is_in_client_predicted_vehicle: Option<(Vec2<LE<f32>>, ActorUniqueID)>,
     pub paddling_left: bool,
     pub paddling_right: bool,
     pub block_breaking_delay_enabled: bool,
