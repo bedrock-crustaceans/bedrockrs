@@ -11,5 +11,5 @@ pub mod toggle;
 
 pub trait Element {
     fn elem_serialize(&self) -> Value;
-    fn elem_deserialize(elem_json: Value) -> Result<Self, FormError>;
+    fn elem_deserialize(elem_json: Value) -> Result<Self, FormError> where Self: Sized;
 }
