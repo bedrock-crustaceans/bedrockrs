@@ -23,3 +23,4 @@ pub mod input_mode;
 pub mod play_mode;
 pub mod interaction_model;
 mod block_action;
+mod inventory_transaction;
