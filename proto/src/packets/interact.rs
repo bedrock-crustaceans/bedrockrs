@@ -71,8 +71,6 @@ impl ProtoCodec for InteractPacket {
             other => return Err(ProtoCodecError::InvalidEnumID(format!("{other:?}"), String::from("InteractAction"))),
         };
 
-        println!("YIPPIE: {:?}", &stream.get_ref()[(stream.position() as usize)..]);
-
         Ok(Self {
             action,
             target_runtime_id
