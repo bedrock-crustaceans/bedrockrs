@@ -216,9 +216,3 @@ impl<T> Vec3<T> {
         }
     }
 }
-
-impl<T: fmt::Display> fmt::Display for Vec3<T> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({}, {}, {})", self.x, self.y, self.z)
-    }
-}
