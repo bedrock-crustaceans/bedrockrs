@@ -217,11 +217,11 @@ impl ProtoCodec for TextMessagePacket {
         let sender_xuid = String::proto_deserialize(stream)?;
         let filtered_message = String::proto_deserialize(stream)?;
 
-        Self {
+        Ok(Self {
             message_type,
             localize,
             sender_xuid,
             filtered_message,
-        }
+        })
     }
 }
