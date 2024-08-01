@@ -1,6 +1,7 @@
 use serde_json::{json, Value};
 
 use crate::elems::Element;
+use crate::error::FormError;
 
 pub struct Toggle {
     text: String,
@@ -14,5 +15,9 @@ impl Element for Toggle {
             "text": self.text,
             "default": self.default,
         })
+    }
+
+    fn elem_deserialize(elem_json: Value) -> Result<Self, FormError> {
+        todo!()
     }
 }

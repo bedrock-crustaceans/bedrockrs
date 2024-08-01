@@ -1,6 +1,7 @@
 use serde_json::{json, Value};
 
 use crate::elems::Element;
+use crate::error::FormError;
 
 pub struct Slider {
     text: String,
@@ -20,5 +21,9 @@ impl Element for Slider {
             "step": self.step_size,
             "default": self.default,
         })
+    }
+
+    fn elem_deserialize(elem_json: Value) -> Result<Self, FormError> {
+        todo!()
     }
 }

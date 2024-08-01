@@ -1,6 +1,7 @@
 use serde_json::{json, Value};
 
 use crate::elems::Element;
+use crate::error::FormError;
 
 pub struct DropDown {
     text: String,
@@ -16,5 +17,9 @@ impl Element for DropDown {
             "default": self.default_index,
             "options": self.options,
         })
+    }
+
+    fn elem_deserialize(elem_json: Value) -> Result<Self, FormError> {
+        todo!()
     }
 }

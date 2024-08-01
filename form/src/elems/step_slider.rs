@@ -1,6 +1,7 @@
 use serde_json::{json, Value};
 
 use crate::elems::Element;
+use crate::error::FormError;
 
 /// A combination of DropDown and Slider
 pub struct StepSlider {
@@ -17,5 +18,9 @@ impl Element for StepSlider {
             "default": self.default_index,
             "steps": self.options,
         })
+    }
+
+    fn elem_deserialize(elem_json: Value) -> Result<Self, FormError> {
+        todo!()
     }
 }
