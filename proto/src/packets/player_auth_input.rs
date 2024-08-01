@@ -4,6 +4,7 @@ use bedrockrs_core::{Vec2, Vec3};
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_shared::actor_unique_id::ActorUniqueID;
 use crate::types::input_data::InputData;
 use crate::types::input_mode::InputMode;
 use crate::types::interaction_model::InteractionModel;
@@ -11,19 +12,19 @@ use crate::types::play_mode::PlayMode;
 
 #[derive(Debug, Clone)]
 pub struct PlayerAuthInputPacket {
-    rotation: Vec2<LE<f32>>,
-    position: Vec3<LE<f32>>,
-    move_vec: Vec2<LE<f32>>,
-    head_rotation: LE<f32>,
-    input_data: InputData,
-    input_mode: InputMode,
-    play_mode: PlayMode,
-    interaction_model: InteractionModel,
+    pub rotation: Vec2<LE<f32>>,
+    pub position: Vec3<LE<f32>>,
+    pub move_vec: Vec2<LE<f32>>,
+    pub head_rotation: LE<f32>,
+    pub input_data: InputData,
+    pub input_mode: InputMode,
+    pub play_mode: PlayMode,
+    pub interaction_model: InteractionModel,
     /// Which simulation frame client is on. Used to match corrections
-    client_tick: VAR<u64>,
+    pub client_tick: VAR<u64>,
     /// Velocity
-    pos_delta: Vec3<LE<f32>>,
-    analog_move_vec: Vec2<LE<f32>>,
+    pub pos_delta: Vec3<LE<f32>>,
+    pub analog_move_vec: Vec2<LE<f32>>,
 }
 
 
@@ -119,7 +120,16 @@ impl ProtoCodec for PlayerAuthInputPacket {
             start_flying: get_bit!(input_data, 42),
             stop_flying: get_bit!(input_data, 43),
             client_ack_server_data: get_bit!(input_data, 44),
-            is_in_client_predicted_vehicle: get_bit!(input_data, 45),
+            is_in_client_predicted_vehicle: {
+                if get_bit!(input_data, 45) {
+                    let vehicle_rotation = Vec2::<LE<f32>>::proto_deserialize(stream)?;
+                    let client_predicted_vehicle = ActorUniqueID::proto_deserialize(stream)?;
+
+                    Some((vehicle_rotation, client_predicted_vehicle))
+                } else {
+                    None
+                }
+            },
             paddling_left: get_bit!(input_data, 46),
             paddling_right: get_bit!(input_data, 47),
             block_breaking_delay_enabled: get_bit!(input_data, 48),
