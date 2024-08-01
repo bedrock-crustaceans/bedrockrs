@@ -4,7 +4,7 @@ use crate::elems::Element;
 use crate::error::FormError;
 
 pub struct Label {
-    text: String,
+    pub text: String,
 }
 
 impl Element for Label {

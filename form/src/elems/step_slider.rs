@@ -5,9 +5,9 @@ use crate::error::FormError;
 
 /// A combination of DropDown and Slider
 pub struct StepSlider {
-    text: String,
-    options: Vec<String>,
-    default_index: i32,
+    pub text: String,
+    pub options: Vec<String>,
+    pub default_index: i32,
 }
 
 impl Element for StepSlider {

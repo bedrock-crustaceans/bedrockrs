@@ -4,9 +4,9 @@ use crate::elems::Element;
 use crate::error::FormError;
 
 pub struct DropDown {
-    text: String,
-    options: Vec<String>,
-    default_index: i32,
+    pub text: String,
+    pub options: Vec<String>,
+    pub default_index: i32,
 }
 
 impl Element for DropDown {

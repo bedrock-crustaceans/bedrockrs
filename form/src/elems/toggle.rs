@@ -4,8 +4,8 @@ use crate::elems::Element;
 use crate::error::FormError;
 
 pub struct Toggle {
-    text: String,
-    default: bool,
+    pub text: String,
+    pub default: bool,
 }
 
 impl Element for Toggle {

@@ -4,9 +4,9 @@ use crate::elems::Element;
 use crate::error::FormError;
 
 pub struct Input {
-    text: String,
-    default: String,
-    placeholder: String,
+    pub text: String,
+    pub default: String,
+    pub placeholder: String,
 }
 
 impl Element for Input {
