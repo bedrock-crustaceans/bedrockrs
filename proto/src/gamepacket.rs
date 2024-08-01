@@ -6,7 +6,6 @@ use std::sync::Arc;
 use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
-
 use crate::packets::client_cache_status::ClientCacheStatusPacket;
 use crate::packets::disconnect::DisconnectPacket;
 use crate::packets::emote_list::EmoteListPacket;
@@ -14,6 +13,8 @@ use crate::packets::handshake_server_to_client::HandshakeServerToClientPacket;
 use crate::packets::interact::InteractPacket;
 use crate::packets::level_chunk::LevelChunkPacket;
 use crate::packets::login::LoginPacket;
+use crate::packets::model_form_request::ModelFormRequestPacket;
+use crate::packets::model_form_response::ModelFormResponsePacket;
 use crate::packets::network_settings::NetworkSettingsPacket;
 use crate::packets::network_settings_request::NetworkSettingsRequestPacket;
 use crate::packets::packet_violation_warning::PacketViolationWarningPacket;
@@ -29,6 +30,7 @@ use crate::packets::set_local_player_as_initialized::SetLocalPlayerAsInitialized
 use crate::packets::start_game::StartGamePacket;
 use crate::packets::player_move::MovePlayerPacket;
 use crate::packets::chunk_radius_updated::ChunkRadiusUpdatedPacket;
+use crate::packets::text_message::TextMessagePacket;
 
 #[repr(u16)]
 #[derive(Debug, Clone)]
@@ -41,7 +43,7 @@ pub enum GamePacket {
     ResourcePacksInfo(ResourcePacksInfoPacket),
     ResourcePackStack(ResourcePacksStackPacket),
     ResourcePackClientResponse(ResourcePacksResponsePacket),
-    Text(),
+    TextMessage(TextMessagePacket),
     SetTime(),
     StartGame(StartGamePacket),
     AddPlayer(),
@@ -130,8 +132,8 @@ pub enum GamePacket {
     BookEdit(),
     NpcRequest(),
     PhotoTransfer(),
-    ModalFormRequest(),
-    ModalFormResponse(),
+    ModalFormRequest(ModelFormRequestPacket),
+    ModalFormResponse(ModelFormResponsePacket),
     ServerSettingsRequest(ServerSettingsRequestPacket),
     ServerSettingsResponse(ServerSettingsResponsePacket),
     ShowProfile(),
@@ -192,7 +194,7 @@ impl GamePacket {
     const ResourcePacksInfoID: u16 = 6;
     const ResourcePacksStackID: u16 = 7;
     const ResourcePacksClientResponseID: u16 = 8;
-    const TextID: u16 = 9;
+    const TextMessageID: u16 = 9;
     const SetTimeID: u16 = 10;
     const StartGameID: u16 = 11;
     const AddPlayerID: u16 = 12;
@@ -414,8 +416,8 @@ impl GamePacket {
             GamePacket::ResourcePackClientResponse(pk) => {
                 ser_packet!(stream, GamePacket::ResourcePacksClientResponseID, pk)
             }
-            GamePacket::Text() => {
-                unimplemented!()
+            GamePacket::TextMessage(pk) => {
+                ser_packet!(stream, GamePacket::TextMessageID, pk)
             }
             GamePacket::SetTime() => {
                 unimplemented!()
@@ -681,11 +683,11 @@ impl GamePacket {
             GamePacket::PhotoTransfer() => {
                 unimplemented!()
             }
-            GamePacket::ModalFormRequest() => {
-                unimplemented!()
+            GamePacket::ModalFormRequest(pk) => {
+                ser_packet!(stream, GamePacket::ModalFormRequestID, pk)
             }
-            GamePacket::ModalFormResponse() => {
-                unimplemented!()
+            GamePacket::ModalFormResponse(pk) => {
+                ser_packet!(stream, GamePacket::ModalFormResponseID, pk)
             }
             GamePacket::ServerSettingsRequest(pk) => {
                 ser_packet!(stream, GamePacket::ServerSettingsRequestID, pk)
@@ -895,8 +897,8 @@ impl GamePacket {
             GamePacket::ResourcePacksClientResponseID => GamePacket::ResourcePackClientResponse(
                 de_packet!(stream, ResourcePacksResponsePacket),
             ),
-            GamePacket::TextID => {
-                unimplemented!()
+            GamePacket::TextMessageID => {
+                GamePacket::TextMessage(de_packet!(stream, TextMessagePacket))
             }
             GamePacket::SetTimeID => {
                 unimplemented!()
@@ -1159,10 +1161,10 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::ModalFormRequestID => {
-                unimplemented!()
+                GamePacket::ModalFormRequest(de_packet!(stream, ModelFormRequestPacket))
             }
             GamePacket::ModalFormResponseID => {
-                unimplemented!()
+                GamePacket::ModalFormResponse(de_packet!(stream, ModelFormResponsePacket))
             }
             GamePacket::ServerSettingsRequestID => {
                 GamePacket::ServerSettingsRequest(de_packet!(stream, ServerSettingsRequestPacket))
