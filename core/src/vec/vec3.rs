@@ -1,6 +1,6 @@
-use std::{fmt, ops::{
+use std::ops::{
     Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
-}};
+};
 
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use crate::int::{BE, LE, VAR};

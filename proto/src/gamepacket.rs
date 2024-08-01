@@ -24,6 +24,7 @@ use crate::packets::resource_packs_response::ResourcePacksResponsePacket;
 use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
 use crate::packets::set_local_player_as_initialized::SetLocalPlayerAsInitializedPacket;
 use crate::packets::start_game::StartGamePacket;
+use crate::packets::player_move::MovePlayerPacket;
 
 #[repr(u16)]
 #[derive(Debug, Clone)]
@@ -45,7 +46,7 @@ pub enum GamePacket {
     AddItemEntity(),
     TakeItemEntity(),
     MoveEntity(),
-    MovePlayer(),
+    MovePlayer(MovePlayerPacket),
     RiderJump(),
     UpdateBlock(),
     AddPainting(),
@@ -438,8 +439,8 @@ impl GamePacket {
             GamePacket::MoveEntity() => {
                 unimplemented!()
             }
-            GamePacket::MovePlayer() => {
-                unimplemented!()
+            GamePacket::MovePlayer(pk) => {
+                ser_packet!(stream, GamePacket::MovePlayerID, pk)
             }
             GamePacket::RiderJump() => {
                 unimplemented!()
@@ -918,7 +919,7 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::MovePlayerID => {
-                unimplemented!()
+                GamePacket::MovePlayer(de_packet!(stream, MovePlayerPacket))
             }
             GamePacket::RiderJumpID => {
                 unimplemented!()

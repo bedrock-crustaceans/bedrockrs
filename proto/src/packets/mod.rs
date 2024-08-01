@@ -15,3 +15,4 @@ pub mod interact;
 pub mod emote_list;
 pub mod player_auth_input;
 pub mod set_local_player_as_initialized;
+pub mod player_move;
