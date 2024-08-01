@@ -25,6 +25,7 @@ use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
 use crate::packets::set_local_player_as_initialized::SetLocalPlayerAsInitializedPacket;
 use crate::packets::start_game::StartGamePacket;
 use crate::packets::player_move::MovePlayerPacket;
+use crate::packets::chunk_radius_updated::ChunkRadiusUpdatedPacket;
 
 #[repr(u16)]
 #[derive(Debug, Clone)]
@@ -96,7 +97,7 @@ pub enum GamePacket {
     ClientboundMapItemData(),
     MapInfoRequest(),
     RequestChunkRadius(RequestChunkRadiusPacket),
-    ChunkRadiusUpdate(),
+    ChunkRadiusUpdate(ChunkRadiusUpdatedPacket),
     ItemFrameDropItem(),
     GameRulesChanged(),
     Camera(),
@@ -589,8 +590,8 @@ impl GamePacket {
             GamePacket::RequestChunkRadius(pk) => {
                 ser_packet!(stream, GamePacket::RequestChunkRadiusID, pk)
             }
-            GamePacket::ChunkRadiusUpdate() => {
-                unimplemented!()
+            GamePacket::ChunkRadiusUpdate(pk) => {
+                ser_packet!(stream, GamePacket::ChunkRadiusUpdateID, pk)
             }
             GamePacket::ItemFrameDropItem() => {
                 unimplemented!()
