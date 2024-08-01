@@ -132,7 +132,7 @@ impl ProtoCodec for TextMessagePacket {
                 let message = String::proto_deserialize(stream)?;
 
                 let len = VAR::<u32>::proto_deserialize(stream)?.into_inner();
-                let mut parameters = Vec::with_capacity(match len.try_into().try_into() {
+                let mut parameters = Vec::with_capacity(match len.try_into() {
                     Ok(v) => { v },
                     Err(e) => { return Err(ProtoCodecError::FromIntError(e.into())) }
                 });
@@ -150,7 +150,7 @@ impl ProtoCodec for TextMessagePacket {
                 let message = String::proto_deserialize(stream)?;
 
                 let len = VAR::<u32>::proto_deserialize(stream)?.into_inner();
-                let mut parameters = Vec::with_capacity(match len.try_into().try_into() {
+                let mut parameters = Vec::with_capacity(match len.try_into() {
                     Ok(v) => { v },
                     Err(e) => { return Err(ProtoCodecError::FromIntError(e.into())) }
                 });
@@ -168,7 +168,7 @@ impl ProtoCodec for TextMessagePacket {
                 let message = String::proto_deserialize(stream)?;
 
                 let len = VAR::<u32>::proto_deserialize(stream)?.into_inner();
-                let mut parameters = Vec::with_capacity(match len.try_into().try_into() {
+                let mut parameters = Vec::with_capacity(match len.try_into() {
                     Ok(v) => { v },
                     Err(e) => { return Err(ProtoCodecError::FromIntError(e.into())) }
                 });
