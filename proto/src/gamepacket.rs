@@ -22,6 +22,8 @@ use crate::packets::request_chunk_radius::RequestChunkRadiusPacket;
 use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
 use crate::packets::resource_packs_response::ResourcePacksResponsePacket;
 use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
+use crate::packets::server_settings_request::ServerSettingsRequestPacket;
+use crate::packets::server_settings_response::ServerSettingsResponsePacket;
 use crate::packets::set_local_player_as_initialized::SetLocalPlayerAsInitializedPacket;
 use crate::packets::start_game::StartGamePacket;
 
@@ -127,8 +129,8 @@ pub enum GamePacket {
     PhotoTransfer(),
     ModalFormRequest(),
     ModalFormResponse(),
-    ServerSettingsRequest(),
-    ServerSettingsResponse(),
+    ServerSettingsRequest(ServerSettingsRequestPacket),
+    ServerSettingsResponse(ServerSettingsResponsePacket),
     ShowProfile(),
     SetDefaultGameType(),
     RemoveObjective(),
@@ -682,11 +684,11 @@ impl GamePacket {
             GamePacket::ModalFormResponse() => {
                 unimplemented!()
             }
-            GamePacket::ServerSettingsRequest() => {
-                unimplemented!()
+            GamePacket::ServerSettingsRequest(pk) => {
+                ser_packet!(stream, GamePacket::ServerSettingsRequestID, pk)
             }
-            GamePacket::ServerSettingsResponse() => {
-                unimplemented!()
+            GamePacket::ServerSettingsResponse(pk) => {
+                ser_packet!(stream, GamePacket::ServerSettingsResponseID, pk)
             }
             GamePacket::ShowProfile() => {
                 unimplemented!()
@@ -1160,10 +1162,10 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::ServerSettingsRequestID => {
-                unimplemented!()
+                GamePacket::ServerSettingsRequest(de_packet!(stream, ServerSettingsRequestPacket))
             }
             GamePacket::ServerSettingsResponseID => {
-                unimplemented!()
+                GamePacket::ServerSettingsResponse(de_packet!(stream, ServerSettingsResponsePacket))
             }
             GamePacket::ShowProfileID => {
                 unimplemented!()
