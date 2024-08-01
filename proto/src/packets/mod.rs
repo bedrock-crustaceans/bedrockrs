@@ -17,3 +17,5 @@ pub mod player_auth_input;
 pub mod set_local_player_as_initialized;
 pub mod server_settings_request;
 pub mod server_settings_response;
+pub mod model_form_request;
+pub mod model_form_response;

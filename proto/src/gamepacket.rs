@@ -6,13 +6,14 @@ use std::sync::Arc;
 use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
-
 use crate::packets::client_cache_status::ClientCacheStatusPacket;
 use crate::packets::disconnect::DisconnectPacket;
 use crate::packets::emote_list::EmoteListPacket;
 use crate::packets::handshake_server_to_client::HandshakeServerToClientPacket;
 use crate::packets::interact::InteractPacket;
 use crate::packets::login::LoginPacket;
+use crate::packets::model_form_request::ModelFormRequestPacket;
+use crate::packets::model_form_response::ModelFormResponsePacket;
 use crate::packets::network_settings::NetworkSettingsPacket;
 use crate::packets::network_settings_request::NetworkSettingsRequestPacket;
 use crate::packets::packet_violation_warning::PacketViolationWarningPacket;
@@ -127,8 +128,8 @@ pub enum GamePacket {
     BookEdit(),
     NpcRequest(),
     PhotoTransfer(),
-    ModalFormRequest(),
-    ModalFormResponse(),
+    ModalFormRequest(ModelFormRequestPacket),
+    ModalFormResponse(ModelFormResponsePacket),
     ServerSettingsRequest(ServerSettingsRequestPacket),
     ServerSettingsResponse(ServerSettingsResponsePacket),
     ShowProfile(),
@@ -678,11 +679,11 @@ impl GamePacket {
             GamePacket::PhotoTransfer() => {
                 unimplemented!()
             }
-            GamePacket::ModalFormRequest() => {
-                unimplemented!()
+            GamePacket::ModalFormRequest(pk) => {
+                ser_packet!(stream, GamePacket::ModalFormRequestID, pk)
             }
-            GamePacket::ModalFormResponse() => {
-                unimplemented!()
+            GamePacket::ModalFormResponse(pk) => {
+                ser_packet!(stream, GamePacket::ModalFormResponseID, pk)
             }
             GamePacket::ServerSettingsRequest(pk) => {
                 ser_packet!(stream, GamePacket::ServerSettingsRequestID, pk)
@@ -1156,10 +1157,10 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::ModalFormRequestID => {
-                unimplemented!()
+                GamePacket::ModalFormRequest(de_packet!(stream, ModelFormRequestPacket))
             }
             GamePacket::ModalFormResponseID => {
-                unimplemented!()
+                GamePacket::ModalFormResponse(de_packet!(stream, ModelFormResponsePacket))
             }
             GamePacket::ServerSettingsRequestID => {
                 GamePacket::ServerSettingsRequest(de_packet!(stream, ServerSettingsRequestPacket))

@@ -22,5 +22,6 @@ pub mod input_data;
 pub mod input_mode;
 pub mod play_mode;
 pub mod interaction_model;
-mod block_action;
-mod inventory_transaction;
+pub mod block_action;
+pub mod inventory_transaction;
+pub mod modal_form_cancel_reason;
