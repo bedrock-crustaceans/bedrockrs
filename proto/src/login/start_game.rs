@@ -126,7 +126,7 @@ pub async fn start_game(
         template_content_identity: String::new(),
         trial: false,
         movement_settings: PlayerMovementSettings {
-            authority_mode: PlayerMovementMode::Server,
+            authority_mode: PlayerMovementMode::Client,
             rewind_history_size: VAR::new(3200),
             server_authoritative_block_breaking: false,
         },
