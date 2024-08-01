@@ -8,8 +8,8 @@ use byteorder::ReadBytesExt;
 
 #[derive(Debug)]
 pub struct PalettedStorage {
-    blocks: [u32; 4096],
-    palette: Vec<NbtTag>,
+    pub blocks: [u32; 4096],
+    pub palette: Vec<NbtTag>,
 }
 
 impl PalettedStorage {

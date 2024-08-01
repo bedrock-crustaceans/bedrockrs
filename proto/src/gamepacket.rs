@@ -12,6 +12,7 @@ use crate::packets::disconnect::DisconnectPacket;
 use crate::packets::emote_list::EmoteListPacket;
 use crate::packets::handshake_server_to_client::HandshakeServerToClientPacket;
 use crate::packets::interact::InteractPacket;
+use crate::packets::level_chunk::LevelChunkPacket;
 use crate::packets::login::LoginPacket;
 use crate::packets::network_settings::NetworkSettingsPacket;
 use crate::packets::network_settings_request::NetworkSettingsRequestPacket;
@@ -87,7 +88,7 @@ pub enum GamePacket {
     AdventureSettings(),
     BlockEntityData(),
     PlayerInput(),
-    LevelChunk(),
+    LevelChunk(LevelChunkPacket),
     SetCommandsEnabled(),
     SetDifficulty(),
     ChangeDimension(),
@@ -556,8 +557,8 @@ impl GamePacket {
             GamePacket::PlayerInput() => {
                 unimplemented!()
             }
-            GamePacket::LevelChunk() => {
-                unimplemented!()
+            GamePacket::LevelChunk(pk) => {
+                ser_packet!(stream, GamePacket::LevelChunkID, pk)
             }
             GamePacket::SetCommandsEnabled() => {
                 unimplemented!()
