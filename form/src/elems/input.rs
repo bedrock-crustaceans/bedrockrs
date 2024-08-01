@@ -1,11 +1,12 @@
 use serde_json::{json, Value};
 
 use crate::elems::Element;
+use crate::error::FormError;
 
 pub struct Input {
-    text: String,
-    default: String,
-    placeholder: String,
+    pub text: String,
+    pub default: String,
+    pub placeholder: String,
 }
 
 impl Element for Input {
@@ -16,5 +17,9 @@ impl Element for Input {
             "default": self.default,
             "placeholder": self.placeholder,
         })
+    }
+
+    fn elem_deserialize(elem_json: Value) -> Result<Self, FormError> {
+        todo!()
     }
 }

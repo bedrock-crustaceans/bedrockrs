@@ -1,6 +1,7 @@
 use serde_json::{json, Value};
 
 use crate::elems::Element;
+use crate::error::FormError;
 
 pub enum ButtonImage {
     Path(String),
@@ -27,5 +28,9 @@ impl Element for Button {
             "text": self.text,
             "data": image_data,
         })
+    }
+
+    fn elem_deserialize(elem_json: Value) -> Result<Self, FormError> {
+        todo!()
     }
 }

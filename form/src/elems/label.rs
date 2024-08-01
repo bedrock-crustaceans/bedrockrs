@@ -1,9 +1,10 @@
 use serde_json::{json, Value};
 
 use crate::elems::Element;
+use crate::error::FormError;
 
 pub struct Label {
-    text: String,
+    pub text: String,
 }
 
 impl Element for Label {
@@ -12,5 +13,9 @@ impl Element for Label {
             "type": "label",
             "text": self.text,
         })
+    }
+
+    fn elem_deserialize(elem_json: Value) -> Result<Self, FormError> {
+        todo!()
     }
 }

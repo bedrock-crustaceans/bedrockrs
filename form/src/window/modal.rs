@@ -2,6 +2,7 @@ use serde_json::json;
 
 use crate::elems::button::Button;
 use crate::elems::Element;
+use crate::error::FormError;
 use crate::window::Form;
 
 pub struct ModalForm {
@@ -21,5 +22,9 @@ impl Form for ModalForm {
             "button2": self.button2.elem_serialize(),
         })
         .to_string()
+    }
+
+    fn form_deserialize(form_json: &str) -> Result<Self, FormError> {
+        todo!()
     }
 }
