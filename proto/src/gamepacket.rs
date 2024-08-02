@@ -14,8 +14,8 @@ use crate::packets::handshake_server_to_client::HandshakeServerToClientPacket;
 use crate::packets::interact::InteractPacket;
 use crate::packets::level_chunk::LevelChunkPacket;
 use crate::packets::login::LoginPacket;
-use crate::packets::model_form_request::ModelFormRequestPacket;
-use crate::packets::model_form_response::ModelFormResponsePacket;
+use crate::packets::modal_form_request::ModalFormRequestPacket;
+use crate::packets::modal_form_response::ModalFormResponsePacket;
 use crate::packets::network_settings::NetworkSettingsPacket;
 use crate::packets::network_settings_request::NetworkSettingsRequestPacket;
 use crate::packets::packet_violation_warning::PacketViolationWarningPacket;
@@ -133,8 +133,8 @@ pub enum GamePacket {
     BookEdit(),
     NpcRequest(),
     PhotoTransfer(),
-    ModalFormRequest(ModelFormRequestPacket),
-    ModalFormResponse(ModelFormResponsePacket),
+    ModalFormRequest(ModalFormRequestPacket),
+    ModalFormResponse(ModalFormResponsePacket),
     ServerSettingsRequest(ServerSettingsRequestPacket),
     ServerSettingsResponse(ServerSettingsResponsePacket),
     ShowProfile(),
@@ -1162,10 +1162,10 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::ModalFormRequestID => {
-                GamePacket::ModalFormRequest(de_packet!(stream, ModelFormRequestPacket))
+                GamePacket::ModalFormRequest(de_packet!(stream, ModalFormRequestPacket))
             }
             GamePacket::ModalFormResponseID => {
-                GamePacket::ModalFormResponse(de_packet!(stream, ModelFormResponsePacket))
+                GamePacket::ModalFormResponse(de_packet!(stream, ModalFormResponsePacket))
             }
             GamePacket::ServerSettingsRequestID => {
                 GamePacket::ServerSettingsRequest(de_packet!(stream, ServerSettingsRequestPacket))
