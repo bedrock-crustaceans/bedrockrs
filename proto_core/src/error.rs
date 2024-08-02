@@ -25,9 +25,7 @@ pub enum ProtoCodecError {
     JwtError(#[from] JwtError),
     #[error("Base64 decoding Error: {0}")]
     Base64DecodeError(#[from] Base64DecodeError),
-    #[error(
-        "parse value `{0}` to enum variant for {1} enum"
-    )]
+    #[error("parse value `{0}` to enum variant for {1} enum")]
     InvalidEnumID(String, String),
     #[error("Got an unknown/invalid game packet id: {0}")]
     InvalidGamePacketID(u16),

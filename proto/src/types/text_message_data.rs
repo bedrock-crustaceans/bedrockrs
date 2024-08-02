@@ -1,4 +1,3 @@
-
 #[derive(Debug, Clone)]
 pub enum TextMessageData {
     Raw(String),

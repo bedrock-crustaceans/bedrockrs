@@ -1,9 +1,9 @@
-use bedrockrs_core::int::{VAR, LE};
-use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
+use bedrockrs_core::int::{LE, VAR};
+use bedrockrs_core::Vec2;
+use bedrockrs_core::Vec3;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
-use bedrockrs_core::Vec3;
-use bedrockrs_core::Vec2;
+use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
 use std::io::Cursor;
 
 #[derive(Debug, Clone)]
@@ -17,7 +17,7 @@ pub struct MovePlayerPacket {
     pub riding_runtime_id: ActorRuntimeID,
     pub teleportation_cause: Option<LE<i32>>,
     pub source_actor_type: Option<LE<i32>>,
-    pub tick: VAR<i64>
+    pub tick: VAR<i64>,
 }
 
 impl ProtoCodec for MovePlayerPacket {
@@ -51,7 +51,7 @@ impl ProtoCodec for MovePlayerPacket {
             riding_runtime_id,
             teleportation_cause,
             source_actor_type,
-            tick
+            tick,
         });
     }
 

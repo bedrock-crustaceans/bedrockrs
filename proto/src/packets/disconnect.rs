@@ -1,9 +1,9 @@
 use std::io::Cursor;
 
+use crate::types::disconnect_reason::DisconnectReason;
 use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
-use crate::types::disconnect_reason::DisconnectReason;
 
 #[derive(Debug, Clone)]
 pub struct DisconnectPacket {

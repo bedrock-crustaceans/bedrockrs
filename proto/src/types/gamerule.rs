@@ -62,9 +62,10 @@ impl ProtoCodec for GameRuleValue {
                         .into_inner(),
                 ),
                 other => {
-                    return Err(ProtoCodecError::InvalidEnumID(format!("{other:?}"), String::from(
-                        "GameRuleValue",
-                    )));
+                    return Err(ProtoCodecError::InvalidEnumID(
+                        format!("{other:?}"),
+                        String::from("GameRuleValue"),
+                    ));
                 }
             },
         )

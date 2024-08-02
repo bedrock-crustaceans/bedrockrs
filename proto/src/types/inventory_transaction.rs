@@ -8,5 +8,5 @@ pub struct UseItemTransactionData {
     /// legacy_request_id ties in with the ItemStackResponse packet. If this field is non-0, the server should
     /// respond with an ItemStackResponse packet. Some inventory actions such as dropping an item out of the
     /// hotbar are still one using this packet, and the ItemStackResponse packet needs to tie in with it.
-    legacy_request_id: LE<i32>
+    legacy_request_id: LE<i32>,
 }
