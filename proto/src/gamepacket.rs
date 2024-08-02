@@ -19,6 +19,7 @@ use crate::packets::network_settings::NetworkSettingsPacket;
 use crate::packets::network_settings_request::NetworkSettingsRequestPacket;
 use crate::packets::packet_violation_warning::PacketViolationWarningPacket;
 use crate::packets::play_status::PlayStatusPacket;
+use crate::packets::player_action::PlayerActionPacket;
 use crate::packets::player_auth_input::PlayerAuthInputPacket;
 use crate::packets::request_chunk_radius::RequestChunkRadiusPacket;
 use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
@@ -69,7 +70,7 @@ pub enum GamePacket {
     Interact(InteractPacket),
     BlockPickRequest(),
     EntityPickRequest(),
-    PlayerAction(),
+    PlayerAction(PlayerActionPacket),
     HurtArmor(),
     SetEntityData(),
     SetEntityMotion(),
@@ -494,8 +495,8 @@ impl GamePacket {
             GamePacket::EntityPickRequest() => {
                 unimplemented!()
             }
-            GamePacket::PlayerAction() => {
-                unimplemented!()
+            GamePacket::PlayerAction(pk) => {
+                ser_packet!(stream, GamePacket::PlayerActionID, pk)
             }
             GamePacket::HurtArmor() => {
                 unimplemented!()
@@ -974,7 +975,7 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::PlayerActionID => {
-                unimplemented!()
+                GamePacket::PlayerAction(de_packet!(stream, PlayerActionPacket))
             }
             GamePacket::HurtArmorID => {
                 unimplemented!()

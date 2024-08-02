@@ -38,6 +38,7 @@ impl ProtoCodec for LevelChunkPacket {
             unimplemented!()
         }
 
+        VAR::<u32>::new(self.serialized_chunk_data.len().try_into().unwrap()).proto_serialize(stream)?;
         stream.extend_from_slice(&self.serialized_chunk_data);
 
         return Ok(());
