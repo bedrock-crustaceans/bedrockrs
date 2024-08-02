@@ -6,6 +6,7 @@ use std::sync::Arc;
 use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
+use crate::packets::animate::AnimatePacket;
 use crate::packets::client_cache_status::ClientCacheStatusPacket;
 use crate::packets::disconnect::DisconnectPacket;
 use crate::packets::emote_list::EmoteListPacket;
@@ -76,7 +77,7 @@ pub enum GamePacket {
     SetEntityLink(),
     SetHealth(),
     SetSpawnPosition(),
-    Animate(),
+    Animate(AnimatePacket),
     Respawn(),
     ContainerOpen(),
     ContainerClose(),
@@ -515,8 +516,8 @@ impl GamePacket {
             GamePacket::SetSpawnPosition() => {
                 unimplemented!()
             }
-            GamePacket::Animate() => {
-                unimplemented!()
+            GamePacket::Animate(pk) => {
+                ser_packet!(stream, GamePacket::AnimateID, pk)
             }
             GamePacket::Respawn() => {
                 unimplemented!()
@@ -995,7 +996,7 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::AnimateID => {
-                unimplemented!()
+                GamePacket::Animate(de_packet!(stream, AnimatePacket))
             }
             GamePacket::RespawnID => {
                 unimplemented!()
