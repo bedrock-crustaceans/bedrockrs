@@ -8,34 +8,37 @@ An easy-to-use universal library for Minecraft Bedrock written in Rust, that aim
 
 - [X] Standards
 - [X] Common implementations
-- [X] An easy to use api
+- [X] An easy-to-use api
 
 ## Crates:
 
-- [Core](https://github.com/Adrian8115/bedrock-rs/tree/main/bedrock_core):
+- [Core](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/bedrock_core):
     - Provides common base datatypes.
 
-- [Shared]()
+- [Shared](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/bedrock_core)
 
-- [Nbt](https://github.com/Adrian8115/bedrock-rs/tree/main/nbt):
+
+- [Proto](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/proto):
+    - Full implementation of the Bedrock protocol.
+    - Support for both Server and Client side intended.
+    - Built-in login procedure.
+
+- [World](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/world):
+    - Implementation of the Bedrock level format using our own `leveldb` bindings for mojangs leveldb fork.
+
+- [Addons](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/packs):
+    - Datatypes defining the structure of Addons.
+    - Serialization and Deserialization of addons.
+
+- [Nbt](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/nbt):
     - A simple nbt implementation focused on Minecraft Bedrock.
     - Provides Serialization for:
         - `NbtLittleEndian`
         - `NbtLittleEndianNetwork` (Commonly used in the mcbe protocol)
         - `NbtBigEndian`
 
-- [Proto](https://github.com/Adrian8115/bedrock-rs/tree/main/proto):
-    - Basic implementation of the Bedrock protocol.
-    - Support for both Server and Client side intended.
-
-- [Form](https://github.com/Adrian8115/bedrock-rs/tree/main/form):
-    - An implementation of the json forms format used in Minecraft Bedrock.
-
-- [World](https://github.com/Adrian8115/bedrock-rs/tree/main/world):
-    - Implementation of the Bedrock level format using our own `leveldb` bindings for mojangs leveldb fork.
-
-- [Addons](https://github.com/Adrian8115/bedrock-rs/tree/main/packs):
-    - Datatypes defining the structure of Addons, including serialization and deserialization logic.
+- [Form](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/form):
+    - Implementation of the JSON form format used in Minecraft Bedrock.
 
 ## Contributing:
 
@@ -43,4 +46,4 @@ Feel free to join in at any time. Your contributions are highly valued, and a bi
 recommend getting acquainted with the bedrock-rs codebase. Whether it's tackling existing issues, adding new features,
 or even introducing entirely fresh modules, your creativity is welcome.
 
-(If you like this library, don't forget to star it!)
+(If you like this library, remember to give bedrockrs a Star!)
