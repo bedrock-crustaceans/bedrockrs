@@ -1,7 +1,7 @@
-use std::collections::HashMap;
 use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::{Vec2, Vec3};
 use bedrockrs_nbt::NbtTag;
+use std::collections::HashMap;
 use uuid::Uuid;
 
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
@@ -15,6 +15,7 @@ use crate::connection::ConnectionShard;
 use crate::error::LoginError;
 use crate::gamepacket::GamePacket;
 use crate::login::provider::LoginProviderServer;
+use crate::packets::play_status::PlayStatusPacket;
 use crate::packets::start_game::StartGamePacket;
 use crate::types::base_game_version::BaseGameVersion;
 use crate::types::chat_restriction_level::ChatRestrictionLevel;
@@ -23,13 +24,12 @@ use crate::types::experiments::Experiments;
 use crate::types::level_settings::LevelSettings;
 use crate::types::network_block_pos::NetworkBlockPos;
 use crate::types::network_permissions::NetworkPermissions;
+use crate::types::play_status::PlayStatusType;
 use crate::types::player_movement_mode::PlayerMovementMode;
 use crate::types::player_movement_settings::PlayerMovementSettings;
 use crate::types::spawn_biome_type::SpawnBiomeType;
 use crate::types::spawn_settings::SpawnSettings;
 use bedrockrs_shared::world::editor_world_type::EditorWorldType;
-use crate::packets::play_status::PlayStatusPacket;
-use crate::types::play_status::PlayStatusType;
 
 pub async fn start_game(
     conn: &mut ConnectionShard,
@@ -147,11 +147,17 @@ pub async fn start_game(
         },
     };
 
-    conn.send(GamePacket::StartGame(start_game)).await.map_err(|e| LoginError::ConnectionError(e))?;
-    conn.send(GamePacket::PlayStatus(PlayStatusPacket{
-        status: PlayStatusType::PlayerSpawn
-    })).await.map_err(|e| LoginError::ConnectionError(e))?;
-    conn.flush().await.map_err(|e| LoginError::ConnectionError(e))?;
+    conn.send(GamePacket::StartGame(start_game))
+        .await
+        .map_err(|e| LoginError::ConnectionError(e))?;
+    conn.send(GamePacket::PlayStatus(PlayStatusPacket {
+        status: PlayStatusType::PlayerSpawn,
+    }))
+    .await
+    .map_err(|e| LoginError::ConnectionError(e))?;
+    conn.flush()
+        .await
+        .map_err(|e| LoginError::ConnectionError(e))?;
 
     Ok(())
 }

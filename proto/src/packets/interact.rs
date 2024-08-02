@@ -1,15 +1,15 @@
-use std::io::Cursor;
+use crate::types::interact_action::InteractAction;
 use bedrockrs_core::int::LE;
 use bedrockrs_core::Vec3;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
-use crate::types::interact_action::InteractAction;
+use std::io::Cursor;
 
 #[derive(Debug, Clone)]
 pub struct InteractPacket {
     action: InteractAction,
-    target_runtime_id: ActorRuntimeID
+    target_runtime_id: ActorRuntimeID,
 }
 
 impl ProtoCodec for InteractPacket {
@@ -37,9 +37,7 @@ impl ProtoCodec for InteractPacket {
         let target_runtime_id = ActorRuntimeID::proto_deserialize(stream)?;
 
         let action = match action {
-            0 => {
-                InteractAction::Invalid
-            }
+            0 => InteractAction::Invalid,
             3 => {
                 let pos = Vec3::<LE<f32>>::proto_deserialize(stream)?;
                 let pos = Vec3::<f32>::from_le(pos);
@@ -52,18 +50,19 @@ impl ProtoCodec for InteractPacket {
 
                 InteractAction::InteractUpdate(pos)
             }
-            5 => {
-                InteractAction::NpcOpen
+            5 => InteractAction::NpcOpen,
+            6 => InteractAction::OpenInventory,
+            other => {
+                return Err(ProtoCodecError::InvalidEnumID(
+                    format!("{other:?}"),
+                    String::from("InteractAction"),
+                ))
             }
-            6 => {
-                InteractAction::OpenInventory
-            }
-            other => return Err(ProtoCodecError::InvalidEnumID(format!("{other:?}"), String::from("InteractAction"))),
         };
 
         Ok(Self {
             action,
-            target_runtime_id
+            target_runtime_id,
         })
     }
 }

@@ -1,5 +1,5 @@
-use bedrockrs_core::int::{VAR, LE};
 use crate::types::chunk_pos::ChunkPos;
+use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_proto_core::ProtoCodec;
 
 #[derive(Debug, Clone)]
@@ -11,23 +11,24 @@ pub struct LevelChunkPacket {
     pub serialized_chunk_data: Vec<u8>,
 
     pub client_needs_to_request_subchunks: bool,
-    pub client_request_subchunk_limit: VAR<i32>
+    pub client_request_subchunk_limit: VAR<i32>,
 }
 
 impl ProtoCodec for LevelChunkPacket {
-    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), bedrockrs_proto_core::error::ProtoCodecError> {
+    fn proto_serialize(
+        &self,
+        stream: &mut Vec<u8>,
+    ) -> Result<(), bedrockrs_proto_core::error::ProtoCodecError> {
         self.chunk_position.proto_serialize(stream)?;
         self.dimension_id.proto_serialize(stream)?;
 
         if !self.client_needs_to_request_subchunks {
             self.sub_chunk_count.proto_serialize(stream)?;
-        }
-        else {
+        } else {
             if !(self.client_request_subchunk_limit.into_inner() < 0) {
                 VAR::<u32>::new(0xFFFFFFFE).proto_serialize(stream)?;
                 self.client_request_subchunk_limit.proto_serialize(stream)?;
-            }
-            else {
+            } else {
                 VAR::<u32>::new(0xFFFFFFFF).proto_serialize(stream)?;
             }
         }
@@ -43,7 +44,9 @@ impl ProtoCodec for LevelChunkPacket {
         return Ok(());
     }
 
-    fn proto_deserialize(stream: &mut std::io::Cursor<&[u8]>) -> Result<Self, bedrockrs_proto_core::error::ProtoCodecError> {
+    fn proto_deserialize(
+        stream: &mut std::io::Cursor<&[u8]>,
+    ) -> Result<Self, bedrockrs_proto_core::error::ProtoCodecError> {
         unreachable!()
     }
 }

@@ -1,8 +1,8 @@
-use bedrockrs_proto_derive::ProtoCodec;
+use crate::types::inventory_transaction::UseItemTransactionData;
 use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::Vec2;
+use bedrockrs_proto_derive::ProtoCodec;
 use bedrockrs_shared::actor_unique_id::ActorUniqueID;
-use crate::types::inventory_transaction::UseItemTransactionData;
 
 #[derive(Debug, Clone)]
 pub struct InputData {
@@ -57,4 +57,3 @@ pub struct InputData {
     pub block_breaking_delay_enabled: bool,
     pub input_num: bool,
 }
-

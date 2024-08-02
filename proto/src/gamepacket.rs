@@ -3,10 +3,8 @@
 use std::io::{Cursor, Write};
 use std::sync::Arc;
 
-use bedrockrs_core::int::VAR;
-use bedrockrs_proto_core::error::ProtoCodecError;
-use bedrockrs_proto_core::ProtoCodec;
 use crate::packets::animate::AnimatePacket;
+use crate::packets::chunk_radius_updated::ChunkRadiusUpdatedPacket;
 use crate::packets::client_cache_status::ClientCacheStatusPacket;
 use crate::packets::disconnect::DisconnectPacket;
 use crate::packets::emote_list::EmoteListPacket;
@@ -21,6 +19,7 @@ use crate::packets::network_settings_request::NetworkSettingsRequestPacket;
 use crate::packets::packet_violation_warning::PacketViolationWarningPacket;
 use crate::packets::play_status::PlayStatusPacket;
 use crate::packets::player_auth_input::PlayerAuthInputPacket;
+use crate::packets::player_move::MovePlayerPacket;
 use crate::packets::request_chunk_radius::RequestChunkRadiusPacket;
 use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
 use crate::packets::resource_packs_response::ResourcePacksResponsePacket;
@@ -29,9 +28,10 @@ use crate::packets::server_settings_request::ServerSettingsRequestPacket;
 use crate::packets::server_settings_response::ServerSettingsResponsePacket;
 use crate::packets::set_local_player_as_initialized::SetLocalPlayerAsInitializedPacket;
 use crate::packets::start_game::StartGamePacket;
-use crate::packets::player_move::MovePlayerPacket;
-use crate::packets::chunk_radius_updated::ChunkRadiusUpdatedPacket;
 use crate::packets::text_message::TextMessagePacket;
+use bedrockrs_core::int::VAR;
+use bedrockrs_proto_core::error::ProtoCodecError;
+use bedrockrs_proto_core::ProtoCodec;
 
 #[repr(u16)]
 #[derive(Debug, Clone)]
@@ -965,9 +965,7 @@ impl GamePacket {
             GamePacket::MobArmorEquipmentID => {
                 unimplemented!()
             }
-            GamePacket::InteractID => {
-                GamePacket::Interact(de_packet!(stream, InteractPacket))
-            }
+            GamePacket::InteractID => GamePacket::Interact(de_packet!(stream, InteractPacket)),
             GamePacket::BlockPickRequestID => {
                 unimplemented!()
             }
@@ -995,9 +993,7 @@ impl GamePacket {
             GamePacket::SetSpawnPositionID => {
                 unimplemented!()
             }
-            GamePacket::AnimateID => {
-                GamePacket::Animate(de_packet!(stream, AnimatePacket))
-            }
+            GamePacket::AnimateID => GamePacket::Animate(de_packet!(stream, AnimatePacket)),
             GamePacket::RespawnID => {
                 unimplemented!()
             }
@@ -1070,7 +1066,9 @@ impl GamePacket {
             GamePacket::MapInfoRequestID => {
                 unimplemented!()
             }
-            GamePacket::RequestChunkRadiusID => GamePacket::RequestChunkRadius(de_packet!(stream, RequestChunkRadiusPacket)),
+            GamePacket::RequestChunkRadiusID => {
+                GamePacket::RequestChunkRadius(de_packet!(stream, RequestChunkRadiusPacket))
+            }
             GamePacket::ChunkRadiusUpdateID => {
                 unimplemented!()
             }
@@ -1200,9 +1198,9 @@ impl GamePacket {
             GamePacket::SetScoreboardIdentityID => {
                 unimplemented!()
             }
-            GamePacket::SetLocalPlayerAsInitializedID => {
-                GamePacket::SetLocalPlayerAsInitialized(de_packet!(stream, SetLocalPlayerAsInitializedPacket))
-            }
+            GamePacket::SetLocalPlayerAsInitializedID => GamePacket::SetLocalPlayerAsInitialized(
+                de_packet!(stream, SetLocalPlayerAsInitializedPacket),
+            ),
             GamePacket::UpdateSoftEnumID => {
                 unimplemented!()
             }
@@ -1284,9 +1282,7 @@ impl GamePacket {
             GamePacket::UpdatePlayerGameTypeID => {
                 unimplemented!()
             }
-            GamePacket::EmoteListID => {
-                GamePacket::EmoteList(de_packet!(stream, EmoteListPacket))
-            }
+            GamePacket::EmoteListID => GamePacket::EmoteList(de_packet!(stream, EmoteListPacket)),
             GamePacket::PacketViolationWarningID => {
                 GamePacket::PacketViolationWarning(de_packet!(stream, PacketViolationWarningPacket))
             }

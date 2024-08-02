@@ -2,8 +2,8 @@ use std::ops::{
     Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
 };
 
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use crate::int::{BE, LE, VAR};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Vec3<T> {
@@ -156,7 +156,6 @@ impl<'de, T: Deserialize<'de>> Deserialize<'de> for Vec3<T> {
         Ok(Self { x, y, z })
     }
 }
-
 
 impl<T> Vec3<T> {
     // LE

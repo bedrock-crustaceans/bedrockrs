@@ -1,9 +1,9 @@
-use std::io::Cursor;
+use crate::types::animate_action::AnimateAction;
 use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
-use crate::types::animate_action::AnimateAction;
+use std::io::Cursor;
 
 #[derive(Debug, Clone)]
 pub struct AnimatePacket {
@@ -28,7 +28,7 @@ impl ProtoCodec for AnimatePacket {
 
         if let AnimateAction::Swing { rowing_time } = self.action {
             LE::new(rowing_time).proto_serialize(stream)?;
-        } 
+        }
 
         Ok(())
     }
@@ -44,20 +44,25 @@ impl ProtoCodec for AnimatePacket {
                 let rowing_time = LE::<f32>::proto_deserialize(stream)?.into_inner();
 
                 AnimateAction::Swing { rowing_time }
-            },
+            }
             3 => AnimateAction::WakeUp,
             4 => AnimateAction::CriticalHit,
             5 => AnimateAction::MagicCriticalHit,
             128 => AnimateAction::RowRight,
             129 => AnimateAction::RowLeft,
-            other => return Err(ProtoCodecError::InvalidEnumID(format!("{other:?}"), String::from("AnimateAction"))),
+            other => {
+                return Err(ProtoCodecError::InvalidEnumID(
+                    format!("{other:?}"),
+                    String::from("AnimateAction"),
+                ))
+            }
         };
 
         println!("{:?}", &stream.get_ref()[(stream.position() as usize)..]);
 
-        Ok(Self{
+        Ok(Self {
             action,
-            target_runtime_id
+            target_runtime_id,
         })
     }
 }

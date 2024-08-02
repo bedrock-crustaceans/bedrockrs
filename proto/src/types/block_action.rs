@@ -1,3 +1,1 @@
-pub struct BlockAction {
-
-}
+pub struct BlockAction {}

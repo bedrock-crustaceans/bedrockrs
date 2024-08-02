@@ -1,14 +1,14 @@
-use std::io::Cursor;
+use crate::types::input_data::InputData;
+use crate::types::input_mode::InputMode;
+use crate::types::interaction_model::InteractionModel;
+use crate::types::play_mode::PlayMode;
 use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::{Vec2, Vec3};
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_proto_derive::ProtoCodec;
 use bedrockrs_shared::actor_unique_id::ActorUniqueID;
-use crate::types::input_data::InputData;
-use crate::types::input_mode::InputMode;
-use crate::types::interaction_model::InteractionModel;
-use crate::types::play_mode::PlayMode;
+use std::io::Cursor;
 
 #[derive(Debug, Clone)]
 pub struct PlayerAuthInputPacket {
@@ -26,7 +26,6 @@ pub struct PlayerAuthInputPacket {
     pub pos_delta: Vec3<LE<f32>>,
     pub analog_move_vec: Vec2<LE<f32>>,
 }
-
 
 macro_rules! set_bit {
     ($v:expr, $bit:expr) => {
@@ -54,20 +53,25 @@ impl ProtoCodec for PlayerAuthInputPacket {
         let input_data = VAR::<u64>::proto_deserialize(stream)?.into_inner();
         let input_mode = InputMode::proto_deserialize(stream)?;
         let play_mode = match VAR::<u32>::proto_deserialize(stream)?.into_inner() {
-            0 => { PlayMode::Normal },
-            1 => { PlayMode::Teaser },
-            2 => { PlayMode::Screen },
-            3 => { PlayMode::Viewer },
+            0 => PlayMode::Normal,
+            1 => PlayMode::Teaser,
+            2 => PlayMode::Screen,
+            3 => PlayMode::Viewer,
             4 => {
                 let vr_gaze_direction = ProtoCodec::proto_deserialize(stream)?;
 
                 PlayMode::Reality(vr_gaze_direction)
-            },
-            5 => { PlayMode::Placement },
-            6 => { PlayMode::LivingRoom },
-            7 => { PlayMode::ExitLevel },
-            8 => { PlayMode::ExitLevelLivingRoom },
-            other => { return Err(ProtoCodecError::InvalidEnumID(other.to_string(), String::from("PlayMode"))) }
+            }
+            5 => PlayMode::Placement,
+            6 => PlayMode::LivingRoom,
+            7 => PlayMode::ExitLevel,
+            8 => PlayMode::ExitLevelLivingRoom,
+            other => {
+                return Err(ProtoCodecError::InvalidEnumID(
+                    other.to_string(),
+                    String::from("PlayMode"),
+                ))
+            }
         };
         let interaction_model = InteractionModel::proto_deserialize(stream)?;
 

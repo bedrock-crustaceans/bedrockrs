@@ -2,8 +2,8 @@ use std::ops::{
     Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
 };
 
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use crate::int::{BE, LE, VAR};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Vec2<T> {
