@@ -4,21 +4,21 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bedrockrs_core = { path = "core" }
-bedrockrs_shared = { path = "shared" }
+bedrockrs_core = { path = "crates/core" }
+bedrockrs_shared = { path = "crates/shared" }
 
-bedrockrs_nbt = { path = "nbt" }
+bedrockrs_nbt = { path = "crates/nbt" }
 
-bedrockrs_proto = { path = "proto", optional = true }
-bedrockrs_proto_core = { path = "proto_core", optional = true }
-bedrockrs_proto_derive = { path = "proto_derive", optional = true }
+bedrockrs_proto = { path = "crates/proto", optional = true }
+bedrockrs_proto_core = { path = "crates/proto_core", optional = true }
+bedrockrs_proto_derive = { path = "crates/proto_derive", optional = true }
 
-bedrockrs_addons = { path = "addons", optional = true }
+bedrockrs_addons = { path = "crates/addons", optional = true }
 
-bedrockrs_form = { path = "form" }
+bedrockrs_form = { path = "crates/form" }
 
-bedrockrs_world = { path = "world", optional = true }
-bedrockrs_paletted_storage = { path = "paletted_storage", optional = true }
+bedrockrs_world = { path = "crates/world", optional = true }
+bedrockrs_paletted_storage = { path = "crates/paletted_storage", optional = true }
 
 [features]
 full = ["addons", "proto", "world"]

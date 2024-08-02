@@ -10,10 +10,12 @@ An easy-to-use universal library for Minecraft Bedrock written in Rust, that aim
 - [X] Common implementations
 - [X] An easy to use api
 
-## Modules:
+## Crates:
 
 - [Core](https://github.com/Adrian8115/bedrock-rs/tree/main/bedrock_core):
-    - Provides common data types and other shared code for other modules to use.
+    - Provides common base datatypes.
+
+- [Shared]()
 
 - [Nbt](https://github.com/Adrian8115/bedrock-rs/tree/main/nbt):
     - A simple nbt implementation focused on Minecraft Bedrock.
