@@ -52,6 +52,12 @@ pub enum NbtTag {
     /// Compound tags are special because they are opened by the [NbtTag::COMPOUND_ID]
     /// and closed again by the [NbtTag::EMPTY_ID].
     Compound(HashMap<String, NbtTag>),
+    /// A length-prefixed array of bytes. The prefix is an `i32`.
+    ByteArray(Vec<u8>),
+    /// A length-prefixed array of `i32`s. The prefix is itself an `i32`.
+    IntArray(Vec<i32>),
+    /// A length-prefixed array of `i64`s. The prefix is an `i32`.
+    LongArray(Vec<i64>),
     /// An empty NBT tag.
     /// Not commonly used, it rather just marks the end of a compound tag.
     Empty,
@@ -75,6 +81,13 @@ impl NbtTag {
 
     /// The tag ID of [NbtTag::Float64]
     const FLOAT64_ID: u8 = 0x06;
+
+    /// The tag ID of [NbtTag::ByteArray]
+    const BYTEARRAY_ID: u8 = 0x07;
+    /// The tag ID of [NbtTag::IntArray]
+    const INTARRAY_ID: u8 = 0x0B;
+    /// The tag ID of [NbtTag::LongArray]
+    const LONGARRAY_ID: u8 = 0x0C;
 
     /// The tag ID of [NbtTag::String]
     const STRING_ID: u8 = 0x08;
@@ -101,6 +114,9 @@ impl NbtTag {
             NbtTag::String(_) => Self::STRING_ID,
             NbtTag::List(_) => Self::LIST_ID,
             NbtTag::Compound(_) => Self::COMPOUND_ID,
+            NbtTag::ByteArray(_) => Self::BYTEARRAY_ID,
+            NbtTag::IntArray(_) => Self::INTARRAY_ID,
+            NbtTag::LongArray(_) => Self::LONGARRAY_ID,
             NbtTag::Empty => Self::EMPTY_ID,
         }
     }
@@ -194,6 +210,33 @@ impl NbtTag {
                 T::write_u8(buf, Self::EMPTY_ID)?;
             }
             NbtTag::Empty => {}
+            NbtTag::ByteArray(arr) => {
+                T::write_i32(
+                    buf,
+                    arr.len().try_into().map_err(|e| NbtError::IntError(e))?,
+                )?;
+                for elem in arr {
+                    T::write_u8(buf, *elem)?;
+                }
+            }
+            NbtTag::IntArray(arr) => {
+                T::write_i32(
+                    buf,
+                    arr.len().try_into().map_err(|e| NbtError::IntError(e))?,
+                )?;
+                for elem in arr {
+                    T::write_i32(buf, *elem)?;
+                }
+            }
+            NbtTag::LongArray(arr) => {
+                T::write_i32(
+                    buf,
+                    arr.len().try_into().map_err(|e| NbtError::IntError(e))?,
+                )?;
+                for elem in arr {
+                    T::write_i64(buf, *elem)?;
+                }
+            }
         }
 
         Ok(())
@@ -447,6 +490,15 @@ impl Debug for NbtTag {
                 NbtTag::Empty => {
                     write!(f, "")
                 }
+                NbtTag::ByteArray(v) => {
+                    write!(f, "{v:?}")
+                }
+                NbtTag::IntArray(v) => {
+                    write!(f, "{v:?}")
+                }
+                NbtTag::LongArray(v) => {
+                    write!(f, "{v:?}")
+                }
             },
             // pretty format
             true => match self {
@@ -480,6 +532,15 @@ impl Debug for NbtTag {
                 // Any better idea of what should be written?
                 NbtTag::Empty => {
                     write!(f, "EMPTY")
+                }
+                NbtTag::ByteArray(v) => {
+                    write!(f, "{v:#?}")
+                }
+                NbtTag::IntArray(v) => {
+                    write!(f, "{v:#?}")
+                }
+                NbtTag::LongArray(v) => {
+                    write!(f, "{v:#?}")
                 }
             },
         }

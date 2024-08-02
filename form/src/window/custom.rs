@@ -6,7 +6,7 @@ use crate::window::Form;
 
 pub struct CustomForm {
     pub title: String,
-    pub elements: Vec<Box<dyn Element>>,
+    pub elements: Vec<Box<dyn Element + Send>>,
 }
 
 impl Form for CustomForm {

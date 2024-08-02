@@ -16,18 +16,18 @@ pub struct TextMessagePacket {
 impl ProtoCodec for TextMessagePacket {
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         let message_type: u8 = match self.message_type {
-            TextMessageData::Raw(_) => { 0 }
-            TextMessageData::Chat { .. } => { 1 }
-            TextMessageData::Translate { .. } => { 2 }
-            TextMessageData::Popup { .. } => { 3 }
-            TextMessageData::JukeboxPopup { .. } => { 4 }
-            TextMessageData::Tip(_) => { 5 }
-            TextMessageData::SystemMessage(_) => { 6 }
-            TextMessageData::Whisper { .. } => { 7 }
-            TextMessageData::Announcement { .. } => { 8 }
-            TextMessageData::TextObjectWhisper(_) => { 9 }
-            TextMessageData::TextObject(_) => { 10 }
-            TextMessageData::TextObjectAnnouncement(_) => { 11 }
+            TextMessageData::Raw(_) => 0,
+            TextMessageData::Chat { .. } => 1,
+            TextMessageData::Translate { .. } => 2,
+            TextMessageData::Popup { .. } => 3,
+            TextMessageData::JukeboxPopup { .. } => 4,
+            TextMessageData::Tip(_) => 5,
+            TextMessageData::SystemMessage(_) => 6,
+            TextMessageData::Whisper { .. } => 7,
+            TextMessageData::Announcement { .. } => 8,
+            TextMessageData::TextObjectWhisper(_) => 9,
+            TextMessageData::TextObject(_) => 10,
+            TextMessageData::TextObjectAnnouncement(_) => 11,
         };
 
         message_type.proto_serialize(stream)?;

@@ -14,27 +14,17 @@ pub struct InteractPacket {
 
 impl ProtoCodec for InteractPacket {
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
-        let (action, pos) = match self.action {
-            InteractAction::Invalid => {
-                (0, None)
-            }
-            InteractAction::StopRiding(pos) => {
-                (3, Some(pos))
-            }
-            InteractAction::InteractUpdate(pos) => {
-                (4, Some(pos))
-            }
-            InteractAction::NpcOpen => {
-                (5, None)
-            }
-            InteractAction::OpenInventory => {
-                (6, None)
-            }
+        let action = match self.action {
+            InteractAction::Invalid => 0,
+            InteractAction::StopRiding(_) => 3,
+            InteractAction::InteractUpdate(_) => 4,
+            InteractAction::NpcOpen => 5,
+            InteractAction::OpenInventory => 6,
         };
 
         u8::proto_serialize(&action, stream)?;
 
-        if let Some(pos) = pos {
+        if let InteractAction::InteractUpdate(pos) = self.action {
             pos.to_le().proto_serialize(stream)?;
         }
 

@@ -18,8 +18,8 @@ impl ProtoCodec for String {
             .map_err(|e| ProtoCodecError::FromIntError(e))?;
 
         VAR::<u32>::new(len)
-            .write(buf)
-            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
+            .proto_serialize(buf)?;
+
         buf.write_all(self.as_bytes())
             .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
 
@@ -30,8 +30,7 @@ impl ProtoCodec for String {
     where
         Self: Sized,
     {
-        let len = VAR::<u32>::read(stream)
-            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?
+        let len = VAR::<u32>::proto_deserialize(stream)?
             .into_inner();
         let len = len
             .try_into()
