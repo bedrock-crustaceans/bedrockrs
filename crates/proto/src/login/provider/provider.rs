@@ -19,38 +19,38 @@ pub trait LoginProviderServer {
 
     fn on_network_settings_request_pk(
         &mut self,
-        pk: &mut NetworkSettingsRequestPacket,
+        _pk: &mut NetworkSettingsRequestPacket,
     ) -> LoginProviderStatus {
         LoginProviderStatus::ContinueLogin
     }
-    fn on_network_settings_pk(&mut self, pk: &mut NetworkSettingsPacket) -> LoginProviderStatus {
+    fn on_network_settings_pk(&mut self, _pk: &mut NetworkSettingsPacket) -> LoginProviderStatus {
         LoginProviderStatus::ContinueLogin
     }
-    fn on_login_pk(&mut self, pk: &mut LoginPacket) -> LoginProviderStatus {
+    fn on_login_pk(&mut self, _pk: &mut LoginPacket) -> LoginProviderStatus {
         LoginProviderStatus::ContinueLogin
     }
-    fn on_play_status_pk(&mut self, pk: &mut PlayStatusPacket) -> LoginProviderStatus {
+    fn on_play_status_pk(&mut self, _pk: &mut PlayStatusPacket) -> LoginProviderStatus {
         LoginProviderStatus::ContinueLogin
     }
     fn on_resource_packs_info_pk(
         &mut self,
-        pk: &mut ResourcePacksInfoPacket,
+        _pk: &mut ResourcePacksInfoPacket,
     ) -> LoginProviderStatus {
         LoginProviderStatus::ContinueLogin
     }
     fn on_resource_packs_stack_pk(
         &mut self,
-        pk: &mut ResourcePacksStackPacket,
+        _pk: &mut ResourcePacksStackPacket,
     ) -> LoginProviderStatus {
         LoginProviderStatus::ContinueLogin
     }
     fn on_resource_packs_response_pk(
         &mut self,
-        pk: &mut ResourcePacksResponsePacket,
+        _pk: &mut ResourcePacksResponsePacket,
     ) -> LoginProviderStatus {
         LoginProviderStatus::ContinueLogin
     }
-    fn on_client_cache_status_pk(&self, pk: &mut ClientCacheStatusPacket) -> LoginProviderStatus {
+    fn on_client_cache_status_pk(&self, _pk: &mut ClientCacheStatusPacket) -> LoginProviderStatus {
         LoginProviderStatus::ContinueLogin
     }
 }
