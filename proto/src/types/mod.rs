@@ -27,3 +27,5 @@ pub mod inventory_transaction;
 pub mod modal_form_cancel_reason;
 pub mod text_message_data;
 pub mod chunk_pos;
+pub mod animate_action;
+pub mod disconnect_reason;

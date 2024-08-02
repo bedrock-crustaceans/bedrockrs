@@ -3,12 +3,13 @@ use std::io::Cursor;
 use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
+use crate::types::disconnect_reason::DisconnectReason;
 
 #[derive(Debug, Clone)]
 pub struct DisconnectPacket {
     /// Seems to have no effect on the message being shown.
     /// It is just for telemetry.
-    pub reason: VAR<i32>,
+    pub reason: DisconnectReason,
     pub message: Option<String>,
 }
 
