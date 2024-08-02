@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = ["tests/open_world"]
+members = [ "crates/*" ]
 
 [dependencies]
 bedrockrs_core = { path = "crates/core" }
