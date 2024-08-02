@@ -41,7 +41,7 @@ impl ProtoCodec for DisconnectPacket {
     where
         Self: Sized,
     {
-        let reason = VAR::<i32>::proto_deserialize(cursor)?;
+        let reason = DisconnectReason::proto_deserialize(cursor)?;
 
         let skip_message = bool::proto_deserialize(cursor)?;
 

@@ -1,7 +1,8 @@
 use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_core::int::VAR;
 
 #[derive(ProtoCodec, Debug, Clone)]
-#[enum_repr(VAR<i32>)]
+#[enum_repr(VAR::<i32>)]
 pub enum DisconnectReason {
     Unknown = 0,
     CantConnectNoInternet = 1,
