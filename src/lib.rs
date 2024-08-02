@@ -30,7 +30,7 @@ pub mod addons {
 pub mod world {
     pub use ::bedrockrs_world::*;
     
-    pub mod palet {
+    pub mod palette {
         pub use ::bedrockrs_paletted_storage::*;
     }
 }
