@@ -1,3 +1,4 @@
+pub mod actor_link;
 pub mod animate_action;
 pub mod base_game_version;
 pub mod block_action;
@@ -22,6 +23,7 @@ pub mod pack_info_resource;
 pub mod pack_url;
 pub mod play_mode;
 pub mod play_status;
+pub mod player_action_type;
 pub mod player_movement_mode;
 pub mod player_movement_settings;
 pub mod resource_packs_response_status;
@@ -29,5 +31,3 @@ pub mod resource_packs_stack_pack;
 pub mod spawn_biome_type;
 pub mod spawn_settings;
 pub mod text_message_data;
-pub mod actor_link;
-pub mod player_action_type;

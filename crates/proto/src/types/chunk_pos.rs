@@ -11,7 +11,7 @@ impl ChunkPos {
     pub fn new(x: i32, z: i32) -> Self {
         ChunkPos {
             x: VAR::<i32>::new(x),
-            z: VAR::<i32>::new(z)
+            z: VAR::<i32>::new(z),
         }
     }
 }
