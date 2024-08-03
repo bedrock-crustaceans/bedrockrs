@@ -30,3 +30,4 @@ pub mod spawn_biome_type;
 pub mod spawn_settings;
 pub mod text_message_data;
 pub mod actor_link;
+pub mod player_action_type;
