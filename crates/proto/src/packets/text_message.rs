@@ -139,12 +139,10 @@ impl ProtoCodec for TextMessagePacket {
 
         let message_type = match message_type {
             0 => TextMessageData::Raw(String::proto_deserialize(stream)?),
-            1 => {
-                TextMessageData::Chat {
-                    player_name: String::proto_deserialize(stream)?,
-                    message: String::proto_deserialize(stream)?,
-                }
-            }
+            1 => TextMessageData::Chat {
+                player_name: String::proto_deserialize(stream)?,
+                message: String::proto_deserialize(stream)?,
+            },
             2 => {
                 let message = String::proto_deserialize(stream)?;
 

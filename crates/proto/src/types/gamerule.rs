@@ -51,12 +51,8 @@ impl ProtoCodec for GameRuleValue {
                 .into_inner()
             {
                 1 => GameRuleValue::ValBool(bool::proto_deserialize(stream)?),
-                2 => GameRuleValue::ValVarU32(
-                    VAR::<u32>::proto_deserialize(stream)?.into_inner(),
-                ),
-                3 => GameRuleValue::ValF32(
-                    LE::<f32>::proto_deserialize(stream)?.into_inner(),
-                ),
+                2 => GameRuleValue::ValVarU32(VAR::<u32>::proto_deserialize(stream)?.into_inner()),
+                3 => GameRuleValue::ValF32(LE::<f32>::proto_deserialize(stream)?.into_inner()),
                 other => {
                     return Err(ProtoCodecError::InvalidEnumID(
                         format!("{other:?}"),

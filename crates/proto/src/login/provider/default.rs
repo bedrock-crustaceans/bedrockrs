@@ -28,9 +28,7 @@ impl DefaultLoginProvider {
 
 impl LoginProviderServer for DefaultLoginProvider {
     fn compression(&self) -> Compression {
-        Compression::Snappy {
-            threshold: 1,
-        }
+        Compression::Snappy { threshold: 1 }
     }
     fn encryption_enabled(&self) -> bool {
         false

@@ -849,7 +849,10 @@ impl GamePacket {
         VAR::<u32>::proto_deserialize(stream)?;
 
         // Read the game packet header and parse it into an u16
-        let game_packet_header: u16 = VAR::<u32>::proto_deserialize(stream)?.into_inner().try_into().map_err(ProtoCodecError::FromIntError)?;
+        let game_packet_header: u16 = VAR::<u32>::proto_deserialize(stream)?
+            .into_inner()
+            .try_into()
+            .map_err(ProtoCodecError::FromIntError)?;
 
         // Get the first 10 bits as the packet id
         // Can never be more than a 16-bit integer due to being 10-bits big

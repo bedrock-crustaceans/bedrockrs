@@ -40,7 +40,8 @@ impl ProtoCodec for LevelChunkPacket {
             unimplemented!()
         }
 
-        let len = self.serialized_chunk_data
+        let len = self
+            .serialized_chunk_data
             .len()
             .try_into()
             .map_err(ProtoCodecError::FromIntError)?;
@@ -50,7 +51,7 @@ impl ProtoCodec for LevelChunkPacket {
         stream.extend_from_slice(&self.serialized_chunk_data);
 
         println!("finish");
-        
+
         Ok(())
     }
 
