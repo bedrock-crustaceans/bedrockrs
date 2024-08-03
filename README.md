@@ -26,7 +26,7 @@ An easy-to-use universal library for Minecraft Bedrock written in Rust, that aim
 - [World](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/world):
   - Implementation of the Bedrock level format using our own `leveldb` bindings for mojangs leveldb fork.
 
-- [Addons](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/packs):
+- [Addons](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/addons):
   - Datatypes defining the structure of Addons.
   - Serialization and Deserialization of addons.
 
