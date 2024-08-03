@@ -24,3 +24,5 @@ pub mod server_settings_response;
 pub mod set_local_player_as_initialized;
 pub mod start_game;
 pub mod text_message;
+pub mod player_action;
+pub mod property_sync_data;

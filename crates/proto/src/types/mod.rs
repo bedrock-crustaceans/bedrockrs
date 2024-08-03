@@ -29,3 +29,4 @@ pub mod resource_packs_stack_pack;
 pub mod spawn_biome_type;
 pub mod spawn_settings;
 pub mod text_message_data;
+pub mod actor_link;
