@@ -12,33 +12,33 @@ An easy-to-use universal library for Minecraft Bedrock written in Rust, that aim
 
 ## Crates:
 
-- [Core](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/bedrock_core):
-    - Provides common base datatypes.
+- [Core](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/core):
+  - Provides common base datatypes.
 
-- [Shared](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/bedrock_core)
-
+- [Shared](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/shared):
+  - Shared datatypes that can use derive macros defined in other crates.
 
 - [Proto](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/proto):
-    - Full implementation of the Bedrock protocol.
-    - Support for both Server and Client side intended.
-    - Built-in login procedure.
+  - Full implementation of the Bedrock protocol.
+  - Support for both Server and Client side intended.
+  - Built-in login procedure.
 
 - [World](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/world):
-    - Implementation of the Bedrock level format using our own `leveldb` bindings for mojangs leveldb fork.
+  - Implementation of the Bedrock level format using our own `leveldb` bindings for mojangs leveldb fork.
 
 - [Addons](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/packs):
-    - Datatypes defining the structure of Addons.
-    - Serialization and Deserialization of addons.
+  - Datatypes defining the structure of Addons.
+  - Serialization and Deserialization of addons.
 
 - [Nbt](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/nbt):
-    - A simple nbt implementation focused on Minecraft Bedrock.
-    - Provides Serialization for:
-        - `NbtLittleEndian`
-        - `NbtLittleEndianNetwork` (Commonly used in the mcbe protocol)
-        - `NbtBigEndian`
+  - A simple nbt implementation focused on Minecraft Bedrock.
+  - Provides Serialization for:
+    - `NbtLittleEndian`
+    - `NbtLittleEndianNetwork` (Commonly used in the mcbe protocol)
+    - `NbtBigEndian`
 
 - [Form](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/form):
-    - Implementation of the JSON form format used in Minecraft Bedrock.
+  - Implementation of the JSON form format used in Minecraft Bedrock.
 
 ## Contributing:
 
