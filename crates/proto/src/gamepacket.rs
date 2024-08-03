@@ -846,24 +846,13 @@ impl GamePacket {
         // Read the game packet length
         // We don't need it, yet?
         // TODO: Use this to possibly async the packet handling
-        match VAR::<u32>::read(stream) {
-            Ok(_) => {}
-            Err(e) => return Err(ProtoCodecError::IOError(Arc::new(e))),
-        };
+        VAR::<u32>::proto_deserialize(stream)?;
 
         // Read the game packet header and parse it into an u16
-        let game_packet_header: u16 = match VAR::<u32>::read(stream) {
-            Ok(v) => match v.into_inner().try_into() {
-                Ok(v) => v,
-                Err(e) => {
-                    return Err(ProtoCodecError::FromIntError(e));
-                }
-            },
-            Err(e) => return Err(ProtoCodecError::IOError(Arc::new(e))),
-        };
+        let game_packet_header: u16 = VAR::<u32>::proto_deserialize(stream)?.into_inner().try_into().map_err(ProtoCodecError::FromIntError)?;
 
         // Get the first 10 bits as the packet id
-        // Can never be more than a 16-bit integer due to being 10 bits big
+        // Can never be more than a 16-bit integer due to being 10-bits big
         // Gamepacket IDs through 200-299 are used for spin-offs, they are free to use for custom packets
         let game_packet_id = game_packet_header & 0b0000_0011_1111_1111;
 

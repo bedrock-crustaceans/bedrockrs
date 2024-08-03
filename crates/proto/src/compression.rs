@@ -30,7 +30,7 @@ impl Compression {
         match self {
             Compression::Zlib { .. } => 0x00,
             Compression::Snappy { .. } => 0x01,
-            Compression::None => 0xFF,
+            Compression::None => u8::MAX,
         }
     }
 
@@ -41,7 +41,7 @@ impl Compression {
         match self {
             Compression::Zlib { .. } => 0x0000,
             Compression::Snappy { .. } => 0x0001,
-            Compression::None => 0xFFFF,
+            Compression::None => u16::MAX,
         }
     }
 
@@ -62,7 +62,7 @@ impl Compression {
         match self {
             Compression::Zlib { threshold, .. } => *threshold,
             Compression::Snappy { threshold, .. } => *threshold,
-            Compression::None => 0x0000,
+            Compression::None => 0,
         }
     }
 

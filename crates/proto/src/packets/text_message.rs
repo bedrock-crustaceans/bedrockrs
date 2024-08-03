@@ -134,16 +134,12 @@ impl ProtoCodec for TextMessagePacket {
     }
 
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
-        println!("#0");
         let message_type = u8::proto_deserialize(stream)?;
-
-        println!("#1");
         let localize = bool::proto_deserialize(stream)?;
 
         let message_type = match message_type {
             0 => TextMessageData::Raw(String::proto_deserialize(stream)?),
             1 => {
-                println!("#2");
                 TextMessageData::Chat {
                     player_name: String::proto_deserialize(stream)?,
                     message: String::proto_deserialize(stream)?,
@@ -224,11 +220,8 @@ impl ProtoCodec for TextMessagePacket {
             }
         };
 
-        println!("#3");
         let sender_xuid = String::proto_deserialize(stream)?;
-        println!("#4");
         let platform_id = String::proto_deserialize(stream)?;
-        println!("#5");
         let filtered_message = String::proto_deserialize(stream)?;
 
         Ok(Self {

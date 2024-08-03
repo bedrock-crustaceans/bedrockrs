@@ -413,30 +413,14 @@ impl NbtTag {
                 let mut map = HashMap::new();
 
                 loop {
-                    let id = match T::read_u8(stream) {
-                        Ok(v) => v,
-                        Err(e) => {
-                            return Err(e);
-                        }
-                    };
+                    let id = T::read_u8(stream)?;
 
                     if id == Self::EMPTY_ID {
                         break;
                     }
 
-                    let key = match T::read_string(stream) {
-                        Ok(v) => v,
-                        Err(e) => {
-                            return Err(e);
-                        }
-                    };
-
-                    let tag = match Self::nbt_deserialize_val::<T>(stream, id) {
-                        Ok(v) => v,
-                        Err(e) => {
-                            return Err(e);
-                        }
-                    };
+                    let key = T::read_string(stream)?;
+                    let tag = Self::nbt_deserialize_val::<T>(stream, id)?;
 
                     map.insert(key, tag);
                 }

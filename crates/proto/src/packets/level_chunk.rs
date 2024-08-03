@@ -1,12 +1,13 @@
 use crate::types::chunk_pos::ChunkPos;
 use bedrockrs_core::int::{LE, VAR};
+use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 
 #[derive(Debug, Clone)]
 pub struct LevelChunkPacket {
     pub chunk_position: ChunkPos,
     pub dimension_id: VAR<i32>,
-    pub sub_chunk_count: VAR<i32>,
+    pub sub_chunk_count: VAR<u32>,
     pub cache_enabled: bool,
     pub serialized_chunk_data: Vec<u8>,
 
@@ -26,10 +27,10 @@ impl ProtoCodec for LevelChunkPacket {
             self.sub_chunk_count.proto_serialize(stream)?;
         } else {
             if !(self.client_request_subchunk_limit.into_inner() < 0) {
-                VAR::<u32>::new(0xFFFFFFFE).proto_serialize(stream)?;
+                VAR::<u32>::new(u32::MAX - 1).proto_serialize(stream)?;
                 self.client_request_subchunk_limit.proto_serialize(stream)?;
             } else {
-                VAR::<u32>::new(0xFFFFFFFF).proto_serialize(stream)?;
+                VAR::<u32>::new(u32::MAX).proto_serialize(stream)?;
             }
         }
 
@@ -39,9 +40,18 @@ impl ProtoCodec for LevelChunkPacket {
             unimplemented!()
         }
 
+        let len = self.serialized_chunk_data
+            .len()
+            .try_into()
+            .map_err(ProtoCodecError::FromIntError)?;
+
+        VAR::<u32>::new(len).proto_serialize(stream)?;
+
         stream.extend_from_slice(&self.serialized_chunk_data);
 
-        return Ok(());
+        println!("finish");
+        
+        Ok(())
     }
 
     fn proto_deserialize(

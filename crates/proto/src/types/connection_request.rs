@@ -100,13 +100,10 @@ impl ProtoCodec for ConnectionRequest {
         // (certificate_chain len + raw_token len + 8)
         // 8 = i32 len + i32 len (length of certificate_chain's len and raw_token's len)
         // can be ignored, other lengths are provided
-        VAR::<u32>::read(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
+        VAR::<u32>::proto_deserialize(stream)?;
 
         // read length of certificate_chain vec
-        let certificate_chain_len = match LE::<i32>::read(stream) {
-            Ok(l) => l.into_inner(),
-            Err(e) => return Err(ProtoCodecError::IOError(Arc::new(e))),
-        };
+        let certificate_chain_len = LE::<i32>::proto_deserialize(stream)?.into_inner();
 
         let certificate_chain_len = certificate_chain_len
             .try_into()

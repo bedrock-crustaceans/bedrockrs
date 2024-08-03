@@ -129,8 +129,10 @@ impl Connection {
                     Err(_) => {}
                 };
 
+                let pos = decrypted_stream.position() as usize;
+                
                 compression
-                    .decompress(decrypted_stream.into_inner(), &mut decompressed_stream)
+                    .decompress(&decrypted_stream.into_inner()[pos..], &mut decompressed_stream)
                     .map_err(|e| ConnectionError::CompressError(e))?;
 
                 Cursor::new(decompressed_stream.as_slice())

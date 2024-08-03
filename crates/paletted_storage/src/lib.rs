@@ -6,7 +6,7 @@ use bedrockrs_nbt::endian::little_endian_network::NbtLittleEndianNetwork;
 use bedrockrs_nbt::NbtTag;
 use byteorder::ReadBytesExt;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PalettedStorage {
     pub blocks: [u32; 4096],
     pub palette: Vec<NbtTag>,

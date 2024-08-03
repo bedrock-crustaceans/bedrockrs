@@ -3,7 +3,7 @@ use std::io::Cursor;
 use bedrockrs_paletted_storage::PalettedStorage;
 use byteorder::ReadBytesExt;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SubChunk {
     pub paletted_storage: Vec<PalettedStorage>,
 }

@@ -52,14 +52,10 @@ impl ProtoCodec for GameRuleValue {
             {
                 1 => GameRuleValue::ValBool(bool::proto_deserialize(stream)?),
                 2 => GameRuleValue::ValVarU32(
-                    VAR::<u32>::read(stream)
-                        .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?
-                        .into_inner(),
+                    VAR::<u32>::proto_deserialize(stream)?.into_inner(),
                 ),
                 3 => GameRuleValue::ValF32(
-                    LE::<f32>::read(stream)
-                        .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?
-                        .into_inner(),
+                    LE::<f32>::proto_deserialize(stream)?.into_inner(),
                 ),
                 other => {
                     return Err(ProtoCodecError::InvalidEnumID(
