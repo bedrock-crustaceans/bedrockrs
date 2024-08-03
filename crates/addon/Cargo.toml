@@ -1,5 +1,5 @@
 [package]
-name = "bedrockrs_addons"
+name = "bedrockrs_addon"
 version = "0.1.0"
 edition = "2021"
 

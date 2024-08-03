@@ -164,7 +164,7 @@ pub async fn packs(
             }
         }
         LoginProviderPacks::DirectNetworkTransfer { .. } => {
-            todo!("impl LoginProviderbedrockrs_addons::DirectNetworkTransfer in login process")
+            todo!("impl LoginProviderbedrockrs_addon::DirectNetworkTransfer in login process")
         }
     };
 

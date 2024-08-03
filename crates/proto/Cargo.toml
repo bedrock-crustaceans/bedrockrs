@@ -9,7 +9,7 @@ bedrockrs_shared = { path = "../shared" }
 bedrockrs_nbt = { path = "../nbt" }
 bedrockrs_proto_core = { path = "../proto_core" }
 bedrockrs_proto_derive = { path = "../proto_derive" }
-bedrockrs_addons = { path = "../addons" }
+bedrockrs_addon = { path = "../addon" }
 
 thiserror = "1.0"
 dyn-clone = "1.0"

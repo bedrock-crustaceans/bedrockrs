@@ -1,4 +1,4 @@
-pub use bedrockrs_addons::*;
+pub use bedrockrs_addon::*;
 pub use default::*;
 pub use provider::*;
 pub use status::*;

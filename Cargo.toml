@@ -16,7 +16,7 @@ bedrockrs_proto = { path = "crates/proto", optional = true }
 bedrockrs_proto_core = { path = "crates/proto_core", optional = true }
 bedrockrs_proto_derive = { path = "crates/proto_derive", optional = true }
 
-bedrockrs_addons = { path = "crates/addons", optional = true }
+bedrockrs_addon = { path = "crates/addon", optional = true }
 
 bedrockrs_form = { path = "crates/form" }
 
@@ -26,6 +26,6 @@ bedrockrs_paletted_storage = { path = "crates/paletted_storage", optional = true
 [features]
 full = ["addons", "proto", "world"]
 
-addons = ["dep:bedrockrs_addons"]
+addons = ["dep:bedrockrs_addon"]
 proto = ["dep:bedrockrs_proto", "dep:bedrockrs_proto_core", "dep:bedrockrs_proto_derive"]
 world = ["dep:bedrockrs_world", "dep:bedrockrs_paletted_storage"]

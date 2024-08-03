@@ -22,8 +22,8 @@ pub mod proto {
 }
 
 #[cfg(feature = "addons")]
-pub mod addons {
-    pub use ::bedrockrs_addons::*;
+pub mod addon {
+    pub use ::bedrockrs_addon::*;
 }
 
 #[cfg(feature = "world")]
