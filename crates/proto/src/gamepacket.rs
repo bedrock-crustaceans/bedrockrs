@@ -1299,8 +1299,8 @@ impl GamePacket {
             GamePacket::AlexEntityAnimationID => {
                 unimplemented!()
             }
-            id => {
-                return Err(ProtoCodecError::InvalidGamePacketID(id));
+            other => {
+                return Err(ProtoCodecError::InvalidGamePacketID(other));
             }
         };
 
