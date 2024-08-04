@@ -6,7 +6,8 @@ use bedrockrs_proto_derive::ProtoCodec;
 use bedrockrs_shared::{actor_runtime_id::ActorRuntimeID, actor_unique_id::ActorUniqueID};
 
 use crate::types::{
-    actor_link::ActorLinkList, actor_type::ActorType, attribute::AttributeList, dataitem::DataItemList, property_sync_data::PropertySyncData
+    actor_link::ActorLinkList, actor_type::ActorType, attribute::AttributeList,
+    dataitem::DataItemList, property_sync_data::PropertySyncData,
 };
 
 #[derive(ProtoCodec, Debug, Clone)]
