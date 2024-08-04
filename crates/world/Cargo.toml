@@ -9,7 +9,7 @@ bedrockrs_shared = { path = "../shared" }
 bedrockrs_nbt = { path = "../nbt" }
 bedrockrs_paletted_storage = { path = "../paletted_storage" }
 
-mojang-leveldb = "0.5"
+mojang-leveldb = "0.6"
 thiserror = "1.0"
 byteorder = "1.5"
 uuid = { version = "1.10", features = ["v4"] }
