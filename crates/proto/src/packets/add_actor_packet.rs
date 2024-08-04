@@ -10,7 +10,7 @@ use crate::types::{
     property_sync_data::PropertySyncData,
 };
 
-#[derive(ProtoCodec,Debug, Clone)]
+#[derive(ProtoCodec, Debug, Clone)]
 pub struct AddActorPacket {
     pub target_actor_id: ActorUniqueID,
     pub target_runtime_id: ActorRuntimeID,

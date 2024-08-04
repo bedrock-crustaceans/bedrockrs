@@ -1,24 +1,24 @@
 use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_proto_derive::ProtoCodec;
 
-#[derive(ProtoCodec,Debug, Clone)]
+#[derive(ProtoCodec, Debug, Clone)]
 struct IntEntry {
     index: VAR<u32>,
     data: VAR<i32>,
 }
-#[derive(ProtoCodec,Debug, Clone)]
+#[derive(ProtoCodec, Debug, Clone)]
 struct IntEntriesList {
     #[len_repr(VAR::<u32>)]
     entries: Vec<IntEntry>,
 }
 
-#[derive(ProtoCodec,Debug, Clone)]
+#[derive(ProtoCodec, Debug, Clone)]
 struct FloatEntry {
     index: VAR<u32>,
     data: LE<f32>,
 }
 
-#[derive(ProtoCodec,Debug, Clone)]
+#[derive(ProtoCodec, Debug, Clone)]
 struct FloatEntriesList {
     #[len_repr(VAR::<u32>)]
     entries: Vec<FloatEntry>,
