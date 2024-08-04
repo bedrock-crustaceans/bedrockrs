@@ -1,3 +1,4 @@
+pub mod add_actor_packet;
 pub mod animate;
 pub mod chunk_radius_updated;
 pub mod client_cache_status;
@@ -16,7 +17,6 @@ pub mod play_status;
 pub mod player_action;
 pub mod player_auth_input;
 pub mod player_move;
-pub mod property_sync_data;
 pub mod request_chunk_radius;
 pub mod resource_packs_info;
 pub mod resource_packs_response;

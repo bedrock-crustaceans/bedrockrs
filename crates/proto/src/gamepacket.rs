@@ -3,6 +3,7 @@
 use std::io::{Cursor, Write};
 use std::sync::Arc;
 
+use crate::packets::add_actor_packet::AddActorPacket;
 use crate::packets::animate::AnimatePacket;
 use crate::packets::chunk_radius_updated::ChunkRadiusUpdatedPacket;
 use crate::packets::client_cache_status::ClientCacheStatusPacket;
@@ -49,7 +50,7 @@ pub enum GamePacket {
     SetTime(),
     StartGame(StartGamePacket),
     AddPlayer(),
-    AddEntity(),
+    AddEntity(AddActorPacket),
     RemoveEntity(),
     AddItemEntity(),
     TakeItemEntity(),
@@ -430,8 +431,8 @@ impl GamePacket {
             GamePacket::AddPlayer() => {
                 unimplemented!()
             }
-            GamePacket::AddEntity() => {
-                unimplemented!()
+            GamePacket::AddEntity(pk) => {
+                ser_packet!(stream, GamePacket::AddEntityID, pk)
             }
             GamePacket::RemoveEntity() => {
                 unimplemented!()
@@ -901,9 +902,7 @@ impl GamePacket {
             GamePacket::AddPlayerID => {
                 unimplemented!()
             }
-            GamePacket::AddEntityID => {
-                unimplemented!()
-            }
+            GamePacket::AddEntityID => GamePacket::AddEntity(de_packet!(stream, AddActorPacket)),
             GamePacket::RemoveEntityID => {
                 unimplemented!()
             }
