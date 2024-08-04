@@ -13,7 +13,7 @@ pub enum TransportLayerConnection {
     NetherNet(/* TODO */),
     // TODO Quic(s2n_quic::connection::Connection),
     // Tcp(std::net::TcpStream),
-    Udp(std::net::UdpSocket) //MCBE over UDP ??
+    Udp(tokio::net::UdpSocket) //MCBE over UDP :sobb:??
 }
 
 impl TransportLayerConnection {
@@ -46,6 +46,7 @@ impl TransportLayerConnection {
                     .map_err(|e| TransportLayerError::IOError(Arc::new(e)))?;
                 
                 conn.send(final_stream.as_slice()) 
+                    .await
                     .map(|_| ())
                     .map_err(|e| TransportLayerError::IOError(Arc::new(e))) //udp send error is std::io::Error
             }
@@ -90,7 +91,11 @@ impl TransportLayerConnection {
                 // Non-blocking I/O allows the program to perform other tasks while waiting for I/O operations to complete,
                 // thereby avoiding potential bottlenecks and enhancing overall performance in high-concurrency scenarios.
                 let mut recv_buffer: Vec<u8> = vec![0; 4096]; 
-                let _amt = conn.recv(&mut recv_buffer);
+                let _amt = conn
+                    .recv(&mut recv_buffer)
+                    .await
+                    .map(|_| ())
+                    .map_err(|e| TransportLayerError::IOError(Arc::new(e)))?;
                 
                 let mut recv_buffer = Cursor::new(recv_buffer.as_slice());
 
