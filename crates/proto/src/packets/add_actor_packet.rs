@@ -6,8 +6,7 @@ use bedrockrs_proto_derive::ProtoCodec;
 use bedrockrs_shared::{actor_runtime_id::ActorRuntimeID, actor_unique_id::ActorUniqueID};
 
 use crate::types::{
-    actor_link::ActorLinkList, actor_type::ActorType, attribute::AttributeList,
-    property_sync_data::PropertySyncData,
+    actor_link::ActorLinkList, actor_type::ActorType, attribute::AttributeList, dataitem::DataItemList, property_sync_data::PropertySyncData
 };
 
 #[derive(ProtoCodec, Debug, Clone)]
@@ -21,8 +20,7 @@ pub struct AddActorPacket {
     pub y_head_rotation: LE<f32>,
     pub y_body_rotation: LE<f32>,
     pub attributes: AttributeList,
-    #[len_repr(VAR::<u32>)]
-    pub actor_data: Vec<u8>,
+    pub actor_data: DataItemList,
     pub synched_properties: PropertySyncData,
     pub actor_links: ActorLinkList,
 }

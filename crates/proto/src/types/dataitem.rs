@@ -5,11 +5,12 @@ use bedrockrs_core::{
 use bedrockrs_nbt::NbtTag;
 use bedrockrs_proto_derive::ProtoCodec;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Debug, Clone)]
 struct DataItem {
     id: VAR<u32>,
     value: DataItemValue,
 }
+#[derive(Debug, Clone)]
 enum DataItemValue {
     ValByte(u8),
     ValShort(i16),
@@ -35,4 +36,10 @@ impl ProtoCodec for DataItemValue {
     ) -> Result<Self, bedrockrs_proto_core::error::ProtoCodecError> {
         Ok(Self::ValByte(0))
     }
+}
+
+#[derive(ProtoCodec, Debug, Clone)]
+pub struct DataItemList {
+    #[len_repr(VAR::<u32>)]
+    items: Vec<DataItem>,
 }
