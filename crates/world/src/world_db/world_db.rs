@@ -1,6 +1,6 @@
 use std::fmt::{Debug, Formatter};
 use std::{collections::HashMap, path::PathBuf};
-
+use std::path::Path;
 use bedrockrs_nbt::{endian::little_endian::NbtLittleEndian, NbtTag};
 use mojang_leveldb::{error::DBError, Options, ReadOptions, WriteBatch, WriteOptions, DB};
 use uuid::Uuid;
@@ -27,7 +27,7 @@ impl WorldDB {
     /// Opens a world from a directory.
     ///
     /// The leveldb database is in the `db` subdirectory.
-    pub fn open(directory: &PathBuf) -> Result<Self, DBError> {
+    pub fn open(directory: &Path) -> Result<Self, DBError> {
         Ok(WorldDB {
             db: DB::open(
                 &directory.join("db").display().to_string(),
@@ -100,10 +100,8 @@ impl WorldDB {
             READ_OPTIONS,
             create_key(x, z, dimension, RecordType::SubChunkPrefix { y }).as_slice(),
         )?;
-        Ok(match bytes {
-            Some(x) => Some(SubChunk::load(&(x.get()))),
-            None => None,
-        })
+        
+        Ok(bytes.map(|x| SubChunk::load(&(x.get()))))
     }
 
     pub fn set_subchunk(
