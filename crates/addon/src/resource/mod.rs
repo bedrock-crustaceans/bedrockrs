@@ -47,4 +47,11 @@ impl Addon for ResourcePack {
     {
         unimplemented!()
     }
+
+    fn merge(addons: Vec<Self>) -> Self
+    where
+        Self: Sized,
+    {
+        unimplemented!()
+    }
 }

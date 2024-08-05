@@ -183,4 +183,11 @@ impl Addon for BehaviorPack {
     {
         unimplemented!()
     }
+
+    fn merge(addons: Vec<Self>) -> Self
+    where
+        Self: Sized,
+    {
+        unimplemented!()
+    }
 }
