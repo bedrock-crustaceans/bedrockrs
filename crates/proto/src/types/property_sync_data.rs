@@ -42,6 +42,6 @@ impl ProtoCodec for PropertySyncData {
     fn proto_deserialize(
         stream: &mut std::io::Cursor<&[u8]>,
     ) -> Result<Self, bedrockrs_proto_core::error::ProtoCodecError> {
-        Ok(Self::Int(IntEntriesList::proto_deserialize(stream)?))
+        unimplemented!()
     }
 }
