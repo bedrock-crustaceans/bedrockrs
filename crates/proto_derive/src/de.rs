@@ -14,7 +14,9 @@ pub fn proto_build_de_struct(struct_data: &DataStruct) -> TokenStream {
 
                 for attr in &f.attrs {
                     if attr.path().is_ident("len_repr") {
-                        let int_type: Expr = attr.parse_args().expect(format!("Given attribute meta for field {field_name:?} could not be parsed").as_str());
+                        let int_type: Expr = attr
+                            .parse_args()
+                            .unwrap_or_else(|_| panic!("Given attribute meta for field {field_name:?} could not be parsed"));
 
                         quote = Some(quote! {
                             #field_name: {
@@ -68,7 +70,9 @@ pub fn proto_build_de_struct(struct_data: &DataStruct) -> TokenStream {
 
                 for attr in &f.attrs {
                     if attr.path().is_ident("len_repr") {
-                        let int_type: Expr = attr.parse_args().expect(format!("Given attribute meta for field self.{:?} could not be parsed", index.index).as_str());
+                        let int_type: Expr = attr
+                            .parse_args()
+                            .unwrap_or_else(|_| panic!("Given attribute meta for field self.{:?} could not be parsed", index.index));
 
                         quote = Some(quote! {
                             #index: {
@@ -122,7 +126,7 @@ pub fn proto_build_de_struct(struct_data: &DataStruct) -> TokenStream {
         }
     };
 
-    TokenStream::from(expand)
+    expand
 }
 
 pub fn proto_build_de_enum(
@@ -136,7 +140,7 @@ pub fn proto_build_de_enum(
         if attr.path().is_ident("enum_repr") {
             int_type = Some(
                 attr.parse_args()
-                    .expect(format!("Given attribute meta for enum could not be parsed").as_str()),
+                    .unwrap_or_else(|_| panic!("Given attribute meta for enum could not be parsed")),
             );
         }
     }
@@ -145,7 +149,10 @@ pub fn proto_build_de_enum(
         .unwrap_or_else(|| panic!("Missing attribute \"enum_repr\" for ProtoCodec macro on Enum"));
 
     let calls = enum_data.variants.iter().map(|v| {
-        let val = v.discriminant.clone().expect("Discriminant needed").1;
+        let val = v.discriminant
+            .clone()
+            .unwrap_or_else(|| panic!("Discriminant needed"))
+            .1;
         let name = v.ident.clone();
 
         quote! {
