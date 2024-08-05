@@ -45,6 +45,6 @@ impl Addon for ResourcePack {
     where
         Self: Sized,
     {
-        todo!()
+        unimplemented!()
     }
 }

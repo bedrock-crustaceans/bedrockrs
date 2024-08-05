@@ -24,4 +24,8 @@ pub trait Addon {
     fn export(path: impl AsRef<Path>) -> Result<Self, AddonError>
     where
         Self: Sized;
+
+    /// Merges multiple addons into one
+    /// The first addon builds the base and every addon following overwrites certain parts of it
+    fn merge(addons: Vec<Self>) -> Self where Self: Sized;
 }
