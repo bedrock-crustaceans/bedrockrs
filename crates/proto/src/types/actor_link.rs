@@ -12,9 +12,3 @@ pub struct ActorLink {
     immediate: bool,
     passenger_seat_id: bool,
 }
-
-#[derive(ProtoCodec, Debug, Clone)]
-pub struct ActorLinkList {
-    #[len_repr(VAR::<u32>)]
-    pub links: Vec<ActorLink>,
-}

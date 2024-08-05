@@ -8,9 +8,3 @@ pub struct Attribute {
     current: LE<f32>,
     max: LE<f32>,
 }
-
-#[derive(ProtoCodec, Debug, Clone)]
-pub struct AttributeList {
-    #[len_repr(VAR::<u32>)]
-    attributes: Vec<Attribute>,
-}

@@ -6,12 +6,12 @@ use bedrockrs_nbt::NbtTag;
 use bedrockrs_proto_derive::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
-struct DataItem {
+pub struct DataItem {
     id: VAR<u32>,
     value: DataItemValue,
 }
 #[derive(Debug, Clone)]
-enum DataItemValue {
+pub enum DataItemValue {
     ValByte(u8),
     ValShort(i16),
     ValInt(i32),
@@ -28,18 +28,12 @@ impl ProtoCodec for DataItemValue {
         &self,
         stream: &mut Vec<u8>,
     ) -> Result<(), bedrockrs_proto_core::error::ProtoCodecError> {
-        Ok(())
+        unimplemented!()
     }
 
     fn proto_deserialize(
         stream: &mut std::io::Cursor<&[u8]>,
     ) -> Result<Self, bedrockrs_proto_core::error::ProtoCodecError> {
-        Ok(Self::ValByte(0))
+        unimplemented!()
     }
-}
-
-#[derive(ProtoCodec, Debug, Clone)]
-pub struct DataItemList {
-    #[len_repr(VAR::<u32>)]
-    items: Vec<DataItem>,
 }
