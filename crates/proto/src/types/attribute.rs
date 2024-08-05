@@ -3,8 +3,8 @@ use bedrockrs_proto_derive::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct Attribute {
-    name: String,
-    min: LE<f32>,
-    current: LE<f32>,
-    max: LE<f32>,
+    pub name: String,
+    pub min: LE<f32>,
+    pub current: LE<f32>,
+    pub max: LE<f32>,
 }

@@ -7,8 +7,8 @@ use bedrockrs_proto_derive::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct DataItem {
-    id: VAR<u32>,
-    value: DataItemValue,
+    pub id: VAR<u32>,
+    pub value: DataItemValue,
 }
 #[derive(Debug, Clone)]
 pub enum DataItemValue {
