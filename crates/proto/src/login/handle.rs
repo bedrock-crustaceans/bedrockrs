@@ -8,6 +8,8 @@ use crate::login::play_status::play_status_login;
 use crate::login::provider::{LoginProviderClient, LoginProviderServer};
 use crate::login::start_game::start_game;
 
+use super::add_actor::add_actor;
+
 pub async fn login_to_server(
     conn: &mut ConnectionShard,
     mut provider: impl LoginProviderServer,
@@ -23,6 +25,7 @@ pub async fn login_to_server(
 
     start_game(conn, &mut provider).await?;
 
+    add_actor(conn, &mut provider).await?;
     Ok(())
 }
 

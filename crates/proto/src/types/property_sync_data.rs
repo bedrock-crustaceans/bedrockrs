@@ -25,9 +25,9 @@ pub struct FloatEntriesList {
 }
 
 #[derive(Debug, Clone)]
-pub enum PropertySyncData {
-    Int(IntEntriesList),
-    Float(FloatEntriesList),
+pub struct PropertySyncData {
+    pub int: IntEntriesList,
+    pub float: FloatEntriesList,
 }
 
 use bedrockrs_proto_core::ProtoCodec;

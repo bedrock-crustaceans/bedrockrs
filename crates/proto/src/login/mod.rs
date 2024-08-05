@@ -1,5 +1,6 @@
 pub use handle::*;
 
+mod add_actor;
 pub mod handle;
 mod handshake;
 mod login;
