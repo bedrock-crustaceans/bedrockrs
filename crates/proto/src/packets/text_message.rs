@@ -50,7 +50,7 @@ impl ProtoCodec for TextMessagePacket {
             } => {
                 message.proto_serialize(stream)?;
 
-                let len = VAR::<u32>::new(match Vec::len(&parameters).try_into() {
+                let len = VAR::<u32>::new(match Vec::len(parameters).try_into() {
                     Ok(v) => v,
                     Err(e) => return Err(ProtoCodecError::FromIntError(e.into())),
                 });

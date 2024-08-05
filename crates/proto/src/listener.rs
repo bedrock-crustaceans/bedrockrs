@@ -29,7 +29,7 @@ impl Listener {
         nintendo_limited: bool,
     ) -> Result<Self, ListenerError> {
         // Bind the Raknet Listener
-        let rak_listener = rak_rs::Listener::bind(socket_addr.clone()).await;
+        let rak_listener = rak_rs::Listener::bind(socket_addr).await;
 
         // Check for success
         let mut rak_listener = match rak_listener {

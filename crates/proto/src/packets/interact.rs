@@ -8,8 +8,8 @@ use std::io::Cursor;
 
 #[derive(Debug, Clone)]
 pub struct InteractPacket {
-    action: InteractAction,
-    target_runtime_id: ActorRuntimeID,
+    pub action: InteractAction,
+    pub target_runtime_id: ActorRuntimeID,
 }
 
 impl ProtoCodec for InteractPacket {

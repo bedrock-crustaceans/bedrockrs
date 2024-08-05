@@ -26,6 +26,12 @@ impl DefaultLoginProvider {
     }
 }
 
+impl Default for DefaultLoginProvider {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl LoginProviderServer for DefaultLoginProvider {
     fn compression(&self) -> Compression {
         Compression::Snappy { threshold: 1 }
