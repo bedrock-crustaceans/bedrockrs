@@ -24,24 +24,8 @@ pub struct FloatEntriesList {
     pub entries: Vec<FloatEntry>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(ProtoCodec, Debug, Clone)]
 pub struct PropertySyncData {
     pub int: IntEntriesList,
     pub float: FloatEntriesList,
-}
-
-use bedrockrs_proto_core::ProtoCodec;
-impl ProtoCodec for PropertySyncData {
-    fn proto_serialize(
-        &self,
-        stream: &mut Vec<u8>,
-    ) -> Result<(), bedrockrs_proto_core::error::ProtoCodecError> {
-        Ok(())
-    }
-
-    fn proto_deserialize(
-        stream: &mut std::io::Cursor<&[u8]>,
-    ) -> Result<Self, bedrockrs_proto_core::error::ProtoCodecError> {
-        unimplemented!()
-    }
 }
