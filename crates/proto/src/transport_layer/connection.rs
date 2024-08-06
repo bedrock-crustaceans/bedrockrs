@@ -6,7 +6,7 @@ use bedrockrs_core::int::LE;
 use crate::error::{RaknetError, TransportLayerError};
 use crate::info::RAKNET_GAME_PACKET_ID;
 
-///
+
 pub enum TransportLayerConnection {
     RaknetUDP(rak_rs::connection::Connection),
     // TODO RaknetTCP(...),

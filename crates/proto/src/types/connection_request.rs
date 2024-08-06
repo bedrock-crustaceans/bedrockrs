@@ -189,7 +189,7 @@ impl ProtoCodec for ConnectionRequest {
 
                 key_data = BASE64_STANDARD
                     .decode(x5u)
-                    .map_err(|e| ProtoCodecError::Base64DecodeError(e))?;
+                    .map_err(ProtoCodecError::Base64DecodeError)?;
             }
 
             // Decode the jwt string into a jwt object
@@ -198,7 +198,7 @@ impl ProtoCodec for ConnectionRequest {
                 &DecodingKey::from_ec_der(&key_data),
                 &jwt_validation,
             )
-            .map_err(|e| ProtoCodecError::JwtError(e))?;
+            .map_err(ProtoCodecError::JwtError)?;
 
             key_data = match jwt.claims.get("identityPublicKey") {
                 None => return Err(ProtoCodecError::FormatMismatch(String::from("Expected identityPublicKey field in JWT for validation"))),
@@ -221,7 +221,7 @@ impl ProtoCodec for ConnectionRequest {
 
         let raw_token_len = raw_token_len
             .try_into()
-            .map_err(|e| ProtoCodecError::FromIntError(e))?;
+            .map_err(ProtoCodecError::FromIntError)?;
 
         let mut raw_token_buf = vec![0; raw_token_len];
 
@@ -232,11 +232,12 @@ impl ProtoCodec for ConnectionRequest {
 
         // transform into string
         let raw_token_string =
-            String::from_utf8(raw_token_buf).map_err(|e| ProtoCodecError::UTF8Error(e))?;
+            String::from_utf8(raw_token_buf)
+                .map_err(ProtoCodecError::UTF8Error)?;
 
         // Extract header
         let raw_token_jwt_header = jsonwebtoken::decode_header(&raw_token_string)
-            .map_err(|e| ProtoCodecError::JwtError(e))?;
+            .map_err(ProtoCodecError::JwtError)?;
 
         let mut jwt_validation = Validation::new(raw_token_jwt_header.alg);
         // TODO: This definitely is not right. Even Zuri-MC doesn't understand this.. I may understand it.. I do understand it, update I don't.
@@ -250,7 +251,7 @@ impl ProtoCodec for ConnectionRequest {
             &DecodingKey::from_ec_der(&vec![]),
             &jwt_validation,
         )
-        .map_err(|e| ProtoCodecError::JwtError(e))?;
+        .map_err(ProtoCodecError::JwtError)?;
 
         Ok(Self {
             certificate_chain,

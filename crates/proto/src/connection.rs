@@ -282,7 +282,7 @@ impl Connection {
                                 }
                             }
                             Err(e) => {
-                                if if task_pk_sender.send(Err(e)).is_err() {
+                                if task_pk_sender.send(Err(e)).is_err() {
                                     break 'select_loop
                                 }
                             }
