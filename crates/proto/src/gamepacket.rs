@@ -29,6 +29,7 @@ use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
 use crate::packets::server_settings_request::ServerSettingsRequestPacket;
 use crate::packets::server_settings_response::ServerSettingsResponsePacket;
 use crate::packets::set_local_player_as_initialized::SetLocalPlayerAsInitializedPacket;
+use crate::packets::set_title_packet::SetTitlePacket;
 use crate::packets::start_game::StartGamePacket;
 use crate::packets::text_message::TextMessagePacket;
 use bedrockrs_core::int::VAR;
@@ -123,7 +124,7 @@ pub enum GamePacket {
     Transfer(),
     PlaySound(),
     StopSound(),
-    SetTitle(),
+    SetTitle(SetTitlePacket),
     AddBehaviorTree(),
     StructureBlockUpdate(),
     ShowStoreOffer(),
@@ -650,8 +651,8 @@ impl GamePacket {
             GamePacket::StopSound() => {
                 unimplemented!()
             }
-            GamePacket::SetTitle() => {
-                unimplemented!()
+            GamePacket::SetTitle(pk) => {
+                ser_packet!(stream, GamePacket::SetTitleID, pk)
             }
             GamePacket::AddBehaviorTree() => {
                 unimplemented!()
@@ -1115,9 +1116,7 @@ impl GamePacket {
             GamePacket::StopSoundID => {
                 unimplemented!()
             }
-            GamePacket::SetTitleID => {
-                unimplemented!()
-            }
+            GamePacket::SetTitleID => GamePacket::SetTitle(de_packet!(stream, SetTitlePacket)),
             GamePacket::AddBehaviorTreeID => {
                 unimplemented!()
             }

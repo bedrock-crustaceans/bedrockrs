@@ -8,4 +8,5 @@ mod network_settings;
 mod packs;
 mod play_status;
 pub mod provider;
+mod set_title;
 mod start_game;
