@@ -128,11 +128,10 @@ pub fn proto_build_ser_enum(
 
     for attr in attributes {
         if attr.path().is_ident("enum_repr") {
-            int_type = Some(
-                attr
-                    .parse_args()
-                    .unwrap_or_else(|_| panic!("Given attribute meta for enum could not be parsed")),
-            );
+            int_type =
+                Some(attr.parse_args().unwrap_or_else(|_| {
+                    panic!("Given attribute meta for enum could not be parsed")
+                }));
         }
     }
 

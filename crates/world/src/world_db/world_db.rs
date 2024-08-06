@@ -1,8 +1,8 @@
-use std::fmt::{Debug, Formatter};
-use std::{collections::HashMap, path::PathBuf};
-use std::path::Path;
 use bedrockrs_nbt::{endian::little_endian::NbtLittleEndian, NbtTag};
 use mojang_leveldb::{error::DBError, Options, ReadOptions, WriteBatch, WriteOptions, DB};
+use std::fmt::{Debug, Formatter};
+use std::path::Path;
+use std::{collections::HashMap, path::PathBuf};
 use uuid::Uuid;
 
 use bedrockrs_shared::world::dimension::Dimension;
@@ -100,7 +100,7 @@ impl WorldDB {
             READ_OPTIONS,
             create_key(x, z, dimension, RecordType::SubChunkPrefix { y }).as_slice(),
         )?;
-        
+
         Ok(bytes.map(|x| SubChunk::load(&(x.get()))))
     }
 

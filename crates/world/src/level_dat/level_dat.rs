@@ -78,9 +78,8 @@ impl LevelDat {
     pub fn open(directory: &Path) -> Result<(i32, i32, Self), WorldError> {
         // Open the level.dat file
         // TODO find out why there is a level.dat_old file as well and how it can be utilised
-        let mut file = File::open(directory.join("level.dat")).map_err(|e| {
-            WorldError::FormatError(e.to_string())
-        })?;
+        let mut file = File::open(directory.join("level.dat"))
+            .map_err(|e| WorldError::FormatError(e.to_string()))?;
 
         // Read the entire level.dat file
         let mut data = vec![];

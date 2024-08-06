@@ -155,9 +155,7 @@ pub async fn start_game(
     }))
     .await
     .map_err(LoginError::ConnectionError)?;
-    conn.flush()
-        .await
-        .map_err(LoginError::ConnectionError)?;
+    conn.flush().await.map_err(LoginError::ConnectionError)?;
 
     Ok(())
 }

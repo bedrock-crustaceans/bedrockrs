@@ -50,7 +50,11 @@ impl ProtoCodec for TextMessagePacket {
             } => {
                 message.proto_serialize(stream)?;
 
-                let len = VAR::<u32>::new(Vec::len(&parameters).try_into().map_err(ProtoCodecError::FromIntError)?);
+                let len = VAR::<u32>::new(
+                    Vec::len(&parameters)
+                        .try_into()
+                        .map_err(ProtoCodecError::FromIntError)?,
+                );
                 len.proto_serialize(stream)?;
 
                 for parameter in parameters {
@@ -63,7 +67,11 @@ impl ProtoCodec for TextMessagePacket {
             } => {
                 message.proto_serialize(stream)?;
 
-                let len = VAR::<u32>::new(Vec::len(&parameters).try_into().map_err(ProtoCodecError::FromIntError)?);
+                let len = VAR::<u32>::new(
+                    Vec::len(&parameters)
+                        .try_into()
+                        .map_err(ProtoCodecError::FromIntError)?,
+                );
                 len.proto_serialize(stream)?;
 
                 for parameter in parameters {
@@ -76,7 +84,11 @@ impl ProtoCodec for TextMessagePacket {
             } => {
                 message.proto_serialize(stream)?;
 
-                let len = VAR::<u32>::new(Vec::len(&parameters).try_into().map_err(ProtoCodecError::FromIntError)?);
+                let len = VAR::<u32>::new(
+                    Vec::len(&parameters)
+                        .try_into()
+                        .map_err(ProtoCodecError::FromIntError)?,
+                );
                 len.proto_serialize(stream)?;
 
                 for parameter in parameters {
@@ -153,7 +165,8 @@ impl ProtoCodec for TextMessagePacket {
                 let message = String::proto_deserialize(stream)?;
 
                 let len = VAR::<u32>::proto_deserialize(stream)?.into_inner();
-                let mut parameters = Vec::with_capacity(len.try_into().map_err(ProtoCodecError::FromIntError)?);
+                let mut parameters =
+                    Vec::with_capacity(len.try_into().map_err(ProtoCodecError::FromIntError)?);
 
                 for _ in 0..len {
                     parameters.push(String::proto_deserialize(stream)?);
