@@ -396,7 +396,7 @@ impl GamePacket {
     pub fn pk_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         match self {
             GamePacket::Login(pk) => {
-                ser_packet!(stream, GamePacket::Login as u16, pk)
+                ser_packet!(stream, GamePacket::LoginID, pk)
             }
             GamePacket::PlayStatus(pk) => {
                 ser_packet!(stream, GamePacket::PlayStatusID, pk)

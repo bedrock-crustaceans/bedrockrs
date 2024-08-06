@@ -41,7 +41,7 @@ impl ProtoCodec for MovePlayerPacket {
 
         let tick = VAR::<i64>::proto_deserialize(stream)?;
 
-        return Ok(Self {
+        Ok(Self {
             player_runtime_id,
             position,
             rotation,
@@ -52,7 +52,7 @@ impl ProtoCodec for MovePlayerPacket {
             teleportation_cause,
             source_actor_type,
             tick,
-        });
+        })
     }
 
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {

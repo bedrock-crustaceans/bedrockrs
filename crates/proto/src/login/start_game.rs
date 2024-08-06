@@ -149,15 +149,15 @@ pub async fn start_game(
 
     conn.send(GamePacket::StartGame(start_game))
         .await
-        .map_err(|e| LoginError::ConnectionError(e))?;
+        .map_err(LoginError::ConnectionError)?;
     conn.send(GamePacket::PlayStatus(PlayStatusPacket {
         status: PlayStatusType::PlayerSpawn,
     }))
     .await
-    .map_err(|e| LoginError::ConnectionError(e))?;
+    .map_err(LoginError::ConnectionError)?;
     conn.flush()
         .await
-        .map_err(|e| LoginError::ConnectionError(e))?;
+        .map_err(LoginError::ConnectionError)?;
 
     Ok(())
 }

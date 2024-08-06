@@ -45,7 +45,7 @@ impl Connection {
             // Write a game packet
             game_packet
                 .pk_serialize(&mut pk_stream)
-                .map_err(|e| ConnectionError::ProtoCodecError(e))?
+                .map_err(ConnectionError::ProtoCodecError)?
         }
 
         // Compress the data depending on compression method
@@ -59,7 +59,7 @@ impl Connection {
                 if compression.needed() && pk_stream.len() as u16 > compression.threshold() {
                     compression
                         .compress(pk_stream.as_slice(), &mut compressed_stream)
-                        .map_err(|e| ConnectionError::CompressError(e))?;
+                        .map_err(ConnectionError::CompressError)?;
                 } else {
                     compressed_stream
                         .write(pk_stream.as_slice())
@@ -84,7 +84,7 @@ impl Connection {
         self.connection
             .send(&Cursor::new(&encrypted_stream))
             .await
-            .map_err(|e| ConnectionError::TransportError(e))
+            .map_err(ConnectionError::TransportError)
     }
 
     pub async fn send_raw(&mut self, data: &Vec<u8>) -> Result<(), ConnectionError> {
@@ -276,20 +276,20 @@ impl Connection {
                         match res {
                             Ok(pks) => {
                                 for pk in pks {
-                                    if let Err(_) = task_pk_sender.send(Ok(pk)) {
+                                    if task_pk_sender.send(Ok(pk)).is_err() {
                                         break 'select_loop
                                     }
                                 }
                             }
                             Err(e) => {
-                                if let Err(_) = task_pk_sender.send(Err(e)) {
+                                if task_pk_sender.send(Err(e)).is_err() {
                                     break 'select_loop
                                 }
                             }
                         }
                     }
                     res = task_pk_receiver.recv() => {
-                        if let Err(_) = res {
+                        if res.is_err() {
                             break 'select_loop
                         }
 
@@ -299,7 +299,7 @@ impl Connection {
                         };
                     }
                     res = task_flush_request_receiver.changed() => {
-                        if let Err(_) = res {
+                        if res.is_err() {
                             break 'select_loop
                         }
 
@@ -308,7 +308,7 @@ impl Connection {
                                 break 'select_loop
                             }
 
-                            if let Err(_) = task_flush_complete_sender.send(()) {
+                            if task_flush_complete_sender.send(()).is_err() {
                                 break 'select_loop
                             }
 
@@ -317,7 +317,7 @@ impl Connection {
                     }
                     _ = flush_interval.tick() => {
                         if !send_buffer.is_empty() {
-                            if let Err(_) = self.send(send_buffer).await {
+                            if (self.send(send_buffer).await).is_err() {
                                 break 'select_loop
                             }
 

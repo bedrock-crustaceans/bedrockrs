@@ -76,11 +76,8 @@ pub fn create_key(x: i32, z: i32, dimension: Dimension, record_type: RecordType)
 
     out.push(Into::<u8>::into(&record_type));
 
-    match record_type {
-        RecordType::SubChunkPrefix { y } => {
-            out.push(y);
-        }
-        _ => {}
+    if let RecordType::SubChunkPrefix { y } = record_type {
+        out.push(y);
     }
 
     out

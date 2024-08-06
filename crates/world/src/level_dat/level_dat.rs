@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{Cursor, Read};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use bedrockrs_nbt::endian::little_endian::NbtLittleEndian;
 use bedrockrs_nbt::NbtTag;
@@ -75,15 +75,12 @@ impl LevelDat {
     /// Returns the header of the `level.dat` file and a [`LevelDat`] object, the header consists
     /// of two `i32` integers which represent the version of the Minecraft Bedrock world
     /// (which currently is `10`) and the length of the `level.dat` file excluding the header size.
-    pub fn open(directory: &PathBuf) -> Result<(i32, i32, Self), WorldError> {
+    pub fn open(directory: &Path) -> Result<(i32, i32, Self), WorldError> {
         // Open the level.dat file
         // TODO find out why there is a level.dat_old file as well and how it can be utilised
-        let mut file = match File::open(directory.join("level.dat")) {
-            Ok(v) => v,
-            Err(e) => {
-                return Err(WorldError::FormatError(e.to_string()));
-            }
-        };
+        let mut file = File::open(directory.join("level.dat")).map_err(|e| {
+            WorldError::FormatError(e.to_string())
+        })?;
 
         // Read the entire level.dat file
         let mut data = vec![];
