@@ -19,13 +19,13 @@ pub async fn add_actor(
     provider: &mut impl LoginProviderServer,
 ) -> Result<(), LoginError> {
     //////////////////////////////////////
-    // AddActorPacket
+    // todo: AddActorPacket
     //////////////////////////////////////
 
     let add_actor = AddActorPacket {
         target_actor_id: ActorUniqueID(610),
         target_runtime_id: ActorRuntimeID(403),
-        actor_type: String::from("minecraft:pig"),
+        actor_type: ActorType::Pig.to_string(),
         position: Vec3 {
             x: LE::new(4.0),
             y: LE::new(8.0),

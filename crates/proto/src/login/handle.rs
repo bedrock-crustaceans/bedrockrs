@@ -24,8 +24,6 @@ pub async fn login_to_server(
     packs(conn, &mut provider).await?;
 
     start_game(conn, &mut provider).await?;
-
-    add_actor(conn, &mut provider).await?;
     Ok(())
 }
 
