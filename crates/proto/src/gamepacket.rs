@@ -338,7 +338,7 @@ impl GamePacket {
     const SubChunkPacketID: u16 = 174;
     const SubChunkRequestPacketID: u16 = 175;
     const DimensionDataID: u16 = 180;
-    const ccID: u16 = 186;
+    const ToastRequestPackeID: u16 = 186;
     const RequestNetworkSettingsID: u16 = 193;
     const AlexEntityAnimationID: u16 = 224;
 }
