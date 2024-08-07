@@ -1,4 +1,3 @@
-mod Command_Request_Packet;
 pub mod add_actor_packet;
 pub mod animate;
 pub mod chunk_radius_updated;
