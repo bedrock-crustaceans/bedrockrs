@@ -32,6 +32,7 @@ use crate::packets::set_local_player_as_initialized::SetLocalPlayerAsInitialized
 use crate::packets::set_title_packet::SetTitlePacket;
 use crate::packets::start_game::StartGamePacket;
 use crate::packets::text_message::TextMessagePacket;
+use crate::packets::toast_request_packet::ToastRequestPacket;
 use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
@@ -185,6 +186,7 @@ pub enum GamePacket {
     SubChunkPacket(),
     SubChunkRequestPacket(),
     DimensionData(),
+    ToastRequestPacket(ToastRequestPacket),
     RequestNetworkSettings(NetworkSettingsRequestPacket),
     AlexEntityAnimation(),
 }
@@ -336,6 +338,7 @@ impl GamePacket {
     const SubChunkPacketID: u16 = 174;
     const SubChunkRequestPacketID: u16 = 175;
     const DimensionDataID: u16 = 180;
+    const ccID: u16 = 186;
     const RequestNetworkSettingsID: u16 = 193;
     const AlexEntityAnimationID: u16 = 224;
 }
@@ -834,6 +837,9 @@ impl GamePacket {
             GamePacket::DimensionData() => {
                 unimplemented!()
             }
+            GamePacket::ToastRequestPacket(pk) => {
+                ser_packet!(stream, GamePacket::ToastRequestPackeID, pk)
+            }
             GamePacket::RequestNetworkSettings(pk) => {
                 ser_packet!(stream, GamePacket::RequestNetworkSettingsID, pk)
             }
@@ -1294,6 +1300,9 @@ impl GamePacket {
             }
             GamePacket::DimensionDataID => {
                 unimplemented!()
+            }
+            GamePacket::ToastRequestPackeID => {
+                GamePacket::ToastRequestPacket(de_packet!(stream, ToastRequestPacket))
             }
             GamePacket::RequestNetworkSettingsID => {
                 GamePacket::RequestNetworkSettings(de_packet!(stream, NetworkSettingsRequestPacket))

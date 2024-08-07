@@ -27,3 +27,4 @@ pub mod set_local_player_as_initialized;
 pub mod set_title_packet;
 pub mod start_game;
 pub mod text_message;
+pub mod toast_request_packet;
