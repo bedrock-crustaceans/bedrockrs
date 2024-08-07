@@ -1,7 +1,10 @@
+mod Command_Request_Packet;
 pub mod add_actor_packet;
 pub mod animate;
 pub mod chunk_radius_updated;
 pub mod client_cache_status;
+pub mod command_request_packet;
+pub mod correct_player_move_prediction_packet;
 pub mod disconnect;
 pub mod emote_list;
 pub mod handshake_server_to_client;

@@ -7,6 +7,7 @@ pub mod base_game_version;
 pub mod block_action;
 pub mod chat_restriction_level;
 pub mod chunk_pos;
+pub mod command_origin_data;
 pub mod connection_request;
 pub mod dataitem;
 pub mod disconnect_reason;

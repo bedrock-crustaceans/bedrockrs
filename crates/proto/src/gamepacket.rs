@@ -7,6 +7,8 @@ use crate::packets::add_actor_packet::AddActorPacket;
 use crate::packets::animate::AnimatePacket;
 use crate::packets::chunk_radius_updated::ChunkRadiusUpdatedPacket;
 use crate::packets::client_cache_status::ClientCacheStatusPacket;
+use crate::packets::command_request_packet::CommandRequestPacket;
+use crate::packets::correct_player_move_prediction_packet::CorrectPlayerMovePredictionPacket;
 use crate::packets::disconnect::DisconnectPacket;
 use crate::packets::emote_list::EmoteListPacket;
 use crate::packets::handshake_server_to_client::HandshakeServerToClientPacket;
@@ -114,7 +116,7 @@ pub enum GamePacket {
     BossEvent(),
     ShowCredits(),
     AvailableCommands(),
-    CommandRequest(),
+    CommandRequest(CommandRequestPacket),
     CommandBlockUpdate(),
     CommandOutput(),
     UpdateTrade(),
@@ -180,6 +182,7 @@ pub enum GamePacket {
     UpdatePlayerGameType(),
     EmoteList(EmoteListPacket),
     PacketViolationWarning(PacketViolationWarningPacket),
+    CorrectPlayerMovePredictionPacket(CorrectPlayerMovePredictionPacket),
     ItemComponent(),
     FilterTextPacket(),
     UpdateSubChunkBlocksPacket(),
@@ -332,6 +335,7 @@ impl GamePacket {
     const UpdatePlayerGameTypeID: u16 = 151;
     const EmoteListID: u16 = 152;
     const PacketViolationWarningID: u16 = 156;
+    const CorrectPlayerMovePredictionPacketID: u16 = 161;
     const ItemComponentID: u16 = 162;
     const FilterTextPacketID: u16 = 163;
     const UpdateSubChunkBlocksPacketID: u16 = 172;
@@ -621,8 +625,8 @@ impl GamePacket {
             GamePacket::AvailableCommands() => {
                 unimplemented!()
             }
-            GamePacket::CommandRequest() => {
-                unimplemented!()
+            GamePacket::CommandRequest(pk) => {
+                ser_packet!(stream, GamePacket::CommandRequestID, pk)
             }
             GamePacket::CommandBlockUpdate() => {
                 unimplemented!()
@@ -818,6 +822,9 @@ impl GamePacket {
             }
             GamePacket::PacketViolationWarning(pk) => {
                 ser_packet!(stream, GamePacket::PacketViolationWarningID, pk)
+            }
+            GamePacket::CorrectPlayerMovePredictionPacket(pk) => {
+                ser_packet!(stream, GamePacket::CorrectPlayerMovePredictionPacketID, pk)
             }
             GamePacket::ItemComponent() => {
                 unimplemented!()
@@ -1090,7 +1097,7 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::CommandRequestID => {
-                unimplemented!()
+                GamePacket::CommandRequest(de_packet!(stream, CommandRequestPacket))
             }
             GamePacket::CommandBlockUpdateID => {
                 unimplemented!()
@@ -1282,6 +1289,12 @@ impl GamePacket {
             GamePacket::EmoteListID => GamePacket::EmoteList(de_packet!(stream, EmoteListPacket)),
             GamePacket::PacketViolationWarningID => {
                 GamePacket::PacketViolationWarning(de_packet!(stream, PacketViolationWarningPacket))
+            }
+            GamePacket::CorrectPlayerMovePredictionPacketID => {
+                GamePacket::CorrectPlayerMovePredictionPacket(de_packet!(
+                    stream,
+                    CorrectPlayerMovePredictionPacket
+                ))
             }
             GamePacket::ItemComponentID => {
                 unimplemented!()
