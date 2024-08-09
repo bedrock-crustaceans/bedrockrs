@@ -138,10 +138,10 @@ pub fn proto_build_de_enum(
 
     for attr in attributes {
         if attr.path().is_ident("enum_repr") {
-            int_type = Some(
-                attr.parse_args()
-                    .unwrap_or_else(|_| panic!("Given attribute meta for enum could not be parsed")),
-            );
+            int_type =
+                Some(attr.parse_args().unwrap_or_else(|_| {
+                    panic!("Given attribute meta for enum could not be parsed")
+                }));
         }
     }
 
@@ -149,7 +149,8 @@ pub fn proto_build_de_enum(
         .unwrap_or_else(|| panic!("Missing attribute \"enum_repr\" for ProtoCodec macro on Enum"));
 
     let calls = enum_data.variants.iter().map(|v| {
-        let val = v.discriminant
+        let val = v
+            .discriminant
             .clone()
             .unwrap_or_else(|| panic!("Discriminant needed"))
             .1;

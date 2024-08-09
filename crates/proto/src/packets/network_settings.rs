@@ -12,7 +12,7 @@ pub struct NetworkSettingsPacket {
     /// - 0x0000 is Zlib
     /// - 0x0001 is Snappy
     /// - 0xFFFF is No compression
-    /// 
+    ///
     /// All 3 compression Algorithms are supported
     pub compression_algorithm: LE<u16>,
     pub client_throttle_enabled: bool,

@@ -58,8 +58,6 @@ impl ProtoCodec for AnimatePacket {
             }
         };
 
-        println!("{:?}", &stream.get_ref()[(stream.position() as usize)..]);
-
         Ok(Self {
             action,
             target_runtime_id,

@@ -3,9 +3,13 @@
 use std::io::{Cursor, Write};
 use std::sync::Arc;
 
+use crate::packets::add_actor_packet::AddActorPacket;
 use crate::packets::animate::AnimatePacket;
 use crate::packets::chunk_radius_updated::ChunkRadiusUpdatedPacket;
 use crate::packets::client_cache_status::ClientCacheStatusPacket;
+use crate::packets::command_request_packet::CommandRequestPacket;
+use crate::packets::container_close_packet::ContainerClosePacket;
+use crate::packets::correct_player_move_prediction_packet::CorrectPlayerMovePredictionPacket;
 use crate::packets::disconnect::DisconnectPacket;
 use crate::packets::emote_list::EmoteListPacket;
 use crate::packets::handshake_server_to_client::HandshakeServerToClientPacket;
@@ -18,6 +22,7 @@ use crate::packets::network_settings::NetworkSettingsPacket;
 use crate::packets::network_settings_request::NetworkSettingsRequestPacket;
 use crate::packets::packet_violation_warning::PacketViolationWarningPacket;
 use crate::packets::play_status::PlayStatusPacket;
+use crate::packets::player_action::PlayerActionPacket;
 use crate::packets::player_auth_input::PlayerAuthInputPacket;
 use crate::packets::player_move::MovePlayerPacket;
 use crate::packets::request_chunk_radius::RequestChunkRadiusPacket;
@@ -27,8 +32,10 @@ use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
 use crate::packets::server_settings_request::ServerSettingsRequestPacket;
 use crate::packets::server_settings_response::ServerSettingsResponsePacket;
 use crate::packets::set_local_player_as_initialized::SetLocalPlayerAsInitializedPacket;
+use crate::packets::set_title_packet::SetTitlePacket;
 use crate::packets::start_game::StartGamePacket;
 use crate::packets::text_message::TextMessagePacket;
+use crate::packets::toast_request_packet::ToastRequestPacket;
 use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
@@ -48,7 +55,7 @@ pub enum GamePacket {
     SetTime(),
     StartGame(StartGamePacket),
     AddPlayer(),
-    AddEntity(),
+    AddEntity(AddActorPacket),
     RemoveEntity(),
     AddItemEntity(),
     TakeItemEntity(),
@@ -70,7 +77,7 @@ pub enum GamePacket {
     Interact(InteractPacket),
     BlockPickRequest(),
     EntityPickRequest(),
-    PlayerAction(),
+    PlayerAction(PlayerActionPacket),
     HurtArmor(),
     SetEntityData(),
     SetEntityMotion(),
@@ -80,7 +87,7 @@ pub enum GamePacket {
     Animate(AnimatePacket),
     Respawn(),
     ContainerOpen(),
-    ContainerClose(),
+    ContainerClose(ContainerClosePacket),
     PlayerHotbar(),
     InventoryContent(),
     InventorySlot(),
@@ -110,7 +117,7 @@ pub enum GamePacket {
     BossEvent(),
     ShowCredits(),
     AvailableCommands(),
-    CommandRequest(),
+    CommandRequest(CommandRequestPacket),
     CommandBlockUpdate(),
     CommandOutput(),
     UpdateTrade(),
@@ -121,7 +128,7 @@ pub enum GamePacket {
     Transfer(),
     PlaySound(),
     StopSound(),
-    SetTitle(),
+    SetTitle(SetTitlePacket),
     AddBehaviorTree(),
     StructureBlockUpdate(),
     ShowStoreOffer(),
@@ -176,12 +183,14 @@ pub enum GamePacket {
     UpdatePlayerGameType(),
     EmoteList(EmoteListPacket),
     PacketViolationWarning(PacketViolationWarningPacket),
+    CorrectPlayerMovePredictionPacket(CorrectPlayerMovePredictionPacket),
     ItemComponent(),
     FilterTextPacket(),
     UpdateSubChunkBlocksPacket(),
     SubChunkPacket(),
     SubChunkRequestPacket(),
     DimensionData(),
+    ToastRequestPacket(ToastRequestPacket),
     RequestNetworkSettings(NetworkSettingsRequestPacket),
     AlexEntityAnimation(),
 }
@@ -327,12 +336,14 @@ impl GamePacket {
     const UpdatePlayerGameTypeID: u16 = 151;
     const EmoteListID: u16 = 152;
     const PacketViolationWarningID: u16 = 156;
+    const CorrectPlayerMovePredictionPacketID: u16 = 161;
     const ItemComponentID: u16 = 162;
     const FilterTextPacketID: u16 = 163;
     const UpdateSubChunkBlocksPacketID: u16 = 172;
     const SubChunkPacketID: u16 = 174;
     const SubChunkRequestPacketID: u16 = 175;
     const DimensionDataID: u16 = 180;
+    const ToastRequestPackeID: u16 = 186;
     const RequestNetworkSettingsID: u16 = 193;
     const AlexEntityAnimationID: u16 = 224;
 }
@@ -429,8 +440,8 @@ impl GamePacket {
             GamePacket::AddPlayer() => {
                 unimplemented!()
             }
-            GamePacket::AddEntity() => {
-                unimplemented!()
+            GamePacket::AddEntity(pk) => {
+                ser_packet!(stream, GamePacket::AddEntityID, pk)
             }
             GamePacket::RemoveEntity() => {
                 unimplemented!()
@@ -495,8 +506,8 @@ impl GamePacket {
             GamePacket::EntityPickRequest() => {
                 unimplemented!()
             }
-            GamePacket::PlayerAction() => {
-                unimplemented!()
+            GamePacket::PlayerAction(pk) => {
+                ser_packet!(stream, GamePacket::PlayerActionID, pk)
             }
             GamePacket::HurtArmor() => {
                 unimplemented!()
@@ -525,8 +536,8 @@ impl GamePacket {
             GamePacket::ContainerOpen() => {
                 unimplemented!()
             }
-            GamePacket::ContainerClose() => {
-                unimplemented!()
+            GamePacket::ContainerClose(pk) => {
+                ser_packet!(stream, GamePacket::ContainerCloseID, pk)
             }
             GamePacket::PlayerHotbar() => {
                 unimplemented!()
@@ -615,8 +626,8 @@ impl GamePacket {
             GamePacket::AvailableCommands() => {
                 unimplemented!()
             }
-            GamePacket::CommandRequest() => {
-                unimplemented!()
+            GamePacket::CommandRequest(pk) => {
+                ser_packet!(stream, GamePacket::CommandRequestID, pk)
             }
             GamePacket::CommandBlockUpdate() => {
                 unimplemented!()
@@ -648,8 +659,8 @@ impl GamePacket {
             GamePacket::StopSound() => {
                 unimplemented!()
             }
-            GamePacket::SetTitle() => {
-                unimplemented!()
+            GamePacket::SetTitle(pk) => {
+                ser_packet!(stream, GamePacket::SetTitleID, pk)
             }
             GamePacket::AddBehaviorTree() => {
                 unimplemented!()
@@ -813,6 +824,9 @@ impl GamePacket {
             GamePacket::PacketViolationWarning(pk) => {
                 ser_packet!(stream, GamePacket::PacketViolationWarningID, pk)
             }
+            GamePacket::CorrectPlayerMovePredictionPacket(pk) => {
+                ser_packet!(stream, GamePacket::CorrectPlayerMovePredictionPacketID, pk)
+            }
             GamePacket::ItemComponent() => {
                 unimplemented!()
             }
@@ -830,6 +844,9 @@ impl GamePacket {
             }
             GamePacket::DimensionData() => {
                 unimplemented!()
+            }
+            GamePacket::ToastRequestPacket(pk) => {
+                ser_packet!(stream, GamePacket::ToastRequestPackeID, pk)
             }
             GamePacket::RequestNetworkSettings(pk) => {
                 ser_packet!(stream, GamePacket::RequestNetworkSettingsID, pk)
@@ -900,9 +917,7 @@ impl GamePacket {
             GamePacket::AddPlayerID => {
                 unimplemented!()
             }
-            GamePacket::AddEntityID => {
-                unimplemented!()
-            }
+            GamePacket::AddEntityID => GamePacket::AddEntity(de_packet!(stream, AddActorPacket)),
             GamePacket::RemoveEntityID => {
                 unimplemented!()
             }
@@ -965,7 +980,7 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::PlayerActionID => {
-                unimplemented!()
+                GamePacket::PlayerAction(de_packet!(stream, PlayerActionPacket))
             }
             GamePacket::HurtArmorID => {
                 unimplemented!()
@@ -993,7 +1008,7 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::ContainerCloseID => {
-                unimplemented!()
+                GamePacket::ContainerClose(de_packet!(stream, ContainerClosePacket))
             }
             GamePacket::PlayerHotbarID => {
                 unimplemented!()
@@ -1083,7 +1098,7 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::CommandRequestID => {
-                unimplemented!()
+                GamePacket::CommandRequest(de_packet!(stream, CommandRequestPacket))
             }
             GamePacket::CommandBlockUpdateID => {
                 unimplemented!()
@@ -1115,9 +1130,7 @@ impl GamePacket {
             GamePacket::StopSoundID => {
                 unimplemented!()
             }
-            GamePacket::SetTitleID => {
-                unimplemented!()
-            }
+            GamePacket::SetTitleID => GamePacket::SetTitle(de_packet!(stream, SetTitlePacket)),
             GamePacket::AddBehaviorTreeID => {
                 unimplemented!()
             }
@@ -1278,6 +1291,12 @@ impl GamePacket {
             GamePacket::PacketViolationWarningID => {
                 GamePacket::PacketViolationWarning(de_packet!(stream, PacketViolationWarningPacket))
             }
+            GamePacket::CorrectPlayerMovePredictionPacketID => {
+                GamePacket::CorrectPlayerMovePredictionPacket(de_packet!(
+                    stream,
+                    CorrectPlayerMovePredictionPacket
+                ))
+            }
             GamePacket::ItemComponentID => {
                 unimplemented!()
             }
@@ -1295,6 +1314,9 @@ impl GamePacket {
             }
             GamePacket::DimensionDataID => {
                 unimplemented!()
+            }
+            GamePacket::ToastRequestPackeID => {
+                GamePacket::ToastRequestPacket(de_packet!(stream, ToastRequestPacket))
             }
             GamePacket::RequestNetworkSettingsID => {
                 GamePacket::RequestNetworkSettings(de_packet!(stream, NetworkSettingsRequestPacket))

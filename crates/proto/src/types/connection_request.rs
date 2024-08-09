@@ -167,8 +167,8 @@ impl ProtoCodec for ConnectionRequest {
             };
 
             // Extract header
-            let jwt_header = jsonwebtoken::decode_header(&jwt_string)
-                .map_err(ProtoCodecError::JwtError)?;
+            let jwt_header =
+                jsonwebtoken::decode_header(&jwt_string).map_err(ProtoCodecError::JwtError)?;
 
             let mut jwt_validation = Validation::new(jwt_header.alg);
             // TODO: This definitely is not right. Even Zuri-MC doesn't understand this.. I may understand it.. I do understand it, update I don't.
@@ -232,12 +232,11 @@ impl ProtoCodec for ConnectionRequest {
 
         // transform into string
         let raw_token_string =
-            String::from_utf8(raw_token_buf)
-                .map_err(ProtoCodecError::UTF8Error)?;
+            String::from_utf8(raw_token_buf).map_err(ProtoCodecError::UTF8Error)?;
 
         // Extract header
-        let raw_token_jwt_header = jsonwebtoken::decode_header(&raw_token_string)
-            .map_err(ProtoCodecError::JwtError)?;
+        let raw_token_jwt_header =
+            jsonwebtoken::decode_header(&raw_token_string).map_err(ProtoCodecError::JwtError)?;
 
         let mut jwt_validation = Validation::new(raw_token_jwt_header.alg);
         // TODO: This definitely is not right. Even Zuri-MC doesn't understand this.. I may understand it.. I do understand it, update I don't.
