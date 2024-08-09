@@ -1,5 +1,6 @@
 pub mod add_actor_packet;
 pub mod animate;
+pub mod camera_packet;
 pub mod chunk_radius_updated;
 pub mod client_cache_status;
 pub mod command_request_packet;

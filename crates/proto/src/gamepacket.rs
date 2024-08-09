@@ -5,6 +5,7 @@ use std::sync::Arc;
 
 use crate::packets::add_actor_packet::AddActorPacket;
 use crate::packets::animate::AnimatePacket;
+use crate::packets::camera_packet::CameraPacket;
 use crate::packets::chunk_radius_updated::ChunkRadiusUpdatedPacket;
 use crate::packets::client_cache_status::ClientCacheStatusPacket;
 use crate::packets::command_request_packet::CommandRequestPacket;
@@ -116,7 +117,7 @@ pub enum GamePacket {
     ChunkRadiusUpdate(ChunkRadiusUpdatedPacket),
     ItemFrameDropItem(),
     GameRulesChanged(),
-    Camera(),
+    Camera(CameraPacket),
     BossEvent(),
     ShowCredits(),
     AvailableCommands(),
@@ -621,8 +622,8 @@ impl GamePacket {
             GamePacket::GameRulesChanged() => {
                 unimplemented!()
             }
-            GamePacket::Camera() => {
-                unimplemented!()
+            GamePacket::Camera(pk) => {
+                ser_packet!(stream, GamePacket::CameraID, pk)
             }
             GamePacket::BossEvent() => {
                 unimplemented!()
@@ -1098,9 +1099,7 @@ impl GamePacket {
             GamePacket::GameRulesChangedID => {
                 unimplemented!()
             }
-            GamePacket::CameraID => {
-                unimplemented!()
-            }
+            GamePacket::CameraID => GamePacket::Camera(de_packet!(stream, CameraPacket)),
             GamePacket::BossEventID => {
                 unimplemented!()
             }
