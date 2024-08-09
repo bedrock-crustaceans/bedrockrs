@@ -926,7 +926,7 @@ impl GamePacket {
             }
             GamePacket::AddEntityID => GamePacket::AddEntity(de_packet!(stream, AddActorPacket)),
             GamePacket::RemoveEntityID => {
-                GamePacket::RemoveEntity(de_packet!(stream, RemoveActorPacket))
+                GamePacket::RemoveEntity(de_packet!(stream, RemoveEntityPacket))
             }
             GamePacket::AddItemEntityID => {
                 unimplemented!()
