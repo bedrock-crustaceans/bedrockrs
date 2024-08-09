@@ -9,6 +9,7 @@ pub mod chat_restriction_level;
 pub mod chunk_pos;
 pub mod command_origin_data;
 pub mod connection_request;
+pub mod container_type;
 pub mod dataitem;
 pub mod disconnect_reason;
 pub mod edu_shared_uri_resource;

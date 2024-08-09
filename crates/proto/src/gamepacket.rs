@@ -8,6 +8,7 @@ use crate::packets::animate::AnimatePacket;
 use crate::packets::chunk_radius_updated::ChunkRadiusUpdatedPacket;
 use crate::packets::client_cache_status::ClientCacheStatusPacket;
 use crate::packets::command_request_packet::CommandRequestPacket;
+use crate::packets::container_close_packet::ContainerClosePacket;
 use crate::packets::correct_player_move_prediction_packet::CorrectPlayerMovePredictionPacket;
 use crate::packets::disconnect::DisconnectPacket;
 use crate::packets::emote_list::EmoteListPacket;
@@ -86,7 +87,7 @@ pub enum GamePacket {
     Animate(AnimatePacket),
     Respawn(),
     ContainerOpen(),
-    ContainerClose(),
+    ContainerClose(ContainerClosePacket),
     PlayerHotbar(),
     InventoryContent(),
     InventorySlot(),
@@ -535,8 +536,8 @@ impl GamePacket {
             GamePacket::ContainerOpen() => {
                 unimplemented!()
             }
-            GamePacket::ContainerClose() => {
-                unimplemented!()
+            GamePacket::ContainerClose(pk) => {
+                ser_packet!(stream, GamePacket::ContainerCloseID, pk)
             }
             GamePacket::PlayerHotbar() => {
                 unimplemented!()
@@ -1007,7 +1008,7 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::ContainerCloseID => {
-                unimplemented!()
+                GamePacket::ContainerClose(de_packet!(stream, ContainerClosePacket))
             }
             GamePacket::PlayerHotbarID => {
                 unimplemented!()

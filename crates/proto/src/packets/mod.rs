@@ -3,6 +3,7 @@ pub mod animate;
 pub mod chunk_radius_updated;
 pub mod client_cache_status;
 pub mod command_request_packet;
+pub mod container_close_packet;
 pub mod correct_player_move_prediction_packet;
 pub mod disconnect;
 pub mod emote_list;

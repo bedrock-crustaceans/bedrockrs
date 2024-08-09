@@ -24,7 +24,7 @@ pub enum CommandOriginType {
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct CommandOriginData {
-    command_type: CommandOriginType,
-    command_uuid: Uuid,
-    request_id: String,
+    pub command_type: CommandOriginType,
+    pub command_uuid: Uuid,
+    pub request_id: String,
 }
