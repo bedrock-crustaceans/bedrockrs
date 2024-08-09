@@ -24,7 +24,6 @@ pub async fn login_to_server(
     packs(conn, &mut provider).await?;
 
     start_game(conn, &mut provider).await?;
-    set_title(conn, &mut provider).await?;
     Ok(())
 }
 
