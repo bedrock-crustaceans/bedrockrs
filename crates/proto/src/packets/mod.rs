@@ -20,6 +20,7 @@ pub mod play_status;
 pub mod player_action;
 pub mod player_auth_input;
 pub mod player_move;
+pub mod remove_actor_packet;
 pub mod request_chunk_radius;
 pub mod resource_packs_info;
 pub mod resource_packs_response;

@@ -25,6 +25,7 @@ use crate::packets::play_status::PlayStatusPacket;
 use crate::packets::player_action::PlayerActionPacket;
 use crate::packets::player_auth_input::PlayerAuthInputPacket;
 use crate::packets::player_move::MovePlayerPacket;
+use crate::packets::remove_actor_packet::RemoveEntityPacket;
 use crate::packets::request_chunk_radius::RequestChunkRadiusPacket;
 use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
 use crate::packets::resource_packs_response::ResourcePacksResponsePacket;
@@ -57,7 +58,7 @@ pub enum GamePacket {
     StartGame(StartGamePacket),
     AddPlayer(),
     AddEntity(AddActorPacket),
-    RemoveEntity(),
+    RemoveEntity(RemoveEntityPacket),
     AddItemEntity(),
     ServerPlayerPostMovePositionPacket(ServerPlayerPostMovePositionPacket),
     TakeItemEntity(),
@@ -446,8 +447,8 @@ impl GamePacket {
             GamePacket::AddEntity(pk) => {
                 ser_packet!(stream, GamePacket::AddEntityID, pk)
             }
-            GamePacket::RemoveEntity() => {
-                unimplemented!()
+            GamePacket::RemoveEntity(pk) => {
+                ser_packet!(stream, GamePacket::RemoveEntityID, pk)
             }
             GamePacket::AddItemEntity() => {
                 unimplemented!()
@@ -925,7 +926,7 @@ impl GamePacket {
             }
             GamePacket::AddEntityID => GamePacket::AddEntity(de_packet!(stream, AddActorPacket)),
             GamePacket::RemoveEntityID => {
-                unimplemented!()
+                GamePacket::RemoveEntity(de_packet!(stream, RemoveActorPacket))
             }
             GamePacket::AddItemEntityID => {
                 unimplemented!()
