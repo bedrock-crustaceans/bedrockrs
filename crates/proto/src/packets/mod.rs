@@ -24,6 +24,7 @@ pub mod request_chunk_radius;
 pub mod resource_packs_info;
 pub mod resource_packs_response;
 pub mod resource_packs_stack;
+pub mod server_player_post_move_position_packet;
 pub mod server_settings_request;
 pub mod server_settings_response;
 pub mod set_local_player_as_initialized;

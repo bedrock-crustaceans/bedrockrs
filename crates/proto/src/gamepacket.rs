@@ -29,6 +29,7 @@ use crate::packets::request_chunk_radius::RequestChunkRadiusPacket;
 use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
 use crate::packets::resource_packs_response::ResourcePacksResponsePacket;
 use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
+use crate::packets::server_player_post_move_position_packet::ServerPlayerPostMovePositionPacket;
 use crate::packets::server_settings_request::ServerSettingsRequestPacket;
 use crate::packets::server_settings_response::ServerSettingsResponsePacket;
 use crate::packets::set_local_player_as_initialized::SetLocalPlayerAsInitializedPacket;
@@ -58,6 +59,7 @@ pub enum GamePacket {
     AddEntity(AddActorPacket),
     RemoveEntity(),
     AddItemEntity(),
+    ServerPlayerPostMovePositionPacket(ServerPlayerPostMovePositionPacket),
     TakeItemEntity(),
     MoveEntity(),
     MovePlayer(MovePlayerPacket),
@@ -211,6 +213,7 @@ impl GamePacket {
     const AddEntityID: u16 = 13;
     const RemoveEntityID: u16 = 14;
     const AddItemEntityID: u16 = 15;
+    const ServerPlayerPostMovePositionPacketID: u16 = 16;
     const TakeItemEntityID: u16 = 17;
     const MoveEntityID: u16 = 18;
     const MovePlayerID: u16 = 19;
@@ -448,6 +451,9 @@ impl GamePacket {
             }
             GamePacket::AddItemEntity() => {
                 unimplemented!()
+            }
+            GamePacket::ServerPlayerPostMovePositionPacket(pk) => {
+                ser_packet!(stream, GamePacket::ServerPlayerPostMovePositionPacketID, pk)
             }
             GamePacket::TakeItemEntity() => {
                 unimplemented!()
@@ -923,6 +929,12 @@ impl GamePacket {
             }
             GamePacket::AddItemEntityID => {
                 unimplemented!()
+            }
+            GamePacket::ServerPlayerPostMovePositionPacketID => {
+                GamePacket::ServerPlayerPostMovePositionPacket(de_packet!(
+                    stream,
+                    ServerPlayerPostMovePositionPacket
+                ))
             }
             GamePacket::TakeItemEntityID => {
                 unimplemented!()
