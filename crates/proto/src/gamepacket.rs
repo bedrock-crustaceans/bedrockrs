@@ -4,19 +4,24 @@ use std::io::{Cursor, Write};
 use std::sync::Arc;
 
 use crate::packets::add_actor_packet::AddActorPacket;
+use crate::packets::add_painting_packet::AddPaintingPacket;
 use crate::packets::animate::AnimatePacket;
 use crate::packets::camera_packet::CameraPacket;
 use crate::packets::chunk_radius_updated::ChunkRadiusUpdatedPacket;
 use crate::packets::client_cache_status::ClientCacheStatusPacket;
 use crate::packets::command_request_packet::CommandRequestPacket;
 use crate::packets::container_close_packet::ContainerClosePacket;
+use crate::packets::container_open_packet::ContainerOpenPacket;
 use crate::packets::correct_player_move_prediction_packet::CorrectPlayerMovePredictionPacket;
+use crate::packets::debug_info_packet::DebugInfoPacket;
 use crate::packets::disconnect::DisconnectPacket;
 use crate::packets::emote_list::EmoteListPacket;
 use crate::packets::handshake_server_to_client::HandshakeServerToClientPacket;
 use crate::packets::interact::InteractPacket;
+use crate::packets::inventory_content_packet::InventoryContentPacket;
 use crate::packets::level_chunk::LevelChunkPacket;
 use crate::packets::login::LoginPacket;
+use crate::packets::mob_equipment_packet::MobEquipmentPacket;
 use crate::packets::modal_form_request::ModalFormRequestPacket;
 use crate::packets::modal_form_response::ModalFormResponsePacket;
 use crate::packets::network_settings::NetworkSettingsPacket;
@@ -25,6 +30,7 @@ use crate::packets::packet_violation_warning::PacketViolationWarningPacket;
 use crate::packets::play_status::PlayStatusPacket;
 use crate::packets::player_action::PlayerActionPacket;
 use crate::packets::player_auth_input::PlayerAuthInputPacket;
+use crate::packets::player_hotbar_packet::PlayerHotbarPacket;
 use crate::packets::player_move::MovePlayerPacket;
 use crate::packets::remove_actor_packet::RemoveEntityPacket;
 use crate::packets::request_chunk_radius::RequestChunkRadiusPacket;
@@ -35,6 +41,7 @@ use crate::packets::server_player_post_move_position_packet::ServerPlayerPostMov
 use crate::packets::server_settings_request::ServerSettingsRequestPacket;
 use crate::packets::server_settings_response::ServerSettingsResponsePacket;
 use crate::packets::set_local_player_as_initialized::SetLocalPlayerAsInitializedPacket;
+use crate::packets::set_time_packet::SetTimePacket;
 use crate::packets::set_title_packet::SetTitlePacket;
 use crate::packets::start_game::StartGamePacket;
 use crate::packets::text_message::TextMessagePacket;
@@ -55,7 +62,7 @@ pub enum GamePacket {
     ResourcePackStack(ResourcePacksStackPacket),
     ResourcePackClientResponse(ResourcePacksResponsePacket),
     TextMessage(TextMessagePacket),
-    SetTime(),
+    SetTime(SetTimePacket),
     StartGame(StartGamePacket),
     AddPlayer(),
     AddEntity(AddActorPacket),
@@ -67,7 +74,7 @@ pub enum GamePacket {
     MovePlayer(MovePlayerPacket),
     RiderJump(),
     UpdateBlock(),
-    AddPainting(),
+    AddPainting(AddPaintingPacket),
     TickSync(),
     LevelSoundEventOld(),
     LevelEvent(),
@@ -76,7 +83,7 @@ pub enum GamePacket {
     MobEffect(),
     UpdateAttributes(),
     InventoryTransaction(),
-    MobEquipment(),
+    MobEquipment(MobEquipmentPacket),
     MobArmorEquipment(),
     Interact(InteractPacket),
     BlockPickRequest(),
@@ -90,10 +97,10 @@ pub enum GamePacket {
     SetSpawnPosition(),
     Animate(AnimatePacket),
     Respawn(),
-    ContainerOpen(),
+    ContainerOpen(ContainerOpenPacket),
     ContainerClose(ContainerClosePacket),
-    PlayerHotbar(),
-    InventoryContent(),
+    PlayerHotbar(PlayerHotbarPacket),
+    InventoryContent(InventoryContentPacket),
     InventorySlot(),
     ContainerSetData(),
     CraftingData(),
@@ -186,6 +193,7 @@ pub enum GamePacket {
     ItemStackResponse(),
     UpdatePlayerGameType(),
     EmoteList(EmoteListPacket),
+    DebugInfoPacket(DebugInfoPacket),
     PacketViolationWarning(PacketViolationWarningPacket),
     CorrectPlayerMovePredictionPacket(CorrectPlayerMovePredictionPacket),
     ItemComponent(),
@@ -340,6 +348,7 @@ impl GamePacket {
     const ItemStackResponseID: u16 = 148;
     const UpdatePlayerGameTypeID: u16 = 151;
     const EmoteListID: u16 = 152;
+    const DebugInfoPacketID: u16 = 155;
     const PacketViolationWarningID: u16 = 156;
     const CorrectPlayerMovePredictionPacketID: u16 = 161;
     const ItemComponentID: u16 = 162;
@@ -436,8 +445,8 @@ impl GamePacket {
             GamePacket::TextMessage(pk) => {
                 ser_packet!(stream, GamePacket::TextMessageID, pk)
             }
-            GamePacket::SetTime() => {
-                unimplemented!()
+            GamePacket::SetTime(pk) => {
+                ser_packet!(stream, GamePacket::SetTimeID, pk)
             }
             GamePacket::StartGame(pk) => {
                 ser_packet!(stream, GamePacket::StartGameID, pk)
@@ -472,8 +481,8 @@ impl GamePacket {
             GamePacket::UpdateBlock() => {
                 unimplemented!()
             }
-            GamePacket::AddPainting() => {
-                unimplemented!()
+            GamePacket::AddPainting(pk) => {
+                ser_packet!(stream, GamePacket::AddPaintingID, pk)
             }
             GamePacket::TickSync() => {
                 unimplemented!()
@@ -499,8 +508,8 @@ impl GamePacket {
             GamePacket::InventoryTransaction() => {
                 unimplemented!()
             }
-            GamePacket::MobEquipment() => {
-                unimplemented!()
+            GamePacket::MobEquipment(pk) => {
+                ser_packet!(stream, GamePacket::MobEquipmentID, pk)
             }
             GamePacket::MobArmorEquipment() => {
                 unimplemented!()
@@ -541,17 +550,17 @@ impl GamePacket {
             GamePacket::Respawn() => {
                 unimplemented!()
             }
-            GamePacket::ContainerOpen() => {
-                unimplemented!()
+            GamePacket::ContainerOpen(pk) => {
+                ser_packet!(stream, GamePacket::ContainerOpenID, pk)
             }
             GamePacket::ContainerClose(pk) => {
                 ser_packet!(stream, GamePacket::ContainerCloseID, pk)
             }
-            GamePacket::PlayerHotbar() => {
-                unimplemented!()
+            GamePacket::PlayerHotbar(pk) => {
+                ser_packet!(stream, GamePacket::PlayerHotbarID, pk)
             }
-            GamePacket::InventoryContent() => {
-                unimplemented!()
+            GamePacket::InventoryContent(pk) => {
+                ser_packet!(stream, GamePacket::InventoryContentID, pk)
             }
             GamePacket::InventorySlot() => {
                 unimplemented!()
@@ -829,6 +838,9 @@ impl GamePacket {
             GamePacket::EmoteList(pk) => {
                 ser_packet!(stream, GamePacket::EmoteListID, pk)
             }
+            GamePacket::DebugInfoPacket(pk) => {
+                ser_packet!(stream, GamePacket::DebugInfoPacketID, pk)
+            }
             GamePacket::PacketViolationWarning(pk) => {
                 ser_packet!(stream, GamePacket::PacketViolationWarningID, pk)
             }
@@ -918,9 +930,7 @@ impl GamePacket {
             GamePacket::TextMessageID => {
                 GamePacket::TextMessage(de_packet!(stream, TextMessagePacket))
             }
-            GamePacket::SetTimeID => {
-                unimplemented!()
-            }
+            GamePacket::SetTimeID => GamePacket::SetTime(de_packet!(stream, SetTimePacket)),
             GamePacket::StartGameID => GamePacket::StartGame(de_packet!(stream, StartGamePacket)),
             GamePacket::AddPlayerID => {
                 unimplemented!()
@@ -954,7 +964,7 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::AddPaintingID => {
-                unimplemented!()
+                GamePacket::AddPainting(de_packet!(stream, AddPaintingPacket))
             }
             GamePacket::TickSyncID => {
                 unimplemented!()
@@ -981,7 +991,7 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::MobEquipmentID => {
-                unimplemented!()
+                GamePacket::MobEquipment(de_packet!(stream, MobEquipmentPacket))
             }
             GamePacket::MobArmorEquipmentID => {
                 unimplemented!()
@@ -1019,16 +1029,16 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::ContainerOpenID => {
-                unimplemented!()
+                GamePacket::ContainerOpen(de_packet!(stream, ContainerOpenPacket))
             }
             GamePacket::ContainerCloseID => {
                 GamePacket::ContainerClose(de_packet!(stream, ContainerClosePacket))
             }
             GamePacket::PlayerHotbarID => {
-                unimplemented!()
+                GamePacket::PlayerHotbar(de_packet!(stream, PlayerHotbarPacket))
             }
             GamePacket::InventoryContentID => {
-                unimplemented!()
+                GamePacket::InventoryContent(de_packet!(stream, InventoryContentPacket))
             }
             GamePacket::InventorySlotID => {
                 unimplemented!()
@@ -1300,6 +1310,9 @@ impl GamePacket {
                 unimplemented!()
             }
             GamePacket::EmoteListID => GamePacket::EmoteList(de_packet!(stream, EmoteListPacket)),
+            GamePacket::DebugInfoPacketID => {
+                GamePacket::DebugInfoPacket(de_packet!(stream, DebugInfoPacket))
+            }
             GamePacket::PacketViolationWarningID => {
                 GamePacket::PacketViolationWarning(de_packet!(stream, PacketViolationWarningPacket))
             }
