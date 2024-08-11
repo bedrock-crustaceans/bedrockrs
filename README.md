@@ -1,7 +1,5 @@
 # bedrock-rs
 
-<a href="https://discord.gg/ArvWEVHGWs"><img src="https://img.shields.io/discord/1218673790775726182.svg?style=flat&label=Azurite&logo=discord&logoColor=ffffff&color=011e2c&labelColor=1f3157"><a/>
-
 _Universal toolkit for MCBE in Rust_
 
 An easy-to-use universal library for Minecraft Bedrock written in Rust, that aims to provide:
@@ -9,6 +7,8 @@ An easy-to-use universal library for Minecraft Bedrock written in Rust, that aim
 - [X] Standards
 - [X] Common implementations
 - [X] An easy-to-use api
+
+We also have a community discord, feel free to join it to learn more about our future and get help when needed: https://discord.com/invite/VCVcrvt3JC
 
 ## Crates:
 
