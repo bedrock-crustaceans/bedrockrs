@@ -6,7 +6,6 @@ use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::{Vec2, Vec3};
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
-use bedrockrs_proto_derive::ProtoCodec;
 use bedrockrs_shared::actor_unique_id::ActorUniqueID;
 use std::io::Cursor;
 
@@ -57,11 +56,7 @@ impl ProtoCodec for PlayerAuthInputPacket {
             1 => PlayMode::Teaser,
             2 => PlayMode::Screen,
             3 => PlayMode::Viewer,
-            4 => {
-                let vr_gaze_direction = ProtoCodec::proto_deserialize(stream)?;
-
-                PlayMode::Reality(vr_gaze_direction)
-            }
+            4 => PlayMode::Reality,
             5 => PlayMode::Placement,
             6 => PlayMode::LivingRoom,
             7 => PlayMode::ExitLevel,
@@ -74,6 +69,11 @@ impl ProtoCodec for PlayerAuthInputPacket {
             }
         };
         let interaction_model = InteractionModel::proto_deserialize(stream)?;
+
+        if play_mode.clone().to_u32() == PlayMode::Reality.to_u32() {
+            // Maybe we can save it in a struct, I don't know
+            let _vr_gaze_direction = ProtoCodec::proto_deserialize(stream)?;
+        }
 
         let client_tick = VAR::<u64>::proto_deserialize(stream)?;
         let pos_delta = Vec3::<LE<f32>>::proto_deserialize(stream)?;
