@@ -13,7 +13,7 @@ pub enum NbtError {
         expected: FieldType,
         actual: FieldType,
     },
-    #[error("{0} is not supported")]
+    #[error("{0}")]
     Unsupported(&'static str),
     #[error("{0}")]
     MissingData(Cow<'static, str>),

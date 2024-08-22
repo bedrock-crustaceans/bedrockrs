@@ -28,8 +28,8 @@ macro_rules! forward_unsupported {
             where
                 V: Visitor<'de>
             {
-                return Err(NbtError::UnsupportedOperation(
-                    concat!("Deserialization of ", stringify!($ty))
+                return Err(NbtError::Unsupported(
+                    concat!("Deserialization of `", stringify!($ty)), "` is not supported"
                 ));
             }
         )+}
@@ -239,7 +239,7 @@ where
             self.deserialize_str(visitor)
         } else {
             match self.next_ty {
-                FieldType::End => return Err(NbtError::Other("Encountered unmatched end tag"))
+                FieldType::End => return Err(NbtError::Other("Encountered unmatched end tag")),
                 FieldType::Byte => self.deserialize_i8(visitor),
                 FieldType::Short => self.deserialize_i16(visitor),
                 FieldType::Int => self.deserialize_i32(visitor),
@@ -445,7 +445,9 @@ where
     where
         V: Visitor<'de>,
     {
-        Err(NbtError::Unsupported("Deserializing unit values"))
+        Err(NbtError::Unsupported(
+            "Deserializing unit values is not supported",
+        ))
     }
 
     fn deserialize_unit_struct<V>(
@@ -456,7 +458,9 @@ where
     where
         V: Visitor<'de>,
     {
-        Err(NbtError::Unsupported("Deserializing unit structs"))
+        Err(NbtError::Unsupported(
+            "Deserializing unit structs is not supported",
+        ))
     }
 
     fn deserialize_newtype_struct<V>(
@@ -467,7 +471,9 @@ where
     where
         V: Visitor<'de>,
     {
-        Err(NbtError::Unsupported("Deserializing newtype structs"))
+        Err(NbtError::Unsupported(
+            "Deserializing newtype structs is not supported",
+        ))
     }
 
     #[inline]
@@ -503,7 +509,9 @@ where
     where
         V: Visitor<'de>,
     {
-        Err(NbtError::Unsupported("Deserializing tuple structs"))
+        Err(NbtError::Unsupported(
+            "Deserializing tuple structs is not supported",
+        ))
     }
 
     #[inline]
@@ -539,7 +547,9 @@ where
     where
         V: Visitor<'de>,
     {
-        Err(NbtError::Unsupported("Deserializing enums is not supported"))
+        Err(NbtError::Unsupported(
+            "Deserializing enums is not supported",
+        ))
     }
 
     #[inline]
@@ -602,11 +612,9 @@ where
         };
 
         if expected_len != 0 && expected_len != remaining {
-            return Err(NbtError::MissingData(
-                Cow::Owned(format!(
-                    "Sequence of {expected_len} {ty:?} expected, found only {remaining} items"
-                ))
-            ))
+            return Err(NbtError::MissingData(Cow::Owned(format!(
+                "Sequence of {expected_len} {ty:?} expected, found only {remaining} items"
+            ))));
         }
 
         Ok(Self { de, ty, remaining })
