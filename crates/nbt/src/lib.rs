@@ -89,7 +89,7 @@ impl VariantImpl for Variable {
 #[allow(dead_code)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 #[repr(u8)]
-enum FieldType {
+pub enum FieldType {
     /// Indicates the end of a compound tag.
     End = 0,
     /// A signed byte.

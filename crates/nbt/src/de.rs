@@ -616,7 +616,7 @@ where
         };
 
         if expected_len != 0 && expected_len != remaining {
-            return Err(NbtError::MissingData(Cow::Owned(format!(
+            return Err(NbtError::Other(Cow::Owned(format!(
                 "Sequence of {expected_len} {ty:?} expected, found only {remaining} items"
             ))));
         }
