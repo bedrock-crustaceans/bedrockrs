@@ -97,10 +97,14 @@ impl PalettedStorage {
 
         for nbt in &self.palette {
             if network {
-                nbt.nbt_serialize::<NbtLittleEndianNetwork>("", &mut out)
-                    .unwrap();
+                nbt::to_var_bytes_in(&mut out, nbt).unwrap();
+                // nbt.nbt_serialize::<NbtLittleEndianNetwork>("", &mut out)
+                //     .unwrap();
+                // todo!()
             } else {
-                nbt.nbt_serialize::<NbtLittleEndian>("", &mut out).unwrap();
+                nbt::to_le_bytes_in(&mut out, nbt).unwrap();
+                // nbt.nbt_serialize::<NbtLittleEndian>("", &mut out).unwrap();
+                // todo!()
             }
         }
 
