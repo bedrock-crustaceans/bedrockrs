@@ -1,8 +1,11 @@
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
+use std::{
+    borrow::Cow,
+    net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr},
+};
 
 use paste::paste;
 
-use crate::{BlockPosition, Deserialize, Vector};
+use crate::{error::StreamError, BlockPosition, Deserialize, Vector};
 
 /// Implements the read functions for integer primitives.
 macro_rules! declare_primitive_fns {
@@ -10,28 +13,28 @@ macro_rules! declare_primitive_fns {
         paste! {$(
             #[doc = concat!("Reads a little endian [`", stringify!($ty), "`] from the reader")]
             #[inline]
-            fn [<read_ $ty _le>] (&mut self) -> anyhow::Result<$ty> {
+            fn [<read_ $ty _le>] (&mut self) -> Result<$ty, StreamError> {
                 let bytes = self.take_const()?;
                 Ok(<$ty>::from_le_bytes(bytes))
             }
 
             #[doc = concat!("Reads a big endian [`", stringify!($ty), "`] from the reader")]
             #[inline]
-            fn [<read_ $ty _be>] (&mut self) -> anyhow::Result<$ty> {
+            fn [<read_ $ty _be>] (&mut self) -> Result<$ty, StreamError> {
                 let bytes = self.take_const()?;
                 Ok(<$ty>::from_be_bytes(bytes))
             }
 
             #[doc = concat!("Reads a little endian [`", stringify!($ty), "`] from the reader without advancing the cursor")]
             #[inline]
-            fn [<peek_ $ty _le>](&self) -> anyhow::Result<$ty> {
+            fn [<peek_ $ty _le>](&self) -> Result<$ty, StreamError> {
                 let bytes = self.peek_const()?;
                 Ok(<$ty>::from_le_bytes(bytes))
             }
 
             #[doc = concat!("Reads a big endian [`", stringify!($ty), "`] from the reader without advancing the cursor")]
             #[inline]
-            fn [<peek_ $ty _be>](&self) -> anyhow::Result<$ty> {
+            fn [<peek_ $ty _be>](&self) -> Result<$ty, StreamError> {
                 let bytes = self.peek_const()?;
                 Ok(<$ty>::from_be_bytes(bytes))
             }
@@ -44,7 +47,7 @@ pub trait BinaryRead<'a>: AsRef<[u8]> {
     declare_primitive_fns!(u16, i16, u32, i32, u64, i64, u128, i128, f32, f64);
 
     /// Consumes `n` bytes.
-    fn advance(&mut self, n: usize) -> anyhow::Result<()>;
+    fn advance(&mut self, n: usize) -> Result<(), StreamError>;
 
     /// Returns the amount of bytes remaining in the reader.
     fn remaining(&mut self) -> usize;
@@ -55,43 +58,43 @@ pub trait BinaryRead<'a>: AsRef<[u8]> {
     }
 
     /// Takes `n` bytes out of the reader.
-    fn take_n(&mut self, n: usize) -> anyhow::Result<&'a [u8]>;
+    fn take_n(&mut self, n: usize) -> Result<&'a [u8], StreamError>;
 
     /// Takes `N` bytes out of the reader.
     /// This can be used to get sized arrays if the size is known at compile time.
-    fn take_const<const N: usize>(&mut self) -> anyhow::Result<[u8; N]>;
+    fn take_const<const N: usize>(&mut self) -> Result<[u8; N], StreamError>;
 
     /// Takes `n` bytes out of the reader without advancing the cursor.
-    fn peek_n(&self, n: usize) -> anyhow::Result<&'a [u8]>;
+    fn peek_n(&self, n: usize) -> Result<&'a [u8], StreamError>;
 
     /// Takes `N` bytes out of the reader without advancing the cursor.
     /// /// This can be used to get sized arrays if the size is known at compile time.
-    fn peek_const<const N: usize>(&self) -> anyhow::Result<[u8; N]>;
+    fn peek_const<const N: usize>(&self) -> Result<[u8; N], StreamError>;
 
     // /// Reads a varuint32-prefixed slice of type `T`.
-    // fn read_slice<T: Deserialize<'a>>(&mut self) -> anyhow::Result<Vec<T>>;
+    // fn read_slice<T: Deserialize<'a>>(&mut self) -> Result<Vec<T>>;
 
     /// Reads a [`bool`] from the reader.
     #[inline]
-    fn read_bool(&mut self) -> anyhow::Result<bool> {
+    fn read_bool(&mut self) -> Result<bool, StreamError> {
         Ok(self.take_const::<1>()?[0] != 0)
     }
 
     /// Reads a [`u8`] from the reader.
     #[inline]
-    fn read_u8(&mut self) -> anyhow::Result<u8> {
+    fn read_u8(&mut self) -> Result<u8, StreamError> {
         Ok(self.take_const::<1>()?[0])
     }
 
     /// Reads an [`i8`] from the reader.
     #[inline]
-    fn read_i8(&mut self) -> anyhow::Result<i8> {
+    fn read_i8(&mut self) -> Result<i8, StreamError> {
         Ok(self.take_const::<1>()?[0] as i8)
     }
 
     /// Reads a little endian `u24` from the reader without advancing the cursor.
     #[inline]
-    fn read_u24_le(&mut self) -> anyhow::Result<u32> {
+    fn read_u24_le(&mut self) -> Result<u32, StreamError> {
         let bytes = self.take_const::<3>()?;
         // let copy = bytes;
 
@@ -103,7 +106,7 @@ pub trait BinaryRead<'a>: AsRef<[u8]> {
 
     /// Reads a big endian `u24` from the reader.
     #[inline]
-    fn read_u24_be(&mut self) -> anyhow::Result<u32> {
+    fn read_u24_be(&mut self) -> Result<u32, StreamError> {
         let bytes = self.take_const::<3>()?;
         let val = u32::from_be_bytes([0, bytes[2], bytes[1], bytes[0]]);
 
@@ -112,7 +115,7 @@ pub trait BinaryRead<'a>: AsRef<[u8]> {
 
     /// Reads a little endian `u24` from the reader without advancing the cursor.
     #[inline]
-    fn peek_u24_le(&self) -> anyhow::Result<u32> {
+    fn peek_u24_le(&self) -> Result<u32, StreamError> {
         let bytes = self.peek_const::<3>()?;
         let val = u32::from_le_bytes([bytes[0], bytes[1], bytes[2], 0]);
 
@@ -121,7 +124,7 @@ pub trait BinaryRead<'a>: AsRef<[u8]> {
 
     /// Reads a big endian `u24` from the reader without advancing the cursor.
     #[inline]
-    fn peek_u24_be(&self) -> anyhow::Result<u32> {
+    fn peek_u24_be(&self) -> Result<u32, StreamError> {
         let bytes = self.peek_const::<3>()?;
         let val = u32::from_be_bytes([bytes[0], bytes[1], bytes[2], 0]);
 
@@ -130,7 +133,7 @@ pub trait BinaryRead<'a>: AsRef<[u8]> {
 
     /// Reads a variable size [`u32`] from the reader.
     #[inline]
-    fn read_var_u32(&mut self) -> anyhow::Result<u32> {
+    fn read_var_u32(&mut self) -> Result<u32, StreamError> {
         let mut v = 0;
         let mut i = 0;
         while i < 35 {
@@ -142,16 +145,14 @@ pub trait BinaryRead<'a>: AsRef<[u8]> {
             i += 7;
         }
 
-        tracing::error!("Variable 32-bit integer did not end after 5 bytes");
-        bail!(
-            Malformed,
-            "variable 32-bit integer did not end after 5 bytes"
-        )
+        Err(StreamError::Other(Cow::Borrowed(
+            "Variable 32-bit integer did not after 5 bytes",
+        )))
     }
 
     /// Reads a variable size [`i32`] from the reader.
     #[inline]
-    fn read_var_u64(&mut self) -> anyhow::Result<u64> {
+    fn read_var_u64(&mut self) -> Result<u64, StreamError> {
         let mut v = 0;
         let mut i = 0;
         while i < 70 {
@@ -165,16 +166,14 @@ pub trait BinaryRead<'a>: AsRef<[u8]> {
             i += 7;
         }
 
-        tracing::error!("Variable 64-bit integer did not end after 10 bytes");
-        bail!(
-            Malformed,
-            "variable 64-bit integer did not end after 10 bytes"
-        )
+        Err(StreamError::Other(Cow::Borrowed(
+            "Variable 64-bit integer did not after 10 bytes",
+        )))
     }
 
     /// Reads a variable size [`u64`] from the reader.
     #[inline]
-    fn read_var_i32(&mut self) -> anyhow::Result<i32> {
+    fn read_var_i32(&mut self) -> Result<i32, StreamError> {
         let vx = self.read_var_u32()?;
         let mut v = (vx >> 1) as i32;
 
@@ -187,7 +186,7 @@ pub trait BinaryRead<'a>: AsRef<[u8]> {
 
     /// Reads a variable size [`i64`] from the reader.
     #[inline]
-    fn read_var_i64(&mut self) -> anyhow::Result<i64> {
+    fn read_var_i64(&mut self) -> Result<i64, StreamError> {
         let vx = self.read_var_u64()?;
         let mut v = (vx >> 1) as i64;
 
@@ -200,7 +199,7 @@ pub trait BinaryRead<'a>: AsRef<[u8]> {
 
     /// Reads a string prefixed by a variable u32.
     #[inline]
-    fn read_str(&mut self) -> anyhow::Result<&'a str> {
+    fn read_str(&mut self) -> Result<&'a str, StreamError> {
         let len = self.read_var_u32()?;
         let data = self.take_n(len as usize)?;
 
@@ -208,7 +207,7 @@ pub trait BinaryRead<'a>: AsRef<[u8]> {
     }
 
     #[inline]
-    fn read_block_pos(&mut self) -> anyhow::Result<BlockPosition> {
+    fn read_block_pos(&mut self) -> Result<BlockPosition, StreamError> {
         let x = self.read_var_i32()?;
         let y = self.read_var_u32()?;
         let z = self.read_var_i32()?;
@@ -218,7 +217,7 @@ pub trait BinaryRead<'a>: AsRef<[u8]> {
 
     /// Reads a byte vector from the buffer.
     #[inline]
-    fn read_vecb<const N: usize>(&mut self) -> anyhow::Result<Vector<i8, N>> {
+    fn read_vecb<const N: usize>(&mut self) -> Result<Vector<i8, N>, StreamError> {
         let mut x = [0; N];
         for v in &mut x {
             *v = self.read_i8()?;
@@ -228,7 +227,7 @@ pub trait BinaryRead<'a>: AsRef<[u8]> {
 
     /// Reads an integer vector from the buffer.
     #[inline]
-    fn read_veci<const N: usize>(&mut self) -> anyhow::Result<Vector<i32, N>> {
+    fn read_veci<const N: usize>(&mut self) -> Result<Vector<i32, N>, StreamError> {
         let mut x = [0; N];
         for v in &mut x {
             *v = self.read_var_i32()?;
@@ -238,7 +237,7 @@ pub trait BinaryRead<'a>: AsRef<[u8]> {
 
     /// Reads a float vector from the buffer.
     #[inline]
-    fn read_vecf<const N: usize>(&mut self) -> anyhow::Result<Vector<f32, N>> {
+    fn read_vecf<const N: usize>(&mut self) -> Result<Vector<f32, N>, StreamError> {
         let mut x = [0.0; N];
         for v in &mut x {
             *v = self.read_f32_le()?;
@@ -247,7 +246,7 @@ pub trait BinaryRead<'a>: AsRef<[u8]> {
     }
 
     /// Reads an IP address from the buffer.
-    fn read_addr(&mut self) -> anyhow::Result<SocketAddr> {
+    fn read_addr(&mut self) -> Result<SocketAddr, StreamError> {
         let variant = self.read_u8()?;
         Ok(match variant {
             4 => {
@@ -266,25 +265,21 @@ pub trait BinaryRead<'a>: AsRef<[u8]> {
                 SocketAddr::new(addr, port)
             }
             _ => {
-                tracing::error!("Invalid IP type {variant}, expected either 4 or 6");
-                bail!(
-                    Malformed,
+                return Err(StreamError::Other(Cow::Owned(format!(
                     "Invalid IP type {variant}, expected either 4 or 6"
-                );
+                ))))
             }
         })
     }
 }
 
 impl<'a> BinaryRead<'a> for &'a [u8] {
-    fn advance(&mut self, n: usize) -> anyhow::Result<()> {
+    fn advance(&mut self, n: usize) -> Result<(), StreamError> {
         if self.len() < n {
-            tracing::error!("Cannot advance {n} bytes, remaining bytes: {}", self.len());
-            bail!(
-                UnexpectedEof,
-                "cannot advance past {n} bytes, remaining: {}",
-                self.len()
-            )
+            return Err(StreamError::UnexpectedEof {
+                expected: n,
+                remaining: self.len(),
+            });
         }
 
         let (_, b) = self.split_at(n);
@@ -306,14 +301,12 @@ impl<'a> BinaryRead<'a> for &'a [u8] {
     /// # Errors
     /// Returns [`UnexpectedEof`](crate::ErrorKind::UnexpectedEof) if the read exceeds the buffer length.
     #[inline]
-    fn take_n(&mut self, n: usize) -> anyhow::Result<&'a [u8]> {
+    fn take_n(&mut self, n: usize) -> Result<&'a [u8], StreamError> {
         if self.len() < n {
-            tracing::error!("Expected {n} remaining bytes, got {}", self.len());
-            bail!(
-                UnexpectedEof,
-                "expected {n} remaining bytes, got {}",
-                self.len()
-            )
+            Err(StreamError::UnexpectedEof {
+                expected: n,
+                remaining: self.len(),
+            })
         } else {
             let (a, b) = self.split_at(n);
             // *self = SharedBuffer::from(b);
@@ -333,13 +326,12 @@ impl<'a> BinaryRead<'a> for &'a [u8] {
     /// # Errors
     /// Returns [`UnexpectedEof`](crate::ErrorKind::UnexpectedEof) if the read exceeds the buffer length.
     #[inline]
-    fn take_const<const N: usize>(&mut self) -> anyhow::Result<[u8; N]> {
+    fn take_const<const N: usize>(&mut self) -> Result<[u8; N], StreamError> {
         if self.len() < N {
-            bail!(
-                UnexpectedEof,
-                "expected {N} remaining bytes, got {}",
-                self.len()
-            )
+            Err(StreamError::UnexpectedEof {
+                expected: N,
+                remaining: self.len(),
+            })
         } else {
             let (a, b) = self.split_at(N);
             // *self = SharedBuffer::from(b);
@@ -357,14 +349,12 @@ impl<'a> BinaryRead<'a> for &'a [u8] {
     /// # Errors
     /// Returns [`UnexpectedEof`](crate::ErrorKind::UnexpectedEof) if the read exceeds the buffer length.
     #[inline]
-    fn peek_n(&self, n: usize) -> anyhow::Result<&'a [u8]> {
+    fn peek_n(&self, n: usize) -> Result<&'a [u8], StreamError> {
         if self.len() < n {
-            tracing::error!("Expected {n} remaining bytes, got {}", self.len());
-            bail!(
-                UnexpectedEof,
-                "expected {n} remaining bytes, got {}",
-                self.len()
-            )
+            Err(StreamError::UnexpectedEof {
+                expected: n,
+                remaining: self.len(),
+            })
         } else {
             Ok(&self[..n])
         }
@@ -381,14 +371,12 @@ impl<'a> BinaryRead<'a> for &'a [u8] {
     /// # Errors
     /// Returns [`UnexpectedEof`](crate::ErrorKind::UnexpectedEof) if the read exceeds the buffer length.
     #[inline]
-    fn peek_const<const N: usize>(&self) -> anyhow::Result<[u8; N]> {
+    fn peek_const<const N: usize>(&self) -> Result<[u8; N], StreamError> {
         if self.len() < N {
-            tracing::error!("Expected {N} remaining bytes, got {}", self.len());
-            bail!(
-                UnexpectedEof,
-                "expected {N} remaining bytes, got {}",
-                self.len()
-            )
+            Err(StreamError::UnexpectedEof {
+                expected: N,
+                remaining: self.len(),
+            })
         } else {
             let dst = &self[..N];
             // SAFETY: dst is guaranteed to be of length N
@@ -397,7 +385,7 @@ impl<'a> BinaryRead<'a> for &'a [u8] {
         }
     }
 
-    // fn read_slice<T: Deserialize<'a>>(&mut self) -> anyhow::Result<Vec<T>> {
+    // fn read_slice<T: Deserialize<'a>>(&mut self) -> Result<Vec<T>, StreamError> {
     //     let len = self.read_var_u32()?;
     //     let mut vec = Vec::with_capacity(len as usize);
 
@@ -414,7 +402,7 @@ where
     R: BinaryRead<'a>,
 {
     #[inline]
-    fn advance(&mut self, n: usize) -> anyhow::Result<()> {
+    fn advance(&mut self, n: usize) -> Result<(), StreamError> {
         (**self).advance(n)
     }
 
@@ -424,27 +412,27 @@ where
     }
 
     #[inline]
-    fn take_n(&mut self, n: usize) -> anyhow::Result<&'a [u8]> {
+    fn take_n(&mut self, n: usize) -> Result<&'a [u8], StreamError> {
         (**self).take_n(n)
     }
 
     #[inline]
-    fn take_const<const N: usize>(&mut self) -> anyhow::Result<[u8; N]> {
+    fn take_const<const N: usize>(&mut self) -> Result<[u8; N], StreamError> {
         (**self).take_const()
     }
 
     #[inline]
-    fn peek_n(&self, n: usize) -> anyhow::Result<&'a [u8]> {
+    fn peek_n(&self, n: usize) -> Result<&'a [u8], StreamError> {
         (**self).peek_n(n)
     }
 
     #[inline]
-    fn peek_const<const N: usize>(&self) -> anyhow::Result<[u8; N]> {
+    fn peek_const<const N: usize>(&self) -> Result<[u8; N], StreamError> {
         (**self).peek_const()
     }
 
     // #[inline]
-    // fn read_slice<T: Deserialize<'a>>(&mut self) -> anyhow::Result<Vec<T>> {
+    // fn read_slice<T: Deserialize<'a>>(&mut self) -> Result<Vec<T>, StreamError> {
     //     (**self).read_slice()
     // }
 }

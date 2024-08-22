@@ -20,3 +20,19 @@ pub enum NbtError {
     #[error("{0}")]
     Other(Cow<'static, str>),
 }
+
+#[derive(Debug, Error)]
+pub enum StreamError {
+    #[error("{0}")]
+    Utf8Error(std::str::Utf8Error),
+    #[error("Expected {expected} remaining bytes, found only {remaining}")]
+    UnexpectedEof { expected: usize, remaining: usize },
+    #[error("{0}")]
+    Other(Cow<'static, str>),
+}
+
+impl From<std::str::Utf8Error> for StreamError {
+    fn from(value: std::str::Utf8Error) -> Self {
+        Self::Utf8Error(value)
+    }
+}
