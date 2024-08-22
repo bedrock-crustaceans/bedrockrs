@@ -2,8 +2,13 @@
 name = "bedrockrs_nbt"
 version = "0.1.0"
 edition = "2021"
+authors = ["Ruben Adema"]
+repository = "https://github.com/bedrock-crustaceans/bedrock-rs"
+license = "Apache-2.0"
+rust-version = "1.65.0"
 
 [dependencies]
-bedrockrs_core = { path = "../core" }
-
-thiserror = "1.0"
+serde = { version = "1.0.204", features = ["derive"] }
+paste = "1.0.15"
+anyhow = "1.0.86"
+thiserror = "1.0.63"

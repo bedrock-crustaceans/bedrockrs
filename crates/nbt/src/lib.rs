@@ -1,532 +1,183 @@
-use std::collections::HashMap;
-use std::fmt::{Debug, Formatter};
-use std::io::Cursor;
+//! Implements NBT serialisation and deserialisation for three different integer encodings.
+
+pub use crate::de::{from_be_bytes, from_le_bytes, from_var_bytes, Deserializer};
+pub use crate::ser::{
+    to_be_bytes, to_be_bytes_in, to_le_bytes, to_le_bytes_in, to_var_bytes, to_var_bytes_in,
+    Serializer,
+};
+pub use crate::value::Value;
+use anyhow::anyhow;
+use std::fmt::{Debug, Display, Formatter};
 
 pub use error::NbtError;
 
-use crate::byte_order::NbtByteOrder;
+#[cfg(test)]
+mod test;
 
-pub mod byte_order;
-pub mod endian;
-pub mod error;
+mod de;
+mod error;
+mod ser;
+mod value;
 
-/// An enum representing all possible NBT tags.
-///
-/// Still missing ([GitHub issue](https://github.com/Adrian8115/bedrock-rs/issues/8)):
-/// - byte array
-/// - int array
-/// - long array
-///
-/// (These missing types are rarely, if not even un-, used in MCBE)
-#[derive(Clone)]
-pub enum NbtTag {
-    /// A simple byte.
-    /// Can represent multiple things like:
-    /// - a boolean
-    /// - an enum
-    /// - an 8-bit (possibly signed/unsigned) integer
-    /// - ...
-    Byte(u8),
-    /// A 16-bit signed integer
-    Int16(i16),
-    /// A 32-bit signed integer
-    Int32(i32),
-    /// A 64-bit signed integer
-    Int64(i64),
-    /// A 32-bit float
-    Float32(f32),
-    /// A 64-bit float
-    Float64(f64),
-    /// A simple string
-    /// Should never be larger than [i16::MAX]
-    String(String),
-    /// A list of NBTs.
-    ///
-    /// All elements should use the same enum variant.
-    /// The serialized type declaration is the first element in the list
-    List(Vec<NbtTag>),
-    /// A key-value pair map of NBTs.
-    ///
-    /// Each key is a String with the following NBT tag.
-    /// Tag enum variants may vary.
-    /// Compound tags are special because they are opened by the [NbtTag::COMPOUND_ID]
-    /// and closed again by the [NbtTag::EMPTY_ID].
-    Compound(HashMap<String, NbtTag>),
-    /// A length-prefixed array of bytes. The prefix is an `i32`.
-    ByteArray(Vec<u8>),
-    /// A length-prefixed array of `i32`s. The prefix is itself an `i32`.
-    IntArray(Vec<i32>),
-    /// A length-prefixed array of `i64`s. The prefix is an `i32`.
-    LongArray(Vec<i64>),
-    /// An empty NBT tag.
-    /// Not commonly used, it rather just marks the end of a compound tag.
-    Empty,
+mod private {
+    use crate::{BigEndian, LittleEndian, Variable};
+
+    /// Prevents [`VariantImpl`](super::VariantImpl) from being implemented for
+    /// types outside of this crate.
+    pub trait Sealed {}
+
+    impl Sealed for LittleEndian {}
+    impl Sealed for BigEndian {}
+    impl Sealed for Variable {}
 }
 
-impl NbtTag {
-    /// The tag ID of [NbtTag::Byte]
-    const BYTE_ID: u8 = 0x01;
+/// Implemented by all NBT variants.
+pub trait VariantImpl: private::Sealed {
+    /// Used to convert a variant to an enum.
+    /// This is used to match generic types in order to prevent
+    /// having to duplicate all deserialisation code three times.
+    const AS_ENUM: Variant;
+}
 
-    /// The tag ID of [NbtTag::Int16]
-    const INT16_ID: u8 = 0x02;
+/// NBT format variant.
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum Variant {
+    /// Used by Bedrock for data saved to disk.
+    /// Every data type is written in little endian format.
+    LittleEndian,
+    /// Used by Java.
+    /// Every data types is written in big endian format.
+    BigEndian,
+    /// Used by Bedrock for NBT transferred over the network.
+    /// This format is the same as [`LittleEndian`], except that type lengths
+    /// (such as for strings or lists), are varints instead of shorts.
+    /// The integer and long types are also varints.
+    Variable,
+}
 
-    /// The tag ID of [NbtTag::Int32]
-    const INT32_ID: u8 = 0x03;
+/// Used by Bedrock for data saved to disk.
+/// Every data type is written in little endian format.
+pub enum LittleEndian {}
 
-    /// The tag ID of [NbtTag::Int64]
-    const INT64_ID: u8 = 0x04;
+impl VariantImpl for LittleEndian {
+    const AS_ENUM: Variant = Variant::LittleEndian;
+}
 
-    /// The tag ID of [NbtTag::Float32]
-    const FLOAT32_ID: u8 = 0x05;
+/// Used by Java.
+/// Every data types is written in big endian format.
+pub enum BigEndian {}
 
-    /// The tag ID of [NbtTag::Float64]
-    const FLOAT64_ID: u8 = 0x06;
+impl VariantImpl for BigEndian {
+    const AS_ENUM: Variant = Variant::BigEndian;
+}
 
-    /// The tag ID of [NbtTag::ByteArray]
-    const BYTEARRAY_ID: u8 = 0x07;
-    /// The tag ID of [NbtTag::IntArray]
-    const INTARRAY_ID: u8 = 0x0B;
-    /// The tag ID of [NbtTag::LongArray]
-    const LONGARRAY_ID: u8 = 0x0C;
+/// Used by Bedrock for NBT transferred over the network.
+/// This format is the same as [`LittleEndian`], except that type lengths
+/// (such as for strings or lists), are varints instead of shorts.
+/// The integer and long types are also varints.
+pub enum Variable {}
 
-    /// The tag ID of [NbtTag::String]
-    const STRING_ID: u8 = 0x08;
+impl VariantImpl for Variable {
+    const AS_ENUM: Variant = Variant::Variable;
+}
 
-    /// The tag ID of [NbtTag::List]
-    const LIST_ID: u8 = 0x09;
+/// NBT field type
+// Compiler complains about unused enum variants even though they're constructed using a transmute.
+#[allow(dead_code)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[repr(u8)]
+enum FieldType {
+    /// Indicates the end of a compound tag.
+    End = 0,
+    /// A signed byte.
+    Byte = 1,
+    /// A signed short.
+    Short = 2,
+    /// A signed int.
+    Int = 3,
+    /// A signed long.
+    Long = 4,
+    /// A float.
+    Float = 5,
+    /// A double.
+    Double = 6,
+    /// An array of byte tags.
+    ByteArray = 7,
+    /// A UTF-8 string.
+    String = 8,
+    /// List of tags.
+    /// Every item in the list must be of the same type.
+    List = 9,
+    /// A key-value map.
+    Compound = 10,
+    /// An array of int tags.
+    IntArray = 11,
+    /// An array of long tags.
+    LongArray = 12,
+}
 
-    /// The open tag ID of [NbtTag::Compound]
-    const COMPOUND_ID: u8 = 0x0A;
+impl TryFrom<u8> for FieldType {
+    type Error = NbtError;
 
-    /// The close tag ID of [NbtTag::Compound]
-    const EMPTY_ID: u8 = 0x00;
-
-    /// Returns the tag (open) ID for a given tag.
-    #[inline(always)]
-    fn get_id(&self) -> u8 {
-        match self {
-            NbtTag::Byte(_) => Self::BYTE_ID,
-            NbtTag::Int16(_) => Self::INT16_ID,
-            NbtTag::Int32(_) => Self::INT32_ID,
-            NbtTag::Int64(_) => Self::INT64_ID,
-            NbtTag::Float32(_) => Self::FLOAT32_ID,
-            NbtTag::Float64(_) => Self::FLOAT64_ID,
-            NbtTag::String(_) => Self::STRING_ID,
-            NbtTag::List(_) => Self::LIST_ID,
-            NbtTag::Compound(_) => Self::COMPOUND_ID,
-            NbtTag::ByteArray(_) => Self::BYTEARRAY_ID,
-            NbtTag::IntArray(_) => Self::INTARRAY_ID,
-            NbtTag::LongArray(_) => Self::LONGARRAY_ID,
-            NbtTag::Empty => Self::EMPTY_ID,
-        }
-    }
-
-    /// Serializes a given NBT with a given root tag
-    /// (the root tags name is nearly always left empty) name into the given buffer.
-    /// Use the provided endian for serialization.
-    ///
-    /// Use [NbtTag::nbt_serialize] as a simple alternative that just returns
-    /// a vec as its output.
-    ///
-    /// # Example:
-    /// ```no_run
-    /// use std::collections::HashMap;
-    /// use bedrockrs_nbt::endian::little_endian::NbtLittleEndian;
-    /// use bedrockrs_nbt::NbtTag;
-    ///
-    /// let mut map = HashMap::new();
-    ///
-    /// map.insert("MyText".to_string(), NbtTag::String("This is my text".to_string()));
-    /// map.insert("MyInt32".to_string(), NbtTag::Int32(42));
-    ///
-    /// let tag = NbtTag::Compound(map);
-    ///
-    /// let mut buf = vec![];
-    ///
-    /// // You can also use other endian encodings
-    /// NbtTag::nbt_serialize::<NbtLittleEndian>(&tag, "", &mut buf).unwrap();
-    ///
-    /// println!("Nbt: {:#?}", tag);
-    /// println!("Raw: {:?}", buf);
-    /// ```
-    pub fn nbt_serialize<T: NbtByteOrder>(
-        &self,
-        root_tag_name: impl Into<String>,
-        stream: &mut Vec<u8>,
-    ) -> Result<(), NbtError> {
-        T::write_u8(stream, self.get_id())?;
-        T::write_string(stream, root_tag_name.into())?;
-
-        self.nbt_serialize_val::<T>(stream)
-    }
-
-    /// Serialize the NBT via a simple vec.
-    /// Simpler alternative to [NbtTag::nbt_serialize].
-    #[inline]
-    pub fn nbt_serialize_vec<T: NbtByteOrder>(
-        &self,
-        key: impl Into<String>,
-    ) -> Result<Vec<u8>, NbtError> {
-        let mut buf = vec![];
-
-        NbtTag::nbt_serialize::<T>(self, key, &mut buf)?;
-
-        Ok(buf)
-    }
-
-    /// Serializes a given val without any root tag name or type notation.
-    /// Should only be used by the [NbtTag::nbt_serialize] function internally.
-    #[inline]
-    fn nbt_serialize_val<T: NbtByteOrder>(&self, buf: &mut Vec<u8>) -> Result<(), NbtError> {
-        match self {
-            NbtTag::Byte(v) => T::write_u8(buf, *v)?,
-            NbtTag::Int16(v) => T::write_i16(buf, *v)?,
-            NbtTag::Int32(v) => T::write_i32(buf, *v)?,
-            NbtTag::Int64(v) => T::write_i64(buf, *v)?,
-            NbtTag::Float32(v) => T::write_f32(buf, *v)?,
-            NbtTag::Float64(v) => T::write_f64(buf, *v)?,
-            NbtTag::String(v) => T::write_string(buf, v.to_string())?,
-            NbtTag::List(v) => {
-                let list_type = if v.is_empty() {
-                    Self::BYTE_ID
-                } else {
-                    v[0].get_id()
-                };
-
-                T::write_u8(buf, list_type)?;
-                T::write_i32(buf, v.len().try_into().map_err(|e| NbtError::IntError(e))?)?;
-
-                for tag in v {
-                    tag.nbt_serialize_val::<T>(buf)?;
-                }
-            }
-            NbtTag::Compound(v) => {
-                let iter = v.iter();
-
-                for (tag_name, v) in iter {
-                    v.nbt_serialize::<T>(tag_name, buf)?;
-                }
-
-                T::write_u8(buf, Self::EMPTY_ID)?;
-            }
-            NbtTag::Empty => {}
-            NbtTag::ByteArray(arr) => {
-                T::write_i32(
-                    buf,
-                    arr.len().try_into().map_err(|e| NbtError::IntError(e))?,
-                )?;
-                for elem in arr {
-                    T::write_u8(buf, *elem)?;
-                }
-            }
-            NbtTag::IntArray(arr) => {
-                T::write_i32(
-                    buf,
-                    arr.len().try_into().map_err(|e| NbtError::IntError(e))?,
-                )?;
-                for elem in arr {
-                    T::write_i32(buf, *elem)?;
-                }
-            }
-            NbtTag::LongArray(arr) => {
-                T::write_i32(
-                    buf,
-                    arr.len().try_into().map_err(|e| NbtError::IntError(e))?,
-                )?;
-                for elem in arr {
-                    T::write_i64(buf, *elem)?;
-                }
-            }
+    fn try_from(v: u8) -> Result<Self, Self::Error> {
+        const LAST_DISC: u8 = FieldType::LongArray as u8;
+        if v > LAST_DISC {
+            return Err(NbtError::TypeOutOfRange(v));
         }
 
-        Ok(())
-    }
-
-    /// Deserializes an NBT from a [`ByteStreamRead`], returns the NBT and its root tag name
-    /// (The root tag name is nearly always left empty).
-    /// Uses the provided endian encoding for deserialization.
-    ///
-    /// Use [`NbtTag::nbt_deserialize_vec`] as a simple alternative that just takes
-    /// a vec as an argument.
-    ///
-    /// # Example:
-    /// ```no_run
-    /// use std::io::Cursor;
-    /// use bedrockrs_nbt::endian::little_endian::NbtLittleEndian;
-    /// use bedrockrs_nbt::NbtTag;
-    ///
-    /// // Data generated by the NbtTag::serialize function's example
-    /// let data = [
-    ///     10, 6, 0, 109, 121, 32, 110, 98, 116,
-    ///     8, 7, 0, 77, 121, 32, 84, 101, 120, 116,
-    ///     15, 0, 84, 104, 105, 115, 32, 105, 115,
-    ///     32, 109, 121, 32, 116, 101, 120, 116, 3,
-    ///     8, 0, 77, 121, 32, 105, 110, 116, 51, 50,
-    ///     42, 0, 0, 0, 0
-    /// ];
-    ///
-    /// // Create the stream
-    /// let mut stream = Cursor::new(data.as_slice());
-    ///
-    /// // Read the nbt tag and its name
-    /// let (tag, name) = NbtTag::nbt_deserialize::<NbtLittleEndian>(&mut stream).unwrap();
-    ///
-    /// println!("{:#?}: {:#?}", name, tag);
-    /// ```
-    pub fn nbt_deserialize<T: NbtByteOrder>(
-        stream: &mut Cursor<&[u8]>,
-    ) -> Result<(String, Self), NbtError> {
-        let id = match T::read_u8(stream) {
-            Ok(v) => v,
-            Err(e) => {
-                return Err(e);
-            }
-        };
-
-        let name = match T::read_string(stream) {
-            Ok(v) => v,
-            Err(e) => {
-                return Err(e);
-            }
-        };
-
-        let tag = match Self::nbt_deserialize_val::<T>(stream, id) {
-            Ok(v) => v,
-            Err(e) => return Err(e),
-        };
-
-        Ok((name, tag))
-    }
-
-    /// Deserialize the NBT via a simple vec.
-    /// Simpler alternative to [NbtTag::nbt_deserialize].
-    #[inline]
-    pub fn nbt_deserialize_vec<T: NbtByteOrder>(vec: &Vec<u8>) -> Result<(String, Self), NbtError> {
-        NbtTag::nbt_deserialize::<T>(&mut Cursor::new(vec.as_slice()))
-    }
-
-    /// Deserializes a given val without reading any tag name notation.
-    /// Should only be used by the [NbtTag::nbt_deserialize] function internally.
-    #[inline]
-    fn nbt_deserialize_val<T: NbtByteOrder>(
-        stream: &mut Cursor<&[u8]>,
-        id: u8,
-    ) -> Result<Self, NbtError> {
-        let tag = match id {
-            Self::BYTE_ID => {
-                let byte = match T::read_u8(stream) {
-                    Ok(v) => v,
-                    Err(e) => {
-                        return Err(e);
-                    }
-                };
-
-                NbtTag::Byte(byte)
-            }
-            Self::INT16_ID => {
-                let int16 = match T::read_i16(stream) {
-                    Ok(v) => v,
-                    Err(e) => {
-                        return Err(e);
-                    }
-                };
-
-                NbtTag::Int16(int16)
-            }
-            Self::INT32_ID => {
-                let int32 = match T::read_i32(stream) {
-                    Ok(v) => v,
-                    Err(e) => {
-                        return Err(e);
-                    }
-                };
-
-                NbtTag::Int32(int32)
-            }
-            Self::INT64_ID => {
-                let int64 = match T::read_i64(stream) {
-                    Ok(v) => v,
-                    Err(e) => {
-                        return Err(e);
-                    }
-                };
-
-                NbtTag::Int64(int64)
-            }
-            Self::FLOAT32_ID => {
-                let float32 = match T::read_f32(stream) {
-                    Ok(v) => v,
-                    Err(e) => {
-                        return Err(e);
-                    }
-                };
-
-                NbtTag::Float32(float32)
-            }
-            Self::FLOAT64_ID => {
-                let float64 = match T::read_f64(stream) {
-                    Ok(v) => v,
-                    Err(e) => {
-                        return Err(e);
-                    }
-                };
-
-                NbtTag::Float64(float64)
-            }
-            Self::STRING_ID => {
-                let string = match T::read_string(stream) {
-                    Ok(v) => v,
-                    Err(e) => {
-                        return Err(e);
-                    }
-                };
-
-                NbtTag::String(string)
-            }
-            Self::LIST_ID => {
-                let list_type = match T::read_u8(stream) {
-                    Ok(v) => v,
-                    Err(e) => {
-                        return Err(e);
-                    }
-                };
-
-                let len = match T::read_i32(stream) {
-                    Ok(v) => v,
-                    Err(e) => {
-                        return Err(e);
-                    }
-                };
-
-                let mut vec = vec![];
-
-                for _ in 0..len {
-                    match Self::nbt_deserialize_val::<T>(stream, list_type) {
-                        Ok(v) => vec.push(v),
-                        Err(e) => return Err(e),
-                    }
-                }
-
-                NbtTag::List(vec)
-            }
-            Self::COMPOUND_ID => {
-                let mut map = HashMap::new();
-
-                loop {
-                    let id = T::read_u8(stream)?;
-
-                    if id == Self::EMPTY_ID {
-                        break;
-                    }
-
-                    let key = T::read_string(stream)?;
-                    let tag = Self::nbt_deserialize_val::<T>(stream, id)?;
-
-                    map.insert(key, tag);
-                }
-
-                NbtTag::Compound(map)
-            }
-            Self::EMPTY_ID => NbtTag::Empty,
-            other => {
-                return Err(NbtError::UnexpectedID(other));
-            }
-        };
-
-        Ok(tag)
+        // SAFETY: Because `Self` is marked as `repr(u8)`, its layout is guaranteed to start
+        // with a `u8` discriminant as its first field. Additionally, the raw discriminant is verified
+        // to be in the enum's range.
+        Ok(unsafe { std::mem::transmute::<u8, FieldType>(v) })
     }
 }
 
-// Implement the Debug trait for NbtTag
-impl Debug for NbtTag {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        // check for pretty formating with #
-        match f.alternate() {
-            // normal format
-            false => match self {
-                NbtTag::Byte(v) => {
-                    write!(f, "Byte({v:?})")
-                }
-                NbtTag::Int16(v) => {
-                    write!(f, "Int16({v:?})")
-                }
-                NbtTag::Int32(v) => {
-                    write!(f, "Int32({v:?})")
-                }
-                NbtTag::Int64(v) => {
-                    write!(f, "Int64({v:?})")
-                }
-                NbtTag::Float32(v) => {
-                    write!(f, "Float32({v:?})")
-                }
-                NbtTag::Float64(v) => {
-                    write!(f, "Float64({v:?})")
-                }
-                NbtTag::String(v) => {
-                    write!(f, "{v:?}")
-                }
-                NbtTag::List(v) => {
-                    write!(f, "{v:?}")
-                }
-                NbtTag::Compound(v) => {
-                    write!(f, "{v:?}")
-                }
-                NbtTag::Empty => {
-                    write!(f, "")
-                }
-                NbtTag::ByteArray(v) => {
-                    write!(f, "{v:?}")
-                }
-                NbtTag::IntArray(v) => {
-                    write!(f, "{v:?}")
-                }
-                NbtTag::LongArray(v) => {
-                    write!(f, "{v:?}")
-                }
-            },
-            // pretty format
-            true => match self {
-                NbtTag::Byte(v) => {
-                    write!(f, "Byte({v:#?})")
-                }
-                NbtTag::Int16(v) => {
-                    write!(f, "Int16({v:#?})")
-                }
-                NbtTag::Int32(v) => {
-                    write!(f, "Int32({v:#?})")
-                }
-                NbtTag::Int64(v) => {
-                    write!(f, "Int64({v:#?})")
-                }
-                NbtTag::Float32(v) => {
-                    write!(f, "Float32({v:#?})")
-                }
-                NbtTag::Float64(v) => {
-                    write!(f, "Float64({v:#?})")
-                }
-                NbtTag::String(v) => {
-                    write!(f, "{v:#?}")
-                }
-                NbtTag::List(v) => {
-                    write!(f, "{v:#?}")
-                }
-                NbtTag::Compound(v) => {
-                    write!(f, "{v:#?}")
-                }
-                // Any better idea of what should be written?
-                NbtTag::Empty => {
-                    write!(f, "EMPTY")
-                }
-                NbtTag::ByteArray(v) => {
-                    write!(f, "{v:#?}")
-                }
-                NbtTag::IntArray(v) => {
-                    write!(f, "{v:#?}")
-                }
-                NbtTag::LongArray(v) => {
-                    write!(f, "{v:#?}")
-                }
-            },
-        }
+// impl From<anyhow::Error> for NbtError {
+//     fn from(value: anyhow::Error) -> Self {
+//         Self(value)
+//     }
+// }
+
+// impl From<std::io::Error> for NbtError {
+//     fn from(value: std::io::Error) -> Self {
+//         Self(value.into())
+//     }
+// }
+
+// impl From<std::string::FromUtf8Error> for NbtError {
+//     fn from(value: std::string::FromUtf8Error) -> Self {
+//         Self(value.into())
+//     }
+// }
+
+// impl From<std::str::Utf8Error> for NbtError {
+//     fn from(value: std::str::Utf8Error) -> Self {
+//         Self(value.into())
+//     }
+// }
+
+// impl Display for NbtError {
+//     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+//         std::fmt::Display::fmt(&self.0, f)
+//     }
+// }
+
+// impl std::error::Error for NbtError {}
+
+impl serde::de::Error for NbtError {
+    fn custom<T>(msg: T) -> Self
+    where
+        T: Display,
+    {
+        Self(anyhow!(msg.to_string()))
+    }
+}
+
+impl serde::ser::Error for NbtError {
+    fn custom<T>(msg: T) -> Self
+    where
+        T: Display,
+    {
+        Self(anyhow!(msg.to_string()))
     }
 }
