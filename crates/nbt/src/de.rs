@@ -5,6 +5,7 @@ use paste::paste;
 use serde::de::{DeserializeSeed, MapAccess, SeqAccess, Visitor};
 use serde::{de, Deserialize};
 
+use crate::error::StreamError;
 use crate::read::BinaryRead;
 use crate::{BigEndian, FieldType, LittleEndian, NbtError, Variable, Variant, VariantImpl};
 
@@ -30,7 +31,7 @@ macro_rules! forward_unsupported {
                 V: Visitor<'de>
             {
                 return Err(NbtError::Unsupported(
-                    concat!("Deserialization of `", stringify!($ty)), "` is not supported"
+                    concat!("Deserialization of `", stringify!($ty), "` is not supported")
                 ));
             }
         )+}
@@ -56,10 +57,12 @@ where
     F: VariantImpl + 'de,
 {
     /// Creates a new deserialiser, consuming the reader.
-    pub fn new(input: &'re mut R) -> anyhow::Result<Self> {
+    pub fn new(input: &'re mut R) -> Result<Self, NbtError> {
         let next_ty = FieldType::try_from(input.read_u8()?)?;
         if next_ty != FieldType::Compound && next_ty != FieldType::List {
-            return Err(NbtError::Other("Expected compound or list tag as root"));
+            return Err(NbtError::Other(Cow::Borrowed(
+                "Expected compound or list tag as root",
+            )));
         }
 
         let mut de = Deserializer {
@@ -75,7 +78,7 @@ where
     }
 
     /// Deserialise a raw UTF-8 string.
-    fn deserialize_raw_str(&mut self) -> anyhow::Result<&str> {
+    fn deserialize_raw_str(&mut self) -> Result<&str, StreamError> {
         let len = match F::AS_ENUM {
             Variant::BigEndian => self.input.read_u16_be()? as u32,
             Variant::LittleEndian => self.input.read_u16_le()? as u32,
@@ -85,8 +88,6 @@ where
         let data = self.input.take_n(len as usize)?;
         let str = std::str::from_utf8(data)?;
 
-        // dbg!(str);
-
         Ok(str)
     }
 }
@@ -95,18 +96,16 @@ where
 ///
 /// On success, the deserialised object and amount of bytes read from the buffer are returned.
 #[inline]
-fn from_bytes<'de, 're, F, R, T>(reader: &'re mut R) -> anyhow::Result<(T, usize)>
+fn from_bytes<'de, 're, F, R, T>(reader: &'re mut R) -> Result<T, NbtError>
 where
     R: BinaryRead<'de>,
     T: Deserialize<'de>,
     F: VariantImpl + 'de,
 {
-    let start = reader.remaining();
     let mut deserializer = Deserializer::<F, R>::new(reader)?;
     let output = T::deserialize(&mut deserializer)?;
-    let end = deserializer.input.remaining();
 
-    Ok((output, start - end))
+    Ok(output)
 }
 
 /// Reads a single object of type `T` from the given buffer.
@@ -139,7 +138,7 @@ where
 /// # }
 /// ```
 #[inline]
-pub fn from_le_bytes<'de, T, R>(reader: &mut R) -> anyhow::Result<(T, usize)>
+pub fn from_le_bytes<'de, T, R>(reader: &mut R) -> Result<T, NbtError>
 where
     R: BinaryRead<'de>,
     T: Deserialize<'de>,
@@ -177,7 +176,7 @@ where
 /// # }
 /// ```
 #[inline]
-pub fn from_be_bytes<'de, T, R>(reader: &mut R) -> anyhow::Result<(T, usize)>
+pub fn from_be_bytes<'de, T, R>(reader: &mut R) -> Result<T, NbtError>
 where
     R: BinaryRead<'de>,
     T: Deserialize<'de>,
@@ -215,7 +214,7 @@ where
 /// # }
 /// ```
 #[inline]
-pub fn from_var_bytes<'data, T, R>(reader: &mut R) -> anyhow::Result<(T, usize)>
+pub fn from_var_bytes<'data, T, R>(reader: &mut R) -> Result<T, NbtError>
 where
     R: BinaryRead<'data>,
     T: Deserialize<'data>,
@@ -240,7 +239,11 @@ where
             self.deserialize_str(visitor)
         } else {
             match self.next_ty {
-                FieldType::End => return Err(NbtError::Other("Encountered unmatched end tag")),
+                FieldType::End => {
+                    return Err(NbtError::Other(Cow::Borrowed(
+                        "Encountered unmatched end tag",
+                    )))
+                }
                 FieldType::Byte => self.deserialize_i8(visitor),
                 FieldType::Short => self.deserialize_i16(visitor),
                 FieldType::Int => self.deserialize_i32(visitor),
@@ -600,7 +603,7 @@ where
         de: &'a mut Deserializer<'re, 'de, F, R>,
         ty: FieldType,
         expected_len: u32,
-    ) -> anyhow::Result<Self> {
+    ) -> Result<Self, NbtError> {
         // debug_assert_ne!(ty, FieldType::End, "Cannot serialize sequence of end tags");
 
         // ty is not read in here because the x_array types don't have a type prefix.

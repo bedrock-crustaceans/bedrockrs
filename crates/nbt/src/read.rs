@@ -5,7 +5,7 @@ use std::{
 
 use paste::paste;
 
-use crate::{error::StreamError, BlockPosition, Deserialize, Vector};
+use crate::error::StreamError;
 
 /// Implements the read functions for integer primitives.
 macro_rules! declare_primitive_fns {
@@ -206,44 +206,44 @@ pub trait BinaryRead<'a>: AsRef<[u8]> {
         Ok(std::str::from_utf8(data)?)
     }
 
-    #[inline]
-    fn read_block_pos(&mut self) -> Result<BlockPosition, StreamError> {
-        let x = self.read_var_i32()?;
-        let y = self.read_var_u32()?;
-        let z = self.read_var_i32()?;
+    // #[inline]
+    // fn read_block_pos(&mut self) -> Result<BlockPosition, StreamError> {
+    //     let x = self.read_var_i32()?;
+    //     let y = self.read_var_u32()?;
+    //     let z = self.read_var_i32()?;
 
-        Ok(BlockPosition::new(x, y, z))
-    }
+    //     Ok(BlockPosition::new(x, y, z))
+    // }
 
-    /// Reads a byte vector from the buffer.
-    #[inline]
-    fn read_vecb<const N: usize>(&mut self) -> Result<Vector<i8, N>, StreamError> {
-        let mut x = [0; N];
-        for v in &mut x {
-            *v = self.read_i8()?;
-        }
-        Ok(Vector::from(x))
-    }
+    // /// Reads a byte vector from the buffer.
+    // #[inline]
+    // fn read_vecb<const N: usize>(&mut self) -> Result<Vector<i8, N>, StreamError> {
+    //     let mut x = [0; N];
+    //     for v in &mut x {
+    //         *v = self.read_i8()?;
+    //     }
+    //     Ok(Vector::from(x))
+    // }
 
-    /// Reads an integer vector from the buffer.
-    #[inline]
-    fn read_veci<const N: usize>(&mut self) -> Result<Vector<i32, N>, StreamError> {
-        let mut x = [0; N];
-        for v in &mut x {
-            *v = self.read_var_i32()?;
-        }
-        Ok(Vector::from(x))
-    }
+    // /// Reads an integer vector from the buffer.
+    // #[inline]
+    // fn read_veci<const N: usize>(&mut self) -> Result<Vector<i32, N>, StreamError> {
+    //     let mut x = [0; N];
+    //     for v in &mut x {
+    //         *v = self.read_var_i32()?;
+    //     }
+    //     Ok(Vector::from(x))
+    // }
 
-    /// Reads a float vector from the buffer.
-    #[inline]
-    fn read_vecf<const N: usize>(&mut self) -> Result<Vector<f32, N>, StreamError> {
-        let mut x = [0.0; N];
-        for v in &mut x {
-            *v = self.read_f32_le()?;
-        }
-        Ok(Vector::from(x))
-    }
+    // /// Reads a float vector from the buffer.
+    // #[inline]
+    // fn read_vecf<const N: usize>(&mut self) -> Result<Vector<f32, N>, StreamError> {
+    //     let mut x = [0.0; N];
+    //     for v in &mut x {
+    //         *v = self.read_f32_le()?;
+    //     }
+    //     Ok(Vector::from(x))
+    // }
 
     /// Reads an IP address from the buffer.
     fn read_addr(&mut self) -> Result<SocketAddr, StreamError> {

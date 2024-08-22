@@ -18,11 +18,41 @@ pub enum NbtError {
     #[error("{0}")]
     MissingData(Cow<'static, str>),
     #[error("{0}")]
+    ByteError(StreamError),
+    #[error("{0}")]
     Other(Cow<'static, str>),
+}
+
+impl From<std::io::Error> for NbtError {
+    fn from(value: std::io::Error) -> Self {
+        Self::ByteError(StreamError::IoError(value))
+    }
+}
+
+impl From<std::str::Utf8Error> for NbtError {
+    fn from(value: std::str::Utf8Error) -> Self {
+        Self::ByteError(StreamError::Utf8Error(value))
+    }
+}
+
+impl From<std::string::FromUtf8Error> for NbtError {
+    fn from(value: std::string::FromUtf8Error) -> Self {
+        Self::ByteError(StreamError::FromUtf8Error(value))
+    }
+}
+
+impl From<StreamError> for NbtError {
+    fn from(value: StreamError) -> Self {
+        Self::ByteError(value)
+    }
 }
 
 #[derive(Debug, Error)]
 pub enum StreamError {
+    #[error("{0}")]
+    IoError(std::io::Error),
+    #[error("{0}")]
+    FromUtf8Error(std::string::FromUtf8Error),
     #[error("{0}")]
     Utf8Error(std::str::Utf8Error),
     #[error("Expected {expected} remaining bytes, found only {remaining}")]
@@ -31,8 +61,20 @@ pub enum StreamError {
     Other(Cow<'static, str>),
 }
 
+impl From<std::io::Error> for StreamError {
+    fn from(value: std::io::Error) -> Self {
+        Self::IoError(value)
+    }
+}
+
 impl From<std::str::Utf8Error> for StreamError {
     fn from(value: std::str::Utf8Error) -> Self {
         Self::Utf8Error(value)
+    }
+}
+
+impl From<std::string::FromUtf8Error> for StreamError {
+    fn from(value: std::string::FromUtf8Error) -> Self {
+        Self::FromUtf8Error(value)
     }
 }
