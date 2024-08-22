@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::marker::PhantomData;
 
 use paste::paste;
@@ -10,12 +11,10 @@ use crate::{BigEndian, FieldType, LittleEndian, NbtError, Variable, Variant, Var
 macro_rules! is_ty {
     ($expected: ident, $actual: expr) => {
         if $actual != FieldType::$expected {
-            bail!(
-                Malformed,
-                "Expected type {:?}, but found {:?}",
-                FieldType::$expected,
-                $actual
-            )
+            return Err(NbtError::UnexpectedType {
+                expected: FieldType::$expected,
+                actual: $actual,
+            });
         }
     };
 }
@@ -29,7 +28,9 @@ macro_rules! forward_unsupported {
             where
                 V: Visitor<'de>
             {
-                bail!(Unsupported, concat!("Deserialisation of `", stringify!($ty), "` is not supported"));
+                return Err(NbtError::UnsupportedOperation(
+                    concat!("Deserialization of ", stringify!($ty))
+                ));
             }
         )+}
     }
@@ -57,7 +58,7 @@ where
     pub fn new(input: &'re mut R) -> anyhow::Result<Self> {
         let next_ty = FieldType::try_from(input.read_u8()?)?;
         if next_ty != FieldType::Compound && next_ty != FieldType::List {
-            bail!(Malformed, "Expected compound or list tag as root");
+            return Err(NbtError::Other("Expected compound or list tag as root"));
         }
 
         let mut de = Deserializer {
@@ -238,7 +239,7 @@ where
             self.deserialize_str(visitor)
         } else {
             match self.next_ty {
-                FieldType::End => bail!(Malformed, "Found unexpected End tag"),
+                FieldType::End => return Err(NbtError::Other("Encountered unmatched end tag"))
                 FieldType::Byte => self.deserialize_i8(visitor),
                 FieldType::Short => self.deserialize_i16(visitor),
                 FieldType::Int => self.deserialize_i32(visitor),
@@ -444,7 +445,7 @@ where
     where
         V: Visitor<'de>,
     {
-        bail!(Unsupported, "Deserializing unit values is not supported")
+        Err(NbtError::Unsupported("Deserializing unit values"))
     }
 
     fn deserialize_unit_struct<V>(
@@ -455,7 +456,7 @@ where
     where
         V: Visitor<'de>,
     {
-        bail!(Unsupported, "Deserializing unit structs is not supported")
+        Err(NbtError::Unsupported("Deserializing unit structs"))
     }
 
     fn deserialize_newtype_struct<V>(
@@ -466,10 +467,7 @@ where
     where
         V: Visitor<'de>,
     {
-        bail!(
-            Unsupported,
-            "Deserializing newtype structs is not supported"
-        )
+        Err(NbtError::Unsupported("Deserializing newtype structs"))
     }
 
     #[inline]
@@ -505,7 +503,7 @@ where
     where
         V: Visitor<'de>,
     {
-        bail!(Unsupported, "Deserializing tuple structs is not supported")
+        Err(NbtError::Unsupported("Deserializing tuple structs"))
     }
 
     #[inline]
@@ -541,7 +539,7 @@ where
     where
         V: Visitor<'de>,
     {
-        bail!(Unsupported, "Deserializing enums is not supported")
+        Err(NbtError::Unsupported("Deserializing enums is not supported"))
     }
 
     #[inline]
@@ -604,10 +602,11 @@ where
         };
 
         if expected_len != 0 && expected_len != remaining {
-            bail!(
-                Malformed,
-                "Expected sequence of length {expected_len}, got length {remaining}"
-            );
+            return Err(NbtError::MissingData(
+                Cow::Owned(format!(
+                    "Sequence of {expected_len} {ty:?} expected, found only {remaining} items"
+                ))
+            ))
         }
 
         Ok(Self { de, ty, remaining })

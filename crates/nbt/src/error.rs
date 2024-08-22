@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use thiserror::Error;
 
 use crate::FieldType;
@@ -11,4 +13,10 @@ pub enum NbtError {
         expected: FieldType,
         actual: FieldType,
     },
+    #[error("{0} is not supported")]
+    Unsupported(&'static str),
+    #[error("{0}")]
+    MissingData(Cow<'static, str>),
+    #[error("{0}")]
+    Other(&'static str),
 }
