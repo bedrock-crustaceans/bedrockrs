@@ -6,13 +6,16 @@ pub use crate::ser::{
     Serializer,
 };
 pub use crate::value::Value;
-use anyhow::anyhow;
-use std::fmt::{Debug, Display, Formatter};
+use std::borrow::Cow;
+use std::fmt::{Debug, Display};
 
 pub use error::NbtError;
 
 #[cfg(test)]
 mod test;
+
+mod read;
+mod write;
 
 mod de;
 mod error;
@@ -132,44 +135,12 @@ impl TryFrom<u8> for FieldType {
     }
 }
 
-// impl From<anyhow::Error> for NbtError {
-//     fn from(value: anyhow::Error) -> Self {
-//         Self(value)
-//     }
-// }
-
-// impl From<std::io::Error> for NbtError {
-//     fn from(value: std::io::Error) -> Self {
-//         Self(value.into())
-//     }
-// }
-
-// impl From<std::string::FromUtf8Error> for NbtError {
-//     fn from(value: std::string::FromUtf8Error) -> Self {
-//         Self(value.into())
-//     }
-// }
-
-// impl From<std::str::Utf8Error> for NbtError {
-//     fn from(value: std::str::Utf8Error) -> Self {
-//         Self(value.into())
-//     }
-// }
-
-// impl Display for NbtError {
-//     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-//         std::fmt::Display::fmt(&self.0, f)
-//     }
-// }
-
-// impl std::error::Error for NbtError {}
-
 impl serde::de::Error for NbtError {
     fn custom<T>(msg: T) -> Self
     where
         T: Display,
     {
-        Self(anyhow!(msg.to_string()))
+        NbtError::Other(Cow::Owned(msg.to_string()))
     }
 }
 
@@ -178,6 +149,6 @@ impl serde::ser::Error for NbtError {
     where
         T: Display,
     {
-        Self(anyhow!(msg.to_string()))
+        NbtError::Other(Cow::Owned(msg.to_string()))
     }
 }

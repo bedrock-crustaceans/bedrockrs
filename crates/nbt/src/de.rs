@@ -5,6 +5,7 @@ use paste::paste;
 use serde::de::{DeserializeSeed, MapAccess, SeqAccess, Visitor};
 use serde::{de, Deserialize};
 
+use crate::read::BinaryRead;
 use crate::{BigEndian, FieldType, LittleEndian, NbtError, Variable, Variant, VariantImpl};
 
 /// Verifies that the deserialised type is equal to the expected type.

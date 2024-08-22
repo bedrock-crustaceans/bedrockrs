@@ -5,7 +5,6 @@ use std::hash::{Hash, Hasher};
 use serde::de::{MapAccess, SeqAccess, Visitor};
 use serde::ser::{SerializeMap, SerializeSeq};
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
-use util::RVec;
 
 /// General NBT value type that can represent any value.
 ///
@@ -30,7 +29,7 @@ pub enum Value {
     /// This type is not used when deserialising due to issues with `serde`.
     /// In case you are defining your own types, you can use [`serde_bytes`](https://crates.io/crates/serde_bytes)
     /// to make use of the byte array type.
-    ByteArray(RVec),
+    ByteArray(Vec<u8>),
     /// A UTF-8 string.
     String(String),
     /// List of an arbitrary NBT value.
@@ -568,7 +567,7 @@ impl Hash for Value {
 
 impl<'de> Deserialize<'de> for Value {
     #[inline]
-    fn deserialize<D>(deserializer: D) -> anyhow::Result<Value, D::Error>
+    fn deserialize<D>(deserializer: D) -> Result<Value, D::Error>
     where
         D: Deserializer<'de>,
     {
@@ -577,7 +576,7 @@ impl<'de> Deserialize<'de> for Value {
 }
 
 #[inline]
-fn serialize_seq<T, S>(ser: S, seq: &[T]) -> anyhow::Result<S::Ok, S::Error>
+fn serialize_seq<T, S>(ser: S, seq: &[T]) -> Result<S::Ok, S::Error>
 where
     T: Serialize,
     S: Serializer,
@@ -590,7 +589,7 @@ where
 }
 
 impl Serialize for Value {
-    fn serialize<S>(&self, ser: S) -> anyhow::Result<S::Ok, S::Error>
+    fn serialize<S>(&self, ser: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
@@ -628,7 +627,7 @@ impl<'de> Visitor<'de> for ValueVisitor {
     }
 
     #[inline]
-    fn visit_bool<E>(self, v: bool) -> anyhow::Result<Self::Value, E>
+    fn visit_bool<E>(self, v: bool) -> Result<Self::Value, E>
     where
         E: de::Error,
     {
@@ -636,7 +635,7 @@ impl<'de> Visitor<'de> for ValueVisitor {
     }
 
     #[inline]
-    fn visit_i8<E>(self, v: i8) -> anyhow::Result<Self::Value, E>
+    fn visit_i8<E>(self, v: i8) -> Result<Self::Value, E>
     where
         E: de::Error,
     {
@@ -644,7 +643,7 @@ impl<'de> Visitor<'de> for ValueVisitor {
     }
 
     #[inline]
-    fn visit_i16<E>(self, v: i16) -> anyhow::Result<Self::Value, E>
+    fn visit_i16<E>(self, v: i16) -> Result<Self::Value, E>
     where
         E: de::Error,
     {
@@ -652,7 +651,7 @@ impl<'de> Visitor<'de> for ValueVisitor {
     }
 
     #[inline]
-    fn visit_i32<E>(self, v: i32) -> anyhow::Result<Self::Value, E>
+    fn visit_i32<E>(self, v: i32) -> Result<Self::Value, E>
     where
         E: de::Error,
     {
@@ -660,7 +659,7 @@ impl<'de> Visitor<'de> for ValueVisitor {
     }
 
     #[inline]
-    fn visit_i64<E>(self, v: i64) -> anyhow::Result<Self::Value, E>
+    fn visit_i64<E>(self, v: i64) -> Result<Self::Value, E>
     where
         E: de::Error,
     {
@@ -668,7 +667,7 @@ impl<'de> Visitor<'de> for ValueVisitor {
     }
 
     #[inline]
-    fn visit_f32<E>(self, v: f32) -> anyhow::Result<Self::Value, E>
+    fn visit_f32<E>(self, v: f32) -> Result<Self::Value, E>
     where
         E: de::Error,
     {
@@ -676,7 +675,7 @@ impl<'de> Visitor<'de> for ValueVisitor {
     }
 
     #[inline]
-    fn visit_f64<E>(self, v: f64) -> anyhow::Result<Self::Value, E>
+    fn visit_f64<E>(self, v: f64) -> Result<Self::Value, E>
     where
         E: de::Error,
     {
@@ -684,7 +683,7 @@ impl<'de> Visitor<'de> for ValueVisitor {
     }
 
     #[inline]
-    fn visit_str<E>(self, v: &str) -> anyhow::Result<Self::Value, E>
+    fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
     where
         E: de::Error,
     {
@@ -692,7 +691,7 @@ impl<'de> Visitor<'de> for ValueVisitor {
     }
 
     #[inline]
-    fn visit_string<E>(self, v: String) -> anyhow::Result<Self::Value, E>
+    fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
     where
         E: de::Error,
     {
@@ -700,15 +699,15 @@ impl<'de> Visitor<'de> for ValueVisitor {
     }
 
     #[inline]
-    fn visit_byte_buf<E>(self, v: Vec<u8>) -> anyhow::Result<Self::Value, E>
+    fn visit_byte_buf<E>(self, v: Vec<u8>) -> Result<Self::Value, E>
     where
         E: de::Error,
     {
-        Ok(Value::ByteArray(RVec::from(v)))
+        Ok(Value::ByteArray(v))
     }
 
     #[inline]
-    fn visit_seq<A>(self, mut seq: A) -> anyhow::Result<Self::Value, A::Error>
+    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
     where
         A: SeqAccess<'de>,
     {
@@ -725,7 +724,7 @@ impl<'de> Visitor<'de> for ValueVisitor {
     }
 
     #[inline]
-    fn visit_map<A>(self, mut map: A) -> anyhow::Result<Self::Value, A::Error>
+    fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
     where
         A: MapAccess<'de>,
     {

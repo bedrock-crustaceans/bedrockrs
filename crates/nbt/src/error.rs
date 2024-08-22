@@ -18,5 +18,5 @@ pub enum NbtError {
     #[error("{0}")]
     MissingData(Cow<'static, str>),
     #[error("{0}")]
-    Other(&'static str),
+    Other(Cow<'static, str>),
 }

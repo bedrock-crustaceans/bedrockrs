@@ -4,6 +4,7 @@ use paste::paste;
 use serde::ser::{Impossible, SerializeMap, SerializeSeq, SerializeStruct, SerializeTuple};
 use serde::{ser, Serialize};
 
+use crate::write::BinaryWrite;
 use crate::{BigEndian, FieldType, LittleEndian, NbtError, Variable, Variant, VariantImpl};
 
 /// Returns a `not supported` error.
