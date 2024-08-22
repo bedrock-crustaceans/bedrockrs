@@ -136,7 +136,7 @@ fn read_write_bigtest() {
     let encoded = to_be_bytes(&decoded).unwrap();
     let _decoded2: AllTypes = from_be_bytes(&mut encoded.as_slice()).unwrap();
 
-    let value: Value = from_be_bytes(&mut BIG_TEST_NBT).unwrap().0;
+    let value: Value = from_be_bytes(&mut BIG_TEST_NBT).unwrap();
     let value_encoded = to_be_bytes(&value).unwrap();
     let value_decoded: Value = from_be_bytes(&mut value_encoded.as_slice()).unwrap();
     assert_eq!(value, value_decoded);

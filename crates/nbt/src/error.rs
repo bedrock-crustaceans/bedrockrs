@@ -4,7 +4,7 @@ use thiserror::Error;
 
 use crate::FieldType;
 
-#[derive(Debug, Error)]
+#[derive(Debug, Clone, Error)]
 pub enum NbtError {
     #[error("An unknown tag type was encountered ({0}), it should be in the range 0-12")]
     TypeOutOfRange(u8),
@@ -25,7 +25,7 @@ pub enum NbtError {
 
 impl From<std::io::Error> for NbtError {
     fn from(value: std::io::Error) -> Self {
-        Self::ByteError(StreamError::IoError(value))
+        Self::ByteError(StreamError::IoError(value.to_string()))
     }
 }
 
@@ -47,10 +47,12 @@ impl From<StreamError> for NbtError {
     }
 }
 
-#[derive(Debug, Error)]
+#[derive(Debug, Clone, Error)]
 pub enum StreamError {
+    // TODO: std::io::Error does not implement Clone while the ProtoCodec error type requires it.
+    // This is why I convert the error to a string rather than storing it directly like the others.
     #[error("{0}")]
-    IoError(std::io::Error),
+    IoError(String),
     #[error("{0}")]
     FromUtf8Error(std::string::FromUtf8Error),
     #[error("{0}")]
@@ -63,7 +65,7 @@ pub enum StreamError {
 
 impl From<std::io::Error> for StreamError {
     fn from(value: std::io::Error) -> Self {
-        Self::IoError(value)
+        Self::IoError(value.to_string())
     }
 }
 

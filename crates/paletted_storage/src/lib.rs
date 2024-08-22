@@ -1,15 +1,14 @@
 use std::io::Cursor;
 
 use bedrockrs_core::int::LE;
-use bedrockrs_nbt::endian::little_endian::NbtLittleEndian;
-use bedrockrs_nbt::endian::little_endian_network::NbtLittleEndianNetwork;
-use bedrockrs_nbt::NbtTag;
 use byteorder::ReadBytesExt;
+
+use bedrockrs_nbt as nbt;
 
 #[derive(Debug, Clone)]
 pub struct PalettedStorage {
     pub blocks: [u32; 4096],
-    pub palette: Vec<NbtTag>,
+    pub palette: Vec<nbt::Value>,
 }
 
 impl PalettedStorage {
@@ -52,17 +51,13 @@ impl PalettedStorage {
         for _ in 0..palette_count {
             match network {
                 0 => {
-                    out.palette.push(
-                        NbtTag::nbt_deserialize::<NbtLittleEndian>(cur)
-                            .expect("Bad NBT Tag in palette")
-                            .1,
-                    );
+                    out.palette.push(todo!());
                 }
                 _ => {
                     out.palette.push(
-                        NbtTag::nbt_deserialize::<NbtLittleEndianNetwork>(cur)
-                            .expect("Bad NBT Tag in palette")
-                            .1,
+                        todo!(), // NbtTag::nbt_deserialize::<NbtLittleEndianNetwork>(cur)
+                                 //     .expect("Bad NBT Tag in palette")
+                                 //     .1,
                     );
                 }
             }
