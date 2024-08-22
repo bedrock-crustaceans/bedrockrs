@@ -1,6 +1,5 @@
 use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::{Vec2, Vec3};
-use bedrockrs_nbt::NbtTag;
 use std::collections::HashMap;
 use uuid::Uuid;
 

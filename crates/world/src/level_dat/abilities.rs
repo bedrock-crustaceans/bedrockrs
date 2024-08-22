@@ -1,7 +1,5 @@
 use std::collections::HashMap;
 
-use bedrockrs_nbt::NbtTag;
-
 use bedrockrs_shared::world::permissions_level::PermissionLevel;
 
 use crate::error::WorldError;

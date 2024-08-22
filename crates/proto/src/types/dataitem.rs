@@ -2,7 +2,6 @@ use bedrockrs_core::{
     int::{LE, VAR},
     Vec3,
 };
-use bedrockrs_nbt::NbtTag;
 use bedrockrs_proto_derive::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]

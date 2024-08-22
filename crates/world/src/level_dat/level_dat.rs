@@ -3,8 +3,6 @@ use std::fs::File;
 use std::io::{Cursor, Read};
 use std::path::{Path, PathBuf};
 
-use bedrockrs_nbt::endian::little_endian::NbtLittleEndian;
-use bedrockrs_nbt::NbtTag;
 use byteorder::{LittleEndian, ReadBytesExt};
 
 use bedrockrs_shared::world::difficulty::Difficulty;

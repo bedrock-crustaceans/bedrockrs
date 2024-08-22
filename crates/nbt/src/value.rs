@@ -42,240 +42,79 @@ pub enum Value {
     LongArray(Vec<i64>),
 }
 
+macro_rules! impl_access_fns {
+    ($($tag: ident = $ty: ty),+) => {
+        $(paste::paste! {
+            #[inline]
+            #[doc = concat!(
+                "Returns the inner value if the tag is of a, ", stringify!($tag), ", otherwise returns self.
+                This method is the same as [`as_", stringify!([<$tag:snake>]), "`](Self::as_", stringify!([<$tag:snake>]), ") but instead takes ownership of the value."
+            )]
+            pub fn [<into_ $tag:snake>](self) -> Result<$ty, Self> {
+                match self {
+                    Self::$tag(val) => Ok(val),
+                    _ => Err(self)
+                }
+            }
+
+            #[inline]
+            #[doc = concat!(
+                "Returns a reference to the inner value of the tag is the requested type is present.
+                Use [`into_", stringify!([<$tag:snake>]), "`](Self::into_", stringify!([<$tag:snake>]), ")."
+            )]
+            pub fn [<as_ $tag:snake>](&self) -> Option<&$ty> {
+                match self {
+                    Self::$tag(val) => Some(val),
+                    _ => None
+                }
+            }
+
+            #[inline]
+            #[doc = concat!(
+                "Returns whether the inner value is of type `", stringify!($tag), "`."
+            )]
+            pub fn [<is_ $tag:snake>](&self) -> bool {
+                matches!(self, Self::$tag(_))
+            }
+        })+
+    }
+}
+
 impl Value {
-    /// Returns true if [`Value`] is a byte.
-    ///
-    /// For any [`Value`] on which `is_i8` returns true, `as_i8` is guaranteed to return
-    /// a value.
-    #[inline]
-    pub const fn is_i8(&self) -> bool {
-        matches!(self, Value::Byte(_))
-    }
-
-    /// Returns true if [`Value`] is a short.
-    ///
-    /// For any [`Value`] on which `is_i16` returns true, `as_i16` is guaranteed to return
-    /// a value.
-    #[inline]
-    pub const fn is_i16(&self) -> bool {
-        matches!(self, Value::Short(_))
-    }
-
-    /// Returns true if [`Value`] is an integer.
-    ///
-    /// For any [`Value`] on which `is_i32` returns true, `as_i32` is guaranteed to return
-    /// a value.
-    #[inline]
-    pub const fn is_i32(&self) -> bool {
-        matches!(self, Value::Int(_))
-    }
-
-    /// Returns true if [`Value`] is a long.
-    ///
-    /// For any [`Value`] on which `is_i64` returns true, `as_i64` is guaranteed to return
-    /// a value.
-    #[inline]
-    pub const fn is_i64(&self) -> bool {
-        matches!(self, Value::Long(_))
-    }
-
-    /// Returns true if [`Value`] is a float.
-    ///
-    /// For any [`Value`] on which `is_f32` returns true, `as_f32` is guaranteed to return
-    /// a value.
-    #[inline]
-    pub const fn is_f32(&self) -> bool {
-        matches!(self, Value::Float(_))
-    }
-
-    /// Returns true if [`Value`] is a double.
-    ///
-    /// For any [`Value`] on which `is_f64` returns true, `as_f64` is guaranteed to return
-    /// a value.
-    #[inline]
-    pub const fn is_f64(&self) -> bool {
-        matches!(self, Value::Double(_))
-    }
-
-    /// Returns true if [`Value`] is a byte array.
-    ///
-    /// For any [`Value`] on which `is_u8_array` returns true, `as_u8_array` is guaranteed to return
-    /// a value.
-    #[inline]
-    pub const fn is_u8_array(&self) -> bool {
-        matches!(self, Value::ByteArray(_))
-    }
-
-    /// Returns true if [`Value`] is a string.
-    ///
-    /// For any [`Value`] on which `is_string` returns true, `as_string` is guaranteed to return
-    /// a value.
-    #[inline]
-    pub const fn is_string(&self) -> bool {
-        matches!(self, Value::String(_))
-    }
-
-    /// Returns true if [`Value`] is a list.
-    ///
-    /// For any [`Value`] on which `is_list` returns true, `as_list` is guaranteed to return
-    /// a value.
-    #[inline]
-    pub const fn is_list(&self) -> bool {
-        matches!(self, Value::List(_))
-    }
-
-    /// Returns true if [`Value`] is a compound.
-    ///
-    /// For any [`Value`] on which `is_compound` returns true, `as_compound` is guaranteed to return
-    /// a value.
-    #[inline]
-    pub const fn is_compound(&self) -> bool {
-        matches!(self, Value::Compound(_))
-    }
-
-    /// Returns true if [`Value`] is an integer array.
-    ///
-    /// For any [`Value`] on which `is_i32_array` returns true, `as_i32_array` is guaranteed to return
-    /// a value.
-    #[inline]
-    pub const fn is_i32_array(&self) -> bool {
-        matches!(self, Value::IntArray(_))
-    }
-
-    /// Returns true if [`Value`] is a long array.
-    ///
-    /// For any [`Value`] on which `is_i64_array` returns true, `as_i64_array` is guaranteed to return
-    /// a value.
-    #[inline]
-    pub const fn is_i64_array(&self) -> bool {
-        matches!(self, Value::LongArray(_))
-    }
-
-    /// If this [`Value`] is a byte, represent it as `i8`. Returns None otherwise.
-    #[inline]
-    pub const fn as_i8(&self) -> Option<i8> {
-        match self {
-            Value::Byte(v) => Some(*v),
-            _ => None,
-        }
-    }
-
-    /// If this [`Value`] is a short, represent it as `i16`. Returns None otherwise.
-    #[inline]
-    pub const fn as_i16(&self) -> Option<i16> {
-        match self {
-            Value::Short(v) => Some(*v),
-            _ => None,
-        }
-    }
-
-    /// If this [`Value`] is an integer, represent it as `i32`. Returns None otherwise.
-    #[inline]
-    pub const fn as_i32(&self) -> Option<i32> {
-        match self {
-            Value::Int(v) => Some(*v),
-            _ => None,
-        }
-    }
-
-    /// If this [`Value`] is a long, represent it as `i64`. Returns None otherwise.
-    #[inline]
-    pub const fn as_i64(&self) -> Option<i64> {
-        match self {
-            Value::Long(v) => Some(*v),
-            _ => None,
-        }
-    }
-
-    /// If this [`Value`] is a float, represent it as `f32`. Returns None otherwise.
-    #[inline]
-    pub const fn as_f32(&self) -> Option<f32> {
-        match self {
-            Value::Float(v) => Some(*v),
-            _ => None,
-        }
-    }
-
-    /// If this [`Value`] is a double, represent it as `f64`. Returns None otherwise.
-    #[inline]
-    pub const fn as_f64(&self) -> Option<f64> {
-        match self {
-            Value::Double(v) => Some(*v),
-            _ => None,
-        }
-    }
-
-    /// If this [`Value`] is a byte array, represent it as `&[u8]`. Returns None otherwise.
-    #[inline]
-    pub fn as_u8_array(&self) -> Option<&[u8]> {
-        match self {
-            Value::ByteArray(v) => Some(v),
-            _ => None,
-        }
-    }
-
-    /// If this [`Value`] is a string, represent it as `&str`. Returns None otherwise.
-    #[inline]
-    pub fn as_string(&self) -> Option<&str> {
-        match self {
-            Value::String(v) => Some(v),
-            _ => None,
-        }
-    }
-
-    /// If this [`Value`] is a list, represent it as `&[Value]`. Returns None otherwise.
-    #[inline]
-    pub fn as_list(&self) -> Option<&[Value]> {
-        match self {
-            Value::List(v) => Some(v),
-            _ => None,
-        }
-    }
-
-    /// If this [`Value`] is a compound/map, returns the map. Returns None otherwise.
-    #[inline]
-    pub const fn as_compound(&self) -> Option<&HashMap<String, Value>> {
-        match self {
-            Value::Compound(v) => Some(v),
-            _ => None,
-        }
-    }
-
-    /// If this [`Value`] is an integer array, represent it as `&[i32]`. Returns None otherwise.
-    #[inline]
-    pub fn as_i32_array(&self) -> Option<&[i32]> {
-        match self {
-            Value::IntArray(v) => Some(v),
-            _ => None,
-        }
-    }
-
-    /// If this [`Value`] is a long array, represent it as `&[i64]`. Returns None otherwise.
-    #[inline]
-    pub fn as_i64_array(&self) -> Option<&[i64]> {
-        match self {
-            Value::LongArray(v) => Some(v),
-            _ => None,
-        }
-    }
+    impl_access_fns!(
+        Byte = i8,
+        Short = i16,
+        Int = i32,
+        Long = i64,
+        Float = f32,
+        Double = f64,
+        String = String,
+        List = Vec<Self>,
+        Compound = HashMap<String, Self>,
+        ByteArray = Vec<u8>,
+        IntArray = Vec<i32>,
+        LongArray = Vec<i64>
+    );
 }
 
 impl PartialEq<Value> for Value {
     #[inline]
     fn eq(&self, rhs: &Value) -> bool {
         match self {
-            Value::Byte(lhs) => rhs.as_i8().map_or(false, |rhs| *lhs == rhs),
-            Value::Short(lhs) => rhs.as_i16().map_or(false, |rhs| *lhs == rhs),
-            Value::Int(lhs) => rhs.as_i32().map_or(false, |rhs| *lhs == rhs),
-            Value::Long(lhs) => rhs.as_i64().map_or(false, |rhs| *lhs == rhs),
-            Value::Float(lhs) => rhs.as_f32().map_or(false, |rhs| *lhs == rhs),
-            Value::Double(lhs) => rhs.as_f64().map_or(false, |rhs| *lhs == rhs),
-            Value::ByteArray(lhs) => rhs.as_u8_array().map_or(false, |rhs| lhs.as_slice() == rhs),
+            Value::Byte(lhs) => rhs.as_byte().map_or(false, |rhs| lhs == rhs),
+            Value::Short(lhs) => rhs.as_short().map_or(false, |rhs| lhs == rhs),
+            Value::Int(lhs) => rhs.as_int().map_or(false, |rhs| lhs == rhs),
+            Value::Long(lhs) => rhs.as_long().map_or(false, |rhs| lhs == rhs),
+            Value::Float(lhs) => rhs.as_float().map_or(false, |rhs| lhs == rhs),
+            Value::Double(lhs) => rhs.as_double().map_or(false, |rhs| lhs == rhs),
+            Value::ByteArray(lhs) => rhs
+                .as_byte_array()
+                .map_or(false, |rhs| lhs.as_slice() == rhs),
             Value::String(lhs) => rhs.as_string().map_or(false, |rhs| lhs == rhs),
             Value::List(lhs) => rhs.as_list().map_or(false, |rhs| lhs == rhs),
             Value::Compound(lhs) => rhs.as_compound().map_or(false, |rhs| lhs == rhs),
-            Value::IntArray(lhs) => rhs.as_i32_array().map_or(false, |rhs| lhs == rhs),
-            Value::LongArray(lhs) => rhs.as_i64_array().map_or(false, |rhs| lhs == rhs),
+            Value::IntArray(lhs) => rhs.as_int_array().map_or(false, |rhs| lhs == rhs),
+            Value::LongArray(lhs) => rhs.as_long_array().map_or(false, |rhs| lhs == rhs),
         }
     }
 }
@@ -283,252 +122,252 @@ impl PartialEq<Value> for Value {
 impl PartialEq<i8> for Value {
     #[inline]
     fn eq(&self, rhs: &i8) -> bool {
-        self.as_i8().map_or(false, |lhs| lhs == *rhs)
+        self.as_byte().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl<'a> PartialEq<i8> for &'a Value {
     #[inline]
     fn eq(&self, rhs: &i8) -> bool {
-        self.as_i8().map_or(false, |lhs| lhs == *rhs)
+        self.as_byte().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl<'a> PartialEq<i8> for &'a mut Value {
     #[inline]
     fn eq(&self, rhs: &i8) -> bool {
-        self.as_i8().map_or(false, |lhs| lhs == *rhs)
+        self.as_byte().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl PartialEq<i16> for Value {
     #[inline]
     fn eq(&self, rhs: &i16) -> bool {
-        self.as_i16().map_or(false, |lhs| lhs == *rhs)
+        self.as_short().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl<'a> PartialEq<i16> for &'a Value {
     #[inline]
     fn eq(&self, rhs: &i16) -> bool {
-        self.as_i16().map_or(false, |lhs| lhs == *rhs)
+        self.as_short().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl<'a> PartialEq<i16> for &'a mut Value {
     #[inline]
     fn eq(&self, rhs: &i16) -> bool {
-        self.as_i16().map_or(false, |lhs| lhs == *rhs)
+        self.as_short().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl PartialEq<i32> for Value {
     #[inline]
     fn eq(&self, rhs: &i32) -> bool {
-        self.as_i32().map_or(false, |lhs| lhs == *rhs)
+        self.as_int().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl<'a> PartialEq<i32> for &'a Value {
     #[inline]
     fn eq(&self, rhs: &i32) -> bool {
-        self.as_i32().map_or(false, |lhs| lhs == *rhs)
+        self.as_int().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl<'a> PartialEq<i32> for &'a mut Value {
     #[inline]
     fn eq(&self, rhs: &i32) -> bool {
-        self.as_i32().map_or(false, |lhs| lhs == *rhs)
+        self.as_int().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl PartialEq<i64> for Value {
     #[inline]
     fn eq(&self, rhs: &i64) -> bool {
-        self.as_i64().map_or(false, |lhs| lhs == *rhs)
+        self.as_long().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl<'a> PartialEq<i64> for &'a Value {
     #[inline]
     fn eq(&self, rhs: &i64) -> bool {
-        self.as_i64().map_or(false, |lhs| lhs == *rhs)
+        self.as_long().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl<'a> PartialEq<i64> for &'a mut Value {
     #[inline]
     fn eq(&self, rhs: &i64) -> bool {
-        self.as_i64().map_or(false, |lhs| lhs == *rhs)
+        self.as_long().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl PartialEq<f32> for Value {
     #[inline]
     fn eq(&self, rhs: &f32) -> bool {
-        self.as_f32().map_or(false, |lhs| lhs == *rhs)
+        self.as_float().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl<'a> PartialEq<f32> for &'a Value {
     #[inline]
     fn eq(&self, rhs: &f32) -> bool {
-        self.as_f32().map_or(false, |lhs| lhs == *rhs)
+        self.as_float().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl<'a> PartialEq<f32> for &'a mut Value {
     #[inline]
     fn eq(&self, rhs: &f32) -> bool {
-        self.as_f32().map_or(false, |lhs| lhs == *rhs)
+        self.as_float().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl PartialEq<f64> for Value {
     #[inline]
     fn eq(&self, rhs: &f64) -> bool {
-        self.as_f64().map_or(false, |lhs| lhs == *rhs)
+        self.as_double().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl<'a> PartialEq<f64> for &'a Value {
     #[inline]
     fn eq(&self, rhs: &f64) -> bool {
-        self.as_f64().map_or(false, |lhs| lhs == *rhs)
+        self.as_double().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl<'a> PartialEq<f64> for &'a mut Value {
     #[inline]
     fn eq(&self, rhs: &f64) -> bool {
-        self.as_f64().map_or(false, |lhs| lhs == *rhs)
+        self.as_double().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl PartialEq<&[u8]> for Value {
     #[inline]
     fn eq(&self, rhs: &&[u8]) -> bool {
-        self.as_u8_array().map_or(false, |lhs| lhs == *rhs)
+        self.as_byte_array().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl PartialEq<&[u8]> for &Value {
     #[inline]
     fn eq(&self, rhs: &&[u8]) -> bool {
-        self.as_u8_array().map_or(false, |lhs| lhs == *rhs)
+        self.as_byte_array().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl PartialEq<&[u8]> for &mut Value {
     #[inline]
     fn eq(&self, rhs: &&[u8]) -> bool {
-        self.as_u8_array().map_or(false, |lhs| lhs == *rhs)
+        self.as_byte_array().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl PartialEq<&str> for Value {
     #[inline]
     fn eq(&self, rhs: &&str) -> bool {
-        self.as_string().map_or(false, |lhs| lhs == *rhs)
+        self.as_string().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl<'a> PartialEq<&str> for &'a Value {
     #[inline]
     fn eq(&self, rhs: &&str) -> bool {
-        self.as_string().map_or(false, |lhs| lhs == *rhs)
+        self.as_string().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl<'a> PartialEq<&str> for &'a mut Value {
     #[inline]
     fn eq(&self, rhs: &&str) -> bool {
-        self.as_string().map_or(false, |lhs| lhs == *rhs)
+        self.as_string().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl PartialEq<&[Value]> for Value {
     #[inline]
     fn eq(&self, rhs: &&[Value]) -> bool {
-        self.as_list().map_or(false, |lhs| lhs == *rhs)
+        self.as_list().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl<'a> PartialEq<&[Value]> for &'a Value {
     #[inline]
     fn eq(&self, rhs: &&[Value]) -> bool {
-        self.as_list().map_or(false, |lhs| lhs == *rhs)
+        self.as_list().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl<'a> PartialEq<&[Value]> for &'a mut Value {
     #[inline]
     fn eq(&self, rhs: &&[Value]) -> bool {
-        self.as_list().map_or(false, |lhs| lhs == *rhs)
+        self.as_list().map_or(false, |lhs| lhs == rhs)
     }
 }
 
-impl PartialEq<&HashMap<String, Value>> for Value {
+impl PartialEq<HashMap<String, Value>> for Value {
     #[inline]
-    fn eq(&self, rhs: &&HashMap<String, Value>) -> bool {
-        self.as_compound().map_or(false, |lhs| lhs == *rhs)
+    fn eq(&self, rhs: &HashMap<String, Value>) -> bool {
+        self.as_compound().map_or(false, |lhs| lhs == rhs)
     }
 }
 
-impl<'a> PartialEq<&HashMap<String, Value>> for &'a Value {
+impl<'a> PartialEq<HashMap<String, Value>> for &'a Value {
     #[inline]
-    fn eq(&self, rhs: &&HashMap<String, Value>) -> bool {
-        self.as_compound().map_or(false, |lhs| lhs == *rhs)
+    fn eq(&self, rhs: &HashMap<String, Value>) -> bool {
+        self.as_compound().map_or(false, |lhs| lhs == rhs)
     }
 }
 
-impl<'a> PartialEq<&HashMap<String, Value>> for &'a mut Value {
+impl<'a> PartialEq<HashMap<String, Value>> for &'a mut Value {
     #[inline]
-    fn eq(&self, rhs: &&HashMap<String, Value>) -> bool {
-        self.as_compound().map_or(false, |lhs| lhs == *rhs)
+    fn eq(&self, rhs: &HashMap<String, Value>) -> bool {
+        self.as_compound().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl PartialEq<&[i32]> for Value {
     #[inline]
     fn eq(&self, rhs: &&[i32]) -> bool {
-        self.as_i32_array().map_or(false, |lhs| lhs == *rhs)
+        self.as_int_array().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl<'a> PartialEq<&[i32]> for &'a Value {
     #[inline]
     fn eq(&self, rhs: &&[i32]) -> bool {
-        self.as_i32_array().map_or(false, |lhs| lhs == *rhs)
+        self.as_int_array().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl<'a> PartialEq<&[i32]> for &'a mut Value {
     #[inline]
     fn eq(&self, rhs: &&[i32]) -> bool {
-        self.as_i32_array().map_or(false, |lhs| lhs == *rhs)
+        self.as_int_array().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl PartialEq<&[i64]> for Value {
     #[inline]
     fn eq(&self, rhs: &&[i64]) -> bool {
-        self.as_i64_array().map_or(false, |lhs| lhs == *rhs)
+        self.as_long_array().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl<'a> PartialEq<&[i64]> for &'a Value {
     #[inline]
     fn eq(&self, rhs: &&[i64]) -> bool {
-        self.as_i64_array().map_or(false, |lhs| lhs == *rhs)
+        self.as_long_array().map_or(false, |lhs| lhs == rhs)
     }
 }
 
 impl<'a> PartialEq<&[i64]> for &'a mut Value {
     #[inline]
     fn eq(&self, rhs: &&[i64]) -> bool {
-        self.as_i64_array().map_or(false, |lhs| lhs == *rhs)
+        self.as_long_array().map_or(false, |lhs| lhs == rhs)
     }
 }
 

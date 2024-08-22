@@ -1,10 +1,11 @@
-use bedrockrs_nbt::{endian::little_endian::NbtLittleEndian, NbtTag};
 use mojang_leveldb::{error::DBError, Options, ReadOptions, WriteBatch, WriteOptions, DB};
+use std::borrow::Cow;
+use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
 use std::path::Path;
-use std::{collections::HashMap, path::PathBuf};
 use uuid::Uuid;
 
+use bedrockrs_nbt::{self as nbt, NbtError};
 use bedrockrs_shared::world::dimension::Dimension;
 
 use crate::error::WorldError;
@@ -40,22 +41,25 @@ impl WorldDB {
     }
 
     /// Read a player's NBT data for this world
-    pub fn get_player(&self, uuid: Uuid) -> Result<Option<HashMap<String, NbtTag>>, WorldError> {
+    pub fn get_player(
+        &self,
+        uuid: Uuid,
+    ) -> Result<Option<HashMap<String, nbt::Value>>, WorldError> {
         let mut str = uuid.to_string();
         str.insert_str(0, "player_");
 
         match self.db.get(READ_OPTIONS, str.as_bytes()) {
             Ok(maybe_bytes) => match maybe_bytes {
                 Some(bytes) => {
-                    let u8_bytes = bytes.get().into();
-                    match NbtTag::nbt_deserialize_vec::<NbtLittleEndian>(&u8_bytes) {
-                        Ok((_, tag)) => match tag {
-                            NbtTag::Compound(ctag) => Ok(Some(ctag)),
-                            _ => Err(WorldError::FormatError(
-                                "Player data tag is not a compound tag".to_string(),
-                            )),
-                        },
-                        Err(e) => Err(WorldError::NbtError(e)),
+                    let mut u8_bytes = bytes.get();
+                    let nbt: nbt::Value = nbt::from_le_bytes(&mut u8_bytes)?;
+
+                    match nbt.into_compound() {
+                        Ok(tag) => Ok(Some(tag)),
+                        Err(_) => Err(NbtError::Other(Cow::Borrowed(
+                            "Expected player data to be a compound",
+                        ))
+                        .into()),
                     }
                 }
                 None => Ok(None),
@@ -68,7 +72,7 @@ impl WorldDB {
     pub fn set_player(
         &mut self,
         uuid: Uuid,
-        data: HashMap<String, NbtTag>,
+        data: HashMap<String, nbt::Value>,
     ) -> Result<(), WorldError> {
         let tag = NbtTag::Compound(data);
         match tag.nbt_serialize_vec::<NbtLittleEndian>("") {

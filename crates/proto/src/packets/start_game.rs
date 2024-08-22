@@ -1,6 +1,5 @@
 use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::{Vec2, Vec3};
-use bedrockrs_nbt::NbtTag;
 use bedrockrs_proto_derive::ProtoCodec;
 use uuid::Uuid;
 
