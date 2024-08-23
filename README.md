@@ -30,13 +30,6 @@ We also have a community discord, feel free to join it to learn more about our f
   - Datatypes defining the structure of Addons.
   - Serialization and Deserialization of addons.
 
-- [Nbt](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/nbt):
-  - A simple nbt implementation focused on Minecraft Bedrock.
-  - Provides Serialization for:
-    - `NbtLittleEndian`
-    - `NbtLittleEndianNetwork` (Commonly used in the mcbe protocol)
-    - `NbtBigEndian`
-
 - [Form](https://github.com/Adrian8115/bedrock-rs/tree/main/crates/form):
   - Implementation of the JSON form format used in Minecraft Bedrock.
 
