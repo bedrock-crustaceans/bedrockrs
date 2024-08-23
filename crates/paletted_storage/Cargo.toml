@@ -5,6 +5,6 @@ edition = "2021"
 
 [dependencies]
 bedrockrs_core = { path = "../core" }
-bedrockrs_nbt = { path = "../nbt" }
+bedrockrs_nbt = { git = "https://github.com/bedrock-crustaceans/bedrockrs-nbt" }
 
 byteorder = "1.5"

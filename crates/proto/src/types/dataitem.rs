@@ -1,8 +1,10 @@
+use std::collections::HashMap;
+
 use bedrockrs_core::{
     int::{LE, VAR},
     Vec3,
 };
-use bedrockrs_nbt::NbtTag;
+use bedrockrs_nbt as nbt;
 use bedrockrs_proto_derive::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
@@ -17,7 +19,7 @@ pub enum DataItemValue {
     ValInt(i32),
     ValFloat(f32),
     ValString(String),
-    ValCompoundTag(NbtTag),
+    ValCompoundTag(HashMap<String, nbt::Value>),
     ValPos(Vec3<VAR<i32>>),
     ValInt64(LE<i64>),
     ValVec3(Vec3<LE<f32>>),

@@ -1,15 +1,13 @@
 use std::io::Cursor;
 
 use bedrockrs_core::int::LE;
-use bedrockrs_nbt::endian::little_endian::NbtLittleEndian;
-use bedrockrs_nbt::endian::little_endian_network::NbtLittleEndianNetwork;
-use bedrockrs_nbt::NbtTag;
+use bedrockrs_nbt as nbt;
 use byteorder::ReadBytesExt;
 
 #[derive(Debug, Clone)]
 pub struct PalettedStorage {
     pub blocks: [u32; 4096],
-    pub palette: Vec<NbtTag>,
+    pub palette: Vec<nbt::Value>,
 }
 
 impl PalettedStorage {
@@ -53,16 +51,16 @@ impl PalettedStorage {
             match network {
                 0 => {
                     out.palette.push(
-                        NbtTag::nbt_deserialize::<NbtLittleEndian>(cur)
-                            .expect("Bad NBT Tag in palette")
-                            .1,
+                        todo!(), // NbtTag::nbt_deserialize::<NbtLittleEndian>(cur)
+                                 //     .expect("Bad NBT Tag in palette")
+                                 //     .1,
                     );
                 }
                 _ => {
                     out.palette.push(
-                        NbtTag::nbt_deserialize::<NbtLittleEndianNetwork>(cur)
-                            .expect("Bad NBT Tag in palette")
-                            .1,
+                        todo!(), // NbtTag::nbt_deserialize::<NbtLittleEndianNetwork>(cur)
+                                 //     .expect("Bad NBT Tag in palette")
+                                 //     .1,
                     );
                 }
             }
@@ -102,10 +100,9 @@ impl PalettedStorage {
 
         for nbt in &self.palette {
             if network {
-                nbt.nbt_serialize::<NbtLittleEndianNetwork>("", &mut out)
-                    .unwrap();
+                nbt::to_var_bytes_in(&mut out, &nbt).unwrap()
             } else {
-                nbt.nbt_serialize::<NbtLittleEndian>("", &mut out).unwrap();
+                nbt::to_le_bytes_in(&mut out, &nbt).unwrap()
             }
         }
 
