@@ -1,21 +1,17 @@
 use std::io::Cursor;
 
-use bedrockrs_nbt::endian::little_endian_network::NbtLittleEndianNetwork;
-use bedrockrs_nbt::NbtTag;
+use bedrockrs_nbt as nbt;
 
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 
-impl ProtoCodec for NbtTag {
+impl ProtoCodec for nbt::Value {
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
-        self.nbt_serialize::<NbtLittleEndianNetwork>("", stream)
-            .map_err(|e| ProtoCodecError::NbtError(e))
+        nbt::to_var_bytes_in(stream, self)?;
+        Ok(())
     }
 
     fn proto_deserialize(cursor: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
-        match NbtTag::nbt_deserialize::<NbtLittleEndianNetwork>(cursor) {
-            Ok((_, v)) => Ok(v),
-            Err(e) => Err(ProtoCodecError::NbtError(e)),
-        }
+        todo!("Deserialize to concrete type instead of NbtTag");
     }
 }

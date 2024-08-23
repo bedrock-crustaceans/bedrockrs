@@ -1,4 +1,4 @@
-use bedrockrs_nbt::{endian::little_endian::NbtLittleEndian, NbtTag};
+use bedrockrs_nbt as nbt;
 use mojang_leveldb::{error::DBError, Options, ReadOptions, WriteBatch, WriteOptions, DB};
 use std::fmt::{Debug, Formatter};
 use std::path::Path;

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use bedrockrs_nbt::NbtTag;
+use bedrockrs_nbt as nbt;
 
 use bedrockrs_shared::world::permissions_level::PermissionLevel;
 
@@ -54,14 +54,14 @@ pub struct LevelDatAbilities {
 }
 
 impl LevelDatAbilities {
-    /// Parses a given [`NbtTag`] into a [`LevelDatAbilities`] object.
-    pub fn parse(tag: NbtTag) -> Result<Self, WorldError> {
+    /// Parses a given [`nbt::Value`] into a [`LevelDatAbilities`] object.
+    pub fn parse(tag: nbt::Value) -> Result<Self, WorldError> {
         fn get_byte_as_bool(
-            map: &mut HashMap<String, NbtTag>,
+            map: &mut HashMap<String, nbt::Value>,
             key: &str,
         ) -> Result<bool, WorldError> {
             match map.remove(key) {
-                Some(NbtTag::Byte(v)) => Ok(v != 0),
+                Some(nbt::Value::Byte(v)) => Ok(v != 0),
                 Some(other) => Err(WorldError::FormatError(format!(
                     "Expected `{}` in LevelDat abilities to be of type Byte, got {:?}",
                     key, other
@@ -74,11 +74,11 @@ impl LevelDatAbilities {
         }
 
         fn get_byte_as_bool_option(
-            map: &mut HashMap<String, NbtTag>,
+            map: &mut HashMap<String, nbt::Value>,
             key: &str,
         ) -> Result<Option<bool>, WorldError> {
             match map.remove(key) {
-                Some(NbtTag::Byte(v)) => Ok(Some(v != 0)),
+                Some(nbt::Value::Byte(v)) => Ok(Some(v != 0)),
                 Some(other) => Err(WorldError::FormatError(format!(
                     "Expected `{}` in LevelDat abilities to be of type Byte, got {:?}",
                     key, other
@@ -87,9 +87,9 @@ impl LevelDatAbilities {
             }
         }
 
-        fn get_int32(map: &mut HashMap<String, NbtTag>, key: &str) -> Result<i32, WorldError> {
+        fn get_int32(map: &mut HashMap<String, nbt::Value>, key: &str) -> Result<i32, WorldError> {
             match map.remove(key) {
-                Some(NbtTag::Int32(v)) => Ok(v),
+                Some(nbt::Value::Int(v)) => Ok(v),
                 Some(other) => Err(WorldError::FormatError(format!(
                     "Expected `{}` in LevelDat abilities to be of type Int32, got {:?}",
                     key, other
@@ -102,11 +102,11 @@ impl LevelDatAbilities {
         }
 
         fn get_int32_option(
-            map: &mut HashMap<String, NbtTag>,
+            map: &mut HashMap<String, nbt::Value>,
             key: &str,
         ) -> Result<Option<i32>, WorldError> {
             match map.remove(key) {
-                Some(NbtTag::Int32(v)) => Ok(Some(v)),
+                Some(nbt::Value::Int(v)) => Ok(Some(v)),
                 Some(other) => Err(WorldError::FormatError(format!(
                     "Expected `{}` in LevelDat abilities to be of type Int32, got {:?}",
                     key, other
@@ -115,9 +115,9 @@ impl LevelDatAbilities {
             }
         }
 
-        fn get_int64(map: &mut HashMap<String, NbtTag>, key: &str) -> Result<i64, WorldError> {
+        fn get_int64(map: &mut HashMap<String, nbt::Value>, key: &str) -> Result<i64, WorldError> {
             match map.remove(key) {
-                Some(NbtTag::Int64(v)) => Ok(v),
+                Some(nbt::Value::Long(v)) => Ok(v),
                 Some(other) => Err(WorldError::FormatError(format!(
                     "Expected `{}` in LevelDat abilities to be of type Int64, got {:?}",
                     key, other
@@ -129,9 +129,9 @@ impl LevelDatAbilities {
             }
         }
 
-        fn get_f32(map: &mut HashMap<String, NbtTag>, key: &str) -> Result<f32, WorldError> {
+        fn get_f32(map: &mut HashMap<String, nbt::Value>, key: &str) -> Result<f32, WorldError> {
             match map.remove(key) {
-                Some(NbtTag::Float32(v)) => Ok(v),
+                Some(nbt::Value::Float(v)) => Ok(v),
                 Some(other) => Err(WorldError::FormatError(format!(
                     "Expected `{}` in LevelDat abilities to be of type Float32, got {:?}",
                     key, other
@@ -144,7 +144,7 @@ impl LevelDatAbilities {
         }
 
         match tag {
-            NbtTag::Compound(mut map) => Ok(Self {
+            nbt::Value::Compound(mut map) => Ok(Self {
                 attack_mobs: get_byte_as_bool(&mut map, "attackmobs")?,
                 attack_players: get_byte_as_bool(&mut map, "attackplayers")?,
                 redstone_interact: get_byte_as_bool(&mut map, "doorsandswitches")?,

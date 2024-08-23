@@ -4,7 +4,7 @@ use std::string::FromUtf8Error;
 use std::sync::Arc;
 
 use base64::DecodeError as Base64DecodeError;
-use bedrockrs_nbt::error::NbtError;
+use bedrockrs_nbt::NbtError;
 use jsonwebtoken::errors::Error as JwtError;
 use serde_json::error::Error as JsonError;
 use thiserror::Error;
