@@ -1,9 +1,0 @@
-[package]
-name = "bedrockrs_nbt"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-bedrockrs_core = { path = "../core" }
-
-thiserror = "1.0"

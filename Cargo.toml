@@ -10,7 +10,7 @@ members = [ "crates/*" ]
 bedrockrs_core = { path = "crates/core" }
 bedrockrs_shared = { path = "crates/shared" }
 
-bedrockrs_nbt = { path = "crates/nbt" }
+bedrockrs_nbt = { git = "https://github.com/bedrock-crustaceans/bedrockrs-nbt" }
 
 bedrockrs_proto = { path = "crates/proto", optional = true }
 bedrockrs_proto_core = { path = "crates/proto_core", optional = true }
