@@ -65,7 +65,8 @@ impl ProtoCodec for PlayerAuthInputPacket {
             },
             5 => PlayMode::Placement,
             6 => PlayMode::LivingRoom,
-            7 => PlayMode::ExitLevelLivingRoom,
+            7 => PlayMode::ExitLevel,
+            8 => PlayMode::ExitLevelLivingRoom,
             other => {
                 return Err(ProtoCodecError::InvalidEnumID(
                     other.to_string(),
