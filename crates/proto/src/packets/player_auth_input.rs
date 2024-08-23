@@ -51,16 +51,21 @@ impl ProtoCodec for PlayerAuthInputPacket {
 
         let input_data = VAR::<u64>::proto_deserialize(stream)?.into_inner();
         let input_mode = InputMode::proto_deserialize(stream)?;
-        let play_mode = match VAR::<u32>::proto_deserialize(stream)?.into_inner() {
+        let play_mode_int = VAR::<u32>::proto_deserialize(stream)?.into_inner();
+        let interaction_model = InteractionModel::proto_deserialize(stream)?;
+
+        let play_mode = match play_mode_int {
             0 => PlayMode::Normal,
             1 => PlayMode::Teaser,
             2 => PlayMode::Screen,
             3 => PlayMode::Viewer,
-            4 => PlayMode::Reality,
+            4 => {
+                let vr_gaze_direction = ProtoCodec::proto_deserialize(stream)?;
+                PlayMode::Reality(vr_gaze_direction)
+            },
             5 => PlayMode::Placement,
             6 => PlayMode::LivingRoom,
-            7 => PlayMode::ExitLevel,
-            8 => PlayMode::ExitLevelLivingRoom,
+            7 => PlayMode::ExitLevelLivingRoom,
             other => {
                 return Err(ProtoCodecError::InvalidEnumID(
                     other.to_string(),
@@ -68,12 +73,6 @@ impl ProtoCodec for PlayerAuthInputPacket {
                 ))
             }
         };
-        let interaction_model = InteractionModel::proto_deserialize(stream)?;
-
-        if play_mode.clone().to_u32() == PlayMode::Reality.to_u32() {
-            // Maybe we can save it in a struct, I don't know
-            let _vr_gaze_direction = ProtoCodec::proto_deserialize(stream)?;
-        }
 
         let client_tick = VAR::<u64>::proto_deserialize(stream)?;
         let pos_delta = Vec3::<LE<f32>>::proto_deserialize(stream)?;

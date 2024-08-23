@@ -1,18 +1,16 @@
+use bedrockrs_core::int::{LE, VAR};
+use bedrockrs_core::Vec3;
+use bedrockrs_proto_derive::ProtoCodec;
+
 #[derive(Debug, Clone)]
 pub enum PlayMode {
     Normal,
     Teaser,
     Screen,
     Viewer,
-    Reality,
+    Reality(Vec3<LE<f32>>),
     Placement,
     LivingRoom,
     ExitLevel,
     ExitLevelLivingRoom,
-}
-
-impl PlayMode {
-    pub fn to_u32(self) -> u32 {
-        self as u32
-    }
 }
