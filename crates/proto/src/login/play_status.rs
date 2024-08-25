@@ -1,6 +1,6 @@
 use crate::connection::ConnectionShard;
 use crate::error::LoginError;
-use crate::gamepacket::GamePackets;
+use crate::gamepackets::GamePackets;
 use crate::login::provider::{LoginProviderServer, LoginProviderStatus};
 use crate::packets::play_status::PlayStatusPacket;
 use crate::types::play_status::PlayStatusType;

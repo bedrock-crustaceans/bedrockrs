@@ -2,7 +2,7 @@ use bedrockrs_core::int::LE;
 
 use crate::connection::ConnectionShard;
 use crate::error::LoginError;
-use crate::gamepacket::GamePackets;
+use crate::gamepackets::GamePackets;
 use crate::login::provider::{LoginProviderServer, LoginProviderStatus};
 use crate::packets::network_settings::NetworkSettingsPacket;
 

@@ -13,7 +13,7 @@ use bedrockrs_shared::world::generator_type::GeneratorType;
 
 use crate::connection::ConnectionShard;
 use crate::error::LoginError;
-use crate::gamepacket::GamePackets;
+use crate::gamepackets::GamePackets;
 use crate::login::provider::LoginProviderServer;
 use crate::packets::play_status::PlayStatusPacket;
 use crate::packets::start_game::StartGamePacket;

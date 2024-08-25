@@ -11,7 +11,7 @@ use tokio::time::interval;
 use crate::compression::Compression;
 use crate::encryption::Encryption;
 use crate::error::ConnectionError;
-use crate::gamepacket::GamePackets;
+use crate::gamepackets::GamePackets;
 use crate::transport_layer::TransportLayerConnection;
 
 pub struct Connection {

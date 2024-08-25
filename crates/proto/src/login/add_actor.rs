@@ -4,7 +4,7 @@ use bedrockrs_shared::{actor_runtime_id::ActorRuntimeID, actor_unique_id::ActorU
 use crate::{
     connection::ConnectionShard,
     error::LoginError,
-    gamepacket::GamePackets,
+    gamepackets::GamePackets,
     packets::add_actor_packet::AddActorPacket,
     types::{
         actor_type::ActorType,
