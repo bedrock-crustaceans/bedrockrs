@@ -4,7 +4,7 @@ use bedrockrs_shared::{actor_runtime_id::ActorRuntimeID, actor_unique_id::ActorU
 use crate::{
     connection::ConnectionShard,
     error::LoginError,
-    gamepacket::GamePacket,
+    gamepacket::GamePackets,
     packets::add_actor_packet::AddActorPacket,
     types::{
         actor_type::ActorType,
@@ -51,7 +51,7 @@ pub async fn add_actor(
         actor_links: vec![],
     };
 
-    conn.send(GamePacket::AddEntity(add_actor))
+    conn.send(GamePackets::AddEntity(add_actor))
         .await
         .map_err(|e| LoginError::ConnectionError(e))?;
 

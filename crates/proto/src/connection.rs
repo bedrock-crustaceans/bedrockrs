@@ -11,7 +11,7 @@ use tokio::time::interval;
 use crate::compression::Compression;
 use crate::encryption::Encryption;
 use crate::error::ConnectionError;
-use crate::gamepacket::GamePacket;
+use crate::gamepacket::GamePackets;
 use crate::transport_layer::TransportLayerConnection;
 
 pub struct Connection {
@@ -37,7 +37,7 @@ impl Connection {
         }
     }
 
-    pub async fn send(&mut self, gamepackets: Vec<GamePacket>) -> Result<(), ConnectionError> {
+    pub async fn send(&mut self, gamepackets: Vec<GamePackets>) -> Result<(), ConnectionError> {
         let mut pk_stream = vec![];
 
         // Batch all game packets together
@@ -97,7 +97,7 @@ impl Connection {
         Ok(())
     }
 
-    pub async fn recv(&mut self) -> Result<Vec<GamePacket>, ConnectionError> {
+    pub async fn recv(&mut self) -> Result<Vec<GamePackets>, ConnectionError> {
         let mut stream = vec![];
 
         // Receive data and turn it into cursor
@@ -148,7 +148,7 @@ impl Connection {
         // Read gamepacket loop
         'gamepacket_read: loop {
             // Deserialize gamepacket
-            match GamePacket::pk_deserialize(&mut decompressed_stream) {
+            match GamePackets::pk_deserialize(&mut decompressed_stream) {
                 Ok(v) => gamepackets.push(v.0),
                 Err(e) => return Err(ConnectionError::ProtoCodecError(e)),
             };
@@ -185,9 +185,9 @@ impl Connection {
         packet_buffer_size: usize,
     ) -> ConnectionShard {
         let (shard_pk_sender, mut task_pk_receiver) =
-            broadcast::channel::<GamePacket>(packet_buffer_size);
+            broadcast::channel::<GamePackets>(packet_buffer_size);
         let (task_pk_sender, shard_pk_receiver) =
-            broadcast::channel::<Result<GamePacket, ConnectionError>>(packet_buffer_size);
+            broadcast::channel::<Result<GamePackets, ConnectionError>>(packet_buffer_size);
 
         let (shard_flush_request_sender, mut task_flush_request_receiver) = watch::channel(());
         let (task_flush_complete_sender, mut shard_flush_complete_receiver) = watch::channel(());
@@ -355,8 +355,8 @@ impl Connection {
 }
 
 pub struct ConnectionShard {
-    pk_sender: broadcast::Sender<GamePacket>,
-    pk_receiver: broadcast::Receiver<Result<GamePacket, ConnectionError>>,
+    pk_sender: broadcast::Sender<GamePackets>,
+    pk_receiver: broadcast::Receiver<Result<GamePackets, ConnectionError>>,
 
     flush_sender: watch::Sender<()>,
     flush_receiver: watch::Receiver<()>,
@@ -377,14 +377,14 @@ pub struct ConnectionShard {
 }
 
 impl ConnectionShard {
-    pub async fn send(&mut self, pk: GamePacket) -> Result<(), ConnectionError> {
+    pub async fn send(&mut self, pk: GamePackets) -> Result<(), ConnectionError> {
         match self.pk_sender.send(pk) {
             Ok(_) => Ok(()),
             Err(_) => Err(ConnectionError::ConnectionClosed),
         }
     }
 
-    pub async fn recv(&mut self) -> Result<GamePacket, ConnectionError> {
+    pub async fn recv(&mut self) -> Result<GamePackets, ConnectionError> {
         match self.pk_receiver.recv().await {
             Ok(pk) => pk,
             Err(_) => Err(ConnectionError::ConnectionClosed),

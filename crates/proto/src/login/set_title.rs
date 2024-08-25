@@ -2,7 +2,7 @@ use bedrockrs_core::int::VAR;
 
 use crate::connection::ConnectionShard;
 use crate::error::LoginError;
-use crate::gamepacket::GamePacket;
+use crate::gamepacket::GamePackets;
 use crate::login::provider::{LoginProviderServer, LoginProviderStatus};
 use crate::packets::play_status::PlayStatusPacket;
 use crate::packets::set_title_packet::SetTitlePacket;
@@ -27,7 +27,7 @@ pub async fn set_title(
         platform_online_id: String::from("hello_platform_online_id"),
     };
 
-    match conn.send(GamePacket::SetTitle(set_title)).await {
+    match conn.send(GamePackets::SetTitle(set_title)).await {
         Ok(_) => {}
         Err(e) => return Err(LoginError::ConnectionError(e)),
     }

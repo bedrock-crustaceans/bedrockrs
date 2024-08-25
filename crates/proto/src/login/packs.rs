@@ -1,6 +1,6 @@
 use crate::connection::ConnectionShard;
 use crate::error::LoginError;
-use crate::gamepacket::GamePacket;
+use crate::gamepacket::GamePackets;
 use crate::login::provider::packs::LoginProviderPacks;
 use crate::login::provider::{LoginProviderServer, LoginProviderStatus};
 use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
@@ -41,7 +41,7 @@ pub async fn packs(
             };
 
             match conn
-                .send(GamePacket::ResourcePacksInfo(resource_packs_info))
+                .send(GamePackets::ResourcePacksInfo(resource_packs_info))
                 .await
             {
                 Ok(_) => {}
@@ -59,7 +59,7 @@ pub async fn packs(
             //////////////////////////////////////
 
             match conn.recv().await {
-                Ok(GamePacket::ClientCacheStatus(mut client_cache_status)) => {
+                Ok(GamePackets::ClientCacheStatus(mut client_cache_status)) => {
                     match provider.on_client_cache_status_pk(&mut client_cache_status) {
                         LoginProviderStatus::ContinueLogin => {}
                         LoginProviderStatus::AbortLogin { reason } => {
@@ -72,7 +72,7 @@ pub async fn packs(
                     }
 
                     match conn.recv().await {
-                        Ok(GamePacket::ResourcePackClientResponse(mut resource_pack_client_response)) => {
+                        Ok(GamePackets::ResourcePackClientResponse(mut resource_pack_client_response)) => {
                             match provider.on_resource_packs_response_pk(&mut resource_pack_client_response) {
                                 LoginProviderStatus::ContinueLogin => {}
                                 LoginProviderStatus::AbortLogin { reason } => {
@@ -88,7 +88,7 @@ pub async fn packs(
                         Err(e) => { return Err(LoginError::ConnectionError(e)) }
                     }
                 }
-                Ok(GamePacket::ResourcePackClientResponse(mut resource_pack_client_response)) => {
+                Ok(GamePackets::ResourcePackClientResponse(mut resource_pack_client_response)) => {
                     match provider.on_resource_packs_response_pk(&mut resource_pack_client_response) {
                         LoginProviderStatus::ContinueLogin => {}
                         LoginProviderStatus::AbortLogin { reason } => {
@@ -129,7 +129,7 @@ pub async fn packs(
             };
 
             match conn
-                .send(GamePacket::ResourcePackStack(resource_packs_stack))
+                .send(GamePackets::ResourcePackStack(resource_packs_stack))
                 .await
             {
                 Ok(_) => {}
@@ -146,7 +146,7 @@ pub async fn packs(
             //////////////////////////////////////
 
             match conn.recv().await {
-                Ok(GamePacket::ResourcePackClientResponse(mut resource_pack_client_response)) => {
+                Ok(GamePackets::ResourcePackClientResponse(mut resource_pack_client_response)) => {
                     match provider.on_resource_packs_response_pk(&mut resource_pack_client_response)
                     {
                         LoginProviderStatus::ContinueLogin => {}

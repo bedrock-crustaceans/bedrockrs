@@ -1,6 +1,6 @@
 use crate::connection::ConnectionShard;
 use crate::error::LoginError;
-use crate::gamepacket::GamePacket;
+use crate::gamepacket::GamePackets;
 use crate::login::provider::{LoginProviderServer, LoginProviderStatus};
 
 pub async fn login(
@@ -12,7 +12,7 @@ pub async fn login(
     //////////////////////////////////////
 
     let mut login = match conn.recv().await {
-        Ok(GamePacket::Login(pk)) => pk,
+        Ok(GamePackets::Login(pk)) => pk,
         Ok(other) => {
             return Err(LoginError::FormatError(format!(
                 "Expected Login packet, got: {other:?}"

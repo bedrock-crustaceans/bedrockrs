@@ -2,7 +2,7 @@ use bedrockrs_core::int::LE;
 
 use crate::connection::ConnectionShard;
 use crate::error::LoginError;
-use crate::gamepacket::GamePacket;
+use crate::gamepacket::GamePackets;
 use crate::login::provider::{LoginProviderServer, LoginProviderStatus};
 use crate::packets::network_settings::NetworkSettingsPacket;
 
@@ -15,7 +15,7 @@ pub async fn network_settings(
     //////////////////////////////////////
 
     let mut network_settings_request = match conn.recv().await {
-        Ok(GamePacket::RequestNetworkSettings(pk)) => pk,
+        Ok(GamePackets::RequestNetworkSettings(pk)) => pk,
         Ok(other) => {
             return Err(LoginError::FormatError(format!(
                 "Expected RequestNetworkSettings packet, got: {other:?}"
@@ -54,7 +54,7 @@ pub async fn network_settings(
     };
 
     match conn
-        .send(GamePacket::NetworkSettings(network_settings))
+        .send(GamePackets::NetworkSettings(network_settings))
         .await
     {
         Ok(_) => {}

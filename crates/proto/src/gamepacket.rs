@@ -52,7 +52,7 @@ use bedrockrs_proto_core::ProtoCodec;
 
 #[repr(u16)]
 #[derive(Debug, Clone)]
-pub enum GamePacket {
+pub enum GamePackets {
     Login(LoginPacket),
     PlayStatus(PlayStatusPacket),
     ServerToClientHandshake(HandshakeServerToClientPacket),
@@ -207,7 +207,7 @@ pub enum GamePacket {
     AlexEntityAnimation(),
 }
 
-impl GamePacket {
+impl GamePackets {
     const LoginID: u16 = 1;
     const PlayStatusID: u16 = 2;
     const ServerToClientHandshakeID: u16 = 3;
@@ -415,463 +415,463 @@ macro_rules! de_packet {
     }};
 }
 
-impl GamePacket {
+impl GamePackets {
     pub fn pk_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         match self {
-            GamePacket::Login(pk) => {
-                ser_packet!(stream, GamePacket::LoginID, pk)
+            GamePackets::Login(pk) => {
+                ser_packet!(stream, GamePackets::LoginID, pk)
             }
-            GamePacket::PlayStatus(pk) => {
-                ser_packet!(stream, GamePacket::PlayStatusID, pk)
+            GamePackets::PlayStatus(pk) => {
+                ser_packet!(stream, GamePackets::PlayStatusID, pk)
             }
-            GamePacket::ServerToClientHandshake(pk) => {
-                ser_packet!(stream, GamePacket::ServerToClientHandshakeID, pk)
+            GamePackets::ServerToClientHandshake(pk) => {
+                ser_packet!(stream, GamePackets::ServerToClientHandshakeID, pk)
             }
-            GamePacket::ClientToServerHandshake() => {
+            GamePackets::ClientToServerHandshake() => {
                 unimplemented!()
             }
-            GamePacket::Disconnect(pk) => {
-                ser_packet!(stream, GamePacket::DisconnectID, pk)
+            GamePackets::Disconnect(pk) => {
+                ser_packet!(stream, GamePackets::DisconnectID, pk)
             }
-            GamePacket::ResourcePacksInfo(pk) => {
-                ser_packet!(stream, GamePacket::ResourcePacksInfoID, pk)
+            GamePackets::ResourcePacksInfo(pk) => {
+                ser_packet!(stream, GamePackets::ResourcePacksInfoID, pk)
             }
-            GamePacket::ResourcePackStack(pk) => {
-                ser_packet!(stream, GamePacket::ResourcePacksStackID, pk)
+            GamePackets::ResourcePackStack(pk) => {
+                ser_packet!(stream, GamePackets::ResourcePacksStackID, pk)
             }
-            GamePacket::ResourcePackClientResponse(pk) => {
-                ser_packet!(stream, GamePacket::ResourcePacksClientResponseID, pk)
+            GamePackets::ResourcePackClientResponse(pk) => {
+                ser_packet!(stream, GamePackets::ResourcePacksClientResponseID, pk)
             }
-            GamePacket::TextMessage(pk) => {
-                ser_packet!(stream, GamePacket::TextMessageID, pk)
+            GamePackets::TextMessage(pk) => {
+                ser_packet!(stream, GamePackets::TextMessageID, pk)
             }
-            GamePacket::SetTime(pk) => {
-                ser_packet!(stream, GamePacket::SetTimeID, pk)
+            GamePackets::SetTime(pk) => {
+                ser_packet!(stream, GamePackets::SetTimeID, pk)
             }
-            GamePacket::StartGame(pk) => {
-                ser_packet!(stream, GamePacket::StartGameID, pk)
+            GamePackets::StartGame(pk) => {
+                ser_packet!(stream, GamePackets::StartGameID, pk)
             }
-            GamePacket::AddPlayer() => {
+            GamePackets::AddPlayer() => {
                 unimplemented!()
             }
-            GamePacket::AddEntity(pk) => {
-                ser_packet!(stream, GamePacket::AddEntityID, pk)
+            GamePackets::AddEntity(pk) => {
+                ser_packet!(stream, GamePackets::AddEntityID, pk)
             }
-            GamePacket::RemoveEntity(pk) => {
-                ser_packet!(stream, GamePacket::RemoveEntityID, pk)
+            GamePackets::RemoveEntity(pk) => {
+                ser_packet!(stream, GamePackets::RemoveEntityID, pk)
             }
-            GamePacket::AddItemEntity() => {
+            GamePackets::AddItemEntity() => {
                 unimplemented!()
             }
-            GamePacket::ServerPlayerPostMovePositionPacket(pk) => {
-                ser_packet!(stream, GamePacket::ServerPlayerPostMovePositionPacketID, pk)
+            GamePackets::ServerPlayerPostMovePositionPacket(pk) => {
+                ser_packet!(stream, GamePackets::ServerPlayerPostMovePositionPacketID, pk)
             }
-            GamePacket::TakeItemEntity() => {
+            GamePackets::TakeItemEntity() => {
                 unimplemented!()
             }
-            GamePacket::MoveEntity() => {
+            GamePackets::MoveEntity() => {
                 unimplemented!()
             }
-            GamePacket::MovePlayer(pk) => {
-                ser_packet!(stream, GamePacket::MovePlayerID, pk)
+            GamePackets::MovePlayer(pk) => {
+                ser_packet!(stream, GamePackets::MovePlayerID, pk)
             }
-            GamePacket::RiderJump() => {
+            GamePackets::RiderJump() => {
                 unimplemented!()
             }
-            GamePacket::UpdateBlock() => {
+            GamePackets::UpdateBlock() => {
                 unimplemented!()
             }
-            GamePacket::AddPainting(pk) => {
-                ser_packet!(stream, GamePacket::AddPaintingID, pk)
+            GamePackets::AddPainting(pk) => {
+                ser_packet!(stream, GamePackets::AddPaintingID, pk)
             }
-            GamePacket::TickSync() => {
+            GamePackets::TickSync() => {
                 unimplemented!()
             }
-            GamePacket::LevelSoundEventOld() => {
+            GamePackets::LevelSoundEventOld() => {
                 unimplemented!()
             }
-            GamePacket::LevelEvent() => {
+            GamePackets::LevelEvent() => {
                 unimplemented!()
             }
-            GamePacket::BlockEvent() => {
+            GamePackets::BlockEvent() => {
                 unimplemented!()
             }
-            GamePacket::EntityEvent() => {
+            GamePackets::EntityEvent() => {
                 unimplemented!()
             }
-            GamePacket::MobEffect() => {
+            GamePackets::MobEffect() => {
                 unimplemented!()
             }
-            GamePacket::UpdateAttributes() => {
+            GamePackets::UpdateAttributes() => {
                 unimplemented!()
             }
-            GamePacket::InventoryTransaction() => {
+            GamePackets::InventoryTransaction() => {
                 unimplemented!()
             }
-            GamePacket::MobEquipment(pk) => {
-                ser_packet!(stream, GamePacket::MobEquipmentID, pk)
+            GamePackets::MobEquipment(pk) => {
+                ser_packet!(stream, GamePackets::MobEquipmentID, pk)
             }
-            GamePacket::MobArmorEquipment() => {
+            GamePackets::MobArmorEquipment() => {
                 unimplemented!()
             }
-            GamePacket::Interact(pk) => {
-                ser_packet!(stream, GamePacket::InteractID, pk)
+            GamePackets::Interact(pk) => {
+                ser_packet!(stream, GamePackets::InteractID, pk)
             }
-            GamePacket::BlockPickRequest() => {
+            GamePackets::BlockPickRequest() => {
                 unimplemented!()
             }
-            GamePacket::EntityPickRequest() => {
+            GamePackets::EntityPickRequest() => {
                 unimplemented!()
             }
-            GamePacket::PlayerAction(pk) => {
-                ser_packet!(stream, GamePacket::PlayerActionID, pk)
+            GamePackets::PlayerAction(pk) => {
+                ser_packet!(stream, GamePackets::PlayerActionID, pk)
             }
-            GamePacket::HurtArmor() => {
+            GamePackets::HurtArmor() => {
                 unimplemented!()
             }
-            GamePacket::SetEntityData() => {
+            GamePackets::SetEntityData() => {
                 unimplemented!()
             }
-            GamePacket::SetEntityMotion() => {
+            GamePackets::SetEntityMotion() => {
                 unimplemented!()
             }
-            GamePacket::SetEntityLink() => {
+            GamePackets::SetEntityLink() => {
                 unimplemented!()
             }
-            GamePacket::SetHealth() => {
+            GamePackets::SetHealth() => {
                 unimplemented!()
             }
-            GamePacket::SetSpawnPosition() => {
+            GamePackets::SetSpawnPosition() => {
                 unimplemented!()
             }
-            GamePacket::Animate(pk) => {
-                ser_packet!(stream, GamePacket::AnimateID, pk)
+            GamePackets::Animate(pk) => {
+                ser_packet!(stream, GamePackets::AnimateID, pk)
             }
-            GamePacket::Respawn() => {
+            GamePackets::Respawn() => {
                 unimplemented!()
             }
-            GamePacket::ContainerOpen(pk) => {
-                ser_packet!(stream, GamePacket::ContainerOpenID, pk)
+            GamePackets::ContainerOpen(pk) => {
+                ser_packet!(stream, GamePackets::ContainerOpenID, pk)
             }
-            GamePacket::ContainerClose(pk) => {
-                ser_packet!(stream, GamePacket::ContainerCloseID, pk)
+            GamePackets::ContainerClose(pk) => {
+                ser_packet!(stream, GamePackets::ContainerCloseID, pk)
             }
-            GamePacket::PlayerHotbar(pk) => {
-                ser_packet!(stream, GamePacket::PlayerHotbarID, pk)
+            GamePackets::PlayerHotbar(pk) => {
+                ser_packet!(stream, GamePackets::PlayerHotbarID, pk)
             }
-            GamePacket::InventoryContent(pk) => {
-                ser_packet!(stream, GamePacket::InventoryContentID, pk)
+            GamePackets::InventoryContent(pk) => {
+                ser_packet!(stream, GamePackets::InventoryContentID, pk)
             }
-            GamePacket::InventorySlot() => {
+            GamePackets::InventorySlot() => {
                 unimplemented!()
             }
-            GamePacket::ContainerSetData() => {
+            GamePackets::ContainerSetData() => {
                 unimplemented!()
             }
-            GamePacket::CraftingData() => {
+            GamePackets::CraftingData() => {
                 unimplemented!()
             }
-            GamePacket::CraftingEvent() => {
+            GamePackets::CraftingEvent() => {
                 unimplemented!()
             }
-            GamePacket::GuiDataPickItem() => {
+            GamePackets::GuiDataPickItem() => {
                 unimplemented!()
             }
-            GamePacket::AdventureSettings() => {
+            GamePackets::AdventureSettings() => {
                 unimplemented!()
             }
-            GamePacket::BlockEntityData() => {
+            GamePackets::BlockEntityData() => {
                 unimplemented!()
             }
-            GamePacket::PlayerInput() => {
+            GamePackets::PlayerInput() => {
                 unimplemented!()
             }
-            GamePacket::LevelChunk(pk) => {
-                ser_packet!(stream, GamePacket::LevelChunkID, pk)
+            GamePackets::LevelChunk(pk) => {
+                ser_packet!(stream, GamePackets::LevelChunkID, pk)
             }
-            GamePacket::SetCommandsEnabled() => {
+            GamePackets::SetCommandsEnabled() => {
                 unimplemented!()
             }
-            GamePacket::SetDifficulty() => {
+            GamePackets::SetDifficulty() => {
                 unimplemented!()
             }
-            GamePacket::ChangeDimension() => {
+            GamePackets::ChangeDimension() => {
                 unimplemented!()
             }
-            GamePacket::SetPlayerGameType() => {
+            GamePackets::SetPlayerGameType() => {
                 unimplemented!()
             }
-            GamePacket::PlayerList() => {
+            GamePackets::PlayerList() => {
                 unimplemented!()
             }
-            GamePacket::SimpleEvent() => {
+            GamePackets::SimpleEvent() => {
                 unimplemented!()
             }
-            GamePacket::TelemetryEvent() => {
+            GamePackets::TelemetryEvent() => {
                 unimplemented!()
             }
-            GamePacket::SpawnExperienceOrb() => {
+            GamePackets::SpawnExperienceOrb() => {
                 unimplemented!()
             }
-            GamePacket::ClientboundMapItemData() => {
+            GamePackets::ClientboundMapItemData() => {
                 unimplemented!()
             }
-            GamePacket::MapInfoRequest() => {
+            GamePackets::MapInfoRequest() => {
                 unimplemented!()
             }
-            GamePacket::RequestChunkRadius(pk) => {
-                ser_packet!(stream, GamePacket::RequestChunkRadiusID, pk)
+            GamePackets::RequestChunkRadius(pk) => {
+                ser_packet!(stream, GamePackets::RequestChunkRadiusID, pk)
             }
-            GamePacket::ChunkRadiusUpdate(pk) => {
-                ser_packet!(stream, GamePacket::ChunkRadiusUpdateID, pk)
+            GamePackets::ChunkRadiusUpdate(pk) => {
+                ser_packet!(stream, GamePackets::ChunkRadiusUpdateID, pk)
             }
-            GamePacket::ItemFrameDropItem() => {
+            GamePackets::ItemFrameDropItem() => {
                 unimplemented!()
             }
-            GamePacket::GameRulesChanged() => {
+            GamePackets::GameRulesChanged() => {
                 unimplemented!()
             }
-            GamePacket::Camera(pk) => {
-                ser_packet!(stream, GamePacket::CameraID, pk)
+            GamePackets::Camera(pk) => {
+                ser_packet!(stream, GamePackets::CameraID, pk)
             }
-            GamePacket::BossEvent() => {
+            GamePackets::BossEvent() => {
                 unimplemented!()
             }
-            GamePacket::ShowCredits() => {
+            GamePackets::ShowCredits() => {
                 unimplemented!()
             }
-            GamePacket::AvailableCommands() => {
+            GamePackets::AvailableCommands() => {
                 unimplemented!()
             }
-            GamePacket::CommandRequest(pk) => {
-                ser_packet!(stream, GamePacket::CommandRequestID, pk)
+            GamePackets::CommandRequest(pk) => {
+                ser_packet!(stream, GamePackets::CommandRequestID, pk)
             }
-            GamePacket::CommandBlockUpdate() => {
+            GamePackets::CommandBlockUpdate() => {
                 unimplemented!()
             }
-            GamePacket::CommandOutput() => {
+            GamePackets::CommandOutput() => {
                 unimplemented!()
             }
-            GamePacket::UpdateTrade() => {
+            GamePackets::UpdateTrade() => {
                 unimplemented!()
             }
-            GamePacket::UpdateEquipment() => {
+            GamePackets::UpdateEquipment() => {
                 unimplemented!()
             }
-            GamePacket::ResourcePackDataInfo() => {
+            GamePackets::ResourcePackDataInfo() => {
                 unimplemented!()
             }
-            GamePacket::ResourcePackChunkData() => {
+            GamePackets::ResourcePackChunkData() => {
                 unimplemented!()
             }
-            GamePacket::ResourcePackChunkRequest() => {
+            GamePackets::ResourcePackChunkRequest() => {
                 unimplemented!()
             }
-            GamePacket::Transfer() => {
+            GamePackets::Transfer() => {
                 unimplemented!()
             }
-            GamePacket::PlaySound() => {
+            GamePackets::PlaySound() => {
                 unimplemented!()
             }
-            GamePacket::StopSound() => {
+            GamePackets::StopSound() => {
                 unimplemented!()
             }
-            GamePacket::SetTitle(pk) => {
-                ser_packet!(stream, GamePacket::SetTitleID, pk)
+            GamePackets::SetTitle(pk) => {
+                ser_packet!(stream, GamePackets::SetTitleID, pk)
             }
-            GamePacket::AddBehaviorTree() => {
+            GamePackets::AddBehaviorTree() => {
                 unimplemented!()
             }
-            GamePacket::StructureBlockUpdate() => {
+            GamePackets::StructureBlockUpdate() => {
                 unimplemented!()
             }
-            GamePacket::ShowStoreOffer() => {
+            GamePackets::ShowStoreOffer() => {
                 unimplemented!()
             }
-            GamePacket::PurchaseReceipt() => {
+            GamePackets::PurchaseReceipt() => {
                 unimplemented!()
             }
-            GamePacket::PlayerSkin() => {
+            GamePackets::PlayerSkin() => {
                 unimplemented!()
             }
-            GamePacket::SubClientLogin() => {
+            GamePackets::SubClientLogin() => {
                 unimplemented!()
             }
-            GamePacket::InitiateWebSocketConnection() => {
+            GamePackets::InitiateWebSocketConnection() => {
                 unimplemented!()
             }
-            GamePacket::SetLastHurtBy() => {
+            GamePackets::SetLastHurtBy() => {
                 unimplemented!()
             }
-            GamePacket::BookEdit() => {
+            GamePackets::BookEdit() => {
                 unimplemented!()
             }
-            GamePacket::NpcRequest() => {
+            GamePackets::NpcRequest() => {
                 unimplemented!()
             }
-            GamePacket::PhotoTransfer() => {
+            GamePackets::PhotoTransfer() => {
                 unimplemented!()
             }
-            GamePacket::ModalFormRequest(pk) => {
-                ser_packet!(stream, GamePacket::ModalFormRequestID, pk)
+            GamePackets::ModalFormRequest(pk) => {
+                ser_packet!(stream, GamePackets::ModalFormRequestID, pk)
             }
-            GamePacket::ModalFormResponse(pk) => {
-                ser_packet!(stream, GamePacket::ModalFormResponseID, pk)
+            GamePackets::ModalFormResponse(pk) => {
+                ser_packet!(stream, GamePackets::ModalFormResponseID, pk)
             }
-            GamePacket::ServerSettingsRequest(pk) => {
-                ser_packet!(stream, GamePacket::ServerSettingsRequestID, pk)
+            GamePackets::ServerSettingsRequest(pk) => {
+                ser_packet!(stream, GamePackets::ServerSettingsRequestID, pk)
             }
-            GamePacket::ServerSettingsResponse(pk) => {
-                ser_packet!(stream, GamePacket::ServerSettingsResponseID, pk)
+            GamePackets::ServerSettingsResponse(pk) => {
+                ser_packet!(stream, GamePackets::ServerSettingsResponseID, pk)
             }
-            GamePacket::ShowProfile() => {
+            GamePackets::ShowProfile() => {
                 unimplemented!()
             }
-            GamePacket::SetDefaultGameType() => {
+            GamePackets::SetDefaultGameType() => {
                 unimplemented!()
             }
-            GamePacket::RemoveObjective() => {
+            GamePackets::RemoveObjective() => {
                 unimplemented!()
             }
-            GamePacket::SetDisplayObjective() => {
+            GamePackets::SetDisplayObjective() => {
                 unimplemented!()
             }
-            GamePacket::SetScore() => {
+            GamePackets::SetScore() => {
                 unimplemented!()
             }
-            GamePacket::LabTable() => {
+            GamePackets::LabTable() => {
                 unimplemented!()
             }
-            GamePacket::UpdateBlockSynced() => {
+            GamePackets::UpdateBlockSynced() => {
                 unimplemented!()
             }
-            GamePacket::MoveEntityDelta() => {
+            GamePackets::MoveEntityDelta() => {
                 unimplemented!()
             }
-            GamePacket::SetScoreboardIdentity() => {
+            GamePackets::SetScoreboardIdentity() => {
                 unimplemented!()
             }
-            GamePacket::SetLocalPlayerAsInitialized(pk) => {
-                ser_packet!(stream, GamePacket::SetLocalPlayerAsInitializedID, pk)
+            GamePackets::SetLocalPlayerAsInitialized(pk) => {
+                ser_packet!(stream, GamePackets::SetLocalPlayerAsInitializedID, pk)
             }
-            GamePacket::UpdateSoftEnum() => {
+            GamePackets::UpdateSoftEnum() => {
                 unimplemented!()
             }
-            GamePacket::NetworkStackLatency() => {
+            GamePackets::NetworkStackLatency() => {
                 unimplemented!()
             }
-            GamePacket::ScriptCustomEvent() => {
+            GamePackets::ScriptCustomEvent() => {
                 unimplemented!()
             }
-            GamePacket::SpawnParticleEffect() => {
+            GamePackets::SpawnParticleEffect() => {
                 unimplemented!()
             }
-            GamePacket::AvailableEntityIdentifiers() => {
+            GamePackets::AvailableEntityIdentifiers() => {
                 unimplemented!()
             }
-            GamePacket::LevelSoundEventV2() => {
+            GamePackets::LevelSoundEventV2() => {
                 unimplemented!()
             }
-            GamePacket::NetworkChunkPublisherUpdate() => {
+            GamePackets::NetworkChunkPublisherUpdate() => {
                 unimplemented!()
             }
-            GamePacket::BiomeDefinitionList() => {
+            GamePackets::BiomeDefinitionList() => {
                 unimplemented!()
             }
-            GamePacket::LevelSoundEvent() => {
+            GamePackets::LevelSoundEvent() => {
                 unimplemented!()
             }
-            GamePacket::LevelEventGeneric() => {
+            GamePackets::LevelEventGeneric() => {
                 unimplemented!()
             }
-            GamePacket::LecternUpdate() => {
+            GamePackets::LecternUpdate() => {
                 unimplemented!()
             }
-            GamePacket::VideoStreamConnect() => {
+            GamePackets::VideoStreamConnect() => {
                 unimplemented!()
             }
-            GamePacket::ClientCacheStatus(pk) => {
-                ser_packet!(stream, GamePacket::ClientCacheStatusID, pk)
+            GamePackets::ClientCacheStatus(pk) => {
+                ser_packet!(stream, GamePackets::ClientCacheStatusID, pk)
             }
-            GamePacket::OnScreenTextureAnimation() => {
+            GamePackets::OnScreenTextureAnimation() => {
                 unimplemented!()
             }
-            GamePacket::MapCreateLockedCopy() => {
+            GamePackets::MapCreateLockedCopy() => {
                 unimplemented!()
             }
-            GamePacket::StructureTemplateDataExportRequest() => {
+            GamePackets::StructureTemplateDataExportRequest() => {
                 unimplemented!()
             }
-            GamePacket::StructureTemplateDataExportResponse() => {
+            GamePackets::StructureTemplateDataExportResponse() => {
                 unimplemented!()
             }
-            GamePacket::UpdateBlockProperties() => {
+            GamePackets::UpdateBlockProperties() => {
                 unimplemented!()
             }
-            GamePacket::ClientCacheBlobStatus() => {
+            GamePackets::ClientCacheBlobStatus() => {
                 unimplemented!()
             }
-            GamePacket::ClientCacheMissResponse() => {
+            GamePackets::ClientCacheMissResponse() => {
                 unimplemented!()
             }
-            GamePacket::NetworkSettings(pk) => {
-                ser_packet!(stream, GamePacket::NetworkSettingsID, pk)
+            GamePackets::NetworkSettings(pk) => {
+                ser_packet!(stream, GamePackets::NetworkSettingsID, pk)
             }
-            GamePacket::PlayerAuthInput(pk) => {
-                ser_packet!(stream, GamePacket::PlayerAuthInputID, pk)
+            GamePackets::PlayerAuthInput(pk) => {
+                ser_packet!(stream, GamePackets::PlayerAuthInputID, pk)
             }
-            GamePacket::CreativeContent() => {
+            GamePackets::CreativeContent() => {
                 unimplemented!()
             }
-            GamePacket::PlayerEnchantOptions() => {
+            GamePackets::PlayerEnchantOptions() => {
                 unimplemented!()
             }
-            GamePacket::ItemStackRequest() => {
+            GamePackets::ItemStackRequest() => {
                 unimplemented!()
             }
-            GamePacket::ItemStackResponse() => {
+            GamePackets::ItemStackResponse() => {
                 unimplemented!()
             }
-            GamePacket::UpdatePlayerGameType() => {
+            GamePackets::UpdatePlayerGameType() => {
                 unimplemented!()
             }
-            GamePacket::EmoteList(pk) => {
-                ser_packet!(stream, GamePacket::EmoteListID, pk)
+            GamePackets::EmoteList(pk) => {
+                ser_packet!(stream, GamePackets::EmoteListID, pk)
             }
-            GamePacket::DebugInfoPacket(pk) => {
-                ser_packet!(stream, GamePacket::DebugInfoPacketID, pk)
+            GamePackets::DebugInfoPacket(pk) => {
+                ser_packet!(stream, GamePackets::DebugInfoPacketID, pk)
             }
-            GamePacket::PacketViolationWarning(pk) => {
-                ser_packet!(stream, GamePacket::PacketViolationWarningID, pk)
+            GamePackets::PacketViolationWarning(pk) => {
+                ser_packet!(stream, GamePackets::PacketViolationWarningID, pk)
             }
-            GamePacket::CorrectPlayerMovePredictionPacket(pk) => {
-                ser_packet!(stream, GamePacket::CorrectPlayerMovePredictionPacketID, pk)
+            GamePackets::CorrectPlayerMovePredictionPacket(pk) => {
+                ser_packet!(stream, GamePackets::CorrectPlayerMovePredictionPacketID, pk)
             }
-            GamePacket::ItemComponent() => {
+            GamePackets::ItemComponent() => {
                 unimplemented!()
             }
-            GamePacket::FilterTextPacket() => {
+            GamePackets::FilterTextPacket() => {
                 unimplemented!()
             }
-            GamePacket::UpdateSubChunkBlocksPacket() => {
+            GamePackets::UpdateSubChunkBlocksPacket() => {
                 unimplemented!()
             }
-            GamePacket::SubChunkPacket() => {
+            GamePackets::SubChunkPacket() => {
                 unimplemented!()
             }
-            GamePacket::SubChunkRequestPacket() => {
+            GamePackets::SubChunkRequestPacket() => {
                 unimplemented!()
             }
-            GamePacket::DimensionData() => {
+            GamePackets::DimensionData() => {
                 unimplemented!()
             }
-            GamePacket::ToastRequestPacket(pk) => {
-                ser_packet!(stream, GamePacket::ToastRequestPackeID, pk)
+            GamePackets::ToastRequestPacket(pk) => {
+                ser_packet!(stream, GamePackets::ToastRequestPackeID, pk)
             }
-            GamePacket::RequestNetworkSettings(pk) => {
-                ser_packet!(stream, GamePacket::RequestNetworkSettingsID, pk)
+            GamePackets::RequestNetworkSettings(pk) => {
+                ser_packet!(stream, GamePackets::RequestNetworkSettingsID, pk)
             }
-            GamePacket::AlexEntityAnimation() => {
+            GamePackets::AlexEntityAnimation() => {
                 unimplemented!()
             }
         }
@@ -879,7 +879,7 @@ impl GamePacket {
 
     pub fn pk_deserialize(
         stream: &mut Cursor<&[u8]>,
-    ) -> Result<(GamePacket, u8, u8), ProtoCodecError> {
+    ) -> Result<(GamePackets, u8, u8), ProtoCodecError> {
         // Read the game packet length
         // We don't need it, yet?
         // TODO: Use this to possibly async the packet handling
@@ -905,448 +905,448 @@ impl GamePacket {
 
         // Match the GamePacket to deserialize the correct packet type
         let game_packet = match game_packet_id {
-            GamePacket::LoginID => GamePacket::Login(de_packet!(stream, LoginPacket)),
-            GamePacket::PlayStatusID => {
-                GamePacket::PlayStatus(de_packet!(stream, PlayStatusPacket))
+            GamePackets::LoginID => GamePackets::Login(de_packet!(stream, LoginPacket)),
+            GamePackets::PlayStatusID => {
+                GamePackets::PlayStatus(de_packet!(stream, PlayStatusPacket))
             }
-            GamePacket::ServerToClientHandshakeID => GamePacket::ServerToClientHandshake(
+            GamePackets::ServerToClientHandshakeID => GamePackets::ServerToClientHandshake(
                 de_packet!(stream, HandshakeServerToClientPacket),
             ),
-            GamePacket::ClientToServerHandshakeID => {
+            GamePackets::ClientToServerHandshakeID => {
                 unimplemented!()
             }
-            GamePacket::DisconnectID => {
-                GamePacket::Disconnect(de_packet!(stream, DisconnectPacket))
+            GamePackets::DisconnectID => {
+                GamePackets::Disconnect(de_packet!(stream, DisconnectPacket))
             }
-            GamePacket::ResourcePacksInfoID => {
-                GamePacket::ResourcePacksInfo(de_packet!(stream, ResourcePacksInfoPacket))
+            GamePackets::ResourcePacksInfoID => {
+                GamePackets::ResourcePacksInfo(de_packet!(stream, ResourcePacksInfoPacket))
             }
-            GamePacket::ResourcePacksStackID => {
-                GamePacket::ResourcePackStack(de_packet!(stream, ResourcePacksStackPacket))
+            GamePackets::ResourcePacksStackID => {
+                GamePackets::ResourcePackStack(de_packet!(stream, ResourcePacksStackPacket))
             }
-            GamePacket::ResourcePacksClientResponseID => GamePacket::ResourcePackClientResponse(
+            GamePackets::ResourcePacksClientResponseID => GamePackets::ResourcePackClientResponse(
                 de_packet!(stream, ResourcePacksResponsePacket),
             ),
-            GamePacket::TextMessageID => {
-                GamePacket::TextMessage(de_packet!(stream, TextMessagePacket))
+            GamePackets::TextMessageID => {
+                GamePackets::TextMessage(de_packet!(stream, TextMessagePacket))
             }
-            GamePacket::SetTimeID => GamePacket::SetTime(de_packet!(stream, SetTimePacket)),
-            GamePacket::StartGameID => GamePacket::StartGame(de_packet!(stream, StartGamePacket)),
-            GamePacket::AddPlayerID => {
+            GamePackets::SetTimeID => GamePackets::SetTime(de_packet!(stream, SetTimePacket)),
+            GamePackets::StartGameID => GamePackets::StartGame(de_packet!(stream, StartGamePacket)),
+            GamePackets::AddPlayerID => {
                 unimplemented!()
             }
-            GamePacket::AddEntityID => GamePacket::AddEntity(de_packet!(stream, AddActorPacket)),
-            GamePacket::RemoveEntityID => {
-                GamePacket::RemoveEntity(de_packet!(stream, RemoveEntityPacket))
+            GamePackets::AddEntityID => GamePackets::AddEntity(de_packet!(stream, AddActorPacket)),
+            GamePackets::RemoveEntityID => {
+                GamePackets::RemoveEntity(de_packet!(stream, RemoveEntityPacket))
             }
-            GamePacket::AddItemEntityID => {
+            GamePackets::AddItemEntityID => {
                 unimplemented!()
             }
-            GamePacket::ServerPlayerPostMovePositionPacketID => {
-                GamePacket::ServerPlayerPostMovePositionPacket(de_packet!(
+            GamePackets::ServerPlayerPostMovePositionPacketID => {
+                GamePackets::ServerPlayerPostMovePositionPacket(de_packet!(
                     stream,
                     ServerPlayerPostMovePositionPacket
                 ))
             }
-            GamePacket::TakeItemEntityID => {
+            GamePackets::TakeItemEntityID => {
                 unimplemented!()
             }
-            GamePacket::MoveEntityID => {
+            GamePackets::MoveEntityID => {
                 unimplemented!()
             }
-            GamePacket::MovePlayerID => {
-                GamePacket::MovePlayer(de_packet!(stream, MovePlayerPacket))
+            GamePackets::MovePlayerID => {
+                GamePackets::MovePlayer(de_packet!(stream, MovePlayerPacket))
             }
-            GamePacket::RiderJumpID => {
+            GamePackets::RiderJumpID => {
                 unimplemented!()
             }
-            GamePacket::UpdateBlockID => {
+            GamePackets::UpdateBlockID => {
                 unimplemented!()
             }
-            GamePacket::AddPaintingID => {
-                GamePacket::AddPainting(de_packet!(stream, AddPaintingPacket))
+            GamePackets::AddPaintingID => {
+                GamePackets::AddPainting(de_packet!(stream, AddPaintingPacket))
             }
-            GamePacket::TickSyncID => {
+            GamePackets::TickSyncID => {
                 unimplemented!()
             }
-            GamePacket::LevelSoundEventOldID => {
+            GamePackets::LevelSoundEventOldID => {
                 unimplemented!()
             }
-            GamePacket::LevelEventID => {
+            GamePackets::LevelEventID => {
                 unimplemented!()
             }
-            GamePacket::BlockEventID => {
+            GamePackets::BlockEventID => {
                 unimplemented!()
             }
-            GamePacket::EntityEventID => {
+            GamePackets::EntityEventID => {
                 unimplemented!()
             }
-            GamePacket::MobEffectID => {
+            GamePackets::MobEffectID => {
                 unimplemented!()
             }
-            GamePacket::UpdateAttributesID => {
+            GamePackets::UpdateAttributesID => {
                 unimplemented!()
             }
-            GamePacket::InventoryTransactionID => {
+            GamePackets::InventoryTransactionID => {
                 unimplemented!()
             }
-            GamePacket::MobEquipmentID => {
-                GamePacket::MobEquipment(de_packet!(stream, MobEquipmentPacket))
+            GamePackets::MobEquipmentID => {
+                GamePackets::MobEquipment(de_packet!(stream, MobEquipmentPacket))
             }
-            GamePacket::MobArmorEquipmentID => {
+            GamePackets::MobArmorEquipmentID => {
                 unimplemented!()
             }
-            GamePacket::InteractID => GamePacket::Interact(de_packet!(stream, InteractPacket)),
-            GamePacket::BlockPickRequestID => {
+            GamePackets::InteractID => GamePackets::Interact(de_packet!(stream, InteractPacket)),
+            GamePackets::BlockPickRequestID => {
                 unimplemented!()
             }
-            GamePacket::EntityPickRequestID => {
+            GamePackets::EntityPickRequestID => {
                 unimplemented!()
             }
-            GamePacket::PlayerActionID => {
-                GamePacket::PlayerAction(de_packet!(stream, PlayerActionPacket))
+            GamePackets::PlayerActionID => {
+                GamePackets::PlayerAction(de_packet!(stream, PlayerActionPacket))
             }
-            GamePacket::HurtArmorID => {
+            GamePackets::HurtArmorID => {
                 unimplemented!()
             }
-            GamePacket::SetEntityDataID => {
+            GamePackets::SetEntityDataID => {
                 unimplemented!()
             }
-            GamePacket::SetEntityMotionID => {
+            GamePackets::SetEntityMotionID => {
                 unimplemented!()
             }
-            GamePacket::SetEntityLinkID => {
+            GamePackets::SetEntityLinkID => {
                 unimplemented!()
             }
-            GamePacket::SetHealthID => {
+            GamePackets::SetHealthID => {
                 unimplemented!()
             }
-            GamePacket::SetSpawnPositionID => {
+            GamePackets::SetSpawnPositionID => {
                 unimplemented!()
             }
-            GamePacket::AnimateID => GamePacket::Animate(de_packet!(stream, AnimatePacket)),
-            GamePacket::RespawnID => {
+            GamePackets::AnimateID => GamePackets::Animate(de_packet!(stream, AnimatePacket)),
+            GamePackets::RespawnID => {
                 unimplemented!()
             }
-            GamePacket::ContainerOpenID => {
-                GamePacket::ContainerOpen(de_packet!(stream, ContainerOpenPacket))
+            GamePackets::ContainerOpenID => {
+                GamePackets::ContainerOpen(de_packet!(stream, ContainerOpenPacket))
             }
-            GamePacket::ContainerCloseID => {
-                GamePacket::ContainerClose(de_packet!(stream, ContainerClosePacket))
+            GamePackets::ContainerCloseID => {
+                GamePackets::ContainerClose(de_packet!(stream, ContainerClosePacket))
             }
-            GamePacket::PlayerHotbarID => {
-                GamePacket::PlayerHotbar(de_packet!(stream, PlayerHotbarPacket))
+            GamePackets::PlayerHotbarID => {
+                GamePackets::PlayerHotbar(de_packet!(stream, PlayerHotbarPacket))
             }
-            GamePacket::InventoryContentID => {
-                GamePacket::InventoryContent(de_packet!(stream, InventoryContentPacket))
+            GamePackets::InventoryContentID => {
+                GamePackets::InventoryContent(de_packet!(stream, InventoryContentPacket))
             }
-            GamePacket::InventorySlotID => {
+            GamePackets::InventorySlotID => {
                 unimplemented!()
             }
-            GamePacket::ContainerSetDataID => {
+            GamePackets::ContainerSetDataID => {
                 unimplemented!()
             }
-            GamePacket::CraftingDataID => {
+            GamePackets::CraftingDataID => {
                 unimplemented!()
             }
-            GamePacket::CraftingEventID => {
+            GamePackets::CraftingEventID => {
                 unimplemented!()
             }
-            GamePacket::GuiDataPickItemID => {
+            GamePackets::GuiDataPickItemID => {
                 unimplemented!()
             }
-            GamePacket::AdventureSettingsID => {
+            GamePackets::AdventureSettingsID => {
                 unimplemented!()
             }
-            GamePacket::BlockEntityDataID => {
+            GamePackets::BlockEntityDataID => {
                 unimplemented!()
             }
-            GamePacket::PlayerInputID => {
+            GamePackets::PlayerInputID => {
                 unimplemented!()
             }
-            GamePacket::LevelChunkID => {
+            GamePackets::LevelChunkID => {
                 unimplemented!()
             }
-            GamePacket::SetCommandsEnabledID => {
+            GamePackets::SetCommandsEnabledID => {
                 unimplemented!()
             }
-            GamePacket::SetDifficultyID => {
+            GamePackets::SetDifficultyID => {
                 unimplemented!()
             }
-            GamePacket::ChangeDimensionID => {
+            GamePackets::ChangeDimensionID => {
                 unimplemented!()
             }
-            GamePacket::SetPlayerGameTypeID => {
+            GamePackets::SetPlayerGameTypeID => {
                 unimplemented!()
             }
-            GamePacket::PlayerListID => {
+            GamePackets::PlayerListID => {
                 unimplemented!()
             }
-            GamePacket::SimpleEventID => {
+            GamePackets::SimpleEventID => {
                 unimplemented!()
             }
-            GamePacket::TelemetryEventID => {
+            GamePackets::TelemetryEventID => {
                 unimplemented!()
             }
-            GamePacket::SpawnExperienceOrbID => {
+            GamePackets::SpawnExperienceOrbID => {
                 unimplemented!()
             }
-            GamePacket::ClientboundMapItemDataID => {
+            GamePackets::ClientboundMapItemDataID => {
                 unimplemented!()
             }
-            GamePacket::MapInfoRequestID => {
+            GamePackets::MapInfoRequestID => {
                 unimplemented!()
             }
-            GamePacket::RequestChunkRadiusID => {
-                GamePacket::RequestChunkRadius(de_packet!(stream, RequestChunkRadiusPacket))
+            GamePackets::RequestChunkRadiusID => {
+                GamePackets::RequestChunkRadius(de_packet!(stream, RequestChunkRadiusPacket))
             }
-            GamePacket::ChunkRadiusUpdateID => {
+            GamePackets::ChunkRadiusUpdateID => {
                 unimplemented!()
             }
-            GamePacket::ItemFrameDropItemID => {
+            GamePackets::ItemFrameDropItemID => {
                 unimplemented!()
             }
-            GamePacket::GameRulesChangedID => {
+            GamePackets::GameRulesChangedID => {
                 unimplemented!()
             }
-            GamePacket::CameraID => GamePacket::Camera(de_packet!(stream, CameraPacket)),
-            GamePacket::BossEventID => {
+            GamePackets::CameraID => GamePackets::Camera(de_packet!(stream, CameraPacket)),
+            GamePackets::BossEventID => {
                 unimplemented!()
             }
-            GamePacket::ShowCreditsID => {
+            GamePackets::ShowCreditsID => {
                 unimplemented!()
             }
-            GamePacket::AvailableCommandsID => {
+            GamePackets::AvailableCommandsID => {
                 unimplemented!()
             }
-            GamePacket::CommandRequestID => {
-                GamePacket::CommandRequest(de_packet!(stream, CommandRequestPacket))
+            GamePackets::CommandRequestID => {
+                GamePackets::CommandRequest(de_packet!(stream, CommandRequestPacket))
             }
-            GamePacket::CommandBlockUpdateID => {
+            GamePackets::CommandBlockUpdateID => {
                 unimplemented!()
             }
-            GamePacket::CommandOutputID => {
+            GamePackets::CommandOutputID => {
                 unimplemented!()
             }
-            GamePacket::UpdateTradeID => {
+            GamePackets::UpdateTradeID => {
                 unimplemented!()
             }
-            GamePacket::UpdateEquipmentID => {
+            GamePackets::UpdateEquipmentID => {
                 unimplemented!()
             }
-            GamePacket::ResourcePackDataInfoID => {
+            GamePackets::ResourcePackDataInfoID => {
                 unimplemented!()
             }
-            GamePacket::ResourcePackChunkDataID => {
+            GamePackets::ResourcePackChunkDataID => {
                 unimplemented!()
             }
-            GamePacket::ResourcePackChunkRequestID => {
+            GamePackets::ResourcePackChunkRequestID => {
                 unimplemented!()
             }
-            GamePacket::TransferID => {
+            GamePackets::TransferID => {
                 unimplemented!()
             }
-            GamePacket::PlaySoundID => {
+            GamePackets::PlaySoundID => {
                 unimplemented!()
             }
-            GamePacket::StopSoundID => {
+            GamePackets::StopSoundID => {
                 unimplemented!()
             }
-            GamePacket::SetTitleID => GamePacket::SetTitle(de_packet!(stream, SetTitlePacket)),
-            GamePacket::AddBehaviorTreeID => {
+            GamePackets::SetTitleID => GamePackets::SetTitle(de_packet!(stream, SetTitlePacket)),
+            GamePackets::AddBehaviorTreeID => {
                 unimplemented!()
             }
-            GamePacket::StructureBlockUpdateID => {
+            GamePackets::StructureBlockUpdateID => {
                 unimplemented!()
             }
-            GamePacket::ShowStoreOfferID => {
+            GamePackets::ShowStoreOfferID => {
                 unimplemented!()
             }
-            GamePacket::PurchaseReceiptID => {
+            GamePackets::PurchaseReceiptID => {
                 unimplemented!()
             }
-            GamePacket::PlayerSkinID => {
+            GamePackets::PlayerSkinID => {
                 unimplemented!()
             }
-            GamePacket::SubClientLoginID => {
+            GamePackets::SubClientLoginID => {
                 unimplemented!()
             }
-            GamePacket::InitiateWebSocketConnectionID => {
+            GamePackets::InitiateWebSocketConnectionID => {
                 unimplemented!()
             }
-            GamePacket::SetLastHurtByID => {
+            GamePackets::SetLastHurtByID => {
                 unimplemented!()
             }
-            GamePacket::BookEditID => {
+            GamePackets::BookEditID => {
                 unimplemented!()
             }
-            GamePacket::NpcRequestID => {
+            GamePackets::NpcRequestID => {
                 unimplemented!()
             }
-            GamePacket::PhotoTransferID => {
+            GamePackets::PhotoTransferID => {
                 unimplemented!()
             }
-            GamePacket::ModalFormRequestID => {
-                GamePacket::ModalFormRequest(de_packet!(stream, ModalFormRequestPacket))
+            GamePackets::ModalFormRequestID => {
+                GamePackets::ModalFormRequest(de_packet!(stream, ModalFormRequestPacket))
             }
-            GamePacket::ModalFormResponseID => {
-                GamePacket::ModalFormResponse(de_packet!(stream, ModalFormResponsePacket))
+            GamePackets::ModalFormResponseID => {
+                GamePackets::ModalFormResponse(de_packet!(stream, ModalFormResponsePacket))
             }
-            GamePacket::ServerSettingsRequestID => {
-                GamePacket::ServerSettingsRequest(de_packet!(stream, ServerSettingsRequestPacket))
+            GamePackets::ServerSettingsRequestID => {
+                GamePackets::ServerSettingsRequest(de_packet!(stream, ServerSettingsRequestPacket))
             }
-            GamePacket::ServerSettingsResponseID => {
-                GamePacket::ServerSettingsResponse(de_packet!(stream, ServerSettingsResponsePacket))
+            GamePackets::ServerSettingsResponseID => {
+                GamePackets::ServerSettingsResponse(de_packet!(stream, ServerSettingsResponsePacket))
             }
-            GamePacket::ShowProfileID => {
+            GamePackets::ShowProfileID => {
                 unimplemented!()
             }
-            GamePacket::SetDefaultGameTypeID => {
+            GamePackets::SetDefaultGameTypeID => {
                 unimplemented!()
             }
-            GamePacket::RemoveObjectiveID => {
+            GamePackets::RemoveObjectiveID => {
                 unimplemented!()
             }
-            GamePacket::SetDisplayObjectiveID => {
+            GamePackets::SetDisplayObjectiveID => {
                 unimplemented!()
             }
-            GamePacket::SetScoreID => {
+            GamePackets::SetScoreID => {
                 unimplemented!()
             }
-            GamePacket::LabTableID => {
+            GamePackets::LabTableID => {
                 unimplemented!()
             }
-            GamePacket::UpdateBlockSyncedID => {
+            GamePackets::UpdateBlockSyncedID => {
                 unimplemented!()
             }
-            GamePacket::MoveEntityDeltaID => {
+            GamePackets::MoveEntityDeltaID => {
                 unimplemented!()
             }
-            GamePacket::SetScoreboardIdentityID => {
+            GamePackets::SetScoreboardIdentityID => {
                 unimplemented!()
             }
-            GamePacket::SetLocalPlayerAsInitializedID => GamePacket::SetLocalPlayerAsInitialized(
+            GamePackets::SetLocalPlayerAsInitializedID => GamePackets::SetLocalPlayerAsInitialized(
                 de_packet!(stream, SetLocalPlayerAsInitializedPacket),
             ),
-            GamePacket::UpdateSoftEnumID => {
+            GamePackets::UpdateSoftEnumID => {
                 unimplemented!()
             }
-            GamePacket::NetworkStackLatencyID => {
+            GamePackets::NetworkStackLatencyID => {
                 unimplemented!()
             }
-            GamePacket::ScriptCustomEventID => {
+            GamePackets::ScriptCustomEventID => {
                 unimplemented!()
             }
-            GamePacket::SpawnParticleEffectID => {
+            GamePackets::SpawnParticleEffectID => {
                 unimplemented!()
             }
-            GamePacket::AvailableEntityIdentifiersID => {
+            GamePackets::AvailableEntityIdentifiersID => {
                 unimplemented!()
             }
-            GamePacket::LevelSoundEventV2ID => {
+            GamePackets::LevelSoundEventV2ID => {
                 unimplemented!()
             }
-            GamePacket::NetworkChunkPublisherUpdateID => {
+            GamePackets::NetworkChunkPublisherUpdateID => {
                 unimplemented!()
             }
-            GamePacket::BiomeDefinitionListID => {
+            GamePackets::BiomeDefinitionListID => {
                 unimplemented!()
             }
-            GamePacket::LevelSoundEventID => {
+            GamePackets::LevelSoundEventID => {
                 unimplemented!()
             }
-            GamePacket::LevelEventGenericID => {
+            GamePackets::LevelEventGenericID => {
                 unimplemented!()
             }
-            GamePacket::LecternUpdateID => {
+            GamePackets::LecternUpdateID => {
                 unimplemented!()
             }
-            GamePacket::VideoStreamConnectID => {
+            GamePackets::VideoStreamConnectID => {
                 unimplemented!()
             }
-            GamePacket::ClientCacheStatusID => {
-                GamePacket::ClientCacheStatus(de_packet!(stream, ClientCacheStatusPacket))
+            GamePackets::ClientCacheStatusID => {
+                GamePackets::ClientCacheStatus(de_packet!(stream, ClientCacheStatusPacket))
             }
-            GamePacket::OnScreenTextureAnimationID => {
+            GamePackets::OnScreenTextureAnimationID => {
                 unimplemented!()
             }
-            GamePacket::MapCreateLockedCopyID => {
+            GamePackets::MapCreateLockedCopyID => {
                 unimplemented!()
             }
-            GamePacket::StructureTemplateDataExportRequestID => {
+            GamePackets::StructureTemplateDataExportRequestID => {
                 unimplemented!()
             }
-            GamePacket::StructureTemplateDataExportResponseID => {
+            GamePackets::StructureTemplateDataExportResponseID => {
                 unimplemented!()
             }
-            GamePacket::UpdateBlockPropertiesID => {
+            GamePackets::UpdateBlockPropertiesID => {
                 unimplemented!()
             }
-            GamePacket::ClientCacheBlobStatusID => {
+            GamePackets::ClientCacheBlobStatusID => {
                 unimplemented!()
             }
-            GamePacket::ClientCacheMissResponseID => {
+            GamePackets::ClientCacheMissResponseID => {
                 unimplemented!()
             }
-            GamePacket::NetworkSettingsID => {
-                GamePacket::NetworkSettings(de_packet!(stream, NetworkSettingsPacket))
+            GamePackets::NetworkSettingsID => {
+                GamePackets::NetworkSettings(de_packet!(stream, NetworkSettingsPacket))
             }
-            GamePacket::PlayerAuthInputID => {
-                GamePacket::PlayerAuthInput(de_packet!(stream, PlayerAuthInputPacket))
+            GamePackets::PlayerAuthInputID => {
+                GamePackets::PlayerAuthInput(de_packet!(stream, PlayerAuthInputPacket))
             }
-            GamePacket::CreativeContentID => {
+            GamePackets::CreativeContentID => {
                 unimplemented!()
             }
-            GamePacket::PlayerEnchantOptionsID => {
+            GamePackets::PlayerEnchantOptionsID => {
                 unimplemented!()
             }
-            GamePacket::ItemStackRequestID => {
+            GamePackets::ItemStackRequestID => {
                 unimplemented!()
             }
-            GamePacket::ItemStackResponseID => {
+            GamePackets::ItemStackResponseID => {
                 unimplemented!()
             }
-            GamePacket::UpdatePlayerGameTypeID => {
+            GamePackets::UpdatePlayerGameTypeID => {
                 unimplemented!()
             }
-            GamePacket::EmoteListID => GamePacket::EmoteList(de_packet!(stream, EmoteListPacket)),
-            GamePacket::DebugInfoPacketID => {
-                GamePacket::DebugInfoPacket(de_packet!(stream, DebugInfoPacket))
+            GamePackets::EmoteListID => GamePackets::EmoteList(de_packet!(stream, EmoteListPacket)),
+            GamePackets::DebugInfoPacketID => {
+                GamePackets::DebugInfoPacket(de_packet!(stream, DebugInfoPacket))
             }
-            GamePacket::PacketViolationWarningID => {
-                GamePacket::PacketViolationWarning(de_packet!(stream, PacketViolationWarningPacket))
+            GamePackets::PacketViolationWarningID => {
+                GamePackets::PacketViolationWarning(de_packet!(stream, PacketViolationWarningPacket))
             }
-            GamePacket::CorrectPlayerMovePredictionPacketID => {
-                GamePacket::CorrectPlayerMovePredictionPacket(de_packet!(
+            GamePackets::CorrectPlayerMovePredictionPacketID => {
+                GamePackets::CorrectPlayerMovePredictionPacket(de_packet!(
                     stream,
                     CorrectPlayerMovePredictionPacket
                 ))
             }
-            GamePacket::ItemComponentID => {
+            GamePackets::ItemComponentID => {
                 unimplemented!()
             }
-            GamePacket::FilterTextPacketID => {
+            GamePackets::FilterTextPacketID => {
                 unimplemented!()
             }
-            GamePacket::UpdateSubChunkBlocksPacketID => {
+            GamePackets::UpdateSubChunkBlocksPacketID => {
                 unimplemented!()
             }
-            GamePacket::SubChunkPacketID => {
+            GamePackets::SubChunkPacketID => {
                 unimplemented!()
             }
-            GamePacket::SubChunkRequestPacketID => {
+            GamePackets::SubChunkRequestPacketID => {
                 unimplemented!()
             }
-            GamePacket::DimensionDataID => {
+            GamePackets::DimensionDataID => {
                 unimplemented!()
             }
-            GamePacket::ToastRequestPackeID => {
-                GamePacket::ToastRequestPacket(de_packet!(stream, ToastRequestPacket))
+            GamePackets::ToastRequestPackeID => {
+                GamePackets::ToastRequestPacket(de_packet!(stream, ToastRequestPacket))
             }
-            GamePacket::RequestNetworkSettingsID => {
-                GamePacket::RequestNetworkSettings(de_packet!(stream, NetworkSettingsRequestPacket))
+            GamePackets::RequestNetworkSettingsID => {
+                GamePackets::RequestNetworkSettings(de_packet!(stream, NetworkSettingsRequestPacket))
             }
-            GamePacket::AlexEntityAnimationID => {
+            GamePackets::AlexEntityAnimationID => {
                 unimplemented!()
             }
             other => {

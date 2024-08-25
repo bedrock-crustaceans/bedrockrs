@@ -13,7 +13,7 @@ use bedrockrs_shared::world::generator_type::GeneratorType;
 
 use crate::connection::ConnectionShard;
 use crate::error::LoginError;
-use crate::gamepacket::GamePacket;
+use crate::gamepacket::GamePackets;
 use crate::login::provider::LoginProviderServer;
 use crate::packets::play_status::PlayStatusPacket;
 use crate::packets::start_game::StartGamePacket;
@@ -147,10 +147,10 @@ pub async fn start_game(
         },
     };
 
-    conn.send(GamePacket::StartGame(start_game))
+    conn.send(GamePackets::StartGame(start_game))
         .await
         .map_err(LoginError::ConnectionError)?;
-    conn.send(GamePacket::PlayStatus(PlayStatusPacket {
+    conn.send(GamePackets::PlayStatus(PlayStatusPacket {
         status: PlayStatusType::PlayerSpawn,
     }))
     .await
