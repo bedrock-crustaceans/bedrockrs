@@ -1,10 +1,11 @@
 use bedrockrs_core::int::VAR;
-use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
 
 use crate::types::base_game_version::BaseGameVersion;
 use crate::types::experiments::Experiments;
 use crate::types::resource_packs_stack_pack::ResourcePacksStackPack;
 
+#[gamepacket(id = 7)]
 #[derive(Debug, Clone, ProtoCodec)]
 pub struct ResourcePacksStackPacket {
     pub texture_pack_required: bool,

@@ -62,7 +62,7 @@ impl ProtoCodec for PlayerAuthInputPacket {
             4 => {
                 let vr_gaze_direction = ProtoCodec::proto_deserialize(stream)?;
                 PlayMode::Reality(vr_gaze_direction)
-            },
+            }
             5 => PlayMode::Placement,
             6 => PlayMode::LivingRoom,
             7 => PlayMode::ExitLevel,

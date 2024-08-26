@@ -1,5 +1,6 @@
 pub mod add_actor_packet;
 pub mod add_painting_packet;
+mod add_player;
 pub mod animate;
 pub mod camera_packet;
 pub mod chunk_radius_updated;

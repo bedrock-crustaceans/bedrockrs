@@ -17,7 +17,7 @@ pub trait GamePacket: Sized + ProtoCodec {
     const ID: u16;
     const COMPRESS: bool;
     const ENCRYPT: bool;
-    
+
     #[inline]
     fn serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         self.proto_serialize(buf)

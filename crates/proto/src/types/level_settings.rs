@@ -19,7 +19,7 @@ pub struct LevelSettings {
     pub seed: LE<u64>,
     pub spawn_settings: SpawnSettings,
     pub generator_type: GeneratorType,
-    pub game_type: Gamemode,
+    pub gamemode: Gamemode,
     pub hardcore: bool,
     pub difficulty: Difficulty,
     pub default_spawn_block: NetworkBlockPos,

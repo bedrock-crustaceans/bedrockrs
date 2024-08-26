@@ -1,10 +1,11 @@
 use std::io::Cursor;
 
 use crate::types::disconnect_reason::DisconnectReason;
-use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
+use bedrockrs_proto_derive::gamepacket;
 
+#[gamepacket(id = 5)]
 #[derive(Debug, Clone)]
 pub struct DisconnectPacket {
     /// Seems to have no effect on the message being shown.
@@ -21,17 +22,12 @@ impl ProtoCodec for DisconnectPacket {
     {
         self.reason.proto_serialize(buf)?;
 
-        match &self.message {
+        if let Some(text) = &self.message {
+            bool::proto_serialize(&false, buf)?;
+            text.proto_serialize(buf)?;
+        } else {
             // Skip message
-            None => {
-                bool::proto_serialize(&true, buf)?;
-            }
-            // Don't skip message
-            Some(str) => {
-                bool::proto_serialize(&false, buf)?;
-
-                str.proto_serialize(buf)?;
-            }
+            bool::proto_serialize(&true, buf)?;
         }
 
         Ok(())
@@ -43,6 +39,7 @@ impl ProtoCodec for DisconnectPacket {
     {
         let reason = DisconnectReason::proto_deserialize(cursor)?;
 
+        // Read if the message should be skipped
         let skip_message = bool::proto_deserialize(cursor)?;
 
         let message = match skip_message {

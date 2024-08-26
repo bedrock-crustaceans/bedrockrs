@@ -1,12 +1,12 @@
-use proc_macro::Ident;
-use std::collections::HashMap;
 use de::proto_build_de_enum;
 use de::proto_build_de_struct;
+use proc_macro::Ident;
 use quote::quote;
 use ser::proto_build_ser_enum;
 use ser::proto_build_ser_struct;
-use syn::{parse_macro_input, Data, DeriveInput, Lit, Token};
+use std::collections::HashMap;
 use syn::parse::{Parse, ParseStream};
+use syn::{parse_macro_input, Data, DeriveInput, Lit, Token};
 
 mod de;
 mod ser;
@@ -78,7 +78,7 @@ struct GamepacketInput {
 impl Parse for GamepacketInput {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let mut map = HashMap::new();
-        
+
         loop {
             if !input.peek(syn::Ident) {
                 break;
@@ -87,7 +87,7 @@ impl Parse for GamepacketInput {
             let param_name = input.parse::<syn::Ident>()?.to_string();
             input.parse::<Token![=]>()?;
             let param_value = input.parse::<syn::Lit>()?;
-            
+
             map.insert(param_name, param_value);
 
             if !input.peek(Token![,]) {
@@ -96,11 +96,11 @@ impl Parse for GamepacketInput {
 
             input.parse::<Token![,]>()?;
         }
-        
+
         let id = map.remove(&String::from("id")).unwrap_or_else(|| {
             panic!("Missing id");
         });
-        
+
         Ok(Self {
             id: id.clone(),
             compress: map.remove("compress").and_then(|v| Some(v.clone())),
@@ -110,42 +110,45 @@ impl Parse for GamepacketInput {
 }
 
 #[proc_macro_attribute]
-pub fn gamepacket(args: proc_macro::TokenStream, item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+pub fn gamepacket(
+    args: proc_macro::TokenStream,
+    item: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
     // Parse the arguments passed to the attribute
     let args = parse_macro_input!(args as GamepacketInput);
     let item_de = item.clone();
     let derive = parse_macro_input!(item_de as DeriveInput);
     let name = derive.ident;
-    
+
     let id = args.id;
-    
-    let compress = match args.compress { 
+
+    let compress = match args.compress {
         Some(v) => quote! {#v},
         None => quote! {true},
     };
-    
+
     let encrypt = match args.encrypt {
         Some(v) => quote! {#v},
         None => quote! {true},
     };
-    
+
     let item = proc_macro2::TokenStream::from(item);
-    
+
     let expanded = quote! {
         #item
-        
+
         impl bedrockrs_proto_core::GamePacket for #name {
             const ID: u16 = #id;
             const COMPRESS: bool = #compress;
             const ENCRYPT: bool = #encrypt;
         }
     };
-    
+
     proc_macro::TokenStream::from(expanded)
 }
 
 struct GamepacketsInput {
-    packets: Vec<(proc_macro2::Ident, proc_macro2::Ident)>
+    packets: Vec<(proc_macro2::Ident, Option<proc_macro2::Ident>)>,
 }
 
 impl Parse for GamepacketsInput {
@@ -158,8 +161,14 @@ impl Parse for GamepacketsInput {
             }
 
             let param_name = input.parse::<syn::Ident>()?;
-            input.parse::<Token![=]>()?;
-            let param_value = input.parse::<syn::Ident>()?;
+            input.parse::<Token![:]>()?;
+
+            let param_value = if !input.peek(Token![_]) {
+                Some(input.parse::<syn::Ident>()?)
+            } else {
+                input.parse::<Token![_]>()?;
+                None
+            };
 
             vec.push((param_name, param_value));
 
@@ -169,16 +178,75 @@ impl Parse for GamepacketsInput {
 
             input.parse::<Token![,]>()?;
         }
-        
-        Ok(Self{
-            packets: vec,
-        })
+
+        Ok(Self { packets: vec })
     }
 }
 
 #[proc_macro]
 pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let args = parse_macro_input!(input as GamepacketsInput);
-    
-    todo!()
+
+    let variants = args.packets.clone();
+    let variants = variants.iter().map(|(name, value)| {
+        if let Some(value) = value {
+            quote! {
+                #name(#value),
+            }
+        } else {
+            quote! {
+                #name(),
+            }
+        }
+    });
+
+    let compress = args.packets.clone();
+    let compress = compress.iter().map(|(name, value)| {
+        if let Some(_) = value {
+            quote! {
+                GamePackets::#name(v) => v::<bedrockrs_proto_core::GamePacket>::COMPRESS,
+            }
+        } else {
+            quote! {
+                GamePackets::#name() => todo!("Not impl: GamePackets::{}", stringify!(name)),
+            }
+        }
+    });
+
+    let encrypt = args.packets.clone();
+    let encrypt = encrypt.iter().map(|(name, value)| {
+        if let Some(_) = value {
+            quote! {
+                GamePackets::#name(v) => v::<bedrockrs_proto_core::GamePacket>::ENCRYPT,
+            }
+        } else {
+            quote! {
+                GamePackets::#name() => todo!("Not impl: GamePackets::{}", stringify!(name)),
+            }
+        }
+    });
+
+    let expanded = quote! {
+        #[repr(u16)]
+        #[derive(Debug, Clone)]
+        pub enum GamePackets {
+            #(#variants)*
+        }
+
+        impl GamePackets {
+            pub fn compress(&self) -> bool {
+                match self {
+                    #(#compress)*
+                }
+            }
+
+            pub fn encrypt(&self) -> bool {
+                match self {
+                    #(#encrypt)*
+                }
+            }
+        }
+    };
+
+    proc_macro::TokenStream::from(expanded)
 }

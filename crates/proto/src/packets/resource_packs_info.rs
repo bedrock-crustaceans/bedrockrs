@@ -1,12 +1,13 @@
 use bedrockrs_core::int::LE;
 use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::ProtoCodec;
-use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
 
 use crate::types::pack_info_behavior::BehaviorPackInfoType;
 use crate::types::pack_info_resource::ResourcePackInfoType;
 use crate::types::pack_url::PackURL;
 
+#[gamepacket(id = 6)]
 #[derive(Debug, Clone, ProtoCodec)]
 pub struct ResourcePacksInfoPacket {
     pub resource_pack_required: bool,

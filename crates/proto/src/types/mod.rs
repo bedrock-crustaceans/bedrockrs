@@ -42,4 +42,4 @@ pub mod spawn_biome_type;
 pub mod spawn_settings;
 pub mod text_message_data;
 pub mod title_type;
-pub mod valid;
+pub mod ability_data;

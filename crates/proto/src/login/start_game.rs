@@ -42,7 +42,7 @@ pub async fn start_game(
     let start_game = StartGamePacket {
         target_actor_id: ActorUniqueID(609),
         target_runtime_id: ActorRuntimeID(402),
-        actor_game_type: Gamemode::Creative,
+        gamemode: Gamemode::Creative,
         position: Vec3 {
             x: LE::new(4.0),
             y: LE::new(6.0),
@@ -60,7 +60,7 @@ pub async fn start_game(
                 dimension: Dimension::Overworld,
             },
             generator_type: GeneratorType::Overworld,
-            game_type: Gamemode::Creative,
+            gamemode: Gamemode::Creative,
             hardcore: false,
             difficulty: Difficulty::Peaceful,
             default_spawn_block: NetworkBlockPos {

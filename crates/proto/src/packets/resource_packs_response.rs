@@ -1,9 +1,10 @@
 use bedrockrs_core::int::LE;
 use bedrockrs_proto_core::ProtoCodec;
-use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
 
 use crate::types::resource_packs_response_status::ResourcePacksResponseStatus;
 
+#[gamepacket(id = 8)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct ResourcePacksResponsePacket {
     pub response: ResourcePacksResponseStatus,

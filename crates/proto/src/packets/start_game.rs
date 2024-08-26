@@ -1,7 +1,7 @@
 use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::{Vec2, Vec3};
 use bedrockrs_nbt as nbt;
-use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
 use uuid::Uuid;
 
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
@@ -12,11 +12,12 @@ use crate::types::level_settings::LevelSettings;
 use crate::types::network_permissions::NetworkPermissions;
 use crate::types::player_movement_settings::PlayerMovementSettings;
 
+#[gamepacket(id = 11)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct StartGamePacket {
     pub target_actor_id: ActorUniqueID,
     pub target_runtime_id: ActorRuntimeID,
-    pub actor_game_type: Gamemode,
+    pub gamemode: Gamemode,
     pub position: Vec3<LE<f32>>,
     pub rotation: Vec2<LE<f32>>,
     pub settings: LevelSettings,

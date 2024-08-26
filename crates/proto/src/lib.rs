@@ -9,5 +9,6 @@ pub mod info;
 pub mod listener;
 pub mod login;
 pub mod packets;
+mod sub_client;
 pub mod transport_layer;
 pub mod types;
