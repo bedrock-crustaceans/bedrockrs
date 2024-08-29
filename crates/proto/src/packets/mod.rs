@@ -44,4 +44,4 @@ pub mod text_message;
 pub mod toast_request;
 pub mod player_transfer;
 pub mod respawn;
-mod boss_event;
+pub mod boss_event;

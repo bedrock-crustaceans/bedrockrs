@@ -51,6 +51,7 @@ use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_proto_derive::gamepackets;
 use crate::packets::add_player::AddPlayerPacket;
+use crate::packets::boss_event::BossEventPacket;
 use crate::packets::player_transfer::TransferPacket;
 use crate::packets::respawn::RespawnPacket;
 
@@ -123,7 +124,7 @@ gamepackets! {
     ChunkRadiusUpdate: ChunkRadiusUpdatedPacket,
     GameRulesChanged: _,
     Camera: CameraPacket,
-    BossEvent: _,
+    BossEvent: BossEventPacket,
     ShowCredits: _,
     AvailableCommands: _,
     CommandRequest: CommandRequestPacket,
