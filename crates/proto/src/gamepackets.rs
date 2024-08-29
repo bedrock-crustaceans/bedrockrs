@@ -14,7 +14,7 @@ use crate::packets::container_close_packet::ContainerClosePacket;
 use crate::packets::container_open_packet::ContainerOpenPacket;
 use crate::packets::correct_player_move_prediction_packet::CorrectPlayerMovePredictionPacket;
 use crate::packets::debug_info_packet::DebugInfoPacket;
-use crate::packets::disconnect::DisconnectPacket;
+use crate::packets::disconnect::DisconnectPlayerPacket;
 use crate::packets::emote_list::EmoteListPacket;
 use crate::packets::handshake_server_to_client::HandshakeServerToClientPacket;
 use crate::packets::interact::InteractPacket;
@@ -58,7 +58,7 @@ gamepackets! {
     PlayStatus: PlayStatusPacket,
     ServerToClientHandshake: HandshakeServerToClientPacket,
     ClientToServerHandshake: _,
-    Disconnect: DisconnectPacket,
+    DisconnectPlayer: DisconnectPlayerPacket,
     ResourcePacksInfo: ResourcePacksInfoPacket,
     ResourcePackStack: ResourcePacksStackPacket,
     ResourcePackClientResponse: ResourcePacksResponsePacket,
@@ -69,7 +69,7 @@ gamepackets! {
     AddEntity: AddActorPacket,
     RemoveEntity: RemoveEntityPacket,
     AddItemEntity: _,
-    ServerPlayerPostMovePositionPacket: ServerPlayerPostMovePositionPacket,
+    ServerPlayerPostMovePosition: ServerPlayerPostMovePositionPacket,
     TakeItemEntity: _,
     MoveEntity: _,
     MovePlayer: MovePlayerPacket,
@@ -77,7 +77,7 @@ gamepackets! {
     UpdateBlock: _,
     AddPainting: AddPaintingPacket,
     TickSync: _,
-    LevelSoundEventOld: _,
+    LevelSoundEventV1: _,
     LevelEvent: _,
     BlockEvent: _,
     EntityEvent: _,
@@ -431,7 +431,7 @@ impl GamePackets {
             GamePackets::ClientToServerHandshake() => {
                 unimplemented!()
             }
-            GamePackets::Disconnect(pk) => {
+            GamePackets::DisconnectPlayer(pk) => {
                 ser_packet!(stream, GamePackets::DisconnectID, pk)
             }
             GamePackets::ResourcePacksInfo(pk) => {
@@ -921,7 +921,7 @@ impl GamePackets {
                 unimplemented!()
             }
             GamePackets::DisconnectID => {
-                GamePackets::Disconnect(de_packet!(stream, DisconnectPacket))
+                GamePackets::DisconnectPlayer(de_packet!(stream, DisconnectPlayerPacket))
             }
             GamePackets::ResourcePacksInfoID => {
                 GamePackets::ResourcePacksInfo(de_packet!(stream, ResourcePacksInfoPacket))

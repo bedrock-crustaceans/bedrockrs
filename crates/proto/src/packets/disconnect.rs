@@ -7,7 +7,7 @@ use bedrockrs_proto_derive::gamepacket;
 
 #[gamepacket(id = 5)]
 #[derive(Debug, Clone)]
-pub struct DisconnectPacket {
+pub struct DisconnectPlayerPacket {
     /// Seems to have no effect on the message being shown.
     /// It is just for telemetry.
     pub reason: DisconnectReason,
@@ -15,7 +15,7 @@ pub struct DisconnectPacket {
 }
 
 // ProtoCodec
-impl ProtoCodec for DisconnectPacket {
+impl ProtoCodec for DisconnectPlayerPacket {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
