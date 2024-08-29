@@ -45,3 +45,4 @@ pub mod title_type;
 pub mod ability_data;
 pub mod respawn_state;
 pub mod event_type;
+pub mod credits_state;

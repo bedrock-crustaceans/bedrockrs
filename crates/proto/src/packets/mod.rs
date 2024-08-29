@@ -45,3 +45,4 @@ pub mod toast_request;
 pub mod player_transfer;
 pub mod respawn;
 pub mod boss_event;
+pub mod show_credits;

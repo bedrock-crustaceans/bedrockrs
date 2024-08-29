@@ -54,6 +54,7 @@ use crate::packets::add_player::AddPlayerPacket;
 use crate::packets::boss_event::BossEventPacket;
 use crate::packets::player_transfer::TransferPacket;
 use crate::packets::respawn::RespawnPacket;
+use crate::packets::show_credits::ShowCreditsPacket;
 
 gamepackets! {
     Login: LoginPacket,
@@ -125,7 +126,7 @@ gamepackets! {
     GameRulesChanged: _,
     Camera: CameraPacket,
     BossEvent: BossEventPacket,
-    ShowCredits: _,
+    ShowCredits: ShowCreditsPacket,
     AvailableCommands: _,
     CommandRequest: CommandRequestPacket,
     CommandBlockUpdate: _,
