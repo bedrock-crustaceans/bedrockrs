@@ -2,7 +2,7 @@ pub mod add_actor;
 pub mod add_painting;
 pub mod add_player;
 pub mod animate;
-pub mod camera_packet;
+pub mod camera;
 pub mod chunk_radius_updated;
 pub mod client_cache_status;
 pub mod command_request;

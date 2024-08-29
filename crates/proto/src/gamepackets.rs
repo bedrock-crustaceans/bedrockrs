@@ -6,7 +6,7 @@ use std::sync::Arc;
 use crate::packets::add_actor::AddActorPacket;
 use crate::packets::add_painting::AddPaintingPacket;
 use crate::packets::animate::AnimatePacket;
-use crate::packets::camera_packet::CameraPacket;
+use crate::packets::camera::CameraPacket;
 use crate::packets::chunk_radius_updated::ChunkRadiusUpdatedPacket;
 use crate::packets::client_cache_status::ClientCacheStatusPacket;
 use crate::packets::command_request::CommandRequestPacket;
