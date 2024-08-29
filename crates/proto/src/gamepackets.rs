@@ -52,6 +52,7 @@ use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_proto_derive::gamepackets;
 use crate::packets::add_player::AddPlayerPacket;
 use crate::packets::player_transfer::TransferPacket;
+use crate::packets::respawn::RespawnPacket;
 
 gamepackets! {
     Login: LoginPacket,
@@ -97,7 +98,7 @@ gamepackets! {
     SetHealth: _,
     SetSpawnPosition: _,
     Animate: AnimatePacket,
-    Respawn: _,
+    Respawn: RespawnPacket,
     ContainerOpen: ContainerOpenPacket,
     ContainerClose: ContainerClosePacket,
     PlayerHotbar: PlayerHotbarPacket,

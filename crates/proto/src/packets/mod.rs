@@ -43,3 +43,4 @@ pub mod start_game;
 pub mod text_message;
 pub mod toast_request;
 pub mod player_transfer;
+pub mod respawn;
