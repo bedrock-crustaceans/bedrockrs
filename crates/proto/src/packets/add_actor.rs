@@ -24,7 +24,7 @@ pub struct AddActorPacket {
     pub attributes: Vec<Attribute>,
     #[len_repr(VAR::<u32>)]
     pub actor_data: Vec<DataItem>,
-    pub synched_properties: PropertySyncData,
+    pub synced_properties: PropertySyncData,
     #[len_repr(VAR::<u32>)]
     pub actor_links: Vec<ActorLink>,
 }

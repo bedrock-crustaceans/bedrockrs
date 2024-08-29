@@ -5,7 +5,7 @@ use crate::error::LoginError;
 use crate::gamepackets::GamePackets;
 use crate::login::provider::{LoginProviderServer, LoginProviderStatus};
 use crate::packets::play_status::PlayStatusPacket;
-use crate::packets::set_title_packet::SetTitlePacket;
+use crate::packets::set_title::SetTitlePacket;
 use crate::types::play_status::PlayStatusType;
 use crate::types::title_type::TitleType;
 

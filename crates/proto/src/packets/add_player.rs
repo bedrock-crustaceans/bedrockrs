@@ -24,5 +24,4 @@ pub struct AddPlayerPacket {
     synced_properties: PropertySyncData,
     abilities: AbilityData, 
     links: Vec<ActorLink>,
-    
 }

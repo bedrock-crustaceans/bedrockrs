@@ -5,7 +5,7 @@ use crate::{
     connection::ConnectionShard,
     error::LoginError,
     gamepackets::GamePackets,
-    packets::add_actor_packet::AddActorPacket,
+    packets::add_actor::AddActorPacket,
     types::{
         actor_type::ActorType,
         property_sync_data::{FloatEntriesList, IntEntriesList, PropertySyncData},
@@ -44,7 +44,7 @@ pub async fn add_actor(
         y_body_rotation: LE::new(90.0),
         attributes: vec![],
         actor_data: vec![],
-        synched_properties: PropertySyncData {
+        synced_properties: PropertySyncData {
             int: IntEntriesList { entries: vec![] },
             float: FloatEntriesList { entries: vec![] },
         },

@@ -40,11 +40,9 @@ impl ProtoCodec for AnimatePacket {
 
         let action = match action {
             0 => AnimateAction::NoAction,
-            1 => {
-                let rowing_time = LE::<f32>::proto_deserialize(stream)?.into_inner();
-
-                AnimateAction::Swing { rowing_time }
-            }
+            1 => AnimateAction::Swing {
+                rowing_time: LE::<f32>::proto_deserialize(stream)?.into_inner(),
+            },
             3 => AnimateAction::WakeUp,
             4 => AnimateAction::CriticalHit,
             5 => AnimateAction::MagicCriticalHit,
