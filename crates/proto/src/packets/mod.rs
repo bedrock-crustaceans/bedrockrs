@@ -1,6 +1,6 @@
 pub mod add_actor_packet;
 pub mod add_painting_packet;
-mod add_player;
+pub mod add_player;
 pub mod animate;
 pub mod camera_packet;
 pub mod chunk_radius_updated;
@@ -42,3 +42,4 @@ pub mod set_title_packet;
 pub mod start_game;
 pub mod text_message;
 pub mod toast_request_packet;
+pub mod transfer;

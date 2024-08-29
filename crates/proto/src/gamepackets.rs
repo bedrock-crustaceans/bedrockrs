@@ -50,6 +50,8 @@ use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_proto_derive::gamepackets;
+use crate::packets::add_player::AddPlayerPacket;
+use crate::packets::transfer::TransferPacket;
 
 gamepackets! {
     Login: LoginPacket,
@@ -63,7 +65,7 @@ gamepackets! {
     TextMessage: TextMessagePacket,
     SetTime: SetTimePacket,
     StartGame: StartGamePacket,
-    AddPlayer: AddPl,
+    AddPlayer: AddPlayerPacket,
     AddEntity: AddActorPacket,
     RemoveEntity: RemoveEntityPacket,
     AddItemEntity: _,
@@ -135,7 +137,7 @@ gamepackets! {
     ResourcePackDataInfo: _,
     ResourcePackChunkData: _,
     ResourcePackChunkRequest: _,
-    Transfer: _,
+    Transfer: TransferPacket,
     PlaySound: _,
     StopSound: _,
     SetTitle: SetTitlePacket,
