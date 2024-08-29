@@ -44,3 +44,4 @@ pub mod text_message_data;
 pub mod title_type;
 pub mod ability_data;
 pub mod respawn_state;
+pub mod event_type;

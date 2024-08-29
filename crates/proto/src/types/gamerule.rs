@@ -14,25 +14,25 @@ pub struct GameRule {
 
 #[derive(Debug, Clone)]
 pub enum GameRuleValue {
-    ValBool(bool),
-    ValVarU32(u32),
-    ValF32(f32),
+    Bool(bool),
+    VarU32(u32),
+    F32(f32),
 }
 
 impl ProtoCodec for GameRuleValue {
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         let int = VAR::<i32>::new(match self {
-            GameRuleValue::ValBool(v) => {
-                v.proto_serialize(stream)?;
+            GameRuleValue::Bool(bool) => {
+                bool.proto_serialize(stream)?;
                 1
             }
-            GameRuleValue::ValVarU32(v) => {
+            GameRuleValue::VarU32(v) => {
                 VAR::<u32>::new(*v)
                     .write(stream)
                     .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
                 2
             }
-            GameRuleValue::ValF32(v) => {
+            GameRuleValue::F32(v) => {
                 LE::<f32>::new(*v)
                     .write(stream)
                     .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
@@ -46,13 +46,12 @@ impl ProtoCodec for GameRuleValue {
 
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
         Ok(
-            match VAR::<i32>::read(stream)
-                .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?
+            match VAR::<i32>::proto_deserialize(stream)?
                 .into_inner()
             {
-                1 => GameRuleValue::ValBool(bool::proto_deserialize(stream)?),
-                2 => GameRuleValue::ValVarU32(VAR::<u32>::proto_deserialize(stream)?.into_inner()),
-                3 => GameRuleValue::ValF32(LE::<f32>::proto_deserialize(stream)?.into_inner()),
+                1 => GameRuleValue::Bool(bool::proto_deserialize(stream)?),
+                2 => GameRuleValue::VarU32(VAR::<u32>::proto_deserialize(stream)?.into_inner()),
+                3 => GameRuleValue::F32(LE::<f32>::proto_deserialize(stream)?.into_inner()),
                 other => {
                     return Err(ProtoCodecError::InvalidEnumID(
                         format!("{other:?}"),
