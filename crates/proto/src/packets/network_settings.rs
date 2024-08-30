@@ -1,6 +1,7 @@
 use bedrockrs_core::int::LE;
-use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
 
+#[gamepacket(id = 143)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct NetworkSettingsPacket {
     /// Determines the smallest size of raw network payload to compress.

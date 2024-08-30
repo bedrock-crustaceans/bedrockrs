@@ -1,8 +1,9 @@
 use bedrockrs_core::int::VAR;
-use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
 
 use crate::types::network_item_stack_descriptor::NetworkItemStackDescriptor;
 
+#[gamepacket(id = 31)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct MobEquipmentPacket {
     pub runtime_id: VAR<i32>,

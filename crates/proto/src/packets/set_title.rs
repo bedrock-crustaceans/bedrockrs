@@ -1,8 +1,9 @@
 use bedrockrs_core::int::VAR;
-use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
 
 use crate::types::title_type::TitleType;
 
+#[gamepacket(id = 88)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct SetTitlePacket {
     pub title_type: TitleType,

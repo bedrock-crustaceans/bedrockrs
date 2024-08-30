@@ -5,7 +5,9 @@ use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
 use std::io::Cursor;
+use bedrockrs_proto_derive::gamepacket;
 
+#[gamepacket(id = 33)]
 #[derive(Debug, Clone)]
 pub struct InteractPacket {
     pub action: InteractAction,

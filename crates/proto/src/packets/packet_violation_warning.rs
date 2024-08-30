@@ -1,6 +1,7 @@
 use bedrockrs_core::int::VAR;
-use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
 
+#[gamepacket(id = 156)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct PacketViolationWarningPacket {
     kind: VAR<u32>,

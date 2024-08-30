@@ -1,9 +1,11 @@
-use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
 use bedrockrs_shared::actor_unique_id::ActorUniqueID;
 
 use crate::types::{
     container_id::ContainerID, container_type::ContainerType, network_block_pos::NetworkBlockPos,
 };
+
+#[gamepacket(id = 46)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct ContainerOpenPacket {
     pub container_id: ContainerID,

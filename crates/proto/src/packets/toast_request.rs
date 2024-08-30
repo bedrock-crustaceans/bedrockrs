@@ -1,6 +1,6 @@
 use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
 
-#[gamepacket(id = 9999)]
+#[gamepacket(id = 186)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct ToastRequestPacket {
     pub title: String,

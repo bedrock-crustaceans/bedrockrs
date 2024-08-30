@@ -4,14 +4,16 @@ use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
 use std::io::Cursor;
+use bedrockrs_proto_derive::gamepacket;
 
+#[gamepacket(id = 44)]
 #[derive(Debug, Clone)]
-pub struct AnimatePacket {
+pub struct AnimatePlayerPacket {
     action: AnimateAction,
     target_runtime_id: ActorRuntimeID,
 }
 
-impl ProtoCodec for AnimatePacket {
+impl ProtoCodec for AnimatePlayerPacket {
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         let action = match self.action {
             AnimateAction::NoAction => 0,

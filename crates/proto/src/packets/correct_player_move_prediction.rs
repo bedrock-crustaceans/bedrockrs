@@ -1,6 +1,7 @@
 use bedrockrs_core::{int::LE, Vec3};
-use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
 
+#[gamepacket(id = 161)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct CorrectPlayerMovePredictionPacket {
     pub prediction_type: u8,

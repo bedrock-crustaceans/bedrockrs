@@ -2,7 +2,7 @@ use bedrockrs_core::{
     int::{LE, VAR},
     Vec2, Vec3,
 };
-use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
 use bedrockrs_shared::{actor_runtime_id::ActorRuntimeID, actor_unique_id::ActorUniqueID};
 
 use crate::types::{
@@ -10,6 +10,7 @@ use crate::types::{
     property_sync_data::PropertySyncData,
 };
 
+#[gamepacket(id = 12)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct AddActorPacket {
     pub target_actor_id: ActorUniqueID,

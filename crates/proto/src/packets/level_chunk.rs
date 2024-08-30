@@ -2,7 +2,9 @@ use crate::types::chunk_pos::ChunkPos;
 use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
+use bedrockrs_proto_derive::gamepacket;
 
+#[gamepacket(id = 58)]
 #[derive(Debug, Clone)]
 pub struct LevelChunkPacket {
     pub chunk_position: ChunkPos,
@@ -10,7 +12,6 @@ pub struct LevelChunkPacket {
     pub sub_chunk_count: VAR<u32>,
     pub cache_enabled: bool,
     pub serialized_chunk_data: Vec<u8>,
-
     pub client_needs_to_request_subchunks: bool,
     pub client_request_subchunk_limit: VAR<i32>,
 }

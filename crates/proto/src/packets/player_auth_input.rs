@@ -8,7 +8,9 @@ use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_shared::actor_unique_id::ActorUniqueID;
 use std::io::Cursor;
+use bedrockrs_proto_derive::gamepacket;
 
+#[gamepacket(id = 144)]
 #[derive(Debug, Clone)]
 pub struct PlayerAuthInputPacket {
     pub rotation: Vec2<LE<f32>>,

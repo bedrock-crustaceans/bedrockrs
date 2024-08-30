@@ -1,7 +1,8 @@
-use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
 
+#[gamepacket(id = 113)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct SetLocalPlayerAsInitializedPacket {
-    player_id: ActorRuntimeID,
+    actor_id: ActorRuntimeID,
 }

@@ -1,7 +1,8 @@
-use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
 use bedrockrs_shared::actor_unique_id::ActorUniqueID;
 
+#[gamepacket(id = 14)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct RemoveEntityPacket {
-    pub target_actor_id: ActorUniqueID,
+    pub actor_id: ActorUniqueID,
 }

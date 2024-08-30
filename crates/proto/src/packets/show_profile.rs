@@ -1,5 +1,7 @@
 use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
 
-#[gamepacket(id = 102)]
+#[gamepacket(id = 104)]
 #[derive(ProtoCodec, Debug, Clone)]
-pub struct ServerSettingsRequestPacket {}
+pub struct ShowProfilePacket {
+    xuid: String,
+}

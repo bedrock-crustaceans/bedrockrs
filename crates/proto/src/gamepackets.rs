@@ -5,7 +5,7 @@ use std::sync::Arc;
 
 use crate::packets::add_actor::AddActorPacket;
 use crate::packets::add_painting::AddPaintingPacket;
-use crate::packets::animate::AnimatePacket;
+use crate::packets::animate_player::AnimatePlayerPacket;
 use crate::packets::camera::CameraPacket;
 use crate::packets::chunk_radius_updated::ChunkRadiusUpdatedPacket;
 use crate::packets::client_cache_status::ClientCacheStatusPacket;
@@ -33,7 +33,7 @@ use crate::packets::player_auth_input::PlayerAuthInputPacket;
 use crate::packets::player_hotbar::PlayerHotbarPacket;
 use crate::packets::player_move::MovePlayerPacket;
 use crate::packets::remove_actor::RemoveEntityPacket;
-use crate::packets::request_chunk_radius::RequestChunkRadiusPacket;
+use crate::packets::chunk_radius_request::ChunkRadiusRequestPacket;
 use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
 use crate::packets::resource_packs_response::ResourcePacksResponsePacket;
 use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
@@ -99,7 +99,7 @@ gamepackets! {
     SetEntityLink: _,
     SetHealth: _,
     SetSpawnPosition: _,
-    Animate: AnimatePacket,
+    Animate: AnimatePlayerPacket,
     Respawn: RespawnPacket,
     ContainerOpen: ContainerOpenPacket,
     ContainerClose: ContainerClosePacket,
@@ -121,7 +121,7 @@ gamepackets! {
     SpawnExperienceOrb: _,
     ClientboundMapItemData: _,
     MapInfoRequest: _,
-    RequestChunkRadius: RequestChunkRadiusPacket,
+    RequestChunkRadius: ChunkRadiusRequestPacket,
     ChunkRadiusUpdate: ChunkRadiusUpdatedPacket,
     GameRulesChanged: _,
     Camera: CameraPacket,
@@ -1028,7 +1028,7 @@ impl GamePackets {
             GamePackets::SetSpawnPositionID => {
                 unimplemented!()
             }
-            GamePackets::AnimateID => GamePackets::Animate(de_packet!(stream, AnimatePacket)),
+            GamePackets::AnimateID => GamePackets::Animate(de_packet!(stream, AnimatePlayerPacket)),
             GamePackets::RespawnID => {
                 unimplemented!()
             }
@@ -1102,7 +1102,7 @@ impl GamePackets {
                 unimplemented!()
             }
             GamePackets::RequestChunkRadiusID => {
-                GamePackets::RequestChunkRadius(de_packet!(stream, RequestChunkRadiusPacket))
+                GamePackets::RequestChunkRadius(de_packet!(stream, ChunkRadiusRequestPacket))
             }
             GamePackets::ChunkRadiusUpdateID => {
                 unimplemented!()

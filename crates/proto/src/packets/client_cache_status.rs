@@ -1,5 +1,6 @@
-use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
 
+#[gamepacket(id = 129)]
 #[derive(ProtoCodec, Debug, Copy, Clone)]
 pub struct ClientCacheStatusPacket {
     pub cache_supported: bool,
