@@ -49,3 +49,5 @@ pub mod show_credits;
 pub mod show_profile;
 pub mod set_difficulty;
 pub mod change_dimension;
+pub mod set_commands_enabled;
+mod set_player_gametype;
