@@ -52,6 +52,7 @@ use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_proto_derive::gamepackets;
 use crate::packets::add_player::AddPlayerPacket;
 use crate::packets::boss_event::BossEventPacket;
+use crate::packets::change_dimension::ChangeDimensionPacket;
 use crate::packets::player_transfer::TransferPacket;
 use crate::packets::respawn::RespawnPacket;
 use crate::packets::set_difficulty::SetDifficultyPacket;
@@ -115,7 +116,7 @@ gamepackets! {
     LevelChunk: LevelChunkPacket,
     SetCommandsEnabled: _,
     SetDifficulty: SetDifficultyPacket,
-    ChangeDimension: _,
+    ChangeDimension: ChangeDimensionPacket,
     SetPlayerGameType: _,
     PlayerList: _,
     SimpleEvent: _,
