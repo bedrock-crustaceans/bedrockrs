@@ -21,6 +21,10 @@ pub struct MovePlayerPacket {
 }
 
 impl ProtoCodec for MovePlayerPacket {
+    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
+        unimplemented!();
+    }
+
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
         let player_runtime_id = ActorRuntimeID::proto_deserialize(stream)?;
         let position = Vec3::<LE<f32>>::proto_deserialize(stream)?;
@@ -53,9 +57,5 @@ impl ProtoCodec for MovePlayerPacket {
             source_actor_type,
             tick,
         })
-    }
-
-    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
-        unimplemented!();
     }
 }
