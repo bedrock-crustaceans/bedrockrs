@@ -46,4 +46,4 @@ pub mod player_transfer;
 pub mod respawn;
 pub mod boss_event;
 pub mod show_credits;
-mod show_profile;
+pub mod show_profile;

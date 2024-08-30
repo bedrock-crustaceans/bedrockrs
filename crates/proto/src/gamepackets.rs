@@ -55,6 +55,7 @@ use crate::packets::boss_event::BossEventPacket;
 use crate::packets::player_transfer::TransferPacket;
 use crate::packets::respawn::RespawnPacket;
 use crate::packets::show_credits::ShowCreditsPacket;
+use crate::packets::show_profile::ShowProfilePacket;
 
 gamepackets! {
     Login: LoginPacket,
@@ -155,7 +156,7 @@ gamepackets! {
     ModalFormResponse: ModalFormResponsePacket,
     ServerSettingsRequest: ServerSettingsRequestPacket,
     ServerSettingsResponse: ServerSettingsResponsePacket,
-    ShowProfile: _,
+    ShowProfile: ShowProfilePacket,
     SetDefaultGameType: _,
     RemoveObjective: _,
     SetDisplayObjective: _,
