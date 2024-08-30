@@ -57,6 +57,7 @@ use crate::packets::player_transfer::TransferPacket;
 use crate::packets::respawn::RespawnPacket;
 use crate::packets::set_commands_enabled::SetCommandsEnabledPacket;
 use crate::packets::set_difficulty::SetDifficultyPacket;
+use crate::packets::set_player_gametype::SetPlayerGameType;
 use crate::packets::show_credits::ShowCreditsPacket;
 use crate::packets::show_profile::ShowProfilePacket;
 
@@ -118,7 +119,7 @@ gamepackets! {
     SetCommandsEnabled: SetCommandsEnabledPacket,
     SetDifficulty: SetDifficultyPacket,
     ChangeDimension: ChangeDimensionPacket,
-    SetPlayerGameType: _,
+    SetPlayerGameType: SetPlayerGameType,
     PlayerList: _,
     SimpleEvent: _,
     TelemetryEvent: _,
