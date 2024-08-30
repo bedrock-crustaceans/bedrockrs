@@ -54,6 +54,7 @@ use crate::packets::add_player::AddPlayerPacket;
 use crate::packets::boss_event::BossEventPacket;
 use crate::packets::player_transfer::TransferPacket;
 use crate::packets::respawn::RespawnPacket;
+use crate::packets::set_difficulty::SetDifficultyPacket;
 use crate::packets::show_credits::ShowCreditsPacket;
 use crate::packets::show_profile::ShowProfilePacket;
 
@@ -113,7 +114,7 @@ gamepackets! {
     PlayerInput: _,
     LevelChunk: LevelChunkPacket,
     SetCommandsEnabled: _,
-    SetDifficulty: _,
+    SetDifficulty: SetDifficultyPacket,
     ChangeDimension: _,
     SetPlayerGameType: _,
     PlayerList: _,
