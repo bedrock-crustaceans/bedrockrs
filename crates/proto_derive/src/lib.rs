@@ -204,11 +204,11 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let compress = compress.iter().map(|(name, value)| {
         if let Some(v) = value {
             quote! {
-                GamePackets::#name(_) => #v::<bedrockrs_proto_core::GamePacket>::COMPRESS,
+                GamePackets::#name(_) => { #v::<bedrockrs_proto_core::GamePacket>::COMPRESS },
             }
         } else {
             quote! {
-                GamePackets::#name() => todo!("impl GamePackets::{}", stringify!(name)),
+                GamePackets::#name() => { todo!("impl GamePackets::{}", stringify!(name)) },
             }
         }
     });
@@ -217,11 +217,11 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let encrypt = encrypt.iter().map(|(name, value)| {
         if let Some(v) = value {
             quote! {
-                GamePackets::#name(_) => #v::<bedrockrs_proto_core::GamePacket>::ENCRYPT,
+                GamePackets::#name(_) => { #v::<bedrockrs_proto_core::GamePacket>::ENCRYPT },
             }
         } else {
             quote! {
-                GamePackets::#name() => todo!("impl GamePackets::{}", stringify!(name)),
+                GamePackets::#name() => { todo!("impl GamePackets::{}", stringify!(name)) },
             }
         }
     });
@@ -246,7 +246,7 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
             }
         } else {
             quote! {
-                GamePackets::#name() => todo!("impl GamePackets::{}", stringify!(name)),
+                GamePackets::#name() => { todo!("impl GamePackets::{}", stringify!(name)) },
             }
         }
     });
@@ -257,10 +257,10 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
             quote! {
                 #v::<bedrockrs_proto_core::GamePacket>::ID => {
                     match #v::<bedrockrs_proto_core::ProtoCodec>::proto_deserialize($stream) {
-                        Ok(v) => v,
+                        Ok(v) => GamePackets::#name(v),
                         Err(e) => return Err(e),
                     }
-                }
+                },
             }
         } else {
             quote! {}
@@ -290,7 +290,7 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
             pub fn pk_serialize(&self, stream: &mut Vec<u8>, subclient_sender_id: u8, subclient_target_id: u8) -> Result<(), ProtoCodecError> {
                 match self {
                     #(#ser)*
-                }
+                };
                 
                 Ok(())
             }
@@ -302,8 +302,8 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
                     #(#de)*
                     other => {
                         return Err(ProtoCodecError::InvalidGamePacketID(other));
-                    }
-                }
+                    },
+                };
                 
                 Ok((gamepacket, subclient_sender_id, subclient_target_id))
             }

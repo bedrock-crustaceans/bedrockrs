@@ -284,7 +284,7 @@ fn read_gamepacket_header(stream: &mut Cursor<&[u8]>) -> Result<(u32, u16, u8, u
     // Get the next 2 bits as the sub client target id
     // Can never be more than an 8-bit integer due to being 2 bits big
     let subclient_target_id = (game_packet_header & 0b0011_0000_0000_0000 >> 12) as u8;
-    
+
     Ok((length, gamepacket_id, subclient_sender_id, subclient_target_id))
 }
 
@@ -310,6 +310,6 @@ fn write_gamepacket_header(stream: &mut Vec<u8>, length: u32, gamepacket_id: u16
 
     // Write the gamepacket header
     VAR::<u16>::new(game_packet_header).proto_serialize(stream)?;
-    
+
     Ok(())
 }
