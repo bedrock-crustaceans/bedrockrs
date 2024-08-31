@@ -1,7 +1,7 @@
+use crate::types::container_id::ContainerID;
 use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
-use crate::types::container_id::ContainerID;
 
 #[gamepacket(id = 48)]
 #[derive(ProtoCodec, Debug, Clone)]

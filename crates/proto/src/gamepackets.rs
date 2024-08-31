@@ -4,8 +4,12 @@ use std::io::{Cursor, Write};
 
 use crate::packets::add_actor::AddActorPacket;
 use crate::packets::add_painting::AddPaintingPacket;
+use crate::packets::add_player::AddPlayerPacket;
 use crate::packets::animate_player::AnimatePlayerPacket;
+use crate::packets::boss_event::BossEventPacket;
 use crate::packets::camera::CameraPacket;
+use crate::packets::change_dimension::ChangeDimensionPacket;
+use crate::packets::chunk_radius_request::ChunkRadiusRequestPacket;
 use crate::packets::chunk_radius_updated::ChunkRadiusUpdatedPacket;
 use crate::packets::client_cache_status::ClientCacheStatusPacket;
 use crate::packets::command_request::CommandRequestPacket;
@@ -13,7 +17,6 @@ use crate::packets::container_close::ContainerClosePacket;
 use crate::packets::container_open::ContainerOpenPacket;
 use crate::packets::correct_player_move_prediction::CorrectPlayerMovePredictionPacket;
 use crate::packets::debug_info::DebugInfoPacket;
-use crate::packets::player_disconnect::DisconnectPlayerPacket;
 use crate::packets::emote_list::EmoteListPacket;
 use crate::packets::handshake_server_to_client::HandshakeServerToClientPacket;
 use crate::packets::interact::InteractPacket;
@@ -29,36 +32,32 @@ use crate::packets::packet_violation_warning::PacketViolationWarningPacket;
 use crate::packets::play_status::PlayStatusPacket;
 use crate::packets::player_action::PlayerActionPacket;
 use crate::packets::player_auth_input::PlayerAuthInputPacket;
+use crate::packets::player_disconnect::DisconnectPlayerPacket;
 use crate::packets::player_hotbar::PlayerHotbarPacket;
 use crate::packets::player_move::MovePlayerPacket;
+use crate::packets::player_transfer::TransferPlayerPacket;
 use crate::packets::remove_actor::RemoveEntityPacket;
-use crate::packets::chunk_radius_request::ChunkRadiusRequestPacket;
 use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
 use crate::packets::resource_packs_response::ResourcePacksResponsePacket;
 use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
+use crate::packets::respawn::RespawnPacket;
 use crate::packets::server_player_post_move_position::ServerPlayerPostMovePositionPacket;
 use crate::packets::server_settings_request::ServerSettingsRequestPacket;
 use crate::packets::server_settings_response::ServerSettingsResponsePacket;
+use crate::packets::set_commands_enabled::SetCommandsEnabledPacket;
+use crate::packets::set_difficulty::SetDifficultyPacket;
 use crate::packets::set_local_player_as_initialized::SetLocalPlayerAsInitializedPacket;
+use crate::packets::set_player_gamemode::SetPlayerGamemode;
 use crate::packets::set_time::SetTimePacket;
 use crate::packets::set_title::SetTitlePacket;
+use crate::packets::show_credits::ShowCreditsPacket;
+use crate::packets::show_profile::ShowProfilePacket;
 use crate::packets::start_game::StartGamePacket;
 use crate::packets::text_message::TextMessagePacket;
 use crate::packets::toast_request::ToastRequestPacket;
 use bedrockrs_core::int::VAR;
-use bedrockrs_proto_core::error::ProtoCodecError;
-use bedrockrs_proto_core::ProtoCodec;
+use bedrockrs_proto_core::{error::ProtoCodecError, GamePacket, ProtoCodec};
 use bedrockrs_proto_derive::gamepackets;
-use crate::packets::add_player::AddPlayerPacket;
-use crate::packets::boss_event::BossEventPacket;
-use crate::packets::change_dimension::ChangeDimensionPacket;
-use crate::packets::player_transfer::TransferPlayerPacket;
-use crate::packets::respawn::RespawnPacket;
-use crate::packets::set_commands_enabled::SetCommandsEnabledPacket;
-use crate::packets::set_difficulty::SetDifficultyPacket;
-use crate::packets::set_player_gamemode::SetPlayerGamemode;
-use crate::packets::show_credits::ShowCreditsPacket;
-use crate::packets::show_profile::ShowProfilePacket;
 
 gamepackets! {
     Login: LoginPacket,
@@ -264,7 +263,9 @@ gamepackets! {
     DiagnosticsPacket: _,
 }
 
-fn read_gamepacket_header(stream: &mut Cursor<&[u8]>) -> Result<(u32, u16, u8, u8), ProtoCodecError> {
+fn read_gamepacket_header(
+    stream: &mut Cursor<&[u8]>,
+) -> Result<(u32, u16, u8, u8), ProtoCodecError> {
     // Read the gamepacket length
     let length = VAR::<u32>::proto_deserialize(stream)?.into_inner();
 
@@ -285,10 +286,21 @@ fn read_gamepacket_header(stream: &mut Cursor<&[u8]>) -> Result<(u32, u16, u8, u
     // Can never be more than an 8-bit integer due to being 2 bits big
     let subclient_target_id = (game_packet_header & 0b0011_0000_0000_0000 >> 12) as u8;
 
-    Ok((length, gamepacket_id, subclient_sender_id, subclient_target_id))
+    Ok((
+        length,
+        gamepacket_id,
+        subclient_sender_id,
+        subclient_target_id,
+    ))
 }
 
-fn write_gamepacket_header(stream: &mut Vec<u8>, length: u32, gamepacket_id: u16, subclient_sender_id: u8, subclient_target_id: u8) -> Result<(), ProtoCodecError> {
+fn write_gamepacket_header(
+    stream: &mut Vec<u8>,
+    length: u32,
+    gamepacket_id: u16,
+    subclient_sender_id: u8,
+    subclient_target_id: u8,
+) -> Result<(), ProtoCodecError> {
     // Write the gamepacket length
     VAR::<u32>::new(length).proto_serialize(stream)?;
 

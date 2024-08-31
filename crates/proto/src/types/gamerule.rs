@@ -45,20 +45,16 @@ impl ProtoCodec for GameRuleValue {
     }
 
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
-        Ok(
-            match VAR::<i32>::proto_deserialize(stream)?
-                .into_inner()
-            {
-                1 => GameRuleValue::Bool(bool::proto_deserialize(stream)?),
-                2 => GameRuleValue::VarU32(VAR::<u32>::proto_deserialize(stream)?.into_inner()),
-                3 => GameRuleValue::F32(LE::<f32>::proto_deserialize(stream)?.into_inner()),
-                other => {
-                    return Err(ProtoCodecError::InvalidEnumID(
-                        format!("{other:?}"),
-                        String::from("GameRuleValue"),
-                    ));
-                }
-            },
-        )
+        Ok(match VAR::<i32>::proto_deserialize(stream)?.into_inner() {
+            1 => GameRuleValue::Bool(bool::proto_deserialize(stream)?),
+            2 => GameRuleValue::VarU32(VAR::<u32>::proto_deserialize(stream)?.into_inner()),
+            3 => GameRuleValue::F32(LE::<f32>::proto_deserialize(stream)?.into_inner()),
+            other => {
+                return Err(ProtoCodecError::InvalidEnumID(
+                    format!("{other:?}"),
+                    String::from("GameRuleValue"),
+                ));
+            }
+        })
     }
 }

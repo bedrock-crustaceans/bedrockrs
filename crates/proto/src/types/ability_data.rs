@@ -6,5 +6,5 @@ use bedrockrs_shared::world::permissions_level::PermissionLevel;
 pub struct AbilityData {
     /// This field is not necessary, 0 seems to work.
     target_player_raw_id: ActorUniqueID,
-    permission: PermissionLevel
+    permission: PermissionLevel,
 }

@@ -230,18 +230,28 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ser = ser.iter().map(|(name, value)| {
         if let Some(v) = value {
             quote! {
-                GamePackets::#name(v) => {
+                GamePackets::#name(pk) => {
                     let buf = Vec::new();
                     
-                    #v::<::bedrockrs_proto_core::ProtoCodec>::proto_serialize(v, &mut buf)?;
+                    match #v::<::bedrockrs_proto_core::ProtoCodec>::proto_serialize(pk, &mut buf) {
+                        Ok(_) => {},
+                        Err(err) => return Err(err),
+                    };
                     
-                    let len = buf.len()
-                        .try_into()
-                        .map_err(ProtoCodecError::FromIntError)?;
+                    let len = match buf.len().try_into() {
+                        Ok(_) => {}
+                        Err(err) => return Err(ProtoCodecError::FromIntError(err));
+                    };
                     
-                    write_gamepacket_header(stream, len, v::<::bedrockrs_proto_core::GamePacket>::ID, subclient_sender_id, subclient_target_id)?;
-                    
-                    stream.write_all(buf.as_slice())?;
+                    match write_gamepacket_header(stream, len, #v::<::bedrockrs_proto_core::GamePacket>::ID, subclient_sender_id, subclient_target_id) {
+                        Ok(_) => {},
+                        Err(err) => return Err(err),
+                    };
+
+                    match stream.write_all(buf.as_slice()) {
+                        Ok(_) => {},
+                        Err(err) => return Err(ProtoCodecError::IOError(::std::sync::Arc::new(err))),
+                    };
                 }
             }
         } else {
@@ -256,17 +266,17 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
         if let Some(v) = value {
             quote! {
                 #v::<::bedrockrs_proto_core::GamePacket>::ID => {
-                    match #v::<::bedrockrs_proto_core::ProtoCodec>::proto_deserialize($stream) {
-                        Ok(v) => GamePackets::#name(v),
+                    match #v::<::bedrockrs_proto_core::ProtoCodec>::proto_deserialize(stream) {
+                        Ok(pk) => GamePackets::#name(pk),
                         Err(e) => return Err(e),
-                    }
+                    };
                 },
             }
         } else {
             quote! {}
         }
     });
-    
+
     let expanded = quote! {
         #[repr(u16)]
         #[derive(Debug, Clone)]
@@ -278,33 +288,36 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
             pub fn compress(&self) -> bool {
                 match self {
                     #(#compress)*
-                }
+                };
             }
 
             pub fn encrypt(&self) -> bool {
                 match self {
                     #(#encrypt)*
-                }
+                };
             }
-            
+
             pub fn pk_serialize(&self, stream: &mut Vec<u8>, subclient_sender_id: u8, subclient_target_id: u8) -> Result<(), ProtoCodecError> {
                 match self {
                     #(#ser)*
                 };
-                
+
                 Ok(())
             }
-            
+
             pub fn pk_deserialize(stream: &mut Cursor<&[u8]>) -> Result<(GamePackets, u8, u8), ProtoCodecError> {
-                let (_length, gamepacket_id, subclient_sender_id, subclient_target_id) = read_gamepacket_header(stream)?;
-                
+                let (_length, gamepacket_id, subclient_sender_id, subclient_target_id) = match read_gamepacket_header(stream) {
+                        Ok(_) => {},
+                        Err(err) => return Err(err),
+                    };
+
                 let gamepacket = match gamepacket_id {
                     #(#de)*
                     other => {
                         return Err(ProtoCodecError::InvalidGamePacketID(other));
                     },
                 };
-                
+
                 Ok((gamepacket, subclient_sender_id, subclient_target_id))
             }
         }

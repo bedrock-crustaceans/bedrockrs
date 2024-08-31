@@ -1,9 +1,9 @@
-use std::io::Cursor;
 use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_proto_derive::ProtoCodec;
 use bedrockrs_shared::actor_unique_id::ActorUniqueID;
+use std::io::Cursor;
 
 #[derive(Debug, Clone)]
 pub enum BossEventType {
@@ -44,9 +44,15 @@ pub enum BossEventType {
 impl ProtoCodec for BossEventType {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         match self {
-            BossEventType::Add { name, health_percentage, darken_screen, color, overlay } => {
+            BossEventType::Add {
+                name,
+                health_percentage,
+                darken_screen,
+                color,
+                overlay,
+            } => {
                 VAR::new(0).proto_serialize(buf)?;
-                
+
                 name.proto_serialize(buf)?;
                 health_percentage.proto_serialize(buf)?;
                 darken_screen.proto_serialize(buf)?;
@@ -55,13 +61,13 @@ impl ProtoCodec for BossEventType {
             }
             BossEventType::PlayerAdded { actor_id } => {
                 VAR::new(1).proto_serialize(buf)?;
-                
+
                 actor_id.proto_serialize(buf)?;
             }
             BossEventType::Remove => VAR::new(2).proto_serialize(buf)?,
             BossEventType::PlayerRemoved { actor_id } => {
                 VAR::new(3).proto_serialize(buf)?;
-                
+
                 actor_id.proto_serialize(buf)?;
             }
             BossEventType::UpdatePercent { health_percentage } => {
@@ -74,7 +80,11 @@ impl ProtoCodec for BossEventType {
 
                 name.proto_serialize(buf)?;
             }
-            BossEventType::UpdateProperties { darken_screen, color, overlay } => {
+            BossEventType::UpdateProperties {
+                darken_screen,
+                color,
+                overlay,
+            } => {
                 VAR::new(6).proto_serialize(buf)?;
 
                 darken_screen.proto_serialize(buf)?;
@@ -83,22 +93,22 @@ impl ProtoCodec for BossEventType {
             }
             BossEventType::UpdateStyle { color, overlay } => {
                 VAR::new(7).proto_serialize(buf)?;
-                
+
                 color.proto_serialize(buf)?;
                 overlay.proto_serialize(buf)?;
             }
             BossEventType::Query { actor_id } => {
                 VAR::new(8).proto_serialize(buf)?;
-                
+
                 actor_id.proto_serialize(buf)?;
             }
         };
-        
+
         Ok(())
     }
 
     fn proto_deserialize(buf: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
-        Ok(match VAR::<u32>::proto_deserialize(buf)?.into_inner() { 
+        Ok(match VAR::<u32>::proto_deserialize(buf)?.into_inner() {
             0 => {
                 let name = String::proto_deserialize(buf)?;
                 let health_percentage = LE::<f32>::proto_deserialize(buf)?;
@@ -113,36 +123,28 @@ impl ProtoCodec for BossEventType {
                     color,
                     overlay,
                 }
-            },
+            }
             1 => {
                 let actor_id = ActorUniqueID::proto_deserialize(buf)?;
-                
-                BossEventType::PlayerAdded {
-                    actor_id
-                }
-            },
+
+                BossEventType::PlayerAdded { actor_id }
+            }
             2 => BossEventType::Remove,
             3 => {
                 let actor_id = ActorUniqueID::proto_deserialize(buf)?;
 
-                BossEventType::PlayerRemoved {
-                    actor_id
-                }
-            },
+                BossEventType::PlayerRemoved { actor_id }
+            }
             4 => {
                 let health_percentage = LE::<f32>::proto_deserialize(buf)?;
 
-                BossEventType::UpdatePercent {
-                    health_percentage
-                }
-            },
+                BossEventType::UpdatePercent { health_percentage }
+            }
             5 => {
                 let name = String::proto_deserialize(buf)?;
 
-                BossEventType::UpdateName {
-                    name
-                }
-            },
+                BossEventType::UpdateName { name }
+            }
             6 => {
                 let darken_screen = LE::<u16>::proto_deserialize(buf)?;
                 let color = VAR::<u32>::proto_deserialize(buf)?;
@@ -153,23 +155,18 @@ impl ProtoCodec for BossEventType {
                     color,
                     overlay,
                 }
-            },
+            }
             7 => {
                 let color = VAR::<u32>::proto_deserialize(buf)?;
                 let overlay = VAR::<u32>::proto_deserialize(buf)?;
 
-                BossEventType::UpdateStyle {
-                    color,
-                    overlay,
-                }
-            },
+                BossEventType::UpdateStyle { color, overlay }
+            }
             8 => {
                 let actor_id = ActorUniqueID::proto_deserialize(buf)?;
 
-                BossEventType::Query {
-                    actor_id
-                }
-            },
+                BossEventType::Query { actor_id }
+            }
             other => {
                 return Err(ProtoCodecError::InvalidEnumID(
                     format!("{other:?}"),

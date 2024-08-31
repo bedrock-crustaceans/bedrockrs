@@ -1,6 +1,6 @@
+use crate::types::event_type::BossEventType;
 use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
 use bedrockrs_shared::actor_unique_id::ActorUniqueID;
-use crate::types::event_type::BossEventType;
 
 #[gamepacket(id = 74)]
 #[derive(ProtoCodec, Debug, Clone)]
