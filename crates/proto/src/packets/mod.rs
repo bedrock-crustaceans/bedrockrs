@@ -50,4 +50,4 @@ pub mod show_profile;
 pub mod set_difficulty;
 pub mod change_dimension;
 pub mod set_commands_enabled;
-pub mod set_player_gametype;
+pub mod set_player_gamemode;
