@@ -58,6 +58,7 @@ use crate::packets::toast_request::ToastRequestPacket;
 use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::{error::ProtoCodecError, GamePacket, ProtoCodec};
 use bedrockrs_proto_derive::gamepackets;
+use crate::sub_client::SubClientID;
 
 gamepackets! {
     Login: LoginPacket,
@@ -265,7 +266,7 @@ gamepackets! {
 
 fn read_gamepacket_header(
     stream: &mut Cursor<&[u8]>,
-) -> Result<(u32, u16, u8, u8), ProtoCodecError> {
+) -> Result<(u32, u16, SubClientID, SubClientID), ProtoCodecError> {
     // Read the gamepacket length
     let length = VAR::<u32>::proto_deserialize(stream)?.into_inner();
 
@@ -298,8 +299,8 @@ fn write_gamepacket_header(
     stream: &mut Vec<u8>,
     length: u32,
     gamepacket_id: u16,
-    subclient_sender_id: u8,
-    subclient_target_id: u8,
+    subclient_sender_id: SubClientID,
+    subclient_target_id: SubClientID,
 ) -> Result<(), ProtoCodecError> {
     // Write the gamepacket length
     VAR::<u32>::new(length).proto_serialize(stream)?;

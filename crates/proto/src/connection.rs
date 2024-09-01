@@ -12,6 +12,7 @@ use crate::compression::Compression;
 use crate::encryption::Encryption;
 use crate::error::ConnectionError;
 use crate::gamepackets::GamePackets;
+use crate::sub_client::SubClientID;
 use crate::transport_layer::TransportLayerConnection;
 
 pub struct Connection {
@@ -37,14 +38,14 @@ impl Connection {
         }
     }
 
-    pub async fn send(&mut self, gamepackets: Vec<GamePackets>) -> Result<(), ConnectionError> {
+    pub async fn send(&mut self, gamepackets: &[GamePackets]) -> Result<(), ConnectionError> {
         let mut pk_stream = vec![];
 
-        // Batch all game packets together
+        // Batch all gamepackets together
         for game_packet in gamepackets {
-            // Write a game packet
+            // Write gamepacket
             game_packet
-                .pk_serialize(&mut pk_stream)
+                .pk_serialize(&mut pk_stream, SubClientID::PrimaryClient, SubClientID::PrimaryClient)
                 .map_err(ConnectionError::ProtoCodecError)?
         }
 
@@ -53,9 +54,11 @@ impl Connection {
             Some(compression) => {
                 let mut compressed_stream = vec![];
 
-                LE::<u8>::write(&LE::new(compression.id_u8()), &mut compressed_stream)
+                LE::new(compression.id_u8())
+                    .write(&mut compressed_stream)
                     .map_err(|e| ConnectionError::IOError(Arc::new(e)))?;
 
+                // TODO: Overflow checking
                 if compression.needed() && pk_stream.len() as u16 > compression.threshold() {
                     compression
                         .compress(pk_stream.as_slice(), &mut compressed_stream)
@@ -87,7 +90,7 @@ impl Connection {
             .map_err(ConnectionError::TransportError)
     }
 
-    pub async fn send_raw(&mut self, data: &Vec<u8>) -> Result<(), ConnectionError> {
+    pub async fn send_raw(&mut self, data: &[u8]) -> Result<(), ConnectionError> {
         // Send the data
         match self.connection.send(&Cursor::new(data)).await {
             Ok(_) => {}
@@ -304,7 +307,7 @@ impl Connection {
                         }
 
                         if !send_buffer.is_empty() {
-                            if let Err(_) = self.send(send_buffer).await {
+                            if let Err(_) = self.send(send_buffer.as_slice()).await {
                                 break 'select_loop
                             }
 
@@ -317,7 +320,7 @@ impl Connection {
                     }
                     _ = flush_interval.tick() => {
                         if !send_buffer.is_empty() {
-                            if (self.send(send_buffer).await).is_err() {
+                            if (self.send(send_buffer.as_slice()).await).is_err() {
                                 break 'select_loop
                             }
 

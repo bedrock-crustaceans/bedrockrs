@@ -2,7 +2,7 @@ use crate::types::ability_data::AbilityData;
 use crate::types::actor_link::ActorLink;
 use crate::types::network_item_stack_descriptor::NetworkItemStackDescriptor;
 use crate::types::property_sync_data::PropertySyncData;
-use bedrockrs_core::int::LE;
+use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::Vec3;
 use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
@@ -24,5 +24,6 @@ pub struct AddPlayerPacket {
     // TODO: Impl SyncedActorDataEntityWrapper
     synced_properties: PropertySyncData,
     abilities: AbilityData,
+    #[len_repr(VAR::<u32>)]
     links: Vec<ActorLink>,
 }
