@@ -55,10 +55,10 @@ use crate::packets::show_profile::ShowProfilePacket;
 use crate::packets::start_game::StartGamePacket;
 use crate::packets::text_message::TextMessagePacket;
 use crate::packets::toast_request::ToastRequestPacket;
+use crate::sub_client::SubClientID;
 use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::{error::ProtoCodecError, GamePacket, ProtoCodec};
-use bedrockrs_proto_derive::gamepackets;
-use crate::sub_client::SubClientID;
+use bedrockrs_proto_macros::gamepackets;
 
 gamepackets! {
     Login: LoginPacket,
@@ -282,10 +282,12 @@ fn read_gamepacket_header(
 
     // Get the next 2 bits as the sub client sender id
     // Can never be more than an 8-bit integer due to being 2 bits big
-    let subclient_sender_id = SubClientID::proto_from((game_packet_header & 0b0000_1100_0000_0000 >> 10) as u8)?;
+    let subclient_sender_id =
+        SubClientID::proto_from((game_packet_header & 0b0000_1100_0000_0000 >> 10) as u8)?;
     // Get the next 2 bits as the sub client target id
     // Can never be more than an 8-bit integer due to being 2 bits big
-    let subclient_target_id = SubClientID::proto_from((game_packet_header & 0b0011_0000_0000_0000 >> 12) as u8)?;
+    let subclient_target_id =
+        SubClientID::proto_from((game_packet_header & 0b0011_0000_0000_0000 >> 12) as u8)?;
 
     Ok((
         length,
@@ -316,10 +318,10 @@ fn write_gamepacket_header(
 
     // Set the next 2 bits as the sub client sender id
     // Can never be more than an 8-bit integer due to being 2 bits big
-    game_packet_header |= subclient_sender_id as u16 >> 10 & 0b0000_1100_0000_0000;
+    game_packet_header |= subclient_sender_id.proto_to() as u16 >> 10 & 0b0000_1100_0000_0000;
     // Set the next 2 bits as the sub client target id
     // Can never be more than an 8-bit integer due to being 2 bits big
-    game_packet_header |= subclient_target_id as u16 >> 12 & 0b0011_0000_0000_0000;
+    game_packet_header |= subclient_target_id.proto_to() as u16 >> 12 & 0b0011_0000_0000_0000;
 
     // Write the gamepacket header
     VAR::<u16>::new(game_packet_header).proto_serialize(stream)?;

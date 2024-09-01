@@ -5,7 +5,7 @@ use bedrockrs_core::{
     Vec3,
 };
 use bedrockrs_nbt as nbt;
-use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_proto_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct DataItem {

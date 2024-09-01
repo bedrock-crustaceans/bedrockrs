@@ -1,5 +1,5 @@
 use bedrockrs_proto_core::ProtoCodec;
-use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_proto_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
 #[repr(transparent)]

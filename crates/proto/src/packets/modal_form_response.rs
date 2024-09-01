@@ -1,6 +1,6 @@
 use crate::types::modal_form_cancel_reason::ModalFormCancelReason;
 use bedrockrs_core::int::VAR;
-use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
+use bedrockrs_proto_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 101)]
 #[derive(ProtoCodec, Debug, Clone)]

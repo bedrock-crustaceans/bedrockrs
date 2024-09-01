@@ -2,7 +2,7 @@ use crate::types::chunk_pos::ChunkPos;
 use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
-use bedrockrs_proto_derive::gamepacket;
+use bedrockrs_proto_macros::gamepacket;
 
 #[gamepacket(id = 58)]
 #[derive(Debug, Clone)]

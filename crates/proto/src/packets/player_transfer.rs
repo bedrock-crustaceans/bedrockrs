@@ -1,5 +1,5 @@
 use bedrockrs_core::int::LE;
-use bedrockrs_proto_derive::{gamepacket, gamepackets, ProtoCodec};
+use bedrockrs_proto_macros::{gamepacket, gamepackets, ProtoCodec};
 
 #[gamepacket(id = 85)]
 #[derive(ProtoCodec, Debug, Clone)]

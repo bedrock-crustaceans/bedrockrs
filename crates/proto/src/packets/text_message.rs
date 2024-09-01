@@ -2,7 +2,7 @@ use crate::types::text_message_data::TextMessageData;
 use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
-use bedrockrs_proto_derive::gamepacket;
+use bedrockrs_proto_macros::gamepacket;
 use std::io::Cursor;
 
 #[gamepacket(id = 9)]

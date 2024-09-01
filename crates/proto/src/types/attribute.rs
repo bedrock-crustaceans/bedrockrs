@@ -1,5 +1,5 @@
 use bedrockrs_core::int::{LE, VAR};
-use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_proto_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct Attribute {

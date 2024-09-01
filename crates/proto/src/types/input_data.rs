@@ -1,7 +1,7 @@
 use crate::types::inventory_transaction::UseItemTransactionData;
 use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::Vec2;
-use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_proto_macros::ProtoCodec;
 use bedrockrs_shared::actor_unique_id::ActorUniqueID;
 
 #[derive(Debug, Clone)]

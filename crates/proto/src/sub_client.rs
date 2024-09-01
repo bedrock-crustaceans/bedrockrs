@@ -1,6 +1,6 @@
-use bedrockrs_proto_derive::ProtoCodec;
 use bedrockrs_core::int::LE;
 use bedrockrs_proto_core::error::ProtoCodecError;
+use bedrockrs_proto_macros::ProtoCodec;
 
 #[derive(Debug, Clone)]
 pub enum SubClientID {
@@ -20,16 +20,16 @@ impl SubClientID {
             other => Err(ProtoCodecError::InvalidEnumID(
                 format!("{other:?}"),
                 String::from("SubClientID"),
-            ))
+            )),
         }
     }
-    
+
     pub fn proto_to(&self) -> u8 {
         match self {
-            SubClientID::PrimaryClient => 0, 
-            SubClientID::Client2 => 1, 
-            SubClientID::Client3 => 2, 
-            SubClientID::Client4 => 3, 
+            SubClientID::PrimaryClient => 0,
+            SubClientID::Client2 => 1,
+            SubClientID::Client3 => 2,
+            SubClientID::Client4 => 3,
         }
     }
 }

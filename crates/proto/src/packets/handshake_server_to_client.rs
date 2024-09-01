@@ -3,7 +3,7 @@ use std::io::Cursor;
 
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
-use bedrockrs_proto_derive::gamepacket;
+use bedrockrs_proto_macros::gamepacket;
 use serde_json::Value;
 
 #[gamepacket(id = 3)]

@@ -1,5 +1,5 @@
 use bedrockrs_core::int::VAR;
-use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_proto_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Copy, Clone, Eq, PartialEq)]
 #[enum_repr(VAR::<i32>)]

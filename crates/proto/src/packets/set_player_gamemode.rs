@@ -1,4 +1,4 @@
-use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
+use bedrockrs_proto_macros::{gamepacket, ProtoCodec};
 use bedrockrs_shared::world::gamemode::Gamemode;
 
 #[gamepacket(id = 62)]

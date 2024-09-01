@@ -45,7 +45,11 @@ impl Connection {
         for game_packet in gamepackets {
             // Write gamepacket
             game_packet
-                .pk_serialize(&mut pk_stream, SubClientID::PrimaryClient, SubClientID::PrimaryClient)
+                .pk_serialize(
+                    &mut pk_stream,
+                    SubClientID::PrimaryClient,
+                    SubClientID::PrimaryClient,
+                )
                 .map_err(ConnectionError::ProtoCodecError)?
         }
 

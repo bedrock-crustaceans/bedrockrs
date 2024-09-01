@@ -1,6 +1,6 @@
 use bedrockrs_core::int::LE;
 use bedrockrs_proto_core::ProtoCodec;
-use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
+use bedrockrs_proto_macros::{gamepacket, ProtoCodec};
 
 use crate::types::resource_packs_response_status::ResourcePacksResponseStatus;
 

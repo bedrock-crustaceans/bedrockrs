@@ -6,7 +6,7 @@ pub struct PropertySyncData {
     pub float: FloatEntriesList,
 }
 
-use bedrockrs_proto_derive::ProtoCodec;
+use bedrockrs_proto_macros::ProtoCodec;
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct IntEntriesList {
     #[len_repr(VAR::<u32>)]

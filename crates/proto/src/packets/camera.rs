@@ -1,4 +1,4 @@
-use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
+use bedrockrs_proto_macros::{gamepacket, ProtoCodec};
 use bedrockrs_shared::actor_unique_id::ActorUniqueID;
 
 #[gamepacket(id = 73)]

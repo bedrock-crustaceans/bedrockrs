@@ -1,5 +1,5 @@
 use bedrockrs_core::int::BE;
-use bedrockrs_proto_derive::{gamepacket, ProtoCodec};
+use bedrockrs_proto_macros::{gamepacket, ProtoCodec};
 
 use crate::types::connection_request::ConnectionRequest;
 
