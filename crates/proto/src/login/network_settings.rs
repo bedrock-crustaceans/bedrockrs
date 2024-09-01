@@ -15,7 +15,7 @@ pub async fn network_settings(
     //////////////////////////////////////
 
     let mut network_settings_request = match conn.recv().await {
-        Ok(GamePackets::RequestNetworkSettings(pk)) => pk,
+        Ok(GamePackets::NetworkSettingsRequest(pk)) => pk,
         Ok(other) => {
             return Err(LoginError::FormatError(format!(
                 "Expected RequestNetworkSettings packet, got: {other:?}"

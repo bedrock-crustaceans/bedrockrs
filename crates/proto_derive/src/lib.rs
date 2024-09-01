@@ -203,7 +203,7 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let compress = compress.iter().map(|(name, value)| {
         if let Some(v) = value {
             quote! {
-                GamePackets::#name(_) => { return #v::<::bedrockrs_proto_core::GamePacket>::COMPRESS; },
+                GamePackets::#name(_) => { return <#v as ::bedrockrs_proto_core::GamePacket>::COMPRESS; },
             }       
         } else {
             quote! {
@@ -216,7 +216,7 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let encrypt = encrypt.iter().map(|(name, value)| {
         if let Some(v) = value {
             quote! {
-                GamePackets::#name(_) => { return #v::<::bedrockrs_proto_core::GamePacket>::ENCRYPT; },
+                GamePackets::#name(_) => { return <#v as ::bedrockrs_proto_core::GamePacket>::ENCRYPT; },
             }
         } else {
             quote! {
@@ -230,19 +230,19 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
         if let Some(v) = value {
             quote! {
                 GamePackets::#name(pk) => {
-                    let buf = Vec::new();
+                    let mut buf = Vec::new();
                     
-                    match #v::<::bedrockrs_proto_core::ProtoCodec>::proto_serialize(pk, &mut buf) {
+                    match <#v as bedrockrs_proto_core::ProtoCodec>::proto_serialize(pk, &mut buf) {
                         Ok(_) => {},
                         Err(err) => return Err(err),
                     };
                     
                     let len: u32 = match buf.len().try_into() {
                         Ok(len) => len,
-                        Err(err) => return Err(::bedrockrs_proto_core::error::ProtoCodecError::FromIntError(err));
+                        Err(err) => return Err(::bedrockrs_proto_core::error::ProtoCodecError::FromIntError(err)),
                     };
                     
-                    match write_gamepacket_header(stream, len, #v::<::bedrockrs_proto_core::GamePacket>::ID, subclient_sender_id, subclient_target_id) {
+                    match write_gamepacket_header(stream, len, <#v as ::bedrockrs_proto_core::GamePacket>::ID, subclient_sender_id, subclient_target_id) {
                         Ok(_) => {},
                         Err(err) => return Err(err),
                     };
@@ -264,8 +264,8 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let de = de.iter().map(|(name, value)| {
         if let Some(v) = value {
             quote! {
-                #v::<::bedrockrs_proto_core::GamePacket>::ID => {
-                    match #v::<::bedrockrs_proto_core::ProtoCodec>::proto_deserialize(stream) {
+                <#v as ::bedrockrs_proto_core::GamePacket>::ID => {
+                    match <#v as ::bedrockrs_proto_core::ProtoCodec>::proto_deserialize(stream) {
                         Ok(pk) => GamePackets::#name(pk),
                         Err(e) => return Err(e),
                     }

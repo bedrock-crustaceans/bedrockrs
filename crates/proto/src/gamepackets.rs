@@ -282,10 +282,10 @@ fn read_gamepacket_header(
 
     // Get the next 2 bits as the sub client sender id
     // Can never be more than an 8-bit integer due to being 2 bits big
-    let subclient_sender_id = (game_packet_header & 0b0000_1100_0000_0000 >> 10) as u8;
+    let subclient_sender_id = SubClientID::proto_from((game_packet_header & 0b0000_1100_0000_0000 >> 10) as u8)?;
     // Get the next 2 bits as the sub client target id
     // Can never be more than an 8-bit integer due to being 2 bits big
-    let subclient_target_id = (game_packet_header & 0b0011_0000_0000_0000 >> 12) as u8;
+    let subclient_target_id = SubClientID::proto_from((game_packet_header & 0b0011_0000_0000_0000 >> 12) as u8)?;
 
     Ok((
         length,
