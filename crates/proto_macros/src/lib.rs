@@ -189,39 +189,27 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let variants = args.packets.clone();
     let variants = variants.iter().map(|(name, value)| {
         if let Some(value) = value {
-            quote! {
-                #name(#value),
-            }
+            quote! { #name(#value), }
         } else {
-            quote! {
-                #name(),
-            }
+            quote! { #name(), }
         }
     });
 
     let compress = args.packets.clone();
     let compress = compress.iter().map(|(name, value)| {
         if let Some(v) = value {
-            quote! {
-                GamePackets::#name(_) => { return <#v as ::bedrockrs_proto_core::GamePacket>::COMPRESS; },
-            }       
+            quote! { GamePackets::#name(_) => { return <#v as ::bedrockrs_proto_core::GamePacket>::COMPRESS; }, }
         } else {
-            quote! {
-                GamePackets::#name() => { todo!("impl GamePackets::{}", stringify!(name)); },
-            }
+            quote! { GamePackets::#name() => { todo!("impl GamePackets::{}", stringify!(name)); }, }
         }
     });
 
     let encrypt = args.packets.clone();
     let encrypt = encrypt.iter().map(|(name, value)| {
         if let Some(v) = value {
-            quote! {
-                GamePackets::#name(_) => { return <#v as ::bedrockrs_proto_core::GamePacket>::ENCRYPT; },
-            }
+            quote! { GamePackets::#name(_) => { return <#v as ::bedrockrs_proto_core::GamePacket>::ENCRYPT; }, }
         } else {
-            quote! {
-                GamePackets::#name() => { todo!("impl GamePackets::{}", stringify!(name)); },
-            }
+            quote! { GamePackets::#name() => { todo!("impl GamePackets::{}", stringify!(name)); }, }
         }
     });
 
@@ -231,17 +219,17 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
             quote! {
                 GamePackets::#name(pk) => {
                     let mut buf = Vec::new();
-                    
+
                     match <#v as bedrockrs_proto_core::ProtoCodec>::proto_serialize(pk, &mut buf) {
                         Ok(_) => {},
                         Err(err) => return Err(err),
                     };
-                    
+
                     let len: u32 = match buf.len().try_into() {
                         Ok(len) => len,
                         Err(err) => return Err(::bedrockrs_proto_core::error::ProtoCodecError::FromIntError(err)),
                     };
-                    
+
                     match write_gamepacket_header(stream, len, <#v as ::bedrockrs_proto_core::GamePacket>::ID, subclient_sender_id, subclient_target_id) {
                         Ok(_) => {},
                         Err(err) => return Err(err),
