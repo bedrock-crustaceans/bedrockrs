@@ -27,7 +27,7 @@ pub mod inventory_transaction;
 pub mod item_stack_net_id_variant;
 pub mod level_settings;
 pub mod modal_form_cancel_reason;
-pub mod network_block_pos;
+pub mod block_pos;
 pub mod network_item_stack_descriptor;
 pub mod network_permissions;
 pub mod pack_info_behavior;

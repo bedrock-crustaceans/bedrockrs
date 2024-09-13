@@ -22,7 +22,7 @@ use crate::types::chat_restriction_level::ChatRestrictionLevel;
 use crate::types::edu_shared_uri_resource::EduSharedResourceUri;
 use crate::types::experiments::Experiments;
 use crate::types::level_settings::LevelSettings;
-use crate::types::network_block_pos::NetworkBlockPos;
+use crate::types::block_pos::BlockPos;
 use crate::types::network_permissions::NetworkPermissions;
 use crate::types::play_status::PlayStatusType;
 use crate::types::player_movement_mode::PlayerMovementMode;
@@ -63,7 +63,7 @@ pub async fn start_game(
             gamemode: Gamemode::Creative,
             hardcore: false,
             difficulty: Difficulty::Peaceful,
-            default_spawn_block: NetworkBlockPos {
+            default_spawn_block: BlockPos {
                 x: VAR::new(100),
                 y: VAR::new(200),
                 z: VAR::new(300),

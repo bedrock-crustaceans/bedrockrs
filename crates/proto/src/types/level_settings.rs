@@ -10,7 +10,7 @@ use crate::types::chat_restriction_level::ChatRestrictionLevel;
 use crate::types::edu_shared_uri_resource::EduSharedResourceUri;
 use crate::types::experiments::Experiments;
 use crate::types::gamerule::GameRule;
-use crate::types::network_block_pos::NetworkBlockPos;
+use crate::types::block_pos::BlockPos;
 use crate::types::spawn_settings::SpawnSettings;
 use bedrockrs_shared::world::editor_world_type::EditorWorldType;
 
@@ -22,7 +22,7 @@ pub struct LevelSettings {
     pub gamemode: Gamemode,
     pub hardcore: bool,
     pub difficulty: Difficulty,
-    pub default_spawn_block: NetworkBlockPos,
+    pub default_spawn_block: BlockPos,
     pub achievements_disabled: bool,
     pub editor_world_type: EditorWorldType,
     pub created_in_editor: bool,
