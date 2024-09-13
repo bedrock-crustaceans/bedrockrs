@@ -11,6 +11,7 @@ pub mod nbt {
 #[cfg(feature = "proto")]
 pub mod proto {
     pub use ::bedrockrs_proto::*;
+    pub use ::bedrockrs_proto_core::GamePacket;
 
     pub mod codec {
         pub use ::bedrockrs_proto_core::error::ProtoCodecError;
