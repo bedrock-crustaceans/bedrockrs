@@ -59,6 +59,7 @@ use crate::sub_client::SubClientID;
 use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::{error::ProtoCodecError, GamePacket, ProtoCodec};
 use bedrockrs_proto_macros::gamepackets;
+use crate::packets::chunk_publisher_update::ChunkPublisherUpdatePacket;
 
 gamepackets! {
     Login: LoginPacket,
@@ -175,7 +176,7 @@ gamepackets! {
     SpawnParticleEffect: _,
     AvailableEntityIdentifiers: _,
     LevelSoundEventV2: _,
-    NetworkChunkPublisherUpdate: _,
+    ChunkPublisherUpdate: ChunkPublisherUpdatePacket,
     BiomeDefinitionList: _,
     LevelSoundEvent: _,
     LevelEventGeneric: _,
