@@ -9,6 +9,7 @@ use crate::packets::animate_player::AnimatePlayerPacket;
 use crate::packets::boss_event::BossEventPacket;
 use crate::packets::camera::CameraPacket;
 use crate::packets::change_dimension::ChangeDimensionPacket;
+use crate::packets::chunk_publisher_update::ChunkPublisherUpdatePacket;
 use crate::packets::chunk_radius_request::ChunkRadiusRequestPacket;
 use crate::packets::chunk_radius_updated::ChunkRadiusUpdatedPacket;
 use crate::packets::client_cache_status::ClientCacheStatusPacket;
@@ -59,7 +60,6 @@ use crate::sub_client::SubClientID;
 use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::{error::ProtoCodecError, GamePacket, ProtoCodec};
 use bedrockrs_proto_macros::gamepackets;
-use crate::packets::chunk_publisher_update::ChunkPublisherUpdatePacket;
 
 gamepackets! {
     Login: LoginPacket,

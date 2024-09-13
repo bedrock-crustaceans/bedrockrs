@@ -6,11 +6,11 @@ use bedrockrs_shared::world::gamemode::Gamemode;
 use bedrockrs_shared::world::generator_type::GeneratorType;
 
 use crate::types::base_game_version::BaseGameVersion;
+use crate::types::block_pos::BlockPos;
 use crate::types::chat_restriction_level::ChatRestrictionLevel;
 use crate::types::edu_shared_uri_resource::EduSharedResourceUri;
 use crate::types::experiments::Experiments;
 use crate::types::gamerule::GameRule;
-use crate::types::block_pos::BlockPos;
 use crate::types::spawn_settings::SpawnSettings;
 use bedrockrs_shared::world::editor_world_type::EditorWorldType;
 
