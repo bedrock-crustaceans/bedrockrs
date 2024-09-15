@@ -1,6 +1,5 @@
 use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::{Vec2, Vec3};
-use bedrockrs_nbt as nbt;
 use std::collections::HashMap;
 use uuid::Uuid;
 
@@ -137,7 +136,7 @@ pub async fn start_game(
         multiplayer_correlation_id: String::from("c5d3d2cc-27fd-4221-9de6-d22c4d423d53"),
         enable_item_stack_net_manager: false,
         server_version: String::from("1.19.2"),
-        player_property_data: nbt::Value::Compound(HashMap::new()),
+        player_property_data: nbtx::Value::Compound(HashMap::new()),
         block_type_registry_checksum: LE::new(0),
         world_template_id: Uuid::nil(),
         enable_clientside_world_generation: false,
