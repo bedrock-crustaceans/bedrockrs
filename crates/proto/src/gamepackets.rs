@@ -323,15 +323,15 @@ fn write_gamepacket_header(
     // Since the size of the header is also included in the batched packet size,
     // we need to write it to a temporary buffer
     let mut game_packet_header_buf = Vec::new();
-    
+
     // Write the gamepacket header into temporary buffer
     VAR::<u16>::new(game_packet_header).proto_serialize(&mut game_packet_header_buf)?;
-    
+
     // Write the gamepacket length and the header length
     VAR::<u32>::new(length + game_packet_header_buf.len() as u32).proto_serialize(stream)?;
 
     // Write the final game packet header
-    stream.write_all(game_packet_header_buf.as_slice()).into()?;
-    
+    stream.write_all(game_packet_header_buf.as_slice()).map_err(ProtoCodecError::from)?;
+
     Ok(())
 }

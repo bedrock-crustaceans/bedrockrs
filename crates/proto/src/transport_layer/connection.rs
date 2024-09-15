@@ -1,6 +1,5 @@
 use std::io::{Cursor, Write};
 use std::sync::Arc;
-
 use bedrockrs_core::int::LE;
 
 use crate::error::{RaknetError, TransportLayerError};
@@ -8,11 +7,9 @@ use crate::info::RAKNET_GAME_PACKET_ID;
 
 pub enum TransportLayerConnection {
     RaknetUDP(rak_rs::connection::Connection),
-    // TODO RaknetTCP(...),
-    NetherNet(/* TODO */),
+    // TOOD NetherNet(nethernet::connection::Connection),
     // TODO Quic(s2n_quic::connection::Connection),
-    // TODO Tcp(net::TcpStream),
-    // TODO Udp(net::UdpSocket)
+    // TODO Tcp(net::TcpStream),\
 }
 
 impl TransportLayerConnection {
@@ -27,14 +24,11 @@ impl TransportLayerConnection {
                 final_stream
                     .write_all(stream.get_ref())
                     .map_err(|e| TransportLayerError::IOError(Arc::new(e)))?;
-
+                
                 // TODO Find out if immediate: true should be used
                 conn.send(final_stream.as_slice(), true)
                     .await
                     .map_err(|e| TransportLayerError::RaknetUDPError(RaknetError::SendError(e)))
-            }
-            _ => {
-                todo!()
             }
         }
     }
@@ -57,7 +51,7 @@ impl TransportLayerConnection {
                     other => {
                         return Err(TransportLayerError::RaknetUDPError(
                             RaknetError::FormatError(format!(
-                                "Expected Raknet Game Packet ID ({:?}), got: {:?}",
+                                "Expected RakNet Game Packet ID ({:?}), got: {:?}",
                                 RAKNET_GAME_PACKET_ID, other
                             )),
                         ));
@@ -66,11 +60,8 @@ impl TransportLayerConnection {
 
                 Ok(stream
                     .write_all(recv_stream.into_inner())
-                    .map_err(|e| TransportLayerError::IOError(Arc::new(e)))?)
-            }
-
-            _ => {
-                todo!()
+                    .map_err(|e| TransportLayerError::IOError(Arc::new(e)))?
+                )
             }
         }
     }

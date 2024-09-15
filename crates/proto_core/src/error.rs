@@ -32,3 +32,9 @@ pub enum ProtoCodecError {
     #[error("Expected format got mismatched: {0}")]
     FormatMismatch(String),
 }
+
+impl From<IOError> for ProtoCodecError {
+    fn from(value: IOError) -> Self {
+        ProtoCodecError::IOError(Arc::new(value))
+    }
+}
