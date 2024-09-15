@@ -1,4 +1,3 @@
-use bedrockrs_nbt as nbt;
 use mojang_leveldb::{error::DBError, Options, ReadOptions, WriteBatch, WriteOptions, DB};
 use std::fmt::{Debug, Formatter};
 use std::path::Path;
@@ -40,7 +39,7 @@ impl WorldDB {
     }
 
     /// Read a player's NBT data for this world
-    pub fn get_player(&self, uuid: Uuid) -> Result<Option<HashMap<String, NbtTag>>, WorldError> {
+    pub fn get_player(&self, uuid: Uuid) -> Result<Option<HashMap<String, nbtx::Value>>, WorldError> {
         let mut str = uuid.to_string();
         str.insert_str(0, "player_");
 
@@ -48,15 +47,16 @@ impl WorldDB {
             Ok(maybe_bytes) => match maybe_bytes {
                 Some(bytes) => {
                     let u8_bytes = bytes.get().into();
-                    match NbtTag::nbt_deserialize_vec::<NbtLittleEndian>(&u8_bytes) {
-                        Ok((_, tag)) => match tag {
-                            NbtTag::Compound(ctag) => Ok(Some(ctag)),
-                            _ => Err(WorldError::FormatError(
-                                "Player data tag is not a compound tag".to_string(),
-                            )),
-                        },
-                        Err(e) => Err(WorldError::NbtError(e)),
-                    }
+                    todo!("Fix this mess")
+                    // match NbtTag::nbt_deserialize_vec::<NbtLittleEndian>(&u8_bytes) {
+                    //     Ok((_, tag)) => match tag {
+                    //         NbtTag::Compound(ctag) => Ok(Some(ctag)),
+                    //         _ => Err(WorldError::FormatError(
+                    //             "Player data tag is not a compound tag".to_string(),
+                    //         )),
+                    //     },
+                    //     Err(e) => Err(WorldError::NbtError(e)),
+                    // }
                 }
                 None => Ok(None),
             },
@@ -68,25 +68,26 @@ impl WorldDB {
     pub fn set_player(
         &mut self,
         uuid: Uuid,
-        data: HashMap<String, NbtTag>,
+        data: HashMap<String, nbtx::Value>,
     ) -> Result<(), WorldError> {
-        let tag = NbtTag::Compound(data);
-        match tag.nbt_serialize_vec::<NbtLittleEndian>("") {
-            Ok(sertag) => {
-                let mut str = uuid.to_string();
-                str.insert_str(0, "player_");
-
-                let mut wb = WriteBatch::new();
-
-                wb.put(str.as_bytes(), &sertag);
-
-                match self.db.write(WRITE_OPTIONS, wb) {
-                    Ok(()) => Ok(()),
-                    Err(dberr) => Err(WorldError::DBError(dberr)),
-                }
-            }
-            Err(e) => Err(WorldError::NbtError(e)),
-        }
+        // let tag = NbtTag::Compound(data);
+        // match tag.nbt_serialize_vec::<NbtLittleEndian>("") {
+        //     Ok(sertag) => {
+        //         let mut str = uuid.to_string();
+        //         str.insert_str(0, "player_");
+        // 
+        //         let mut wb = WriteBatch::new();
+        // 
+        //         wb.put(str.as_bytes(), &sertag);
+        // 
+        //         match self.db.write(WRITE_OPTIONS, wb) {
+        //             Ok(()) => Ok(()),
+        //             Err(dberr) => Err(WorldError::DBError(dberr)),
+        //         }
+        //     }
+        //     Err(e) => Err(WorldError::NbtError(e)),
+        // }
+        todo!()
     }
 
     pub fn get_subchunk(
