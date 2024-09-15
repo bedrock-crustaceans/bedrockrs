@@ -1,13 +1,12 @@
 use std::io::Cursor;
 
 use bedrockrs_core::int::LE;
-use bedrockrs_nbt as nbt;
 use byteorder::ReadBytesExt;
 
 #[derive(Debug, Clone)]
 pub struct PalettedStorage {
     pub blocks: [u32; 4096],
-    pub palette: Vec<nbt::Value>,
+    pub palette: Vec<nbtx::Value>,
 }
 
 impl PalettedStorage {
@@ -100,9 +99,9 @@ impl PalettedStorage {
 
         for nbt in &self.palette {
             if network {
-                nbt::to_var_bytes_in(&mut out, &nbt).unwrap()
+                nbtx::to_net_bytes_in(&mut out, &nbt).unwrap()
             } else {
-                nbt::to_le_bytes_in(&mut out, &nbt).unwrap()
+                nbtx::to_le_bytes_in(&mut out, &nbt).unwrap()
             }
         }
 
