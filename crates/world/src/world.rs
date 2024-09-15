@@ -21,12 +21,13 @@ impl World {
 
         // Read the world settings/specifications from the level.dat file.
         // (in world/level.dat and world/level.dat_old)
-        let (version, _, level_dat) = match LevelDat::open(&directory) {
-            Ok(v) => v,
-            Err(e) => {
-                return Err(e);
-            }
-        };
+        todo!("Help");
+        // let (version, _, level_dat) = match LevelDat::open(&directory) {
+        //     Ok(v) => v,
+        //     Err(e) => {
+        //         return Err(e);
+        //     }
+        // };
 
         // Read the world name from the levelname.txt file
         // (in world/levelname.txt)
@@ -43,7 +44,7 @@ impl World {
                 }
             },
             level_dat,
-            format_version: version,
+            format_version: 2,
         })
     }
 }
