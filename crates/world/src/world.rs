@@ -35,16 +35,16 @@ impl World {
         // - in the levelname.txt file
         // - as a field in the level.dat file (world/level.dat and world/level.dat_old)
 
-        Ok(World {
-            // Read the LevelDB database (in world/db/*)
-            db: match WorldDB::open(&PathBuf::from(&directory)) {
-                Ok(v) => v,
-                Err(e) => {
-                    return Err(WorldError::DBError(e));
-                }
-            },
-            level_dat,
-            format_version: 2,
-        })
+        // Ok(World {
+        //     // Read the LevelDB database (in world/db/*)
+        //     db: match WorldDB::open(&PathBuf::from(&directory)) {
+        //         Ok(v) => v,
+        //         Err(e) => {
+        //             return Err(WorldError::DBError(e));
+        //         }
+        //     },
+        //     level_dat,
+        //     format_version: 2,
+        // })
     }
 }

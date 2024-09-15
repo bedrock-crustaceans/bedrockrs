@@ -46,7 +46,6 @@ impl WorldDB {
         match self.db.get(READ_OPTIONS, str.as_bytes()) {
             Ok(maybe_bytes) => match maybe_bytes {
                 Some(bytes) => {
-                    let u8_bytes = bytes.get().into();
                     todo!("Fix this mess")
                     // match NbtTag::nbt_deserialize_vec::<NbtLittleEndian>(&u8_bytes) {
                     //     Ok((_, tag)) => match tag {
