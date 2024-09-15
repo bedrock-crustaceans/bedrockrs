@@ -2,6 +2,7 @@ use crate::types::block_pos::BlockPos;
 use crate::types::chunk_pos::ChunkPos;
 use bedrockrs_core::int::LE;
 use bedrockrs_proto_macros::{gamepacket, ProtoCodec};
+use bedrockrs_core::int::VAR;
 
 #[gamepacket(id = 121)]
 #[derive(ProtoCodec, Debug, Clone)]
