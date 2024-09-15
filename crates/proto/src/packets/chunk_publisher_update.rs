@@ -7,8 +7,8 @@ use bedrockrs_proto_macros::{gamepacket, ProtoCodec};
 #[gamepacket(id = 121)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct ChunkPublisherUpdatePacket {
-    position: BlockPos,
-    radius: LE<u32>,
+    pub position: BlockPos,
+    pub radius: LE<u32>,
     #[len_repr(VAR::<u32>)]
-    saved_chunks: Vec<ChunkPos>,
+    pub saved_chunks: Vec<ChunkPos>,
 }
