@@ -1,6 +1,0 @@
-[package]
-name = "bedrockrs_play_fab"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
