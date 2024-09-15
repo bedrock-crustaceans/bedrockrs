@@ -7,3 +7,13 @@ pub struct BlockPos {
     pub y: VAR<u32>,
     pub z: VAR<i32>,
 }
+
+impl BlockPos {
+    pub fn new(x: i32, y: u32, z: i32) -> BlockPos {
+        Self {
+            x: VAR::new(x),
+            y: VAR::new(y),
+            z: VAR::new(z),
+        }
+    }
+}
