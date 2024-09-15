@@ -6,10 +6,11 @@ edition = "2021"
 [dependencies]
 bedrockrs_core = { path = "../core" }
 bedrockrs_shared = { path = "../shared" }
-bedrockrs_nbt = { git = "https://github.com/bedrock-crustaceans/bedrockrs-nbt" }
 bedrockrs_proto_core = { path = "../proto_core" }
 bedrockrs_proto_macros = { path = "../proto_macros" }
 bedrockrs_addon = { path = "../addon" }
+
+nbtx = { git = "https://github.com/bedrock-crustaceans/nbtx" }
 
 thiserror = "1.0"
 dyn-clone = "1.0"

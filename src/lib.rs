@@ -4,10 +4,6 @@ pub mod core {
     pub use ::bedrockrs_shared::*;
 }
 
-pub mod nbt {
-    pub use ::bedrockrs_nbt::*;
-}
-
 #[cfg(feature = "proto")]
 pub mod proto {
     pub use ::bedrockrs_proto::*;
@@ -19,7 +15,7 @@ pub mod proto {
     }
 }
 
-#[cfg(feature = "addons")]
+#[cfg(feature = "addon")]
 pub mod addon {
     pub use ::bedrockrs_addon::*;
 }

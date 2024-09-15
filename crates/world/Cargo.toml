@@ -6,8 +6,9 @@ edition = "2021"
 [dependencies]
 bedrockrs_core = { path = "../core" }
 bedrockrs_shared = { path = "../shared" }
-bedrockrs_nbt = { git = "https://github.com/bedrock-crustaceans/bedrockrs-nbt" }
 bedrockrs_paletted_storage = { path = "../paletted_storage" }
+
+nbtx = { git = "https://github.com/bedrock-crustaceans/nbtx" }
 
 mojang-leveldb = "0.6"
 thiserror = "1.0"

@@ -5,8 +5,9 @@ edition = "2021"
 
 [dependencies]
 bedrockrs_core = { path = "../core" }
-bedrockrs_nbt = { git = "https://github.com/bedrock-crustaceans/bedrockrs-nbt" }
 bedrockrs_proto_macros = { path = "../proto_macros" }
+
+nbtx = { git = "https://github.com/bedrock-crustaceans/nbtx" }
 
 thiserror = "1.0"
 serde_json = "1.0"

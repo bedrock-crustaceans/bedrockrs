@@ -10,8 +10,6 @@ members = [ "crates/*" ]
 bedrockrs_core = { path = "crates/core" }
 bedrockrs_shared = { path = "crates/shared" }
 
-bedrockrs_nbt = { git = "https://github.com/bedrock-crustaceans/bedrockrs-nbt" }
-
 bedrockrs_proto = { path = "crates/proto", optional = true }
 bedrockrs_proto_core = { path = "crates/proto_core", optional = true }
 bedrockrs_proto_macros = { path = "crates/proto_macros", optional = true }
@@ -23,12 +21,9 @@ bedrockrs_form = { path = "crates/form" }
 bedrockrs_world = { path = "crates/world", optional = true }
 bedrockrs_paletted_storage = { path = "crates/paletted_storage", optional = true }
 
-bedrockrs_play_fab = { path = "crates/play_fab" }
-bedrockrs_xsapi = { path = "crates/xsapi" }
-
 [features]
-full = ["addons", "proto", "world"]
+full = ["addon", "proto", "world"]
 
-addons = ["dep:bedrockrs_addon"]
+addon = ["dep:bedrockrs_addon"]
 proto = ["dep:bedrockrs_proto", "dep:bedrockrs_proto_core", "dep:bedrockrs_proto_macros"]
 world = ["dep:bedrockrs_world", "dep:bedrockrs_paletted_storage"]
