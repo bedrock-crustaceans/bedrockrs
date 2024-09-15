@@ -39,7 +39,10 @@ impl WorldDB {
     }
 
     /// Read a player's NBT data for this world
-    pub fn get_player(&self, uuid: Uuid) -> Result<Option<HashMap<String, nbtx::Value>>, WorldError> {
+    pub fn get_player(
+        &self,
+        uuid: Uuid,
+    ) -> Result<Option<HashMap<String, nbtx::Value>>, WorldError> {
         let mut str = uuid.to_string();
         str.insert_str(0, "player_");
 
@@ -74,11 +77,11 @@ impl WorldDB {
         //     Ok(sertag) => {
         //         let mut str = uuid.to_string();
         //         str.insert_str(0, "player_");
-        // 
+        //
         //         let mut wb = WriteBatch::new();
-        // 
+        //
         //         wb.put(str.as_bytes(), &sertag);
-        // 
+        //
         //         match self.db.write(WRITE_OPTIONS, wb) {
         //             Ok(()) => Ok(()),
         //             Err(dberr) => Err(WorldError::DBError(dberr)),

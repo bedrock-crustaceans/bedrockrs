@@ -1,6 +1,6 @@
+use bedrockrs_core::int::LE;
 use std::io::{Cursor, Write};
 use std::sync::Arc;
-use bedrockrs_core::int::LE;
 
 use crate::error::{RaknetError, TransportLayerError};
 use crate::info::RAKNET_GAME_PACKET_ID;
@@ -24,7 +24,7 @@ impl TransportLayerConnection {
                 final_stream
                     .write_all(stream.get_ref())
                     .map_err(|e| TransportLayerError::IOError(Arc::new(e)))?;
-                
+
                 // TODO Find out if immediate: true should be used
                 conn.send(final_stream.as_slice(), true)
                     .await
@@ -60,8 +60,7 @@ impl TransportLayerConnection {
 
                 Ok(stream
                     .write_all(recv_stream.into_inner())
-                    .map_err(|e| TransportLayerError::IOError(Arc::new(e)))?
-                )
+                    .map_err(|e| TransportLayerError::IOError(Arc::new(e)))?)
             }
         }
     }

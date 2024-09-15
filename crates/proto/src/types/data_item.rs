@@ -1,10 +1,10 @@
-use std::collections::HashMap;
-use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_core::{
     int::{LE, VAR},
     Vec3,
 };
+use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_proto_macros::ProtoCodec;
+use std::collections::HashMap;
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct DataItem {

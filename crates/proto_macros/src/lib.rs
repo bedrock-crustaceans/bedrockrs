@@ -23,7 +23,7 @@ pub fn proto_codec_derive(item: proc_macro::TokenStream) -> proc_macro::TokenStr
         Data::Struct(struct_data) => {
             let ser = proto_build_ser_struct(&struct_data);
             let de = proto_build_de_struct(&struct_data);
-            
+
             quote! {
                 impl #impl_generics ::bedrockrs_proto_core::ProtoCodec for #name #ty_generics #where_clause {
                     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ::bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {

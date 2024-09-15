@@ -1,6 +1,5 @@
 #![allow(non_upper_case_globals)]
 
-use std::io::{Cursor, Write};
 use crate::packets::add_actor::AddActorPacket;
 use crate::packets::add_painting::AddPaintingPacket;
 use crate::packets::add_player::AddPlayerPacket;
@@ -59,6 +58,7 @@ use crate::sub_client::SubClientID;
 use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::{error::ProtoCodecError, GamePacket, ProtoCodec};
 use bedrockrs_proto_macros::gamepackets;
+use std::io::{Cursor, Write};
 
 gamepackets! {
     Login: LoginPacket,
@@ -331,7 +331,9 @@ fn write_gamepacket_header(
     VAR::<u32>::new(length + game_packet_header_buf.len() as u32).proto_serialize(stream)?;
 
     // Write the final game packet header
-    stream.write_all(game_packet_header_buf.as_slice()).map_err(ProtoCodecError::from)?;
+    stream
+        .write_all(game_packet_header_buf.as_slice())
+        .map_err(ProtoCodecError::from)?;
 
     Ok(())
 }
