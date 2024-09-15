@@ -59,6 +59,7 @@ use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::{error::ProtoCodecError, GamePacket, ProtoCodec};
 use bedrockrs_proto_macros::gamepackets;
 use std::io::{Cursor, Write};
+use crate::packets::loading_screen::LoadingScreenPacket;
 
 gamepackets! {
     Login: LoginPacket,
@@ -257,8 +258,8 @@ gamepackets! {
     SetPlayerInventoryOptions: _,
     SetHud: _,
     AwardAchievement: _,
-    ClientboundCloseForm: _,
-    ServerboundLoadingScreen: _,
+    CloseForm: _,
+    LoadingScreen: LoadingScreenPacket,
     JigsawStructureData: _,
     CurrentStructureFeature: _,
     DiagnosticsPacket: _,
