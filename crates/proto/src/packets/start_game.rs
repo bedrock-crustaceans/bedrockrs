@@ -1,6 +1,5 @@
 use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::{Vec2, Vec3};
-use bedrockrs_nbt as nbt;
 use bedrockrs_proto_macros::{gamepacket, ProtoCodec};
 use uuid::Uuid;
 
@@ -39,7 +38,7 @@ pub struct StartGamePacket {
     pub server_version: String,
     // TODO: This can now be a concrete type rather than an NBT value.
     // How should we do this with the ProtoCodec macro?
-    pub player_property_data: nbt::Value,
+    pub player_property_data: nbtx::Value,
     pub block_type_registry_checksum: LE<u64>,
     pub world_template_id: Uuid,
     pub enable_clientside_world_generation: bool,

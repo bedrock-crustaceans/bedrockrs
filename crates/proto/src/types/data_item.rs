@@ -1,10 +1,9 @@
 use std::collections::HashMap;
-
+use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_core::{
     int::{LE, VAR},
     Vec3,
 };
-use bedrockrs_nbt as nbt;
 use bedrockrs_proto_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
@@ -12,6 +11,7 @@ pub struct DataItem {
     pub id: VAR<u32>,
     pub value: DataItemValue,
 }
+
 #[derive(Debug, Clone)]
 pub enum DataItemValue {
     ValByte(u8),
@@ -19,12 +19,12 @@ pub enum DataItemValue {
     ValInt(i32),
     ValFloat(f32),
     ValString(String),
-    ValCompoundTag(HashMap<String, nbt::Value>),
+    ValCompoundTag(HashMap<String, nbtx::Value>),
     ValPos(Vec3<VAR<i32>>),
     ValInt64(LE<i64>),
     ValVec3(Vec3<LE<f32>>),
 }
-use bedrockrs_proto_core::ProtoCodec;
+
 impl ProtoCodec for DataItemValue {
     fn proto_serialize(
         &self,
