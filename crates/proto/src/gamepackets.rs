@@ -1,7 +1,6 @@
 #![allow(non_upper_case_globals)]
 
 use std::io::{Cursor, Write};
-
 use crate::packets::add_actor::AddActorPacket;
 use crate::packets::add_painting::AddPaintingPacket;
 use crate::packets::add_player::AddPlayerPacket;
@@ -284,11 +283,11 @@ fn read_gamepacket_header(
     // Get the next 2 bits as the sub client sender id
     // Can never be more than an 8-bit integer due to being 2 bits big
     let subclient_sender_id =
-        SubClientID::proto_from((game_packet_header & 0b0000_1100_0000_0000 >> 10) as u8)?;
+        SubClientID::proto_from(((game_packet_header & 0b0000_1100_0000_0000) >> 10) as u8)?;
     // Get the next 2 bits as the sub client target id
-    // Can never be more than an 8-bit integer due to being 2 bits big
+    // Never more than an 8-bit integer due to being 2 bits big
     let subclient_target_id =
-        SubClientID::proto_from((game_packet_header & 0b0011_0000_0000_0000 >> 12) as u8)?;
+        SubClientID::proto_from(((game_packet_header & 0b0011_0000_0000_0000) >> 12) as u8)?;
 
     Ok((
         length,
@@ -305,10 +304,7 @@ fn write_gamepacket_header(
     subclient_sender_id: SubClientID,
     subclient_target_id: SubClientID,
 ) -> Result<(), ProtoCodecError> {
-    // Write the gamepacket length
-    VAR::<u32>::new(length).proto_serialize(stream)?;
-
-    // Since the (var)int is only storing 14 bytes we can treat it as an u16
+    // Since the (var)int is only storing 14 bytes, we can treat it as an u16
     // This is normally treated as u32 varint
     let mut game_packet_header: u16 = 0;
 
@@ -318,14 +314,24 @@ fn write_gamepacket_header(
     game_packet_header |= 0b0000_0011_1111_1111 & gamepacket_id;
 
     // Set the next 2 bits as the sub client sender id
-    // Can never be more than an 8-bit integer due to being 2 bits big
-    game_packet_header |= subclient_sender_id.proto_to() as u16 >> 10 & 0b0000_1100_0000_0000;
+    // Never more than an 8-bit integer due to being 2 bits big
+    game_packet_header |= (subclient_sender_id.proto_to() as u16 >> 10) & 0b0000_1100_0000_0000;
     // Set the next 2 bits as the sub client target id
-    // Can never be more than an 8-bit integer due to being 2 bits big
-    game_packet_header |= subclient_target_id.proto_to() as u16 >> 12 & 0b0011_0000_0000_0000;
+    // Never more than an 8-bit integer due to being 2 bits big
+    game_packet_header |= (subclient_target_id.proto_to() as u16 >> 12) & 0b0011_0000_0000_0000;
 
-    // Write the gamepacket header
-    VAR::<u16>::new(game_packet_header).proto_serialize(stream)?;
+    // Since the size of the header is also included in the batched packet size,
+    // we need to write it to a temporary buffer
+    let mut game_packet_header_buf = Vec::new();
+    
+    // Write the gamepacket header into temporary buffer
+    VAR::<u16>::new(game_packet_header).proto_serialize(&mut game_packet_header_buf)?;
+    
+    // Write the gamepacket length and the header length
+    VAR::<u32>::new(length + game_packet_header_buf.len() as u32).proto_serialize(stream)?;
 
+    // Write the final game packet header
+    stream.write_all(game_packet_header_buf.as_slice()).into()?;
+    
     Ok(())
 }
