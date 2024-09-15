@@ -7,3 +7,5 @@ edition = "2021"
 bedrockrs_core = { path = "../core" }
 bedrockrs_proto_core = { path = "../proto_core" }
 bedrockrs_proto_macros = { path = "../proto_macros" }
+
+log = "0.4"
