@@ -1,7 +1,6 @@
 use crate::types::block_pos::BlockPos;
 use crate::types::chunk_pos::ChunkPos;
-use bedrockrs_core::int::LE;
-use bedrockrs_core::int::VAR;
+use bedrockrs_core::int::{VAR, LE};
 use bedrockrs_proto_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 121)]
@@ -9,6 +8,6 @@ use bedrockrs_proto_macros::{gamepacket, ProtoCodec};
 pub struct ChunkPublisherUpdatePacket {
     pub position: BlockPos,
     pub radius: VAR<u32>,
-    #[len_repr(VAR::<u32>)]
+    #[len_repr(LE::<u32>)]
     pub saved_chunks: Vec<ChunkPos>,
 }
