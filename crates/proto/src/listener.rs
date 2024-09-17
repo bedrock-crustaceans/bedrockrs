@@ -13,8 +13,8 @@ pub struct Listener {
     listener: TransportLaterListener,
     name: String,
     sub_name: String,
-    player_count_max: u32,
-    player_count_current: u32,
+    player_max: u32,
+    player_count: u32,
     socket_addr: SocketAddr,
     guid: u64,
 }
@@ -23,8 +23,9 @@ impl Listener {
     pub async fn new_raknet(
         name: String,
         sub_name: String,
-        player_count_max: u32,
-        player_count_current: u32,
+        display_version: String,
+        player_max: u32,
+        player_count: u32,
         socket_addr: SocketAddr,
         nintendo_limited: bool,
     ) -> Result<Self, ListenerError> {
@@ -47,11 +48,11 @@ impl Listener {
         // Setup the motd
         rak_listener.motd = Motd {
             edition: String::from(MINECRAFT_EDITION_MOTD),
-            version: String::from(MINECRAFT_VERSION),
+            version: display_version,
             name: name.clone(),
             sub_name: sub_name.clone(),
-            player_max: player_count_max,
-            player_count: player_count_current,
+            player_max,
+            player_count,
             protocol: PROTOCOL_VERSION as u16,
             server_guid: guid,
             gamemode: Gamemode::Survival,
@@ -64,8 +65,8 @@ impl Listener {
             listener: TransportLaterListener::RaknetUDP(rak_listener),
             name,
             sub_name,
-            player_count_max,
-            player_count_current,
+            player_max,
+            player_count,
             socket_addr,
             guid,
         })
