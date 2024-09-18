@@ -5,3 +5,4 @@ pub mod option;
 pub mod string;
 pub mod uuid;
 pub mod vec;
+pub mod xuid;

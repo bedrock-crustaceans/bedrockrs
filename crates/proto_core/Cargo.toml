@@ -8,6 +8,7 @@ bedrockrs_core = { path = "../core" }
 bedrockrs_proto_macros = { path = "../proto_macros" }
 
 nbtx = { git = "https://github.com/bedrock-crustaceans/nbtx" }
+xuid = "1.0.0"
 
 thiserror = "1.0"
 serde_json = "1.0"

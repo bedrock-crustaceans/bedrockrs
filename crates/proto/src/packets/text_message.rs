@@ -4,13 +4,14 @@ use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_proto_macros::gamepacket;
 use std::io::Cursor;
+use xuid::Xuid;
 
 #[gamepacket(id = 9)]
 #[derive(Debug, Clone)]
 pub struct TextMessagePacket {
     pub message_type: TextMessageData,
     pub localize: bool,
-    pub sender_xuid: String,
+    pub sender_xuid: Xuid,
     pub platform_id: String,
     pub filtered_message: String,
 }
@@ -218,7 +219,7 @@ impl ProtoCodec for TextMessagePacket {
             }
         };
 
-        let sender_xuid = String::proto_deserialize(stream)?;
+        let sender_xuid = Xuid::proto_deserialize(stream)?;
         let platform_id = String::proto_deserialize(stream)?;
         let filtered_message = String::proto_deserialize(stream)?;
 

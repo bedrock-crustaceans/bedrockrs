@@ -1,3 +1,4 @@
+use xuid::Xuid;
 use bedrockrs_core::int::VAR;
 
 use crate::connection::ConnectionShard;
@@ -23,7 +24,7 @@ pub async fn set_title(
         fade_in_time: VAR::new(500),
         stay_time: VAR::new(500),
         fade_out_time: VAR::new(500),
-        xuid: String::from("hello_xuid"),
+        xuid: Xuid::from(123456789),
         platform_online_id: String::from("hello_platform_online_id"),
     };
 

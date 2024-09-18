@@ -1,3 +1,4 @@
+use xuid::Xuid;
 use bedrockrs_core::int::VAR;
 use bedrockrs_proto_macros::{gamepacket, ProtoCodec};
 
@@ -11,6 +12,6 @@ pub struct SetTitlePacket {
     pub fade_in_time: VAR<i32>,
     pub stay_time: VAR<i32>,
     pub fade_out_time: VAR<i32>,
-    pub xuid: String,
+    pub xuid: Xuid,
     pub platform_online_id: String,
 }

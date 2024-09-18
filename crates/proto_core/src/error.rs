@@ -1,5 +1,5 @@
 use std::io::Error as IOError;
-use std::num::TryFromIntError;
+use std::num::{ParseIntError, TryFromIntError};
 use std::string::FromUtf8Error;
 use std::sync::Arc;
 
@@ -25,6 +25,8 @@ pub enum ProtoCodecError {
     JwtError(#[from] JwtError),
     #[error("Base64 decoding Error: {0}")]
     Base64DecodeError(#[from] Base64DecodeError),
+    #[error("XUID could not be parsed : {0}")]
+    XuidParseError(ParseIntError),
     #[error("parse value `{0}` to enum variant for {1} enum")]
     InvalidEnumID(String, String),
     #[error("Got an unknown/invalid game packet id: {0}")]
