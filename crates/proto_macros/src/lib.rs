@@ -106,8 +106,8 @@ impl Parse for GamepacketInput {
 
         Ok(Self {
             id: id.clone(),
-            compress: map.remove("compress").and_then(|v| Some(v.clone())),
-            encrypt: map.remove("encrypt").and_then(|v| Some(v.clone())),
+            compress: map.remove("compress"),
+            encrypt: map.remove("encrypt"),
         })
     }
 }
