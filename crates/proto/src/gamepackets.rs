@@ -21,6 +21,7 @@ use crate::packets::handshake_server_to_client::HandshakeServerToClientPacket;
 use crate::packets::interact::InteractPacket;
 use crate::packets::inventory_content::InventoryContentPacket;
 use crate::packets::level_chunk::LevelChunkPacket;
+use crate::packets::loading_screen::LoadingScreenPacket;
 use crate::packets::login::LoginPacket;
 use crate::packets::mob_equipment::MobEquipmentPacket;
 use crate::packets::modal_form_request::ModalFormRequestPacket;
@@ -59,7 +60,6 @@ use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::{error::ProtoCodecError, GamePacket, ProtoCodec};
 use bedrockrs_proto_macros::gamepackets;
 use std::io::{Cursor, Write};
-use crate::packets::loading_screen::LoadingScreenPacket;
 
 gamepackets! {
     Login: LoginPacket,

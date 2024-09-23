@@ -1,6 +1,6 @@
-use xuid::Xuid;
 use bedrockrs_core::int::VAR;
 use bedrockrs_proto_macros::{gamepacket, ProtoCodec};
+use xuid::Xuid;
 
 use crate::types::title_type::TitleType;
 

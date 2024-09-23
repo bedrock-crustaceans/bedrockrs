@@ -1,5 +1,5 @@
-use xuid::Xuid;
 use bedrockrs_core::int::VAR;
+use xuid::Xuid;
 
 use crate::connection::ConnectionShard;
 use crate::error::LoginError;
