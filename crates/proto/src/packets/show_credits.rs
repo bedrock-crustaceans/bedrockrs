@@ -5,6 +5,6 @@ use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
 #[gamepacket(id = 75)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct ShowCreditsPacket {
-    actor_id: ActorRuntimeID,
-    credits_state: CreditsState,
+    pub target_actor_id: ActorRuntimeID,
+    pub credits_state: CreditsState,
 }

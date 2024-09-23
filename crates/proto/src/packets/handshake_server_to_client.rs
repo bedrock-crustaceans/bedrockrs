@@ -6,6 +6,8 @@ use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_proto_macros::gamepacket;
 use serde_json::Value;
 
+// Yeah we aren't supporting secure things rn...
+
 #[gamepacket(id = 3)]
 #[derive(Debug, Clone)]
 pub struct HandshakeServerToClientPacket {

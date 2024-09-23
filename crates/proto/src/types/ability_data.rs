@@ -5,6 +5,6 @@ use bedrockrs_shared::world::permissions_level::PermissionLevel;
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct AbilityData {
     /// This field is not necessary, 0 seems to work.
-    target_player_raw_id: ActorUniqueID,
-    permission: PermissionLevel,
+    pub target_player_id: ActorUniqueID,
+    pub permission: PermissionLevel,
 }

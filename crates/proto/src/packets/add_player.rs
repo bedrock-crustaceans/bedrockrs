@@ -12,18 +12,18 @@ use uuid::Uuid;
 #[gamepacket(id = 12)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct AddPlayerPacket {
-    uuid: Uuid,
-    name: String,
-    runtime_id: ActorRuntimeID,
-    platform_chat_id: String,
-    position: Vec3<LE<f32>>,
-    velocity: Vec3<LE<f32>>,
-    rotation: Vec3<LE<f32>>,
-    carried_item: NetworkItemStackDescriptor,
-    gamemode: Gamemode,
+    pub uuid: Uuid,
+    pub name: String,
+    pub runtime_id: ActorRuntimeID,
+    pub platform_chat_id: String,
+    pub position: Vec3<LE<f32>>,
+    pub velocity: Vec3<LE<f32>>,
+    pub rotation: Vec3<LE<f32>>,
+    pub carried_item: NetworkItemStackDescriptor,
+    pub gamemode: Gamemode,
     // TODO: Impl SyncedActorDataEntityWrapper
-    synced_properties: PropertySyncData,
-    abilities: AbilityData,
+    pub synced_properties: PropertySyncData,
+    pub abilities: AbilityData,
     #[len_repr(VAR::<u32>)]
-    links: Vec<ActorLink>,
+    pub links: Vec<ActorLink>,
 }

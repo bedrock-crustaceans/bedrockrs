@@ -5,9 +5,9 @@ use bedrockrs_proto_core::ProtoCodec;
 
 #[derive(Debug, Clone)]
 pub struct PackURL {
-    uuid: String,
-    version: String,
-    url: String,
+    pub uuid: String,
+    pub version: String,
+    pub url: String,
 }
 
 impl ProtoCodec for PackURL {

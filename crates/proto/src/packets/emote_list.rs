@@ -6,7 +6,7 @@ use uuid::Uuid;
 #[gamepacket(id = 152)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct EmoteListPacket {
-    runtime_id: ActorRuntimeID,
+    pub runtime_id: ActorRuntimeID,
     #[len_repr(VAR::<u32>)]
-    emote_piece_ids: Vec<Uuid>,
+    pub emote_piece_ids: Vec<Uuid>,
 }

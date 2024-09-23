@@ -6,8 +6,8 @@ use bedrockrs_shared::world::dimension::Dimension;
 #[gamepacket(id = 61)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct ChangeDimensionPacket {
-    dimension: Dimension,
-    pos: Vec3<LE<f32>>,
-    respawn: bool,
-    loading_screen: Option<LE<u32>>,
+    pub dimension: Dimension,
+    pub pos: Vec3<LE<f32>>,
+    pub respawn: bool,
+    pub loading_screen: Option<LE<u32>>,
 }

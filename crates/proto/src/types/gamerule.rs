@@ -7,9 +7,9 @@ use std::sync::Arc;
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct GameRule {
-    name: String,
-    editable: bool,
-    value: GameRuleValue,
+    pub name: String,
+    pub editable: bool,
+    pub value: GameRuleValue,
 }
 
 #[derive(Debug, Clone)]

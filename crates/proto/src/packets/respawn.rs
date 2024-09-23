@@ -7,7 +7,7 @@ use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
 #[gamepacket(id = 45)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct RespawnPacket {
-    position: Vec3<LE<f32>>,
-    state: RespawnState,
-    runtime_id: ActorRuntimeID,
+    pub position: Vec3<LE<f32>>,
+    pub state: RespawnState,
+    pub runtime_id: ActorRuntimeID,
 }

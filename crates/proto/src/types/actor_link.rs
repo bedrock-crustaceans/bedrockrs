@@ -6,9 +6,9 @@ use super::actor_link_type::ActorLinkType;
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct ActorLink {
-    actor_unique_id_a: ActorUniqueID,
-    actor_unique_id_b: ActorUniqueID,
-    link_type: ActorLinkType,
-    immediate: bool,
-    passenger_seat_id: bool,
+    pub actor_unique_id_a: ActorUniqueID,
+    pub actor_unique_id_b: ActorUniqueID,
+    pub link_type: ActorLinkType,
+    pub immediate: bool,
+    pub passenger_seat_id: bool,
 }

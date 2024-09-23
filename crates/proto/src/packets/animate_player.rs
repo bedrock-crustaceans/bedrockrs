@@ -9,8 +9,8 @@ use std::io::Cursor;
 #[gamepacket(id = 44)]
 #[derive(Debug, Clone)]
 pub struct AnimatePlayerPacket {
-    action: AnimateAction,
-    target_runtime_id: ActorRuntimeID,
+    pub action: AnimateAction,
+    pub target_runtime_id: ActorRuntimeID,
 }
 
 impl ProtoCodec for AnimatePlayerPacket {
