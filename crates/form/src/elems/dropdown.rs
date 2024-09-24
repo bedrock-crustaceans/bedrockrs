@@ -3,13 +3,13 @@ use serde_json::{json, Value};
 use crate::elems::Element;
 use crate::error::FormError;
 
-pub struct DropDown {
+pub struct Dropdown {
     pub text: String,
     pub options: Vec<String>,
     pub default_index: i32,
 }
 
-impl Element for DropDown {
+impl Element for Dropdown {
     fn elem_serialize(&self) -> Value {
         json!({
             "type": "dropdown",

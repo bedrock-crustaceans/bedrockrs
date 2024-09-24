@@ -1,12 +1,12 @@
 use serde_json::json;
 
-use crate::elems::Element;
+use crate::elems::{Element, Elements};
 use crate::error::FormError;
 use crate::window::Form;
 
 pub struct CustomForm {
     pub title: String,
-    pub elements: Vec<Box<dyn Element + Send>>,
+    pub elements: Vec<Elements>,
 }
 
 impl Form for CustomForm {
@@ -29,3 +29,6 @@ impl Form for CustomForm {
         todo!()
     }
 }
+
+
+
