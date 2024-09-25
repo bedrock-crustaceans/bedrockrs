@@ -9,10 +9,10 @@ use nbtx::NbtError;
 use serde_json::error::Error as JsonError;
 use thiserror::Error;
 
-#[derive(Error, Debug, Clone)]
+#[derive(Error, Debug)]
 pub enum ProtoCodecError {
     #[error("IOError occurred: {0}")]
-    IOError(#[from] Arc<IOError>),
+    IOError(#[from] IOError),
     #[error("NbtError: {0}")]
     NbtError(#[from] NbtError),
     #[error("Error while reading UTF8 encoded String: {0}")]
@@ -20,23 +20,18 @@ pub enum ProtoCodecError {
     #[error("Error while converting integers: {0}")]
     FromIntError(#[from] TryFromIntError),
     #[error("Json Error: {0}")]
-    JsonError(#[from] Arc<JsonError>),
+    JsonError(#[from] JsonError),
     #[error("Jwt Error: {0}")]
     JwtError(#[from] JwtError),
     #[error("Base64 decoding Error: {0}")]
     Base64DecodeError(#[from] Base64DecodeError),
     #[error("XUID could not be parsed : {0}")]
-    XuidParseError(ParseIntError),
+    XuidParseError(#[from] ParseIntError),
+    /// TODO: This likely hurts performance, but it is *kinda* good for debugging
     #[error("parse value `{0}` to enum variant for {1} enum")]
     InvalidEnumID(String, String),
     #[error("Got an unknown/invalid game packet id: {0}")]
     InvalidGamePacketID(u16),
     #[error("Expected format got mismatched: {0}")]
     FormatMismatch(String),
-}
-
-impl From<IOError> for ProtoCodecError {
-    fn from(value: IOError) -> Self {
-        ProtoCodecError::IOError(Arc::new(value))
-    }
 }
