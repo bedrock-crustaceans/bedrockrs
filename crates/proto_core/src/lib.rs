@@ -6,6 +6,7 @@ use crate::error::ProtoCodecError;
 
 pub mod error;
 pub mod types;
+pub mod byteorder;
 
 pub trait ProtoCodec: Sized {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError>;
