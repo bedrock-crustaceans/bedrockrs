@@ -13,6 +13,9 @@ bedrockrs_addon = { path = "../addon" }
 nbtx = { git = "https://github.com/bedrock-crustaceans/nbtx" }
 xuid = "1.0.0"
 
+byteorder = "1.5"
+varint-rs = "2.2"
+
 log = "0.4"
 thiserror = "1.0"
 dyn-clone = "1.0"
