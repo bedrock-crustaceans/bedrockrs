@@ -32,7 +32,7 @@ macro_rules! impl_proto_tuple {
                         #( T::proto_deserialize(stream)?, )*
                     );
                 });
-                
+
                 Ok(tuple)
             }
         }
