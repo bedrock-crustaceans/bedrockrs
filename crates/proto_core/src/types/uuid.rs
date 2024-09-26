@@ -1,25 +1,24 @@
 use std::io::Cursor;
 
-use bedrockrs_core::int::LE;
-use uuid::Uuid;
-
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
+use uuid::Uuid;
+use varint_rs::{VarintReader, VarintWriter};
 
 impl ProtoCodec for Uuid {
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         let pair = self.as_u64_pair();
 
-        LE::<u64>::new(pair.0).proto_serialize(stream)?;
-        LE::<u64>::new(pair.1).proto_serialize(stream)?;
+        stream.write_u64_varint(pair.0)?;
+        stream.write_u64_varint(pair.1)?;
 
         Ok(())
     }
 
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
-        let first = LE::<u64>::proto_deserialize(stream)?.into_inner();
-        let second = LE::<u64>::proto_deserialize(stream)?.into_inner();
-
-        Ok(Uuid::from_u64_pair(first, second))
+        Ok(Uuid::from_u64_pair(
+            stream.read_u64_varint()?,
+            stream.read_u64_varint()?,
+        ))
     }
 }
