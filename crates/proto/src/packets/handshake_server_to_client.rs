@@ -1,9 +1,9 @@
 use std::collections::BTreeMap;
 use std::io::Cursor;
 
+use bedrockrs_macros::gamepacket;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
-use bedrockrs_macros::gamepacket;
 use serde_json::Value;
 
 // Yeah we aren't supporting secure things rn...

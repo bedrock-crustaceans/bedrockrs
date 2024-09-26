@@ -1,9 +1,9 @@
 use crate::types::interact_action::InteractAction;
 use bedrockrs_core::int::LE;
 use bedrockrs_core::Vec3;
+use bedrockrs_macros::gamepacket;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
-use bedrockrs_macros::gamepacket;
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
 use std::io::Cursor;
 

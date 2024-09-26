@@ -4,9 +4,9 @@ use crate::types::interaction_model::InteractionModel;
 use crate::types::play_mode::PlayMode;
 use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::{Vec2, Vec3};
+use bedrockrs_macros::gamepacket;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
-use bedrockrs_macros::gamepacket;
 use bedrockrs_shared::actor_unique_id::ActorUniqueID;
 use std::io::Cursor;
 

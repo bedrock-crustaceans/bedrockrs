@@ -1,9 +1,9 @@
 use std::io::Cursor;
 
 use crate::types::disconnect_reason::DisconnectReason;
+use bedrockrs_macros::gamepacket;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
-use bedrockrs_macros::gamepacket;
 
 #[gamepacket(id = 5)]
 #[derive(Debug, Clone)]

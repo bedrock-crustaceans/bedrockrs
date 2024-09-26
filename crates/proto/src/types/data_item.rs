@@ -2,8 +2,8 @@ use bedrockrs_core::{
     int::{LE, VAR},
     Vec3,
 };
-use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_macros::ProtoCodec;
+use bedrockrs_proto_core::ProtoCodec;
 use std::collections::HashMap;
 
 #[derive(ProtoCodec, Debug, Clone)]
