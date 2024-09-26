@@ -1,8 +1,8 @@
+use bedrockrs_proto_core::error::ProtoCodecError;
+use bedrockrs_proto_core::ProtoCodec;
 use std::io::Cursor;
 use std::mem::transmute;
 use varint_rs::{VarintReader, VarintWriter};
-use bedrockrs_proto_core::error::ProtoCodecError;
-use bedrockrs_proto_core::ProtoCodec;
 
 #[derive(Debug, Clone)]
 pub struct BlockPos {

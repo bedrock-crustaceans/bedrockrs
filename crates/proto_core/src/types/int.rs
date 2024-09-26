@@ -1,10 +1,10 @@
 use std::io::Cursor;
 use std::sync::Arc;
 
-use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
 use crate::byteorder::ProtoCodecLE;
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
+use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
 
 impl ProtoCodec for u8 {
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {

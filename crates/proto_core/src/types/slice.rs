@@ -1,7 +1,7 @@
+use crate::byteorder::{ProtoCodecBE, ProtoCodecLE, ProtoCodecVAR};
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 use std::io::Cursor;
-use crate::byteorder::{ProtoCodecBE, ProtoCodecLE, ProtoCodecVAR};
 
 macro_rules! impl_proto_slice {
     ($name:ident, $size:literal) => {
@@ -26,7 +26,6 @@ macro_rules! impl_proto_slice {
         }
     };
 }
-
 
 impl_proto_slice!(ProtoCodec, 0);
 impl_proto_slice!(ProtoCodec, 1);
