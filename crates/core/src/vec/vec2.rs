@@ -1,7 +1,7 @@
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::ops::{
     Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
 };
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Vec2<T> {
@@ -143,7 +143,6 @@ impl<'de, T: Deserialize<'de>> Deserialize<'de> for Vec2<T> {
     }
 }
 
-
 impl<T> From<[T; 2]> for Vec2<T> {
     fn from(value: [T; 2]) -> Self {
         let [x, y] = value;
@@ -170,4 +169,3 @@ impl<T> From<Vec2<T>> for (T, T) {
         (value.x, value.y)
     }
 }
-
