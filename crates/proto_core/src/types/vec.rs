@@ -1,9 +1,9 @@
 use std::io::Cursor;
 
-use bedrockrs_core::{Vec2, Vec3};
 use crate::byteorder::{ProtoCodecBE, ProtoCodecLE, ProtoCodecVAR};
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
+use bedrockrs_core::{Vec2, Vec3};
 
 macro_rules! impl_proto_vec2 {
     ($name:ident) => {
@@ -68,4 +68,3 @@ impl_proto_vec3!(ProtoCodec);
 impl_proto_vec3!(ProtoCodecLE);
 impl_proto_vec3!(ProtoCodecBE);
 impl_proto_vec3!(ProtoCodecVAR);
-
