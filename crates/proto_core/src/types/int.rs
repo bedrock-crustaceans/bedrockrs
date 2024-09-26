@@ -1,82 +1,100 @@
 use std::io::Cursor;
 use std::sync::Arc;
 
-use bedrockrs_core::int::{BE, LE, VAR};
-use byteorder::{ReadBytesExt, WriteBytesExt};
-
+use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
+use crate::byteorder::ProtoCodecLE;
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 
 impl ProtoCodec for u8 {
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
-        stream
-            .write_u8(*self)
-            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
+        Ok(stream.write_u8(*self)?)
     }
 
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
-        stream
-            .read_u8()
-            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
+        Ok(stream.read_u8()?)
     }
 }
 
 impl ProtoCodec for i8 {
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
-        stream
-            .write_i8(*self)
-            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
+        Ok(stream.write_i8(*self)?)
     }
 
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
-        stream
-            .read_i8()
-            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
+        Ok(stream.read_i8()?)
     }
 }
 
-macro_rules! impl_proto_codec {
-    ($wrapper:ident, $int:ty) => {
-        impl ProtoCodec for $wrapper<$int> {
+macro_rules! impl_proto_codec_le {
+    ($int:ident) => {
+        impl ProtoCodecLE for $int {
             fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
-                $wrapper::<$int>::write(self, stream)
-                    .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
+                Ok(stream.(concat_idents!(write_, $int))::<LittleEndian>(*self)?)
             }
 
             fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
-                $wrapper::<$int>::read(stream).map_err(|e| ProtoCodecError::IOError(Arc::new(e)))
+                Ok(stream.(concat_idents!(read_, $int))::<LittleEndian>()?)
             }
         }
     };
 }
 
-impl_proto_codec!(LE, u16);
-impl_proto_codec!(LE, i16);
-impl_proto_codec!(LE, u32);
-impl_proto_codec!(LE, i32);
-impl_proto_codec!(LE, u64);
-impl_proto_codec!(LE, i64);
-impl_proto_codec!(LE, u128);
-impl_proto_codec!(LE, i128);
-impl_proto_codec!(LE, f32);
-impl_proto_codec!(LE, f64);
+macro_rules! impl_proto_codec_be {
+    ($int:ident) => {
+        impl ProtoCodecBE for $int {
+            fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
+                Ok(stream.(concat_idents!(write_, $int))::<BigEndian>(*self)?)
+            }
 
-impl_proto_codec!(BE, u16);
-impl_proto_codec!(BE, i16);
-impl_proto_codec!(BE, u32);
-impl_proto_codec!(BE, i32);
-impl_proto_codec!(BE, u64);
-impl_proto_codec!(BE, i64);
-impl_proto_codec!(BE, u128);
-impl_proto_codec!(BE, i128);
-impl_proto_codec!(BE, f32);
-impl_proto_codec!(BE, f64);
+            fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
+                Ok(stream.(concat_idents!(read_, $int))::<BigEndian>()?)
+            }
+        }
+    };
+}
 
-impl_proto_codec!(VAR, u16);
-impl_proto_codec!(VAR, i16);
-impl_proto_codec!(VAR, u32);
-impl_proto_codec!(VAR, i32);
-impl_proto_codec!(VAR, u64);
-impl_proto_codec!(VAR, i64);
-impl_proto_codec!(VAR, u128);
-impl_proto_codec!(VAR, i128);
+macro_rules! impl_proto_codec_var {
+    ($int:ident) => {
+        impl ProtoCodecVar for $int {
+            fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
+                Ok(stream.(concat_idents!(write_, $int, _varint))(*self)?)
+            }
+
+            fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
+                Ok(stream.(concat_idents!(read_, $int, _varint))()?)
+            }
+        }
+    };
+}
+
+impl_proto_codec_le!(u16);
+impl_proto_codec_le!(i16);
+impl_proto_codec_le!(u32);
+impl_proto_codec_le!(i32);
+impl_proto_codec_le!(u64);
+impl_proto_codec_le!(i64);
+impl_proto_codec_le!(u128);
+impl_proto_codec_le!(i128);
+impl_proto_codec_le!(f32);
+impl_proto_codec_le!(f64);
+
+impl_proto_codec_be!(u16);
+impl_proto_codec_be!(i16);
+impl_proto_codec_be!(u32);
+impl_proto_codec_be!(i32);
+impl_proto_codec_be!(u64);
+impl_proto_codec_be!(i64);
+impl_proto_codec_be!(u128);
+impl_proto_codec_be!(i128);
+impl_proto_codec_be!(f32);
+impl_proto_codec_be!(f64);
+
+impl_proto_codec_var!(u16);
+impl_proto_codec_var!(i16);
+impl_proto_codec_var!(u32);
+impl_proto_codec_var!(i32);
+impl_proto_codec_var!(u64);
+impl_proto_codec_var!(i64);
+impl_proto_codec_var!(u128);
+impl_proto_codec_var!(i128);
