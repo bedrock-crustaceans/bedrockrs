@@ -1,6 +1,5 @@
 pub mod bool;
 pub mod int;
-pub mod nbt_tag;
 pub mod option;
 pub mod slice;
 pub mod string;
