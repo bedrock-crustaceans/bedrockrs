@@ -5,6 +5,17 @@ use seq_macro::seq;
 use std::io::Cursor;
 
 macro_rules! impl_proto_slice {
+    ($name:ident, 0) => {
+        impl<T> $name for [T; 0] {
+            fn proto_serialize(&self, _stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
+                Ok(())
+            }
+
+            fn proto_deserialize(_stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
+                Ok([])
+            }
+        }
+    };
     ($name:ident, $size:literal) => {
         impl<T: $name> $name for [T; $size] {
             fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
@@ -21,7 +32,7 @@ macro_rules! impl_proto_slice {
                         #( T::proto_deserialize(stream)?, )*
                     ];
                 });
-                
+
                 Ok(buf)
             }
         }
