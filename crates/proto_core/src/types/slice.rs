@@ -1,26 +1,27 @@
 use crate::byteorder::{ProtoCodecBE, ProtoCodecLE, ProtoCodecVAR};
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
+use seq_macro::seq;
 use std::io::Cursor;
 
 macro_rules! impl_proto_slice {
     ($name:ident, $size:literal) => {
         impl<T: $name> $name for [T; $size] {
             fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
-                for i in 0..$size {
-                    self[i].proto_serialize(stream)?;
-                }
+                seq!(N in 0..$size {
+                    self[N].proto_serialize(stream)?;
+                });
 
                 Ok(())
             }
 
             fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
-                let mut buf = [0; $size];
-
-                for i in 0..$size {
-                    buf[i] = T::proto_deserialize(stream)?;
-                }
-
+                seq!(N in 0..$size {
+                    let buf = [
+                        #( T::proto_deserialize(stream)?, )*
+                    ];
+                });
+                
                 Ok(buf)
             }
         }
