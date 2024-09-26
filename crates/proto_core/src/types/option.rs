@@ -12,10 +12,10 @@ macro_rules! impl_proto_option {
             {
                 match self {
                     Some(v) => {
-                        bool::proto_serialize(*true, buf)?;
-                        v.proto_serialize(buf)?;
+                        bool::proto_serialize(&true, buf)?;
+                        T::proto_serialize(&v, buf)?;
                     }
-                    None => bool::proto_serialize(*false, buf)?,
+                    None => bool::proto_serialize(&false, buf)?,
                 }
 
                 Ok(())
