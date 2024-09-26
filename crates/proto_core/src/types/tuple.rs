@@ -5,6 +5,17 @@ use seq_macro::seq;
 use std::io::Cursor;
 
 macro_rules! impl_proto_tuple {
+    ($name:ident, 0) => {
+        impl $name for () {
+            fn proto_serialize(&self, _stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
+                Ok(())
+            }
+
+            fn proto_deserialize(_stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
+                Ok(())
+            }
+        }
+    };
     ($name:ident, $size:literal) => {
         impl<T: $name> $name for seq!(N in 0..$size { ( #(T, )* ) }) {
             fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
