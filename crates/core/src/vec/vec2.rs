@@ -1,8 +1,6 @@
 use std::ops::{
     Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
 };
-
-use crate::int::{BE, LE, VAR};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -145,55 +143,31 @@ impl<'de, T: Deserialize<'de>> Deserialize<'de> for Vec2<T> {
     }
 }
 
-impl<T> Vec2<T> {
-    // LE
-    #[inline]
-    pub fn to_le(self) -> Vec2<LE<T>> {
-        Vec2 {
-            x: LE::new(self.x),
-            y: LE::new(self.y),
-        }
-    }
 
-    #[inline]
-    pub fn from_le(le: Vec2<LE<T>>) -> Vec2<T> {
-        Vec2 {
-            x: le.x.into_inner(),
-            y: le.y.into_inner(),
-        }
-    }
+impl<T> From<[T; 2]> for Vec2<T> {
+    fn from(value: [T; 2]) -> Self {
+        let [x, y] = value;
 
-    // BE
-    #[inline]
-    pub fn to_be(self) -> Vec2<BE<T>> {
-        Vec2 {
-            x: BE::new(self.x),
-            y: BE::new(self.y),
-        }
-    }
-
-    #[inline]
-    pub fn from_be(be: Vec2<BE<T>>) -> Vec2<T> {
-        Vec2 {
-            x: be.x.into_inner(),
-            y: be.y.into_inner(),
-        }
-    }
-
-    // VAR
-    #[inline]
-    pub fn to_var(self) -> Vec2<VAR<T>> {
-        Vec2 {
-            x: VAR::new(self.x),
-            y: VAR::new(self.y),
-        }
-    }
-
-    #[inline]
-    pub fn from_var(var: Vec2<VAR<T>>) -> Vec2<T> {
-        Vec2 {
-            x: var.x.into_inner(),
-            y: var.y.into_inner(),
-        }
+        Self { x, y }
     }
 }
+
+impl<T> From<Vec2<T>> for [T; 2] {
+    fn from(value: Vec2<T>) -> Self {
+        [value.x, value.y]
+    }
+}
+
+impl<T> From<(T, T)> for Vec2<T> {
+    fn from(value: (T, T)) -> Self {
+        let (x, y) = value;
+        Self { x, y }
+    }
+}
+
+impl<T> From<Vec2<T>> for (T, T) {
+    fn from(value: Vec2<T>) -> Self {
+        (value.x, value.y)
+    }
+}
+

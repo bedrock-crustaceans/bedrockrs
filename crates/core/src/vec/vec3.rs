@@ -1,8 +1,6 @@
 use std::ops::{
     Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
 };
-
-use crate::int::{BE, LE, VAR};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -157,61 +155,29 @@ impl<'de, T: Deserialize<'de>> Deserialize<'de> for Vec3<T> {
     }
 }
 
-impl<T> Vec3<T> {
-    // LE
-    #[inline]
-    pub fn to_le(self) -> Vec3<LE<T>> {
-        Vec3 {
-            x: LE::new(self.x),
-            y: LE::new(self.y),
-            z: LE::new(self.z),
-        }
-    }
+impl<T> From<[T; 3]> for Vec3<T> {
+    fn from(value: [T; 3]) -> Self {
+        let [x, y, z] = value;
 
-    #[inline]
-    pub fn from_le(le: Vec3<LE<T>>) -> Vec3<T> {
-        Vec3 {
-            x: le.x.into_inner(),
-            y: le.y.into_inner(),
-            z: le.z.into_inner(),
-        }
+        Self { x, y, z }
     }
+}
 
-    // BE
-    #[inline]
-    pub fn to_be(self) -> Vec3<BE<T>> {
-        Vec3 {
-            x: BE::new(self.x),
-            y: BE::new(self.y),
-            z: BE::new(self.z),
-        }
+impl<T> From<Vec3<T>> for [T; 3] {
+    fn from(value: Vec3<T>) -> Self {
+        [value.x, value.y, value.z]
     }
+}
 
-    #[inline]
-    pub fn from_be(be: Vec3<BE<T>>) -> Vec3<T> {
-        Vec3 {
-            x: be.x.into_inner(),
-            y: be.y.into_inner(),
-            z: be.z.into_inner(),
-        }
+impl<T> From<(T, T, T)> for Vec3<T> {
+    fn from(value: (T, T, T)) -> Self {
+        let (x, y, z) = value;
+        Self { x, y, z }
     }
+}
 
-    // VAR
-    #[inline]
-    pub fn to_var(self) -> Vec3<VAR<T>> {
-        Vec3 {
-            x: VAR::new(self.x),
-            y: VAR::new(self.y),
-            z: VAR::new(self.z),
-        }
-    }
-
-    #[inline]
-    pub fn from_var(var: Vec3<VAR<T>>) -> Vec3<T> {
-        Vec3 {
-            x: var.x.into_inner(),
-            y: var.y.into_inner(),
-            z: var.z.into_inner(),
-        }
+impl<T> From<Vec3<T>> for (T, T, T) {
+    fn from(value: Vec3<T>) -> Self {
+        (value.x, value.y, value.z)
     }
 }
