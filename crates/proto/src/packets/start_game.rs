@@ -1,6 +1,6 @@
 use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::{Vec2, Vec3};
-use bedrockrs_proto_macros::{gamepacket, ProtoCodec};
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 use uuid::Uuid;
 
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;

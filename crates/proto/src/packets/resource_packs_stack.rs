@@ -1,5 +1,5 @@
 use bedrockrs_core::int::VAR;
-use bedrockrs_proto_macros::{gamepacket, ProtoCodec};
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 use crate::types::base_game_version::BaseGameVersion;
 use crate::types::experiments::Experiments;

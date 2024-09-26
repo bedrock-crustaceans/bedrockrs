@@ -1,7 +1,7 @@
 use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
-use bedrockrs_proto_macros::ProtoCodec;
+use bedrockrs_macros::ProtoCodec;
 use bedrockrs_shared::actor_unique_id::ActorUniqueID;
 use std::io::Cursor;
 

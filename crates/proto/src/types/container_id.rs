@@ -1,5 +1,5 @@
 use bedrockrs_core::int::{BE, VAR};
-use bedrockrs_proto_macros::ProtoCodec;
+use bedrockrs_macros::ProtoCodec;
 
 /// Defines an enum for container IDs, used to identify different types of containers.
 #[derive(ProtoCodec, Debug, Copy, Clone, Eq, PartialEq)]

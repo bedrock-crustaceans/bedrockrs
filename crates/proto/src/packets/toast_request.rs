@@ -1,4 +1,4 @@
-use bedrockrs_proto_macros::{gamepacket, ProtoCodec};
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 186)]
 #[derive(ProtoCodec, Debug, Clone)]

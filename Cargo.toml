@@ -12,7 +12,7 @@ bedrockrs_shared = { path = "crates/shared" }
 
 bedrockrs_proto = { path = "crates/proto", optional = true }
 bedrockrs_proto_core = { path = "crates/proto_core", optional = true }
-bedrockrs_proto_macros = { path = "crates/proto_macros", optional = true }
+bedrockrs_macros = { path = "crates/macros", optional = true }
 
 bedrockrs_addon = { path = "crates/addon", optional = true }
 
@@ -25,5 +25,5 @@ bedrockrs_paletted_storage = { path = "crates/paletted_storage", optional = true
 full = ["addon", "proto", "world"]
 
 addon = ["dep:bedrockrs_addon"]
-proto = ["dep:bedrockrs_proto", "dep:bedrockrs_proto_core", "dep:bedrockrs_proto_macros"]
+proto = ["dep:bedrockrs_proto", "dep:bedrockrs_proto_core", "dep:bedrockrs_macros"]
 world = ["dep:bedrockrs_world", "dep:bedrockrs_paletted_storage"]

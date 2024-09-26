@@ -6,6 +6,6 @@ edition = "2021"
 [dependencies]
 bedrockrs_core = { path = "../core" }
 bedrockrs_proto_core = { path = "../proto_core" }
-bedrockrs_proto_macros = { path = "../proto_macros" }
+bedrockrs_macros = { path = "../macros" }
 
 log = "0.4"

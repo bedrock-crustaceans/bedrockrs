@@ -3,7 +3,7 @@ use bedrockrs_core::Vec2;
 use bedrockrs_core::Vec3;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
-use bedrockrs_proto_macros::gamepacket;
+use bedrockrs_macros::gamepacket;
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
 use std::io::Cursor;
 

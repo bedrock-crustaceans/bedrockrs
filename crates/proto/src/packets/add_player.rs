@@ -4,7 +4,7 @@ use crate::types::network_item_stack_descriptor::NetworkItemStackDescriptor;
 use crate::types::property_sync_data::PropertySyncData;
 use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::Vec3;
-use bedrockrs_proto_macros::{gamepacket, ProtoCodec};
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
 use bedrockrs_shared::world::gamemode::Gamemode;
 use uuid::Uuid;

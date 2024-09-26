@@ -1,6 +1,6 @@
 use bedrockrs_core::int::LE;
 use bedrockrs_core::Vec3;
-use bedrockrs_proto_macros::{gamepacket, ProtoCodec};
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 use bedrockrs_shared::world::dimension::Dimension;
 
 #[gamepacket(id = 61)]

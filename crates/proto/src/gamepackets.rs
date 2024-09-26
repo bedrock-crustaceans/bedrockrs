@@ -58,7 +58,7 @@ use crate::packets::toast_request::ToastRequestPacket;
 use crate::sub_client::SubClientID;
 use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::{error::ProtoCodecError, GamePacket, ProtoCodec};
-use bedrockrs_proto_macros::gamepackets;
+use bedrockrs_macros::gamepackets;
 use std::io::{Cursor, Write};
 
 gamepackets! {

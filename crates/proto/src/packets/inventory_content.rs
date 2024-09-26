@@ -1,5 +1,5 @@
 use bedrockrs_core::int::VAR;
-use bedrockrs_proto_macros::{gamepacket, ProtoCodec};
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 use crate::types::network_item_stack_descriptor::NetworkItemStackDescriptor;
 

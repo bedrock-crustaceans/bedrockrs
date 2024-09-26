@@ -1,6 +1,6 @@
 use bedrockrs_core::int::LE;
 use bedrockrs_proto_core::error::ProtoCodecError;
-use bedrockrs_proto_macros::ProtoCodec;
+use bedrockrs_macros::ProtoCodec;
 
 #[derive(Debug, Clone)]
 pub enum SubClientID {

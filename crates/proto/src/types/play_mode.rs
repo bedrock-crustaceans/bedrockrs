@@ -1,6 +1,6 @@
 use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::Vec3;
-use bedrockrs_proto_macros::ProtoCodec;
+use bedrockrs_macros::ProtoCodec;
 
 #[derive(Debug, Clone)]
 pub enum PlayMode {

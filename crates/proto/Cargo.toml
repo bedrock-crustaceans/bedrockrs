@@ -7,7 +7,7 @@ edition = "2021"
 bedrockrs_core = { path = "../core" }
 bedrockrs_shared = { path = "../shared" }
 bedrockrs_proto_core = { path = "../proto_core" }
-bedrockrs_proto_macros = { path = "../proto_macros" }
+bedrockrs_macros = { path = "../macros" }
 bedrockrs_addon = { path = "../addon" }
 
 nbtx = { git = "https://github.com/bedrock-crustaceans/nbtx" }

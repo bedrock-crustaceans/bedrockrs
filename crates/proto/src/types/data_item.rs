@@ -3,7 +3,7 @@ use bedrockrs_core::{
     Vec3,
 };
 use bedrockrs_proto_core::ProtoCodec;
-use bedrockrs_proto_macros::ProtoCodec;
+use bedrockrs_macros::ProtoCodec;
 use std::collections::HashMap;
 
 #[derive(ProtoCodec, Debug, Clone)]

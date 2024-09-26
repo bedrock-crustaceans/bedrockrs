@@ -1,7 +1,7 @@
 use bedrockrs_core::int::LE;
 use bedrockrs_core::int::VAR;
 use bedrockrs_proto_core::ProtoCodec;
-use bedrockrs_proto_macros::{gamepacket, ProtoCodec};
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 use crate::types::pack_info_behavior::BehaviorPackInfoType;
 use crate::types::pack_info_resource::ResourcePackInfoType;

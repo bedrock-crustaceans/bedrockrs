@@ -1,5 +1,5 @@
 use bedrockrs_core::int::{LE, VAR};
-use bedrockrs_proto_macros::ProtoCodec;
+use bedrockrs_macros::ProtoCodec;
 
 use bedrockrs_shared::world::difficulty::Difficulty;
 use bedrockrs_shared::world::gamemode::Gamemode;

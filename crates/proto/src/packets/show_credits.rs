@@ -1,5 +1,5 @@
 use crate::types::credits_state::CreditsState;
-use bedrockrs_proto_macros::{gamepacket, ProtoCodec};
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
 
 #[gamepacket(id = 75)]

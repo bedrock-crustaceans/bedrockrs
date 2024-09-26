@@ -1,4 +1,4 @@
-use bedrockrs_proto_macros::ProtoCodec;
+use bedrockrs_macros::ProtoCodec;
 
 use bedrockrs_shared::world::dimension::Dimension;
 
