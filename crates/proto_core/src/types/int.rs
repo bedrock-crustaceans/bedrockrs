@@ -1,10 +1,11 @@
-use std::io::Cursor;
-use std::sync::Arc;
-
-use crate::byteorder::ProtoCodecLE;
+use crate::byteorder::{ProtoCodecBE, ProtoCodecLE, ProtoCodecVAR};
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
+use paste::paste;
+use std::io::Cursor;
+use varint_rs::VarintReader;
+use varint_rs::VarintWriter;
 
 impl ProtoCodec for u8 {
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
@@ -28,13 +29,15 @@ impl ProtoCodec for i8 {
 
 macro_rules! impl_proto_codec_le {
     ($int:ident) => {
-        impl ProtoCodecLE for $int {
-            fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
-                Ok(stream.(concat_idents!(write_, $int))::<LittleEndian>(*self)?)
-            }
+        paste! {
+            impl ProtoCodecLE for $int {
+                fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
+                    Ok(WriteBytesExt::[<write_ $int>]::<LittleEndian>(stream, *self)?)
+                }
 
-            fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
-                Ok(stream.(concat_idents!(read_, $int))::<LittleEndian>()?)
+                fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
+                    Ok(ReadBytesExt::[<read_ $int>]::<LittleEndian>(stream)?)
+                }
             }
         }
     };
@@ -42,13 +45,15 @@ macro_rules! impl_proto_codec_le {
 
 macro_rules! impl_proto_codec_be {
     ($int:ident) => {
-        impl ProtoCodecBE for $int {
-            fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
-                Ok(stream.(concat_idents!(write_, $int))::<BigEndian>(*self)?)
-            }
+        paste! {
+            impl ProtoCodecBE for $int {
+                fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
+                    Ok(WriteBytesExt::[<write_ $int>]::<BigEndian>(stream, *self)?)
+                }
 
-            fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
-                Ok(stream.(concat_idents!(read_, $int))::<BigEndian>()?)
+                fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
+                    Ok(ReadBytesExt::[<read_ $int>]::<BigEndian>(stream)?)
+                }
             }
         }
     };
@@ -56,13 +61,15 @@ macro_rules! impl_proto_codec_be {
 
 macro_rules! impl_proto_codec_var {
     ($int:ident) => {
-        impl ProtoCodecVar for $int {
-            fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
-                Ok(stream.(concat_idents!(write_, $int, _varint))(*self)?)
-            }
+        paste! {
+            impl ProtoCodecVAR for $int {
+                fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
+                    Ok(VarintWriter::[<write_ $int _varint>](stream, *self)?)
+                }
 
-            fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
-                Ok(stream.(concat_idents!(read_, $int, _varint))()?)
+                fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
+                    Ok(VarintReader::[<read_ $int _varint>](stream)?)
+                }
             }
         }
     };
