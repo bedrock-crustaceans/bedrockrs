@@ -1,6 +1,6 @@
 use std::io::Cursor;
 
-use crate::byteorder::{ProtoCodecBE, ProtoCodecLE, ProtoCodecVAR};
+use crate::endian::{ProtoCodecBE, ProtoCodecLE, ProtoCodecVAR};
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 use bedrockrs_core::{Vec2, Vec3};

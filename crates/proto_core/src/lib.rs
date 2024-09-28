@@ -4,7 +4,9 @@ use std::io::Cursor;
 
 use crate::error::ProtoCodecError;
 
-pub mod byteorder;
+mod endian;
+pub use endian::*;
+
 pub mod error;
 pub mod types;
 
