@@ -1,5 +1,5 @@
-use std::io::Cursor;
 use byteorder::{ReadBytesExt, WriteBytesExt};
+use std::io::Cursor;
 
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
@@ -13,7 +13,7 @@ impl ProtoCodec for bool {
             true => stream.write_u8(1)?,
             false => stream.write_u8(0)?,
         };
-        
+
         Ok(())
     }
 
