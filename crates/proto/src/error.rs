@@ -23,10 +23,10 @@ pub enum ListenerError {
     TransportListenerError(#[from] TransportLayerError),
 }
 
-#[derive(Error, Debug, Clone)]
+#[derive(Error, Debug)]
 pub enum ConnectionError {
     #[error("IO Error: {0}")]
-    IOError(#[from] Arc<IOError>),
+    IOError(#[from] IOError),
     #[error("Proto Codec Error: {0}")]
     ProtoCodecError(#[from] ProtoCodecError),
     #[error("Connection Closed")]
@@ -35,12 +35,13 @@ pub enum ConnectionError {
     TransportError(TransportLayerError),
     #[error("Compression Error: {0}")]
     CompressError(CompressionError),
+    // TODO: Move into RakNet Error enum
     #[error("Invalid RakNet Header, expected: {RAKNET_GAME_PACKET_ID}, got: {0}")]
     InvalidRakNetHeader(u8),
     #[error("Unknown Compression method, got: {0}")]
-    UnknownCompressionMethod(u8),
+    CompressionMethodUnknown(u8),
     #[error("Wrong Compression method")]
-    WrongCompressionMethod(u8),
+    CompressionMethodMismatch(u8),
 }
 
 #[derive(Error, Debug, Clone)]
