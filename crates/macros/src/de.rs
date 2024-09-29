@@ -44,7 +44,7 @@ fn build_de_field(fields: &[&Field]) -> TokenStream {
                         };
                         
                         vec
-                    }
+                    };
                 }
             }
             
@@ -79,10 +79,10 @@ fn build_de_fields(fields: Fields) -> (TokenStream, Option<TokenStream>) {
 
     let de = if let Some(i_fields) = i_fields {
         build_de_field(Vec::from_iter(i_fields).as_slice())
-    } else { 
+    } else {
         quote! {}
     };
-    
+
     let ctor_fields = match fields {
         Fields::Named(ref v) => {
             let ctor = v.named.iter().enumerate().map(|(i, f)| {
@@ -114,12 +114,12 @@ pub fn build_de_struct(data_struct: &DataStruct) -> TokenStream {
     if let Some(ctor) = ctor_fields {
         quote! {
             #de
-            let val = Self<#ctor>
+            let val = Self #ctor;
         }
     } else {
         quote! {
             #de
-            let val = Self()
+            let val = Self();
         }
     }
 }
