@@ -1,7 +1,6 @@
 use std::io::Cursor;
 
-use bedrockrs_core::int::LE;
-use byteorder::ReadBytesExt;
+use byteorder::{LittleEndian, ReadBytesExt};
 
 #[derive(Debug, Clone)]
 pub struct PalettedStorage {
@@ -30,21 +29,19 @@ impl PalettedStorage {
 
         let mut pos = 0;
         for _ in 0..num_words {
-            let mut word = LE::<u32>::read(cur).expect("Missing word").into_inner();
+            let mut word = cur.read_u32::<LittleEndian>().expect("Missing word");
             for _ in 0..blocks_per_word {
                 let val = word & mask;
                 if pos == 4096 {
                     break;
                 }
                 out.blocks[pos] = val;
-                word = word >> bits_per_block;
+                word >>= bits_per_block;
                 pos += 1;
             }
         }
 
-        let palette_count = LE::<i32>::read(cur)
-            .expect("Missing palette count")
-            .into_inner();
+        let palette_count = cur.read_i32::<LittleEndian>().expect("Missing palette count");
 
         for _ in 0..palette_count {
             match network {
