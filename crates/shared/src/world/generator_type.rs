@@ -1,13 +1,13 @@
-use bedrockrs_core::int::VAR;
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
-#[enum_repr(VAR::<i32>)]
+#[enum_repr(i32)]
+#[enum_endianness(var)]
 pub enum GeneratorType {
-    Legacy = 0x00,
-    Overworld = 0x01,
-    Flat = 0x02,
-    Nether = 0x03,
-    End = 0x04,
-    Void = 0x05,
+    Legacy = 0,
+    Overworld = 1,
+    Flat = 2,
+    Nether = 3,
+    End = 4,
+    Void = 5,
 }
