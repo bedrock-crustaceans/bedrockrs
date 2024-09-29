@@ -7,6 +7,7 @@ use uuid::Uuid;
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct EmoteListPacket {
     pub runtime_id: ActorRuntimeID,
-    #[len_repr(VAR::<u32>)]
+    #[vec_repr(u32)]
+    #[vec_endianness(var)]
     pub emote_piece_ids: Vec<Uuid>,
 }

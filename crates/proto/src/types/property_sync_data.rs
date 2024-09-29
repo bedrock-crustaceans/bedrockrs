@@ -1,4 +1,4 @@
-use bedrockrs_core::int::{LE, VAR};
+use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct PropertySyncData {
@@ -6,27 +6,32 @@ pub struct PropertySyncData {
     pub float: FloatEntriesList,
 }
 
-use bedrockrs_macros::ProtoCodec;
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct IntEntriesList {
-    #[len_repr(VAR::<u32>)]
+    #[vec_repr(u32)]
+    #[vec_endianness(var)]
     pub entries: Vec<IntEntry>,
 }
 
 #[derive(ProtoCodec, Debug, Clone)]
+pub struct IntEntry {
+    #[endianness(var)]
+    pub property_index: u32,
+    #[endianness(var)]
+    pub data: i32,
+}
+
+#[derive(ProtoCodec, Debug, Clone)]
 pub struct FloatEntriesList {
-    #[len_repr(VAR::<u32>)]
+    #[vec_repr(u32)]
+    #[vec_endianness(var)]
     pub entries: Vec<FloatEntry>,
 }
 
 #[derive(ProtoCodec, Debug, Clone)]
-pub struct IntEntry {
-    pub property_index: VAR<u32>,
-    pub data: VAR<i32>,
-}
-
-#[derive(ProtoCodec, Debug, Clone)]
 pub struct FloatEntry {
-    pub property_index: VAR<u32>,
-    pub data: LE<f32>,
+    #[endianness(var)]
+    pub property_index: u32,
+    #[endianness(le)]
+    pub data: f32,
 }

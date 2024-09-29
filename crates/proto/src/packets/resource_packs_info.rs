@@ -14,10 +14,13 @@ pub struct ResourcePacksInfoPacket {
     pub has_addon_packs: bool,
     pub has_scripts: bool,
     pub force_server_packs_enabled: bool,
-    #[len_repr(LE::<u16>)]
+    #[vec_repr(u16)]
+    #[vec_endianness(le)]
     pub behavior_packs: Vec<BehaviorPackInfoType>,
-    #[len_repr(LE::<u16>)]
+    #[vec_repr(u16)]
+    #[vec_endianness(le)]
     pub resource_packs: Vec<ResourcePackInfoType>,
-    #[len_repr(VAR::<u32>)]
+    #[vec_repr(u32)]
+    #[vec_endianness(var)]
     pub cdn_urls: Vec<PackURL>,
 }

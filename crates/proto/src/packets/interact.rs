@@ -27,7 +27,7 @@ impl ProtoCodec for InteractPacket {
         u8::proto_serialize(&action, stream)?;
 
         if let InteractAction::InteractUpdate(pos) = self.action {
-            pos.to_le().proto_serialize(stream)?;
+            pos.proto_serialize(stream)?;
         }
 
         Ok(())

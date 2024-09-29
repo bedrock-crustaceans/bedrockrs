@@ -5,7 +5,8 @@ use bedrockrs_macros::{gamepacket, ProtoCodec};
 #[gamepacket(id = 101)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct ModalFormResponsePacket {
-    pub form_id: VAR<u32>,
+    #[endianness(var)]
+    pub form_id: u32,
     pub form_response: Option<String>,
     pub cancel_reason: Option<ModalFormCancelReason>,
 }

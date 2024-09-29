@@ -1,14 +1,13 @@
-use crate::types::inventory_transaction::UseItemTransactionData;
-use bedrockrs_core::int::{LE, VAR};
+use crate::types::block_actions::BlockActions;
 use bedrockrs_core::Vec2;
-use bedrockrs_macros::ProtoCodec;
 use bedrockrs_shared::actor_unique_id::ActorUniqueID;
 
 #[derive(Debug, Clone)]
 pub struct InputData {
     pub ascend: bool,
     pub descend: bool,
-    pub north_jump_DEPRECATED: bool,
+    #[deprecated]
+    pub north_jump_deprecated: bool,
     pub jump_down: bool,
     pub sprint_down: bool,
     pub change_height: bool,
@@ -41,7 +40,7 @@ pub struct InputData {
     pub start_gliding: bool,
     pub stop_gliding: bool,
     pub perform_item_interaction: bool,
-    pub perform_block_actions: bool,
+    pub perform_block_actions: Option<BlockActions>,
     pub perform_item_stack_request: bool,
     pub handled_teleport: bool,
     pub emoting: bool,
@@ -51,7 +50,7 @@ pub struct InputData {
     pub start_flying: bool,
     pub stop_flying: bool,
     pub client_ack_server_data: bool,
-    pub is_in_client_predicted_vehicle: Option<(Vec2<LE<f32>>, ActorUniqueID)>,
+    pub is_in_client_predicted_vehicle: Option<(Vec2<f32>, ActorUniqueID)>,
     pub paddling_left: bool,
     pub paddling_right: bool,
     pub block_breaking_delay_enabled: bool,

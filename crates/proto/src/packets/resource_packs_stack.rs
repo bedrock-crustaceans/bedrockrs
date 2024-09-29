@@ -9,9 +9,11 @@ use crate::types::resource_packs_stack_pack::ResourcePacksStackPack;
 #[derive(Debug, Clone, ProtoCodec)]
 pub struct ResourcePacksStackPacket {
     pub texture_pack_required: bool,
-    #[len_repr(VAR::<i32>)]
+    #[vec_repr(i32)]
+    #[vec_endianness(var)]
     pub addons: Vec<ResourcePacksStackPack>,
-    #[len_repr(VAR::<i32>)]
+    #[vec_repr(i32)]
+    #[vec_endianness(var)]
     pub texture_packs: Vec<ResourcePacksStackPack>,
     pub base_game_version: BaseGameVersion,
     pub experiments: Experiments,

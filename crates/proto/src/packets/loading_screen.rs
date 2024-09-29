@@ -6,5 +6,6 @@ use bedrockrs_macros::{gamepacket, ProtoCodec};
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct LoadingScreenPacket {
     pub screen_action: LoadingScreenAction,
-    pub screen_id: Option<LE<u32>>,
+    #[endianness(le)]
+    pub screen_id: Option<u32>,
 }

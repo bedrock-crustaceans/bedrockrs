@@ -1,3 +1,4 @@
+use crate::types::block_actions::BlockActions;
 use crate::types::input_data::InputData;
 use crate::types::input_mode::InputMode;
 use crate::types::interaction_model::InteractionModel;
@@ -6,26 +7,26 @@ use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::{Vec2, Vec3};
 use bedrockrs_macros::gamepacket;
 use bedrockrs_proto_core::error::ProtoCodecError;
-use bedrockrs_proto_core::ProtoCodec;
+use bedrockrs_proto_core::{ProtoCodec, ProtoCodecLE, ProtoCodecVAR};
 use bedrockrs_shared::actor_unique_id::ActorUniqueID;
 use std::io::Cursor;
 
 #[gamepacket(id = 144)]
 #[derive(Debug, Clone)]
 pub struct PlayerAuthInputPacket {
-    pub rotation: Vec2<LE<f32>>,
-    pub position: Vec3<LE<f32>>,
-    pub move_vec: Vec2<LE<f32>>,
-    pub head_rotation: LE<f32>,
+    pub rotation: Vec2<f32>,
+    pub position: Vec3<f32>,
+    pub move_vec: Vec2<f32>,
+    pub head_rotation: f32,
     pub input_data: InputData,
     pub input_mode: InputMode,
     pub play_mode: PlayMode,
     pub interaction_model: InteractionModel,
-    /// Which simulation frame client is on. Used to match corrections
-    pub client_tick: VAR<u64>,
+    /// Which simulation frame client is on, used to match corrections
+    pub client_tick: u64,
     /// Velocity
-    pub pos_delta: Vec3<LE<f32>>,
-    pub analog_move_vec: Vec2<LE<f32>>,
+    pub pos_delta: Vec3<f32>,
+    pub analog_move_vec: Vec2<f32>,
 }
 
 macro_rules! set_bit {
@@ -46,14 +47,14 @@ impl ProtoCodec for PlayerAuthInputPacket {
     }
 
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
-        let rotation = Vec2::<LE<f32>>::proto_deserialize(stream)?;
-        let position = Vec3::<LE<f32>>::proto_deserialize(stream)?;
-        let move_vec = Vec2::<LE<f32>>::proto_deserialize(stream)?;
-        let head_rotation = LE::<f32>::proto_deserialize(stream)?;
+        let rotation = <Vec2<f32> as ProtoCodecLE>::proto_deserialize(stream)?;
+        let position = <Vec3<f32> as ProtoCodecLE>::proto_deserialize(stream)?;
+        let move_vec = <Vec2<f32> as ProtoCodecLE>::proto_deserialize(stream)?;
+        let head_rotation = <f32 as ProtoCodecLE>::proto_deserialize(stream)?;
 
-        let input_data = VAR::<u64>::proto_deserialize(stream)?.into_inner();
+        let input_data = <u64 as ProtoCodecVAR>::proto_deserialize(stream)?;
         let input_mode = InputMode::proto_deserialize(stream)?;
-        let play_mode_int = VAR::<u32>::proto_deserialize(stream)?.into_inner();
+        let play_mode_int = <u32 as ProtoCodecVAR>::proto_deserialize(stream)?;
         let interaction_model = InteractionModel::proto_deserialize(stream)?;
 
         let play_mode = match play_mode_int {
@@ -77,13 +78,13 @@ impl ProtoCodec for PlayerAuthInputPacket {
             }
         };
 
-        let client_tick = VAR::<u64>::proto_deserialize(stream)?;
-        let pos_delta = Vec3::<LE<f32>>::proto_deserialize(stream)?;
+        let client_tick = <u64 as ProtoCodecVAR>::proto_deserialize(stream)?;
+        let pos_delta = <Vec3<f32> as ProtoCodecLE>::proto_deserialize(stream)?;
 
         let input_data = InputData {
             ascend: get_bit!(input_data, 0),
             descend: get_bit!(input_data, 1),
-            north_jump_DEPRECATED: get_bit!(input_data, 2),
+            north_jump_deprecated: get_bit!(input_data, 2),
             jump_down: get_bit!(input_data, 3),
             sprint_down: get_bit!(input_data, 4),
             change_height: get_bit!(input_data, 5),
@@ -116,7 +117,11 @@ impl ProtoCodec for PlayerAuthInputPacket {
             start_gliding: get_bit!(input_data, 32),
             stop_gliding: get_bit!(input_data, 33),
             perform_item_interaction: get_bit!(input_data, 34),
-            perform_block_actions: get_bit!(input_data, 35),
+            perform_block_actions: if get_bit!(input_data, 35) {
+                Some(BlockActions::proto_deserialize(stream)?)
+            } else {
+                None
+            },
             perform_item_stack_request: get_bit!(input_data, 36),
             handled_teleport: get_bit!(input_data, 37),
             emoting: get_bit!(input_data, 38),
@@ -128,9 +133,8 @@ impl ProtoCodec for PlayerAuthInputPacket {
             client_ack_server_data: get_bit!(input_data, 44),
             is_in_client_predicted_vehicle: {
                 if get_bit!(input_data, 45) {
-                    let vehicle_rotation = Vec2::<LE<f32>>::proto_deserialize(stream)?;
+                    let vehicle_rotation = <Vec2<f32> as ProtoCodecLE>::proto_deserialize(stream)?;
                     let client_predicted_vehicle = ActorUniqueID::proto_deserialize(stream)?;
-
                     Some((vehicle_rotation, client_predicted_vehicle))
                 } else {
                     None
@@ -142,7 +146,7 @@ impl ProtoCodec for PlayerAuthInputPacket {
             input_num: get_bit!(input_data, 49),
         };
 
-        let analog_move_vec = Vec2::<LE<f32>>::proto_deserialize(stream)?;
+        let analog_move_vec = <Vec2<f32> as ProtoCodecLE>::proto_deserialize(stream)?;
 
         Ok(Self {
             rotation,

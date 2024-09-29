@@ -1,4 +1,3 @@
-use bedrockrs_core::int::VAR;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 use xuid::Xuid;
 
@@ -9,9 +8,12 @@ use crate::types::title_type::TitleType;
 pub struct SetTitlePacket {
     pub title_type: TitleType,
     pub title_text: String,
-    pub fade_in_time: VAR<i32>,
-    pub stay_time: VAR<i32>,
-    pub fade_out_time: VAR<i32>,
+    #[endianness(var)]
+    pub fade_in_time: i32,
+    #[endianness(var)]
+    pub stay_time: i32,
+    #[endianness(var)]
+    pub fade_out_time: i32,
     pub xuid: Xuid,
     pub platform_online_id: String,
 }

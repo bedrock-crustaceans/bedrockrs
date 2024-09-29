@@ -10,6 +10,7 @@ pub struct ResourcePacksResponsePacket {
     pub response: ResourcePacksResponseStatus,
     /// The addons that are downloaded/getting downloaded
     /// with their pack name as strings
-    #[len_repr(LE::<u16>)]
+    #[vec_repr(u16)]
+    #[vec_endianness(le)]
     pub downloading_packs: Vec<String>,
 }

@@ -3,7 +3,6 @@ use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
 use syn::{Attribute, DataEnum, DataStruct, Field, Fields, GenericArgument, PathArguments, Type};
 
-
 fn extract_inner_type_from_vec(ty: &Type) -> Option<&Type> {
     if let Type::Path(type_path) = ty {
         if let Some(last_segment) = type_path.path.segments.last() {
@@ -148,8 +147,8 @@ pub fn build_de_struct(data_struct: &DataStruct) -> TokenStream {
 pub fn build_de_enum(data_enum: &DataEnum, attrs: &[Attribute]) -> TokenStream {
     let flags = get_attrs(attrs).expect("Error while getting attrs");
 
-    if let (Some(repr), Some(endian)) = (flags.enum_repr, flags.enum_endianness) {
-        let enum_type_de = build_de_instance(Some(endian), &repr);
+    if let (Some(repr), endian) = (flags.enum_repr, flags.enum_endianness) {
+        let enum_type_de = build_de_instance(endian, &repr);
 
         let variants = data_enum.variants.iter().map(|var| {
             let desc = var

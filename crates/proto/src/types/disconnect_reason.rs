@@ -1,8 +1,8 @@
-use bedrockrs_core::int::VAR;
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
-#[enum_repr(VAR::<i32>)]
+#[enum_repr(i32)]
+#[enum_endianness(var)]
 pub enum DisconnectReason {
     Unknown = 0,
     CantConnectNoInternet = 1,
@@ -93,7 +93,7 @@ pub enum DisconnectReason {
     NetherNetNegotiationTimeout = 86,
     NetherNetInactivityTimeout = 87,
     StaleConnectionBeingReplaced = 88,
-    RealmsSessionNotFound_DEPRECATED = 89,
+    RealmsSessionNotFoundDeprecated = 89,
     BadPacket = 90,
     NetherNetFailedToCreateOffer = 91,
     NetherNetFailedToCreateAnswer = 92,

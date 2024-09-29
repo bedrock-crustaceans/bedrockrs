@@ -10,5 +10,6 @@ pub struct PlayerActionPacket {
     pub action: PlayerActionType,
     pub block_pos: BlockPos,
     pub result_pos: BlockPos,
-    pub face: VAR<i32>,
+    #[endianness(var)]
+    pub face: i32,
 }

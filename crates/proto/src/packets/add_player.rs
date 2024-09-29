@@ -1,8 +1,7 @@
 use crate::types::ability_data::AbilityData;
 use crate::types::actor_link::ActorLink;
-use crate::types::network_item_stack_descriptor::NetworkItemStackDescriptor;
+use crate::types::item_stack_descriptor::ItemStackDescriptor;
 use crate::types::property_sync_data::PropertySyncData;
-use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::Vec3;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
@@ -16,14 +15,18 @@ pub struct AddPlayerPacket {
     pub name: String,
     pub runtime_id: ActorRuntimeID,
     pub platform_chat_id: String,
-    pub position: Vec3<LE<f32>>,
-    pub velocity: Vec3<LE<f32>>,
-    pub rotation: Vec3<LE<f32>>,
-    pub carried_item: NetworkItemStackDescriptor,
+    #[endianness(le)]
+    pub position: Vec3<f32>,
+    #[endianness(le)]
+    pub velocity: Vec3<f32>,
+    #[endianness(le)]
+    pub rotation: Vec3<f32>,
+    pub carried_item: ItemStackDescriptor,
     pub gamemode: Gamemode,
     // TODO: Impl SyncedActorDataEntityWrapper
     pub synced_properties: PropertySyncData,
     pub abilities: AbilityData,
-    #[len_repr(VAR::<u32>)]
+    #[vec_repr(u32)]
+    #[vec_endianness(var)]
     pub links: Vec<ActorLink>,
 }

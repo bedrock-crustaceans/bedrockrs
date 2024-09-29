@@ -1,8 +1,8 @@
-use bedrockrs_core::int::VAR;
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Copy, Clone, Eq, PartialEq)]
-#[enum_repr(VAR::<i32>)]
+#[enum_repr(i32)]
+#[enum_endianness(var)]
 pub enum PlayerActionType {
     Unknown = -1,
     StartDestroyBlock = 0,

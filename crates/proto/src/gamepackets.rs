@@ -56,10 +56,10 @@ use crate::packets::start_game::StartGamePacket;
 use crate::packets::text_message::TextMessagePacket;
 use crate::packets::toast_request::ToastRequestPacket;
 use crate::sub_client::SubClientID;
-use bedrockrs_core::int::VAR;
 use bedrockrs_macros::gamepackets;
 use bedrockrs_proto_core::{error::ProtoCodecError, GamePacket, ProtoCodec};
 use std::io::{Cursor, Write};
+use varint_rs::{VarintReader, VarintWriter};
 
 gamepackets! {
     Login: LoginPacket,
@@ -269,12 +269,12 @@ fn read_gamepacket_header(
     stream: &mut Cursor<&[u8]>,
 ) -> Result<(u32, u16, SubClientID, SubClientID), ProtoCodecError> {
     // Read the gamepacket length
-    let length = VAR::<u32>::proto_deserialize(stream)?.into_inner();
+    let length = stream.read_u32_varint()?;
 
     // Read the gamepacket header and parse it into an u16
     // Since the (var)int is only storing 14 bytes we can treat it as an u16
     // This is normally treated as u32 varint
-    let game_packet_header: u16 = VAR::<u16>::proto_deserialize(stream)?.into_inner();
+    let game_packet_header: u16 = stream.read_u16_varint()?;
 
     // Get the first 10 bits as the packet id
     // Can never be more than a 16-bit integer due to being 10-bits big
@@ -326,15 +326,13 @@ fn write_gamepacket_header(
     let mut game_packet_header_buf = Vec::new();
 
     // Write the gamepacket header into temporary buffer
-    VAR::<u16>::new(game_packet_header).proto_serialize(&mut game_packet_header_buf)?;
+    game_packet_header_buf.write_u16_varint(game_packet_header)?;
 
     // Write the gamepacket length and the header length
-    VAR::<u32>::new(length + game_packet_header_buf.len() as u32).proto_serialize(stream)?;
+    stream.write_u32_varint(length + game_packet_header_buf.len() as u32)?;
 
     // Write the final game packet header
-    stream
-        .write_all(game_packet_header_buf.as_slice())
-        .map_err(ProtoCodecError::from)?;
+    stream.write_all(game_packet_header_buf.as_slice())?;
 
     Ok(())
 }

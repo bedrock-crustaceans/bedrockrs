@@ -1,8 +1,8 @@
-use bedrockrs_core::int::BE;
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Copy, Clone, Eq, PartialEq)]
-#[enum_repr(BE::<i32>)]
+#[enum_repr(i32)]
+#[enum_endianness(be)]
 pub enum PlayStatusType {
     /// Sent after Login has been successfully decoded and the player has logged in
     LoginSuccess = 0,
@@ -20,6 +20,8 @@ pub enum PlayStatusType {
     FailedEditionMismatchVanillaToEdu = 6,
     /// Displays "Wow this server is popular! Check back later to see if space opens up. Server Full"
     FailedServerFull = 7,
+    // TODO: Find out what this displays
     FailedEditorMismatchEditorToVanilla = 8,
+    // TODO: Find out what this displays
     FailedEditorMismatchVanillaToEditor = 9,
 }

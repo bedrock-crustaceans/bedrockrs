@@ -2,8 +2,6 @@ use std::future::Future;
 use std::io::{Cursor, Write};
 use std::sync::Arc;
 use std::time::Duration;
-
-use bedrockrs_core::int::LE;
 use tokio::select;
 use tokio::sync::{broadcast, watch};
 use tokio::time::interval;
@@ -58,9 +56,7 @@ impl Connection {
             Some(compression) => {
                 let mut compressed_stream = vec![];
 
-                LE::new(compression.id_u8())
-                    .write(&mut compressed_stream)
-                    .map_err(|e| ConnectionError::IOError(Arc::new(e)))?;
+                compressed_stream.write_u8(compression.id_u8())?;
 
                 // TODO: Overflow checking
                 if compression.needed() && pk_stream.len() as u16 > compression.threshold() {
@@ -392,10 +388,10 @@ impl ConnectionShard {
     }
 
     pub async fn recv(&mut self) -> Result<GamePackets, ConnectionError> {
-        match self.pk_receiver.recv().await {
-            Ok(pk) => pk,
-            Err(_) => Err(ConnectionError::ConnectionClosed),
-        }
+        self.pk_receiver
+            .recv()
+            .await
+            .unwrap_or_else(|_| Err(ConnectionError::ConnectionClosed))
     }
 
     pub async fn flush(&mut self) -> Result<(), ConnectionError> {

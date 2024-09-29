@@ -3,15 +3,8 @@ use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct ChunkPos {
-    pub x: VAR<i32>,
-    pub z: VAR<i32>,
-}
-
-impl ChunkPos {
-    pub fn new(x: i32, z: i32) -> Self {
-        ChunkPos {
-            x: VAR::<i32>::new(x),
-            z: VAR::<i32>::new(z),
-        }
-    }
+    #[endianness(var)]
+    pub x: i32,
+    #[endianness(var)]
+    pub z: i32,
 }

@@ -1,9 +1,8 @@
-use bedrockrs_core::int::{BE, VAR};
 use bedrockrs_macros::ProtoCodec;
 
 /// Defines an enum for container IDs, used to identify different types of containers.
 #[derive(ProtoCodec, Debug, Copy, Clone, Eq, PartialEq)]
-#[enum_repr(BE::<i8>)]
+#[enum_repr(i8)]
 pub enum ContainerID {
     /// Used to indicate that no container is selected.
     None = -1,

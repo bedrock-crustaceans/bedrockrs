@@ -42,9 +42,10 @@ impl ProtoCodec for DisconnectPlayerPacket {
         // Read if the message should be skipped
         let skip_message = bool::proto_deserialize(cursor)?;
 
-        let message = match skip_message {
-            true => None,
-            false => Some(String::proto_deserialize(cursor)?),
+        let message = if !skip_message {
+            Some(String::proto_deserialize(cursor)?)
+        } else {
+            None
         };
 
         Ok(Self { reason, message })

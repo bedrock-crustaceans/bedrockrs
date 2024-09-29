@@ -1,8 +1,8 @@
-use bedrockrs_core::int::VAR;
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
-#[enum_repr(VAR::<i32>)]
+#[enum_repr(i32)]
+#[enum_endianness(var)]
 pub enum PlayerMovementMode {
     Client = 0,
     Server = 1,

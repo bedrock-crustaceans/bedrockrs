@@ -16,16 +16,24 @@ pub struct AddActorPacket {
     pub target_actor_id: ActorUniqueID,
     pub target_runtime_id: ActorRuntimeID,
     pub actor_type: String,
-    pub position: Vec3<LE<f32>>,
-    pub velocity: Vec3<LE<f32>>,
-    pub rotation: Vec2<LE<f32>>,
-    pub y_head_rotation: LE<f32>,
-    pub y_body_rotation: LE<f32>,
-    #[len_repr(VAR::<u32>)]
+    #[endianness(le)]
+    pub position: Vec3<f32>,
+    #[endianness(le)]
+    pub velocity: Vec3<f32>,
+    #[endianness(le)]
+    pub rotation: Vec2<f32>,
+    #[endianness(le)]
+    pub y_head_rotation: f32,
+    #[endianness(le)]
+    pub y_body_rotation: f32,
+    #[vec_repr(u32)]
+    #[vec_endianness(var)]
     pub attributes: Vec<Attribute>,
-    #[len_repr(VAR::<u32>)]
+    #[vec_repr(u32)]
+    #[vec_endianness(var)]
     pub actor_data: Vec<DataItem>,
     pub synced_properties: PropertySyncData,
-    #[len_repr(VAR::<u32>)]
+    #[vec_repr(u32)]
+    #[vec_endianness(var)]
     pub actor_links: Vec<ActorLink>,
 }

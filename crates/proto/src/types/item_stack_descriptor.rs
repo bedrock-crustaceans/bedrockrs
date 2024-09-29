@@ -1,31 +1,30 @@
 use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_proto_core::ProtoCodec;
+use std::num::NonZero;
 
-use super::item_stack_net_id_variant::ItemStackNetIdVariant;
+use super::item_stack_id_variant::ItemStackIdVariant;
 
 #[derive(Debug, Clone)]
-pub enum NetworkItemStackDescriptor {
-    Invalid {
-        id: VAR<i32>,
-    },
+pub enum ItemStackDescriptor {
+    Invalid,
     Valid {
         id: VAR<i32>,
         stack_size: LE<u16>,
         aux_value: LE<u16>,
         include_net_id: bool,
-        include_net_id_data: Option<ItemStackNetIdVariant>,
+        include_net_id_data: Option<ItemStackIdVariant>,
         block_runtime_id: VAR<i32>,
         user_data_buffer: String,
     },
 }
-impl ProtoCodec for NetworkItemStackDescriptor {
+impl ProtoCodec for ItemStackDescriptor {
     fn proto_serialize(
         &self,
         stream: &mut Vec<u8>,
     ) -> Result<(), bedrockrs_proto_core::error::ProtoCodecError> {
         match self {
-            NetworkItemStackDescriptor::Invalid { id } => id.proto_serialize(stream)?,
-            NetworkItemStackDescriptor::Valid {
+            ItemStackDescriptor::Invalid { id } => id.proto_serialize(stream)?,
+            ItemStackDescriptor::Valid {
                 id,
                 stack_size,
                 aux_value,
@@ -59,7 +58,7 @@ impl ProtoCodec for NetworkItemStackDescriptor {
             let include_net_id = bool::proto_deserialize(stream)?;
 
             let include_net_id_data = if include_net_id {
-                Some(ItemStackNetIdVariant::proto_deserialize(stream)?)
+                Some(ItemStackIdVariant::proto_deserialize(stream)?)
             } else {
                 None
             };
