@@ -1,7 +1,25 @@
 use crate::attr::{get_attrs, ProtoCodecEndianness};
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
-use syn::{Attribute, DataEnum, DataStruct, Field, Fields, Type};
+use syn::{Attribute, DataEnum, DataStruct, Field, Fields, GenericArgument, PathArguments, Type};
+
+
+fn extract_inner_type_from_vec(ty: &Type) -> Option<&Type> {
+    if let Type::Path(type_path) = ty {
+        if let Some(last_segment) = type_path.path.segments.last() {
+            if last_segment.ident == "Vec" {
+                if let PathArguments::AngleBracketed(ref generics) = last_segment.arguments {
+                    if generics.args.len() == 1 {
+                        if let Some(GenericArgument::Type(inner_type)) = generics.args.first() {
+                            return Some(inner_type);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    None
+}
 
 fn build_de_instance(endianness: Option<ProtoCodecEndianness>, f_type: &Type) -> TokenStream {
     match endianness {
@@ -26,12 +44,13 @@ fn build_de_field(fields: &[&Field]) -> TokenStream {
         .enumerate()
         .map(|(i, f)| {
             let name = f.ident.clone().unwrap_or(Ident::new(&format!("e{i}"), Span::call_site()));
-            let f_type = f.ty.clone();
+            let ty = f.ty.clone();
             let flags = get_attrs(f.attrs.as_slice()).expect("Error while getting attrs");
-            let des = build_de_instance(flags.endianness, &f_type);
             
             if let (Some(endian), Some(repr)) = (flags.vec_endianness, flags.vec_repr) {
                 let vec_des = build_de_instance(Some(endian), &repr);
+                let inner_ty = extract_inner_type_from_vec(&ty).expect("Failed to get inner Vec type").clone();
+                let des = build_de_instance(flags.endianness, &inner_ty);
                 
                 return quote! {
                     let #name = {
@@ -50,18 +69,20 @@ fn build_de_field(fields: &[&Field]) -> TokenStream {
             
             if flags.nbt {
                 return quote! {
-                    let #name: #f_type = ::nbtx::from_bytes::<::nbtx::NetworkLittleEndian, _>(stream)?;
+                    let #name: #ty = ::nbtx::from_bytes::<::nbtx::NetworkLittleEndian, _>(stream)?;
                 }
             }
             
             if flags.str {
                 return quote! {
-                    let #name: #f_type = <String as ::bedrockrs_proto_core::ProtoCodecLE>::proto_deserialize(stream)?.try_into()?;
+                    let #name: #ty = <String as ::bedrockrs_proto_core::ProtoCodecLE>::proto_deserialize(stream)?.try_into()?;
                 }
             }
+
+            let des = build_de_instance(flags.endianness, &ty);
             
             quote! {
-                let #name: #f_type = #des;
+                let #name: #ty = #des;
             }
     });
 
