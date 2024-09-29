@@ -11,7 +11,15 @@ mod ser;
 
 #[proc_macro_derive(
     ProtoCodec,
-    attributes(endianness, vec_endianness, vec_repr, enum_endianness, enum_repr, nbt, str)
+    attributes(
+        endianness,
+        vec_endianness,
+        vec_repr,
+        enum_endianness,
+        enum_repr,
+        nbt,
+        str
+    )
 )]
 pub fn proto_codec_derive(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = parse_macro_input!(item as DeriveInput);

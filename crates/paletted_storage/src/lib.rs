@@ -41,7 +41,9 @@ impl PalettedStorage {
             }
         }
 
-        let palette_count = cur.read_i32::<LittleEndian>().expect("Missing palette count");
+        let palette_count = cur
+            .read_i32::<LittleEndian>()
+            .expect("Missing palette count");
 
         for _ in 0..palette_count {
             match network {
