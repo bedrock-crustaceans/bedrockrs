@@ -1,8 +1,9 @@
-use bedrockrs_core::int::VAR;
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
-#[enum_repr(VAR::<u32>)]
+// TODO: Give more specialized name, find out if u32 or i32
+#[enum_repr(u32)]
+#[enum_endianness(var)]
 pub enum PermissionLevel {
     /// Any/Normal permission
     Default = 0,
