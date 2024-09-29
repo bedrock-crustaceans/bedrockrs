@@ -1,175 +1,174 @@
-use proc_macro2::{Ident, TokenStream};
+use crate::attr::{get_attrs, ProtoCodecEndianness};
+use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
-use syn::{Attribute, DataEnum, DataStruct, Expr, Fields, Index};
+use syn::{Attribute, DataEnum, DataStruct, Field, Fields, Type};
 
-pub fn proto_build_de_struct(struct_data: &DataStruct) -> TokenStream {
-    let fields = &struct_data.fields;
-
-    let expand = match fields {
-        Fields::Named(ref fields) => {
-            let calls = fields.named.iter().map(|f| {
-                let field_name = f.ident.clone();
-
-                let mut quote = None;
-
-                for attr in &f.attrs {
-                    if attr.path().is_ident("len_repr") {
-                        let int_type: Expr = attr
-                            .parse_args()
-                            .unwrap_or_else(|_| panic!("Given attribute meta for field {field_name:?} could not be parsed"));
-
-                        quote = Some(quote! {
-                            #field_name: {
-                                let len = match #int_type::read(stream) {
-                                    Ok(v) => { v.into_inner() },
-                                    Err(e) => { return Err(::bedrockrs_proto_core::error::ProtoCodecError::IOError(std::sync::Arc::new(e))) }
-                                };
-
-                                let mut vec = Vec::with_capacity(match len.try_into() {
-                                    Ok(v) => { v },
-                                    Err(e) => { return Err(::bedrockrs_proto_core::error::ProtoCodecError::FromIntError(e.into())) }
-                                });
-
-                                for _ in 0..len {
-                                    vec.push(match ::bedrockrs_proto_core::ProtoCodec::proto_deserialize(stream) {
-                                        Ok(v) => { v },
-                                        Err(e) => { return Err(e) }
-                                    });
-                                };
-
-                                vec
-                            },
-                        });
-                    }
-                }
-
-                match quote {
-                    None => {
-                        quote! {
-                            #field_name: match ::bedrockrs_proto_core::ProtoCodec::proto_deserialize(stream) {
-                                Ok(v) => { v },
-                                Err(e) => { return Err(e) }
-                            },
-                        }
-                    }
-                    Some(v) => {
-                        v
-                    }
-                }
-            });
-
-            quote! {
-                #(#calls)*
-            }
+fn build_de_instance(endianness: Option<ProtoCodecEndianness>, f_type: &Type) -> TokenStream {
+    match endianness {
+        None => {
+            quote! { <#f_type as ::bedrockrs_proto_core::ProtoCodec>::proto_deserialize(stream)? }
         }
-        Fields::Unnamed(ref fields) => {
-            let calls = fields.unnamed.iter().enumerate().map(|(i, f)| {
-                let index = Index::from(i);
-
-                let mut quote = None;
-
-                for attr in &f.attrs {
-                    if attr.path().is_ident("len_repr") {
-                        let int_type: Expr = attr
-                            .parse_args()
-                            .unwrap_or_else(|_| panic!("Given attribute meta for field self.{:?} could not be parsed", index.index));
-
-                        quote = Some(quote! {
-                            #index: {
-                                let len = match #int_type::read(stream) {
-                                    Ok(v) => { v.into_inner() },
-                                    Err(e) => { return Err(::bedrockrs_proto_core::error::ProtoCodecError::IOError(std::sync::Arc::new(e))) }
-                                };
-
-                                let mut vec = Vec::with_capacity( match len.try_into() {
-                                    Ok(v) => { v },
-                                    Err(e) => { return Err(::bedrockrs_proto_core::error::ProtoCodecError::FromIntError(e.into())) }
-                                });
-
-                                for _ in 0..len {
-                                    vec.push(match ::bedrockrs_proto_core::ProtoCodec::proto_deserialize(stream) {
-                                        Ok(v) => { v },
-                                        Err(e) => { return Err(e) }
-                                    });
-                                };
-
-                                vec
-                            },
-                        });
-                    }
-                }
-
-                match quote {
-                    None => {
-                        quote! {
-                            #index: match ::bedrockrs_proto_core::ProtoCodec::proto_deserialize(stream) {
-                                Ok(v) => { v },
-                                Err(e) => { return Err(e) }
-                            },
-                        }
-                    }
-                    Some(v) => {
-                        v
-                    }
-                }
-            });
-
-            quote! {
-                #(#calls)*
-            }
+        Some(ProtoCodecEndianness::LE) => {
+            quote! { <#f_type as ::bedrockrs_proto_core::ProtoCodecLE>::proto_deserialize(stream)? }
         }
-        Fields::Unit => {
-            // Unit structs are empty and not supported
-            panic!(
-                "ProtoCodec macro only supports named/unnamed structs and enums, got unit struct."
-            )
+        Some(ProtoCodecEndianness::BE) => {
+            quote! { <#f_type as ::bedrockrs_proto_core::ProtoCodecBE>::proto_deserialize(stream)? }
         }
-    };
-
-    expand
-}
-
-pub fn proto_build_de_enum(
-    enum_data: &DataEnum,
-    attributes: &Vec<Attribute>,
-    enum_name: &Ident,
-) -> TokenStream {
-    let mut int_type: Option<Expr> = None;
-
-    for attr in attributes {
-        if attr.path().is_ident("enum_repr") {
-            int_type =
-                Some(attr.parse_args().unwrap_or_else(|_| {
-                    panic!("Given attribute meta for enum could not be parsed")
-                }));
+        Some(ProtoCodecEndianness::VAR) => {
+            quote! { <#f_type as ::bedrockrs_proto_core::ProtoCodecVAR>::proto_deserialize(stream)? }
         }
     }
+}
 
-    let int_type = int_type
-        .unwrap_or_else(|| panic!("Missing attribute \"enum_repr\" for ProtoCodec macro on Enum"));
+fn build_de_field(fields: &[&Field]) -> TokenStream {
+    let code = fields
+        .iter()
+        .enumerate()
+        .map(|(i, f)| {
+            let name = f.ident.clone().unwrap_or(Ident::new(&format!("e{i}"), Span::call_site()));
+            let f_type = f.ty.clone();
+            let flags = get_attrs(f.attrs.as_slice()).expect("Error while getting attrs");
+            let des = build_de_instance(flags.endianness, &f_type);
+            
+            if let (Some(endian), Some(repr)) = (flags.vec_endianness, flags.vec_repr) {
+                let vec_des = build_de_instance(Some(endian), &repr);
+                
+                return quote! {
+                    let #name = {
+                        let len: #repr = #vec_des;
 
-    let calls = enum_data.variants.iter().map(|v| {
-        let val = v
-            .discriminant
-            .clone()
-            .unwrap_or_else(|| panic!("Discriminant needed"))
-            .1;
-        let name = v.ident.clone();
+                        let mut vec = Vec::with_capacity(len.try_into()?);
 
-        quote! {
-            #val => #enum_name::#name,
-        }
+                        for _ in 0..len {
+                            vec.push(#des);
+                        };
+                        
+                        vec
+                    }
+                }
+            }
+            
+            if flags.nbt {
+                return quote! {
+                    let #name: #f_type = ::nbtx::from_bytes::<::nbtx::NetworkLittleEndian, _>(stream)?;
+                }
+            }
+            
+            if flags.str {
+                return quote! {
+                    let #name: #f_type = <String as ::bedrockrs_proto_core::ProtoCodecLE>::proto_deserialize(stream)?.try_into()?;
+                }
+            }
+            
+            quote! {
+                let #name: #f_type = #des;
+            }
     });
 
     quote! {
-        let int = match #int_type::read(stream) {
-            Ok(v) => { v.into_inner() },
-            Err(e) => { return Err(::bedrockrs_proto_core::error::ProtoCodecError::IOError(std::sync::Arc::new(e))) }
-        };
+        #(#code)*
+    }
+}
 
-        match int {
-            #(#calls)*
-            other => { return Err(::bedrockrs_proto_core::error::ProtoCodecError::InvalidEnumID(format!("{other:?}"), stringify!(#enum_name).to_string())); }
+fn build_de_fields(fields: Fields) -> (TokenStream, Option<TokenStream>) {
+    let i_fields = match fields {
+        Fields::Named(ref v) => Some(v.named.iter().clone()),
+        Fields::Unnamed(ref v) => Some(v.unnamed.iter().clone()),
+        Fields::Unit => None,
+    };
+
+    let de = if let Some(i_fields) = i_fields {
+        build_de_field(Vec::from_iter(i_fields).as_slice())
+    } else { 
+        quote! {}
+    };
+    
+    let ctor_fields = match fields {
+        Fields::Named(ref v) => {
+            let ctor = v.named.iter().enumerate().map(|(i, f)| {
+                f.ident
+                    .clone()
+                    .unwrap_or(Ident::new(&format!("e{i}"), Span::call_site()))
+            });
+
+            Some(quote! { {#(#ctor),*} })
         }
+        Fields::Unnamed(ref v) => {
+            let ctor = v.unnamed.iter().enumerate().map(|(i, f)| {
+                f.ident
+                    .clone()
+                    .unwrap_or(Ident::new(&format!("e{i}"), Span::call_site()))
+            });
+
+            Some(quote! { (#(#ctor),*) })
+        }
+        Fields::Unit => None,
+    };
+
+    (de, ctor_fields)
+}
+
+pub fn build_de_struct(data_struct: &DataStruct) -> TokenStream {
+    let (de, ctor_fields) = build_de_fields(data_struct.fields.clone());
+
+    if let Some(ctor) = ctor_fields {
+        quote! {
+            #de
+            let val = Self<#ctor>
+        }
+    } else {
+        quote! {
+            #de
+            let val = Self()
+        }
+    }
+}
+
+pub fn build_de_enum(data_enum: &DataEnum, attrs: &[Attribute]) -> TokenStream {
+    let flags = get_attrs(attrs).expect("Error while getting attrs");
+
+    if let (Some(repr), Some(endian)) = (flags.enum_repr, flags.enum_endianness) {
+        let enum_type_de = build_de_instance(Some(endian), &repr);
+
+        let variants = data_enum.variants.iter().map(|var| {
+            let desc = var
+                .discriminant
+                .clone()
+                .unwrap_or_else(|| panic!("Missing discriminant for {:?}", var.ident))
+                .1;
+
+            let name = var.ident.clone();
+            let (de, ctor_fields) = build_de_fields(var.fields.clone());
+
+            if let Some(ctor) = ctor_fields {
+                quote! {
+                    #desc => {
+                        #de
+
+                        Self::<#name><#ctor>
+                    }
+                }
+            } else {
+                quote! {
+                    #desc => {
+                        #de
+
+                        Self::#name
+                    }
+                }
+            }
+        });
+
+        // We need to find a solution for what happens when an enum type is not found
+        quote! {
+            let enum_type = #enum_type_de;
+
+            let val = match enum_type {
+                #(#variants),*
+                _ => { todo!() }
+            };
+        }
+    } else {
+        panic!("Missing attr `enum_repr` or `enum_endianness` on enum")
     }
 }

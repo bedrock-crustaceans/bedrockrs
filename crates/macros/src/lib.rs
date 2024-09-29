@@ -1,16 +1,18 @@
-use de::proto_build_de_enum;
-use de::proto_build_de_struct;
+use crate::de::{build_de_enum, build_de_struct};
+use crate::ser::{build_ser_enum, build_ser_struct};
 use quote::quote;
-use ser::proto_build_ser_enum;
-use ser::proto_build_ser_struct;
 use std::collections::HashMap;
 use syn::parse::{Parse, ParseStream};
 use syn::{parse_macro_input, Data, DeriveInput, Lit, Token};
 
+mod attr;
 mod de;
 mod ser;
 
-#[proc_macro_derive(ProtoCodec, attributes(len_repr, enum_repr))]
+#[proc_macro_derive(
+    ProtoCodec,
+    attributes(endianness, vec_endianness, vec_repr, enum_endianness, enum_repr, nbt, str)
+)]
 pub fn proto_codec_derive(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = parse_macro_input!(item as DeriveInput);
 
@@ -19,53 +21,34 @@ pub fn proto_codec_derive(item: proc_macro::TokenStream) -> proc_macro::TokenStr
     let generics = input.generics;
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
-    let expanded = match input.data {
-        Data::Struct(struct_data) => {
-            let ser = proto_build_ser_struct(&struct_data);
-            let de = proto_build_de_struct(&struct_data);
-
-            quote! {
-                impl #impl_generics ::bedrockrs_proto_core::ProtoCodec for #name #ty_generics #where_clause {
-                    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ::bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {
-                        #[cfg(debug_assertions)]
-                        ::log::trace!("ProtoSerialize: {}", stringify!(#name));
-                        #ser
-                        Ok(())
-                    }
-
-                    fn proto_deserialize(stream: &mut ::std::io::Cursor<&[u8]>) -> Result<Self, ::bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {
-                        #[cfg(debug_assertions)]
-                        ::log::trace!("ProtoDeserialize: {}", stringify!(#name));
-                        Ok(Self{
-                            #de
-                        })
-                    }
-                }
-            }
-        }
-        Data::Enum(enum_data) => {
-            let ser = proto_build_ser_enum(&enum_data, &input.attrs, &name);
-            let de = proto_build_de_enum(&enum_data, &input.attrs, &name);
-
-            quote! {
-                impl #impl_generics ::bedrockrs_proto_core::ProtoCodec for #name #ty_generics #where_clause {
-                    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ::bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {
-                        #ser
-                        Ok(())
-                    }
-
-                    fn proto_deserialize(stream: &mut ::std::io::Cursor<&[u8]>) -> Result<Self, ::bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {
-
-                        Ok({#de})
-                    }
-                }
-            }
-        }
+    let (ser, de) = match input.data {
+        Data::Struct(v) => (build_ser_struct(&v), build_de_struct(&v)),
+        Data::Enum(v) => (
+            build_ser_enum(&v),
+            build_de_enum(&v, input.attrs.as_slice()),
+        ),
         Data::Union(_) => {
-            // Unions are not supported
-            panic!(
-                "ProtoCodec derive macro only supports named/unnamed structs, got union: {name:?}."
-            )
+            return proc_macro::TokenStream::from(quote! {
+                compile_error!("ProtoCodec derive macro only supports structs and enums")
+            })
+        }
+    };
+
+    let expanded = quote! {
+        impl #impl_generics ::bedrockrs_proto_core::ProtoCodec for #name #ty_generics #where_clause {
+            fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ::bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {
+                #[cfg(debug_assertions)]
+                ::log::trace!("ProtoSerialize: {}", stringify!(#name));
+                #ser
+                Ok(())
+            }
+
+            fn proto_deserialize(stream: &mut ::std::io::Cursor<&[u8]>) -> Result<Self, ::bedrockrs_proto_core::error::ProtoCodecError> where Self: Sized {
+                #[cfg(debug_assertions)]
+                ::log::trace!("ProtoDeserialize: {}", stringify!(#name));
+                #de
+                Ok(val)
+            }
         }
     };
 
