@@ -19,6 +19,30 @@ pub enum Form {
     Simple(SimpleForm),
 }
 
+impl TryFrom<String> for Form {
+    type Error = serde_json::Error;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        Self::try_from(value.as_str())
+    }
+}
+
+impl TryFrom<&str> for Form {
+    type Error = serde_json::Error;
+    
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        serde_json::from_str(value)
+    }
+}
+
+impl TryFrom<Form> for String {
+    type Error = serde_json::Error;
+
+    fn try_from(value: Form) -> Result<Self, Self::Error> {
+        serde_json::to_string(&value)
+    }
+}
+
 #[cfg(test)]
 mod test {
     use crate::elems::button::{Button, ButtonImage};
