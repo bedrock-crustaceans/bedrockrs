@@ -5,6 +5,7 @@ use serde::{Deserialize, Deserializer, Serialize};
 /// This button features text and may optionally include an image,
 /// which can be sourced from a website or the game's local assets.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Button {
     /// Contains the text shown on the button.
     /// It can include Minecraft formatting codes and may contain newlines.
