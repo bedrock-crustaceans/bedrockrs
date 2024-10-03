@@ -9,9 +9,13 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ModalForm {
+    /// Refers to the title.
     pub title: String,
+    /// Refers to the body.
     #[serde(rename = "content")]
     pub body: String,
+    /// Refers to the first displayed button.
     pub button1: Button,
+    /// Refers to the second displayed button.
     pub button2: Button,
 }

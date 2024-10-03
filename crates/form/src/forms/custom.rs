@@ -7,7 +7,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct CustomForm {
+    /// Refers to the title.
     pub title: String,
+    /// All elements in the [`CustomForm`](CustomForm). Sequence is maintained.
     #[serde(rename = "content")]
     pub elements: Vec<Element>,
 }

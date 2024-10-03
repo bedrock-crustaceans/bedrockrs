@@ -7,8 +7,11 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SimpleForm {
+    /// Refers to the title.
     pub title: String,
+    /// Refers to the body.
     #[serde(rename = "content")]
     pub body: String,
+    /// Refers to all available buttons. Sequence is maintained.
     pub buttons: Vec<Button>,
 }
