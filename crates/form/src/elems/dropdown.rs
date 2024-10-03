@@ -1,25 +1,24 @@
-use serde_json::{json, Value};
+use serde::{Deserialize, Serialize};
 
-use crate::elems::Element;
-use crate::error::FormError;
-
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Dropdown {
     pub text: String,
     pub options: Vec<String>,
-    pub default_index: i32,
+    pub default: i32,
 }
 
-impl Element for Dropdown {
-    fn elem_serialize(&self) -> Value {
-        json!({
-            "type": "dropdown",
-            "text": self.text,
-            "default": self.default_index,
-            "options": self.options,
-        })
-    }
-
-    fn elem_deserialize(elem_json: Value) -> Result<Self, FormError> {
-        todo!()
-    }
-}
+// impl Dropdown {
+//     fn elem_serialize(&self) -> Value {
+//         json!({
+//             "type": "dropdown",
+//             "text": self.text,
+//             "default": self.default,
+//             "options": self.options,
+//         })
+//     }
+//
+//     fn elem_deserialize(elem_json: Value) -> Result<Self, FormError> {
+//         todo!()
+//     }
+// }

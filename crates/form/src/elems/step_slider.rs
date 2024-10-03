@@ -1,26 +1,11 @@
-use serde_json::{json, Value};
-
-use crate::elems::Element;
-use crate::error::FormError;
+use serde::{Deserialize, Serialize};
 
 /// A combination of DropDown and Slider
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct StepSlider {
     pub text: String,
+    #[serde(rename = "steps")]
     pub options: Vec<String>,
-    pub default_index: i32,
-}
-
-impl Element for StepSlider {
-    fn elem_serialize(&self) -> Value {
-        json!({
-            "type": "step_slider",
-            "text": self.text,
-            "default": self.default_index,
-            "steps": self.options,
-        })
-    }
-
-    fn elem_deserialize(elem_json: Value) -> Result<Self, FormError> {
-        todo!()
-    }
+    pub default: i32,
 }

@@ -1,30 +1,12 @@
-use serde_json::json;
-
+use serde::{Deserialize, Serialize};
 use crate::elems::button::Button;
-use crate::elems::Element;
-use crate::error::FormError;
-use crate::window::Form;
 
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ModalForm {
     pub title: String,
+    #[serde(rename = "content")]
     pub body: String,
     pub button1: Button,
     pub button2: Button,
-}
-
-impl Form for ModalForm {
-    fn form_serialize(&self) -> String {
-        json!({
-            "type": "form",
-            "title": self.title,
-            "content": self.body,
-            "button1": self.button1.elem_serialize(),
-            "button2": self.button2.elem_serialize(),
-        })
-        .to_string()
-    }
-
-    fn form_deserialize(form_json: &str) -> Result<Self, FormError> {
-        todo!()
-    }
 }
