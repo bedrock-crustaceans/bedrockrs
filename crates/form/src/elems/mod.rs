@@ -14,6 +14,7 @@ pub mod slider;
 pub mod step_slider;
 pub mod toggle;
 
+/// An enum of all possible [`Elements`](Element) for a [`CustomForm`](crate::forms::custom::CustomForm).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "type")]
 #[serde(rename_all = "snake_case")]

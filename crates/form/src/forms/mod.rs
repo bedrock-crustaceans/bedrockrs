@@ -7,14 +7,26 @@ pub mod custom;
 pub mod modal;
 pub mod simple;
 
+/// An enum of all possible Forms, including [`Custom`](CustomForm), [`Modal`](ModalForm) and [`Simple`](SimpleForm).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "type")]
 #[serde(deny_unknown_fields)]
 pub enum Form {
+    /// [`CustomForm`] represents a form that can be sent to a player,
+    /// containing fields that the player may fill out.
+    /// All possible fields are in the [`Element`] enum.
     #[serde(rename = "custom_form")]
     Custom(CustomForm),
+    /// [`ModalForm`] represents a modal form.
+    /// These forms consist of a body containing text and two [`Buttons`](Button) at the bottom,
+    /// usually labeled "Yes" (`gui.yes` for automatic translation) and "No" (`gui.no` for automatic translation)
+    /// While the button text can be customized,
+    /// unlike a [`SimpleForm`](crate::forms::SimpleForm), they cannot include images next to them.
     #[serde(rename = "modal")]
     Modal(ModalForm),
+    /// [`SimpleForm`] represents a form consisting of a title,
+    /// body, and a set of buttons beneath the body.
+    /// These [`Buttons`](Button) can optionally include images alongside them.
     #[serde(rename = "form")]
     Simple(SimpleForm),
 }
@@ -29,7 +41,7 @@ impl TryFrom<String> for Form {
 
 impl TryFrom<&str> for Form {
     type Error = serde_json::Error;
-    
+
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         serde_json::from_str(value)
     }
@@ -47,12 +59,12 @@ impl TryFrom<Form> for String {
 mod test {
     use crate::elems::button::{Button, ButtonImage};
     use crate::elems::dropdown::Dropdown;
-    use crate::elems::Element;
     use crate::elems::toggle::Toggle;
+    use crate::elems::Element;
     use crate::forms::custom::CustomForm;
-    use crate::forms::Form;
     use crate::forms::modal::ModalForm;
     use crate::forms::simple::SimpleForm;
+    use crate::forms::Form;
 
     #[test]
     fn custom_form() {
@@ -100,7 +112,6 @@ mod test {
         assert_eq!(serde_json::from_str::<Form>(json).unwrap(), form);
     }
 
-
     #[test]
     fn modal_form() {
         let json = r#"
@@ -126,7 +137,9 @@ mod test {
             body: "Body of this modal form".to_string(),
             button1: Button {
                 text: "Ferris is happy!".to_string(),
-                image: Some(ButtonImage::Url("https://rustacean.net/assets/rustacean-flat-happy.png".to_string())),
+                image: Some(ButtonImage::Url(
+                    "https://rustacean.net/assets/rustacean-flat-happy.png".to_string(),
+                )),
             },
             button2: Button {
                 text: "Ferris is gesturing... but where?".to_string(),
@@ -165,14 +178,16 @@ mod test {
             ]
         }
         "#;
-        
+
         let form = Form::Simple(SimpleForm {
             title: "Title of this simple form".to_string(),
             body: "Body of this simple form".to_string(),
             buttons: vec![
                 Button {
                     text: "Ferris is happy!".to_string(),
-                    image: Some(ButtonImage::Url("https://rustacean.net/assets/rustacean-flat-happy.png".to_string())),
+                    image: Some(ButtonImage::Url(
+                        "https://rustacean.net/assets/rustacean-flat-happy.png".to_string(),
+                    )),
                 },
                 Button {
                     text: "Ferris is extra cute!!!".to_string(),
@@ -181,10 +196,10 @@ mod test {
                 Button {
                     text: "Ferris is gone...".to_string(),
                     image: None,
-                }
+                },
             ],
         });
-        
+
         assert_eq!(serde_json::from_str::<Form>(json).unwrap(), form);
     }
 }
