@@ -1,10 +1,11 @@
 use crate::types::animate_action::AnimateAction;
-use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_macros::gamepacket;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
 use std::io::Cursor;
+use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
+use varint_rs::{VarintReader, VarintWriter};
 
 #[gamepacket(id = 44)]
 #[derive(Debug, Clone)]
@@ -25,25 +26,25 @@ impl ProtoCodec for AnimatePlayerPacket {
             AnimateAction::RowLeft => 129,
         };
 
-        VAR::<i32>::new(action).proto_serialize(stream)?;
+        stream.write_i32_varint(action)?;
         self.target_runtime_id.proto_serialize(stream)?;
 
         if let AnimateAction::Swing { rowing_time } = self.action {
-            LE::new(rowing_time).proto_serialize(stream)?;
+            stream.write_f32::<LittleEndian>(rowing_time)?;
         }
 
         Ok(())
     }
 
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
-        let action = VAR::<i32>::proto_deserialize(stream)?.into_inner();
+        let action = stream.read_i32_varint()?;
 
         let target_runtime_id = ActorRuntimeID::proto_deserialize(stream)?;
 
         let action = match action {
             0 => AnimateAction::NoAction,
             1 => AnimateAction::Swing {
-                rowing_time: LE::<f32>::proto_deserialize(stream)?.into_inner(),
+                rowing_time: stream.read_f32::<LittleEndian>()?,
             },
             3 => AnimateAction::WakeUp,
             4 => AnimateAction::CriticalHit,

@@ -1,4 +1,3 @@
-use bedrockrs_core::int::LE;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 143)]
@@ -8,15 +7,18 @@ pub struct NetworkSettingsPacket {
     /// - 0 is "disable compression"
     /// - 1 is "compress everything 1 byte or larger" (so everything)
     /// - others are just the normal threshold
-    pub compression_threshold: LE<u16>,
+    #[endianness(le)]
+    pub compression_threshold: u16,
     /// Determines the compression Algorithm used
     /// - 0x0000 is Zlib
     /// - 0x0001 is Snappy
     /// - 0xFFFF is No compression
     ///
-    /// All 3 compression Algorithms are supported
-    pub compression_algorithm: LE<u16>,
+    /// All three compression Algorithms are supported
+    #[endianness(le)]
+    pub compression_algorithm: u16,
     pub client_throttle_enabled: bool,
     pub client_throttle_threshold: u8,
-    pub client_throttle_scalar: LE<f32>,
+    #[endianness(le)]
+    pub client_throttle_scalar: f32,
 }

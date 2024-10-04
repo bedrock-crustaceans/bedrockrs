@@ -1,12 +1,16 @@
-use bedrockrs_core::{int::LE, Vec3};
+use bedrockrs_core::Vec3;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 161)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct CorrectPlayerMovePredictionPacket {
+    // TODO: Possibly turn this into an enum
     pub prediction_type: u8,
-    pub pos: Vec3<LE<f32>>,
-    pub pos_delta: Vec3<LE<f32>>,
+    #[endianness(le)]
+    pub pos: Vec3<f32>,
+    #[endianness(le)]
+    pub pos_delta: Vec3<f32>,
     pub on_ground: bool,
-    pub tick: LE<u64>,
+    #[endianness(le)]
+    pub tick: u64,
 }

@@ -1,8 +1,9 @@
-use bedrockrs_core::int::VAR;
 use bedrockrs_macros::ProtoCodec;
 use uuid::Uuid;
+
 #[derive(ProtoCodec, Debug, Clone)]
-#[enum_repr(VAR::<u32>)]
+#[enum_repr(u32)]
+#[enum_endianness(var)]
 pub enum CommandOriginType {
     Player = 0,
     CommandBlock = 1,

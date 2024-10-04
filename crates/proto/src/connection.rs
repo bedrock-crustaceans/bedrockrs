@@ -1,7 +1,7 @@
-use std::future::Future;
 use std::io::{Cursor, Write};
 use std::sync::Arc;
 use std::time::Duration;
+use byteorder::WriteBytesExt;
 use tokio::select;
 use tokio::sync::{broadcast, watch};
 use tokio::time::interval;
@@ -64,9 +64,7 @@ impl Connection {
                         .compress(pk_stream.as_slice(), &mut compressed_stream)
                         .map_err(ConnectionError::CompressError)?;
                 } else {
-                    compressed_stream
-                        .write(pk_stream.as_slice())
-                        .map_err(|e| ConnectionError::IOError(Arc::new(e)))?;
+                    compressed_stream.write(pk_stream.as_slice())?;
                 };
 
                 compressed_stream

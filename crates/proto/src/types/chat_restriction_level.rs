@@ -1,8 +1,7 @@
-use bedrockrs_core::int::LE;
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
-#[enum_repr(LE::<u8>)]
+#[enum_repr(i8)]
 pub enum ChatRestrictionLevel {
     None = 0x00,
     Dropped = 0x01,

@@ -1,4 +1,3 @@
-use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::Vec2;
 use bedrockrs_core::Vec3;
 use bedrockrs_macros::gamepacket;

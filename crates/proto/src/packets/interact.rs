@@ -1,9 +1,8 @@
 use crate::types::interact_action::InteractAction;
-use bedrockrs_core::int::LE;
 use bedrockrs_core::Vec3;
 use bedrockrs_macros::gamepacket;
 use bedrockrs_proto_core::error::ProtoCodecError;
-use bedrockrs_proto_core::ProtoCodec;
+use bedrockrs_proto_core::{ProtoCodec, ProtoCodecLE};
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
 use std::io::Cursor;
 
@@ -27,7 +26,7 @@ impl ProtoCodec for InteractPacket {
         u8::proto_serialize(&action, stream)?;
 
         if let InteractAction::InteractUpdate(pos) = self.action {
-            pos.proto_serialize(stream)?;
+            ProtoCodecLE::proto_serialize(&pos, stream)?;
         }
 
         Ok(())
@@ -41,14 +40,12 @@ impl ProtoCodec for InteractPacket {
         let action = match action {
             0 => InteractAction::Invalid,
             3 => {
-                let pos = Vec3::<LE<f32>>::proto_deserialize(stream)?;
-                let pos = Vec3::<f32>::from_le(pos);
+                let pos = <Vec3<f32> as ProtoCodecLE>::proto_deserialize(stream)?;
 
                 InteractAction::StopRiding(pos)
             }
             4 => {
-                let pos = Vec3::<LE<f32>>::proto_deserialize(stream)?;
-                let pos = Vec3::<f32>::from_le(pos);
+                let pos = <Vec3<f32> as ProtoCodecLE>::proto_deserialize(stream)?;
 
                 InteractAction::InteractUpdate(pos)
             }

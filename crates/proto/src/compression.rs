@@ -46,7 +46,7 @@ impl Compression {
     }
 
     /// Specifies if functions like [`Self::compress`] and [`Self::decompress`] need to be used.
-    /// This is needed for optimizing compression.
+    /// This is necessary for optimizing compression.
     #[inline]
     pub const fn needed(&self) -> bool {
         match self {

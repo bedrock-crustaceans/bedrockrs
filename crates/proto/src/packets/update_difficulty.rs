@@ -3,6 +3,6 @@ use bedrockrs_shared::world::difficulty::Difficulty;
 
 #[gamepacket(id = 60)]
 #[derive(ProtoCodec, Debug, Clone)]
-pub struct SetDifficultyPacket {
+pub struct UpdateDifficultyPacket {
     pub difficulty: Difficulty,
 }

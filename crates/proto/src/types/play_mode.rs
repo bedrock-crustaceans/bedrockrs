@@ -1,6 +1,4 @@
-use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::Vec3;
-use bedrockrs_macros::ProtoCodec;
 
 #[derive(Debug, Clone)]
 pub enum PlayMode {
@@ -8,7 +6,7 @@ pub enum PlayMode {
     Teaser,
     Screen,
     Viewer,
-    Reality(Vec3<LE<f32>>),
+    Reality(Vec3<f32>),
     Placement,
     LivingRoom,
     ExitLevel,

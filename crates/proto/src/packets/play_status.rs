@@ -1,5 +1,4 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
-
 use crate::types::play_status::PlayStatusType;
 
 #[gamepacket(id = 2)]

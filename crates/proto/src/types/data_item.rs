@@ -1,41 +1,26 @@
-use bedrockrs_core::{
-    int::{LE, VAR},
-    Vec3,
-};
+use bedrockrs_core::Vec3;
 use bedrockrs_macros::ProtoCodec;
-use bedrockrs_proto_core::ProtoCodec;
-use std::collections::HashMap;
+use crate::types::block_pos::BlockPos;
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct DataItem {
-    pub id: VAR<u32>,
+    #[endianness(var)]
+    pub id: u32,
     pub value: DataItemValue,
 }
 
-#[derive(Debug, Clone)]
+#[derive(ProtoCodec, Debug, Clone)]
+#[enum_repr(u32)]
+#[enum_endianness(var)]
+#[repr(u32)]
 pub enum DataItemValue {
-    ValByte(u8),
-    ValShort(i16),
-    ValInt(i32),
-    ValFloat(f32),
-    ValString(String),
-    ValCompoundTag(HashMap<String, nbtx::Value>),
-    ValPos(Vec3<VAR<i32>>),
-    ValInt64(LE<i64>),
-    ValVec3(Vec3<LE<f32>>),
-}
-
-impl ProtoCodec for DataItemValue {
-    fn proto_serialize(
-        &self,
-        stream: &mut Vec<u8>,
-    ) -> Result<(), bedrockrs_proto_core::error::ProtoCodecError> {
-        unimplemented!()
-    }
-
-    fn proto_deserialize(
-        stream: &mut std::io::Cursor<&[u8]>,
-    ) -> Result<Self, bedrockrs_proto_core::error::ProtoCodecError> {
-        unimplemented!()
-    }
+    ValByte(u8) = 0,
+    ValShort(#[endianness(le)] i16) = 1,
+    ValInt(#[endianness(var)] i32) = 2,
+    ValFloat(#[endianness(le)] f32) = 3,
+    ValString(String) = 4,
+    ValCompoundTag(#[nbt] nbtx::Value) = 5,
+    ValBlockPos(BlockPos) = 6,
+    ValInt64(#[endianness(var)] i64) = 7,
+    ValVec3(#[endianness(le)] Vec3<f32>) = 8,
 }

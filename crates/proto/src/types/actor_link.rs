@@ -1,4 +1,3 @@
-use bedrockrs_core::int::VAR;
 use bedrockrs_macros::ProtoCodec;
 use bedrockrs_shared::actor_unique_id::ActorUniqueID;
 

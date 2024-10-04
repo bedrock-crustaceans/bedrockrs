@@ -45,9 +45,9 @@ use crate::packets::server_player_post_move_position::ServerPlayerPostMovePositi
 use crate::packets::server_settings_request::ServerSettingsRequestPacket;
 use crate::packets::server_settings_response::ServerSettingsResponsePacket;
 use crate::packets::set_commands_enabled::SetCommandsEnabledPacket;
-use crate::packets::set_difficulty::SetDifficultyPacket;
+use crate::packets::update_difficulty::UpdateDifficultyPacket;
 use crate::packets::set_local_player_as_initialized::SetLocalPlayerAsInitializedPacket;
-use crate::packets::set_player_gamemode::SetPlayerGamemode;
+use crate::packets::update_player_gamemode::UpdatePlayerGamemode;
 use crate::packets::set_time::SetTimePacket;
 use crate::packets::set_title::SetTitlePacket;
 use crate::packets::show_credits::ShowCreditsPacket;
@@ -118,9 +118,9 @@ gamepackets! {
     PlayerInput: _,
     LevelChunk: LevelChunkPacket,
     SetCommandsEnabled: SetCommandsEnabledPacket,
-    SetDifficulty: SetDifficultyPacket,
+    SetDifficulty: UpdateDifficultyPacket,
     ChangeDimension: ChangeDimensionPacket,
-    SetPlayerGamemode: SetPlayerGamemode,
+    SetPlayerGamemode: UpdatePlayerGamemode,
     PlayerList: _,
     SimpleEvent: _,
     TelemetryEvent: _,

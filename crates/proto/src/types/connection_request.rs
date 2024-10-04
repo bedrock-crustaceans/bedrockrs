@@ -1,14 +1,14 @@
 use std::collections::BTreeMap;
 use std::io::{Cursor, Read};
-use std::sync::Arc;
 
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
-use bedrockrs_core::int::{LE, VAR};
+use byteorder::{LittleEndian, ReadBytesExt};
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 use jsonwebtoken::{DecodingKey, Validation};
 use serde_json::Value;
+use varint_rs::VarintReader;
 
 #[derive(Debug, Clone)]
 pub struct ConnectionRequest {
@@ -100,10 +100,10 @@ impl ProtoCodec for ConnectionRequest {
         // (certificate_chain len + raw_token len + 8)
         // 8 = i32 len + i32 len (length of certificate_chain's len and raw_token's len)
         // can be ignored, other lengths are provided
-        VAR::<u32>::proto_deserialize(stream)?;
+        stream.read_u32_varint()?;
 
         // read length of certificate_chain vec
-        let certificate_chain_len = LE::<i32>::proto_deserialize(stream)?.into_inner();
+        let certificate_chain_len = stream.read_i32::<LittleEndian>()?;
 
         let certificate_chain_len = certificate_chain_len
             .try_into()
@@ -112,17 +112,13 @@ impl ProtoCodec for ConnectionRequest {
         let mut certificate_chain_buf = vec![0; certificate_chain_len];
 
         // read string data (certificate_chain)
-        stream
-            .read_exact(&mut certificate_chain_buf)
-            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
+        stream.read_exact(&mut certificate_chain_buf)?;
 
         // transform into string
-        let certificate_chain_string =
-            String::from_utf8(certificate_chain_buf).map_err(ProtoCodecError::UTF8Error)?;
+        let certificate_chain_string = String::from_utf8(certificate_chain_buf)?;
 
         // parse certificate chain string into json
-        let certificate_chain_json = serde_json::from_str(&certificate_chain_string)
-            .map_err(|e| ProtoCodecError::JsonError(Arc::new(e)))?;
+        let certificate_chain_json = serde_json::from_str(&certificate_chain_string)?;
 
         let certificate_chain_json_jwts = match certificate_chain_json {
             Value::Object(mut v) => {
@@ -215,9 +211,7 @@ impl ProtoCodec for ConnectionRequest {
         }
 
         // read length of certificate_chain vec
-        let raw_token_len = LE::<i32>::read(stream)
-            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?
-            .into_inner();
+        let raw_token_len = stream.read_i32::<LittleEndian>()?;
 
         let raw_token_len = raw_token_len
             .try_into()
@@ -226,9 +220,7 @@ impl ProtoCodec for ConnectionRequest {
         let mut raw_token_buf = vec![0; raw_token_len];
 
         // read string data (certificate_chain)
-        stream
-            .read_exact(&mut raw_token_buf)
-            .map_err(|e| ProtoCodecError::IOError(Arc::new(e)))?;
+        stream.read_exact(&mut raw_token_buf)?;
 
         // transform into string
         let raw_token_string =

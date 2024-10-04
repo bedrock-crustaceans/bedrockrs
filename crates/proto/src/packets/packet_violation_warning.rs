@@ -1,11 +1,13 @@
-use bedrockrs_core::int::VAR;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 156)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct PacketViolationWarningPacket {
-    pub kind: VAR<i32>,
-    pub severity: VAR<i32>,
-    pub violating_packet_id: VAR<i32>,
+    #[endianness(var)]
+    pub kind: i32,
+    #[endianness(var)]
+    pub severity: i32,
+    #[endianness(var)]
+    pub violating_packet_id: i32,
     pub context: String,
 }

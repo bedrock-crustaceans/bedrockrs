@@ -1,4 +1,3 @@
-use bedrockrs_core::int::VAR;
 use bedrockrs_macros::ProtoCodec;
 
 use crate::types::player_movement_mode::PlayerMovementMode;

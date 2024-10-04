@@ -1,4 +1,3 @@
-use bedrockrs_core::int::VAR;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 use crate::types::base_game_version::BaseGameVersion;

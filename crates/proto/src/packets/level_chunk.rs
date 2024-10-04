@@ -1,5 +1,5 @@
+use varint_rs::VarintWriter;
 use crate::types::chunk_pos::ChunkPos;
-use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_macros::gamepacket;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
@@ -28,27 +28,24 @@ impl ProtoCodec for LevelChunkPacket {
             self.sub_chunk_count.proto_serialize(stream)?;
         } else {
             if !(self.client_request_subchunk_limit.into_inner() < 0) {
-                VAR::<u32>::new(u32::MAX - 1).proto_serialize(stream)?;
+                stream.write_u32_varint(u32::MAX - 1)?;
                 self.client_request_subchunk_limit.proto_serialize(stream)?;
             } else {
-                VAR::<u32>::new(u32::MAX).proto_serialize(stream)?;
+                stream.write_u32_varint(u32::MAX)?;
             }
         }
 
         self.cache_enabled.proto_serialize(stream)?;
         if self.cache_enabled {
-            // todo: implement sending with cached blobs.
-            unimplemented!()
+            todo!("implement sending with cached blobs.")
         }
 
         let len = self
             .serialized_chunk_data
             .len()
-            .try_into()
-            .map_err(ProtoCodecError::FromIntError)?;
+            .try_into()?;
 
-        VAR::<u32>::new(len).proto_serialize(stream)?;
-
+        stream.write_u32_varint(len)?;
         stream.extend_from_slice(&self.serialized_chunk_data);
 
         println!("finish");
@@ -59,6 +56,6 @@ impl ProtoCodec for LevelChunkPacket {
     fn proto_deserialize(
         stream: &mut std::io::Cursor<&[u8]>,
     ) -> Result<Self, bedrockrs_proto_core::error::ProtoCodecError> {
-        unreachable!()
+        todo!()
     }
 }

@@ -1,9 +1,9 @@
-use bedrockrs_core::int::VAR;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 100)]
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct ModalFormRequestPacket {
-    pub form_id: VAR<u32>,
+    #[endianness(var)]
+    pub form_id: u32,
     pub form_json: String,
 }

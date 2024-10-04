@@ -1,4 +1,3 @@
-use bedrockrs_core::int::LE;
 use bedrockrs_core::Vec3;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 use bedrockrs_shared::world::dimension::Dimension;
@@ -7,7 +6,9 @@ use bedrockrs_shared::world::dimension::Dimension;
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct ChangeDimensionPacket {
     pub dimension: Dimension,
-    pub pos: Vec3<LE<f32>>,
+    #[endianness(le)]
+    pub pos: Vec3<f32>,
     pub respawn: bool,
-    pub loading_screen: Option<LE<u32>>,
+    #[endianness(le)]
+    pub loading_screen: Option<u32>,
 }

@@ -1,5 +1,4 @@
 use crate::types::{block_pos::BlockPos, player_action_type::PlayerActionType};
-use bedrockrs_core::int::VAR;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
 
