@@ -165,7 +165,7 @@ pub fn build_de_enum(data_enum: &DataEnum, attrs: &[Attribute]) -> TokenStream {
                     #desc => {
                         #de
 
-                        Self::<#name><#ctor>
+                        Self::#name #ctor
                     }
                 }
             } else {
