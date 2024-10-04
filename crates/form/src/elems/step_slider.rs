@@ -1,26 +1,18 @@
-use serde_json::{json, Value};
+use serde::{Deserialize, Serialize};
 
-use crate::elems::Element;
-use crate::error::FormError;
-
-/// A combination of DropDown and Slider
+/// [`StepSlider`] is an element that functions as a slider with multiple selectable options.
+/// It effectively merges the characteristics of a dropdown and a slider,
+/// appearing like a slider while incorporating features typical of a dropdown.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct StepSlider {
+    /// Represents the text displayed over the step slider element.
+    /// It may include Minecraft formatting codes.
     pub text: String,
+    /// Contains a list of choices that a player can select from.
+    #[serde(rename = "steps")]
     pub options: Vec<String>,
-    pub default_index: i32,
-}
-
-impl Element for StepSlider {
-    fn elem_serialize(&self) -> Value {
-        json!({
-            "type": "step_slider",
-            "text": self.text,
-            "default": self.default_index,
-            "steps": self.options,
-        })
-    }
-
-    fn elem_deserialize(elem_json: Value) -> Result<Self, FormError> {
-        todo!()
-    }
+    /// Refers to the index in the Options slice designated as the default.
+    /// The value at this index within the Options slice will be chosen.
+    pub default: i32,
 }

@@ -1,23 +1,12 @@
-use serde_json::{json, Value};
+use serde::{Deserialize, Serialize};
 
-use crate::elems::Element;
-use crate::error::FormError;
-
+/// [`Toggle`] represents a switch-like element.
+/// Players can turn it either on or off, resulting in a value of `true` when on and `false` when off.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Toggle {
+    /// The text displayed over the toggle element, which may include Minecraft formatting codes.
     pub text: String,
+    /// Specifies whether the toggle should be on or off by default.
     pub default: bool,
-}
-
-impl Element for Toggle {
-    fn elem_serialize(&self) -> Value {
-        json!({
-            "type": "toggle",
-            "text": self.text,
-            "default": self.default,
-        })
-    }
-
-    fn elem_deserialize(elem_json: Value) -> Result<Self, FormError> {
-        todo!()
-    }
 }
