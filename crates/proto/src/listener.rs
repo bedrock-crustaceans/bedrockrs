@@ -6,7 +6,7 @@ use rand::RngCore;
 
 use crate::connection::Connection;
 use crate::error::{ListenerError, RaknetError, TransportLayerError};
-use crate::info::{MINECRAFT_EDITION_MOTD, MINECRAFT_VERSION, PROTOCOL_VERSION};
+use crate::info::{MINECRAFT_EDITION_MOTD, PROTOCOL_VERSION};
 use crate::transport_layer::TransportLaterListener;
 
 pub struct Listener {
