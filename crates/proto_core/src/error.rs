@@ -1,7 +1,6 @@
 use std::io::Error as IOError;
 use std::num::{ParseIntError, TryFromIntError};
 use std::string::FromUtf8Error;
-use std::sync::Arc;
 
 use base64::DecodeError as Base64DecodeError;
 use jsonwebtoken::errors::Error as JwtError;
