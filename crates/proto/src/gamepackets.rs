@@ -61,6 +61,7 @@ use bedrockrs_proto_core::{error::ProtoCodecError, GamePacket, ProtoCodec};
 use std::io::{Cursor, Write};
 use varint_rs::{VarintReader, VarintWriter};
 use crate::packets::award_achievement::AwardAchievementPacket;
+use crate::packets::camera_shake::CameraShakePacket;
 use crate::packets::open_sign::OpenSignPacket;
 
 gamepackets! {
@@ -204,6 +205,7 @@ gamepackets! {
     ItemStackResponse: _,
     PlayerArmorDamage: _,
     CodeBuilder: _,
+    // TODO: Find a better name for this, else this collides with `UpdatePlayerGamemode`
     UpdateOtherPlayerGamemode: _,
     EmoteList: EmoteListPacket,
     PositionTrackingDBServerBroadcast: _,
@@ -212,7 +214,7 @@ gamepackets! {
     PacketViolationWarning: PacketViolationWarningPacket,
     MotionPredictionHints: _,
     AnimateEntity: _,
-    CameraShake: _,
+    CameraShake: CameraShakePacket,
     PlayerFog: _,
     CorrectPlayerMovePrediction: CorrectPlayerMovePredictionPacket,
     ItemComponent: _,

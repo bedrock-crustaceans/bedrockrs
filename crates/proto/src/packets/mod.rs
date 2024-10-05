@@ -55,3 +55,4 @@ pub mod text_message;
 pub mod toast_request;
 pub mod open_sign;
 pub mod award_achievement;
+pub mod camera_shake;
