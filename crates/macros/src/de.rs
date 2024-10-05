@@ -1,24 +1,7 @@
-use crate::attr::{get_attrs, ProtoCodecEndianness};
+use crate::attr::{extract_inner_type_from_vec, get_attrs, ProtoCodecEndianness};
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
-use syn::{Attribute, DataEnum, DataStruct, Field, Fields, GenericArgument, PathArguments, Type};
-
-fn extract_inner_type_from_vec(ty: &Type) -> Option<&Type> {
-    if let Type::Path(type_path) = ty {
-        if let Some(last_segment) = type_path.path.segments.last() {
-            if last_segment.ident == "Vec" {
-                if let PathArguments::AngleBracketed(ref generics) = last_segment.arguments {
-                    if generics.args.len() == 1 {
-                        if let Some(GenericArgument::Type(inner_type)) = generics.args.first() {
-                            return Some(inner_type);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    None
-}
+use syn::{Attribute, DataEnum, DataStruct, Field, Fields, Type};
 
 fn build_de_instance(endianness: Option<ProtoCodecEndianness>, f_type: &Type) -> TokenStream {
     match endianness {
@@ -46,8 +29,8 @@ fn build_de_field(fields: &[&Field]) -> TokenStream {
             let ty = f.ty.clone();
             let flags = get_attrs(f.attrs.as_slice()).expect("Error while getting attrs");
             
-            if let (Some(endian), Some(repr)) = (flags.vec_endianness, flags.vec_repr) {
-                let vec_des = build_de_instance(Some(endian), &repr);
+            if let Some(repr) = flags.vec_repr {
+                let vec_des = build_de_instance(flags.vec_endianness, &repr);
                 let inner_ty = extract_inner_type_from_vec(&ty).expect("Failed to get inner Vec type").clone();
                 let des = build_de_instance(flags.endianness, &inner_ty);
                 
@@ -74,7 +57,7 @@ fn build_de_field(fields: &[&Field]) -> TokenStream {
             
             if flags.str {
                 return quote! {
-                    let #name: #ty = <String as ::bedrockrs_proto_core::ProtoCodecLE>::proto_deserialize(stream)?.try_into()?;
+                    let #name: #ty = <String as ::bedrockrs_proto_core::ProtoCodec>::proto_deserialize(stream)?.try_into()?;
                 }
             }
 
@@ -139,7 +122,7 @@ pub fn build_de_struct(data_struct: &DataStruct) -> TokenStream {
     } else {
         quote! {
             #de
-            let val = Self();
+            let val = Self;
         }
     }
 }

@@ -1,6 +1,7 @@
 use quote::ToTokens;
-use syn::{Attribute, Error, Type};
+use syn::{Attribute, Error, GenericArgument, PathArguments, Type};
 
+#[derive(Clone)]
 pub enum ProtoCodecEndianness {
     LE,
     BE,
@@ -109,4 +110,21 @@ pub fn get_attrs(attrs: &[Attribute]) -> Result<ProtoCodecFlags, Error> {
     }
 
     Ok(flags)
+}
+
+pub fn extract_inner_type_from_vec(ty: &Type) -> Option<&Type> {
+    if let Type::Path(type_path) = ty {
+        if let Some(last_segment) = type_path.path.segments.last() {
+            if last_segment.ident == "Vec" {
+                if let PathArguments::AngleBracketed(ref generics) = last_segment.arguments {
+                    if generics.args.len() == 1 {
+                        if let Some(GenericArgument::Type(inner_type)) = generics.args.first() {
+                            return Some(inner_type);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    None
 }
