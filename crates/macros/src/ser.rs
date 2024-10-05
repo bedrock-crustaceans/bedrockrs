@@ -55,7 +55,7 @@ fn build_ser_field(fields: &[&Field], f_prefix: Option<TokenStream>) -> TokenStr
 
             if flags.nbt {
                 return quote! {
-                    ::nbtx::to_bytes_in::<::nbtx::NetworkLittleEndian>(stream, #final_name)?;
+                    ::nbtx::to_bytes_in::<::nbtx::NetworkLittleEndian>(stream, &#final_name)?;
                 }
             }
 
@@ -157,15 +157,11 @@ pub fn build_ser_enum(data_enum: &DataEnum, attrs: &[Attribute]) -> TokenStream 
             }
         });
         
-        let code = quote! {
+        quote! {
             match self {
                 #(#variants),*
             }
-        };
-        // 
-        // panic!("{}", code.to_string());
-        
-        code
+        }
     } else {
         panic!("Missing attr `enum_repr` or `enum_endianness` on enum")
     }
