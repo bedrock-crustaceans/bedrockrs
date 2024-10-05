@@ -1,7 +1,4 @@
-use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_proto_core::ProtoCodec;
-use std::num::NonZero;
-
 use super::item_stack_id_variant::ItemStackIdVariant;
 
 #[derive(Debug, Clone)]

@@ -45,6 +45,7 @@ pub struct StartGamePacket {
     pub server_version: String,
     // TODO: This can now be a concrete type rather than an NBT value.
     // How should we do this with the ProtoCodec macro?
+    #[nbt]
     pub player_property_data: nbtx::Value,
     #[endianness(le)]
     pub block_type_registry_checksum: u64,

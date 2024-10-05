@@ -1,10 +1,9 @@
-use bedrockrs_core::int::LE;
 use bedrockrs_macros::ProtoCodec;
-use bedrockrs_proto_core::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct Experiments {
-    #[len_repr(LE::<u32>)]
+    #[vec_repr(u32)]
+    #[vec_endianness(le)]
     pub experiments: Vec<Experiment>,
     pub ever_toggled: bool,
 }

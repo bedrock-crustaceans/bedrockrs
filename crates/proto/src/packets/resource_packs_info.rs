@@ -4,7 +4,7 @@ use crate::types::pack_info_resource::ResourcePackInfoType;
 use crate::types::pack_url::PackURL;
 
 #[gamepacket(id = 6)]
-#[derive(Debug, Clone, ProtoCodec)]
+#[derive(ProtoCodec, Debug, Clone)]
 pub struct ResourcePacksInfoPacket {
     pub resource_pack_required: bool,
     pub has_addon_packs: bool,
