@@ -215,7 +215,7 @@ gamepackets! {
     PlayerFog: _,
     CorrectPlayerMovePrediction: CorrectPlayerMovePredictionPacket,
     ItemComponent: _,
-    ClientboundDebugRenderer: _,
+    DebugRenderer: _,
     SyncEntityProperty: _,
     AddVolumeEntity: _,
     RemoveVolumeEntity: _,
