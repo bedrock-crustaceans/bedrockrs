@@ -47,7 +47,7 @@ use crate::packets::server_settings_response::ServerSettingsResponsePacket;
 use crate::packets::set_commands_enabled::SetCommandsEnabledPacket;
 use crate::packets::update_difficulty::UpdateDifficultyPacket;
 use crate::packets::set_local_player_as_initialized::SetLocalPlayerAsInitializedPacket;
-use crate::packets::update_player_gamemode::UpdatePlayerGamemode;
+use crate::packets::update_player_gamemode::UpdatePlayerGamemodePacket;
 use crate::packets::set_time::SetTimePacket;
 use crate::packets::set_title::SetTitlePacket;
 use crate::packets::show_credits::ShowCreditsPacket;
@@ -60,6 +60,7 @@ use bedrockrs_macros::gamepackets;
 use bedrockrs_proto_core::{error::ProtoCodecError, GamePacket, ProtoCodec};
 use std::io::{Cursor, Write};
 use varint_rs::{VarintReader, VarintWriter};
+use crate::packets::open_sign::OpenSignPacket;
 
 gamepackets! {
     Login: LoginPacket,
@@ -118,9 +119,9 @@ gamepackets! {
     PlayerInput: _,
     LevelChunk: LevelChunkPacket,
     SetCommandsEnabled: SetCommandsEnabledPacket,
-    SetDifficulty: UpdateDifficultyPacket,
+    UpdateDifficulty: UpdateDifficultyPacket,
     ChangeDimension: ChangeDimensionPacket,
-    SetPlayerGamemode: UpdatePlayerGamemode,
+    UpdatePlayerGamemode: UpdatePlayerGamemodePacket,
     PlayerList: _,
     SimpleEvent: _,
     TelemetryEvent: _,
@@ -202,7 +203,7 @@ gamepackets! {
     ItemStackResponse: _,
     PlayerArmorDamage: _,
     CodeBuilder: _,
-    UpdatePlayerGamemode: _,
+    UpdateOtherPlayerGamemode: _,
     EmoteList: EmoteListPacket,
     PositionTrackingDBServerBroadcast: _,
     PositionTrackingDBClientRequest: _,
@@ -251,7 +252,7 @@ gamepackets! {
     CameraInstruction: _,
     CompressedBiomeDefinitionList: _,
     TrimData: _,
-    OpenSign: _,
+    OpenSign: OpenSignPacket,
     AgentAnimation: _,
     RefreshEntitlements: _,
     PlayerToggleCrafterSlotRequest: _,
@@ -263,6 +264,8 @@ gamepackets! {
     JigsawStructureData: _,
     CurrentStructureFeature: _,
     DiagnosticsPacket: _,
+    CameraAimAssist: _,
+    DynamicContainerRegistryCleanup: _,
 }
 
 fn read_gamepacket_header(
