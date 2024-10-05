@@ -42,7 +42,7 @@ fn build_ser_field(fields: &[&Field], f_prefix: Option<TokenStream>) -> TokenStr
 
                 return quote! {
                     {
-                        let len: usize = #final_name.len().try_into()?;
+                        let len: #repr = #final_name.len().try_into()?;
                         
                         #vec_ser;
 
