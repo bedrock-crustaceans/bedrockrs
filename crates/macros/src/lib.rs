@@ -232,7 +232,7 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
 
                     match stream.write_all(buf.as_slice()) {
                         Ok(_) => {},
-                        Err(err) => return Err(::bedrockrs_proto_core::error::ProtoCodecError::IOError(::std::sync::Arc::new(err))),
+                        Err(err) => return Err(::bedrockrs_proto_core::error::ProtoCodecError::IOError(err)),
                     };
                 },
             }

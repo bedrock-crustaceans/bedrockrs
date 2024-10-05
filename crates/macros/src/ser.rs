@@ -46,7 +46,7 @@ fn build_ser_field(fields: &[&Field], f_prefix: Option<TokenStream>) -> TokenStr
                         
                         #vec_ser;
 
-                        for i in #final_name {
+                        for i in &#final_name {
                             #ser;
                         };
                     };
