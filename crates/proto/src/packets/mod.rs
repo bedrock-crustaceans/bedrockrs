@@ -54,3 +54,4 @@ pub mod start_game;
 pub mod text_message;
 pub mod toast_request;
 pub mod open_sign;
+pub mod award_achievement;

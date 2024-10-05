@@ -60,6 +60,7 @@ use bedrockrs_macros::gamepackets;
 use bedrockrs_proto_core::{error::ProtoCodecError, GamePacket, ProtoCodec};
 use std::io::{Cursor, Write};
 use varint_rs::{VarintReader, VarintWriter};
+use crate::packets::award_achievement::AwardAchievementPacket;
 use crate::packets::open_sign::OpenSignPacket;
 
 gamepackets! {
@@ -258,7 +259,7 @@ gamepackets! {
     PlayerToggleCrafterSlotRequest: _,
     SetPlayerInventoryOptions: _,
     SetHud: _,
-    AwardAchievement: _,
+    AwardAchievement: AwardAchievementPacket,
     CloseForm: _,
     LoadingScreen: LoadingScreenPacket,
     JigsawStructureData: _,
