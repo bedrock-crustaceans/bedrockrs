@@ -62,6 +62,7 @@ use std::io::{Cursor, Write};
 use varint_rs::{VarintReader, VarintWriter};
 use crate::packets::award_achievement::AwardAchievementPacket;
 use crate::packets::camera_shake::CameraShakePacket;
+use crate::packets::emote::EmotePacket;
 use crate::packets::open_sign::OpenSignPacket;
 
 gamepackets! {
@@ -192,7 +193,7 @@ gamepackets! {
     ClientCacheBlobStatus: _,
     ClientCacheMissResponse: _,
     EducationSettings: _,
-    Emote: _,
+    Emote: EmotePacket,
     MultiplayerSettings: _,
     SettingsCommand: _,
     AnvilDamage: _,
