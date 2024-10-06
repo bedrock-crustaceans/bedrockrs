@@ -11,14 +11,13 @@ pub async fn login(
     // Login Packet
     //////////////////////////////////////
 
-    let mut login = match conn.recv().await {
-        Ok(GamePackets::Login(pk)) => pk,
-        Ok(other) => {
+    let mut login = match conn.recv().await? {
+        GamePackets::Login(pk) => pk,
+        other => {
             return Err(LoginError::FormatError(format!(
                 "Expected Login packet, got: {other:?}"
             )))
         }
-        Err(e) => return Err(LoginError::ConnectionError(e)),
     };
 
     match provider.on_login_pk(&mut login) {

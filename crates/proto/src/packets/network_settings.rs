@@ -17,8 +17,11 @@ pub struct NetworkSettingsPacket {
     /// All three compression Algorithms are supported
     #[endianness(le)]
     pub compression_algorithm: u16,
+    // TODO: Document what this field does
     pub client_throttle_enabled: bool,
+    // TODO: Document what this field does
     pub client_throttle_threshold: u8,
+    // TODO: Document what this field does
     #[endianness(le)]
     pub client_throttle_scalar: f32,
 }

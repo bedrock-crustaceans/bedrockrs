@@ -1,5 +1,3 @@
-use bedrockrs_core::int::LE;
-
 use crate::connection::ConnectionShard;
 use crate::error::LoginError;
 use crate::gamepackets::GamePackets;
@@ -14,14 +12,13 @@ pub async fn network_settings(
     // Network Settings Request Packet
     //////////////////////////////////////
 
-    let mut network_settings_request = match conn.recv().await {
-        Ok(GamePackets::NetworkSettingsRequest(pk)) => pk,
-        Ok(other) => {
+    let mut network_settings_request = match conn.recv().await? {
+        GamePackets::NetworkSettingsRequest(pk) => pk,
+        other => {
             return Err(LoginError::FormatError(format!(
                 "Expected RequestNetworkSettings packet, got: {other:?}"
             )))
         }
-        Err(e) => return Err(LoginError::ConnectionError(e)),
     };
 
     match provider.on_network_settings_request_pk(&mut network_settings_request) {
@@ -38,12 +35,12 @@ pub async fn network_settings(
     let compression = provider.compression();
 
     let mut network_settings = NetworkSettingsPacket {
-        compression_threshold: LE::new(compression.threshold()),
-        compression_algorithm: LE::new(compression.id_u16()),
+        compression_threshold: compression.threshold(),
+        compression_algorithm: compression.id_u16(),
         // TODO What do these 3 fields do?
         client_throttle_enabled: false,
         client_throttle_threshold: 0,
-        client_throttle_scalar: LE::new(0.0),
+        client_throttle_scalar: 0.0,
     };
 
     match provider.on_network_settings_pk(&mut network_settings) {
@@ -53,23 +50,10 @@ pub async fn network_settings(
         }
     };
 
-    match conn
-        .send(GamePackets::NetworkSettings(network_settings))
-        .await
-    {
-        Ok(_) => {}
-        Err(e) => return Err(LoginError::ConnectionError(e)),
-    }
+    conn.send(GamePackets::NetworkSettings(network_settings)).await?;
+    conn.flush().await?;
 
-    match conn.flush().await {
-        Ok(_) => {}
-        Err(e) => return Err(LoginError::ConnectionError(e)),
-    }
-
-    match conn.set_compression(Some(compression)).await {
-        Ok(_) => {}
-        Err(e) => return Err(LoginError::ConnectionError(e)),
-    };
+    conn.set_compression(Some(compression)).await?;
 
     Ok(())
 }

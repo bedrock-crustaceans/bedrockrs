@@ -29,6 +29,7 @@ pub struct LevelSettings {
     pub exported_from_editor: bool,
     #[endianness(var)]
     pub day_cycle_stop_time: i32,
+    // TODO: Turn into enum
     #[endianness(var)]
     pub education_edition_offer: i32,
     pub education_features: bool,
@@ -43,6 +44,7 @@ pub struct LevelSettings {
     // TODO turn into enum
     #[endianness(var)]
     pub broadcasting_settings_xbox_live: i32,
+    // TODO: Turn into enum
     #[endianness(var)]
     pub broadcasting_settings_platform: i32,
     pub commands_enabled: bool,

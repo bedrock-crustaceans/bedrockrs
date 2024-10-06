@@ -24,15 +24,8 @@ pub async fn play_status_login(
         }
     };
 
-    match conn.send(GamePackets::PlayStatus(play_status)).await {
-        Ok(_) => {}
-        Err(e) => return Err(LoginError::ConnectionError(e)),
-    }
-
-    match conn.flush().await {
-        Ok(_) => {}
-        Err(e) => return Err(LoginError::ConnectionError(e)),
-    };
+    conn.send(GamePackets::PlayStatus(play_status)).await?;
+    conn.flush().await?;
 
     Ok(())
 }

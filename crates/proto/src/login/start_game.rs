@@ -1,4 +1,3 @@
-use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::{Vec2, Vec3};
 use std::collections::HashMap;
 use uuid::Uuid;
@@ -43,16 +42,16 @@ pub async fn start_game(
         target_runtime_id: ActorRuntimeID(402),
         gamemode: Gamemode::Creative,
         position: Vec3 {
-            x: LE::new(4.0),
-            y: LE::new(6.0),
-            z: LE::new(7.0),
+            x: 4.0,
+            y: 6.0,
+            z: 7.0,
         },
         rotation: Vec2 {
-            x: LE::new(270.0),
-            y: LE::new(90.0),
+            x: 270.0,
+            y: 90.0,
         },
         settings: LevelSettings {
-            seed: LE::new(777777777777),
+            seed: 777777777777,
             spawn_settings: SpawnSettings {
                 biome_type: SpawnBiomeType::Default,
                 user_defined_biome_name: String::from("RandomBiome"),
@@ -63,27 +62,25 @@ pub async fn start_game(
             hardcore: false,
             difficulty: Difficulty::Peaceful,
             default_spawn_block: BlockPos {
-                x: VAR::new(100),
-                y: VAR::new(200),
-                z: VAR::new(300),
+                x: 100,
+                y: 200,
+                z: 300,
             },
             achievements_disabled: true,
             editor_world_type: EditorWorldType::NotEditor,
             created_in_editor: false,
             exported_from_editor: false,
-            day_cycle_stop_time: VAR::new(2000),
-            // TODO: Turn into enum
-            education_edition_offer: VAR::new(0),
+            day_cycle_stop_time: 2000,
+            education_edition_offer: 0,
             education_features: false,
             education_product_id: String::from(""),
-            rain_level: LE::new(300.0),
-            lightning_level: LE::new(400.0),
+            rain_level: 300.0,
+            lightning_level: 400.0,
             platform_locked_content: false,
             multiplayer_intended: true,
             lan_broadcasting_intended: true,
-            // TOD: Turn into enum
-            broadcasting_settings_xbox_live: VAR::new(2),
-            broadcasting_settings_platform: VAR::new(2),
+            broadcasting_settings_xbox_live: 2,
+            broadcasting_settings_platform: 2,
             commands_enabled: true,
             texture_pack_required: false,
             gamerules: vec![],
@@ -93,8 +90,8 @@ pub async fn start_game(
             },
             bonus_chest: false,
             start_with_map: false,
-            player_permission: VAR::new(3),
-            server_chunk_tick_radius: LE::new(4),
+            player_permission: 3,
+            server_chunk_tick_radius: 4,
             locked_behavior_packs: false,
             locked_resource_packs: false,
             from_locked_template: false,
@@ -106,8 +103,8 @@ pub async fn start_game(
             custom_skins_disabled: false,
             emote_chat_muted: false,
             base_game_version: BaseGameVersion(String::from("1.21.0")),
-            limited_world_width: LE::new(16),
-            limited_world_depth: LE::new(16),
+            limited_world_width: 0,
+            limited_world_depth: 0,
             new_nether: true,
             edu_shared_uri_resource: EduSharedResourceUri {
                 button_name: String::from(""),
@@ -126,18 +123,18 @@ pub async fn start_game(
         trial: false,
         movement_settings: PlayerMovementSettings {
             authority_mode: PlayerMovementMode::Client,
-            rewind_history_size: VAR::new(3200),
+            rewind_history_size: 3200,
             server_authoritative_block_breaking: false,
         },
-        current_level_time: LE::new(9000),
-        enchantment_seed: VAR::new(99000),
-        block_properties: vec![],
+        current_level_time: 9000,
+        enchantment_seed: 99000,
+        blocks: vec![],
         items: vec![],
         multiplayer_correlation_id: String::from("c5d3d2cc-27fd-4221-9de6-d22c4d423d53"),
         enable_item_stack_net_manager: false,
         server_version: String::from("1.19.2"),
         player_property_data: nbtx::Value::Compound(HashMap::new()),
-        block_type_registry_checksum: LE::new(0),
+        block_type_registry_checksum: 0,
         world_template_id: Uuid::nil(),
         enable_clientside_world_generation: false,
         use_block_network_id_hashes: true,
@@ -146,15 +143,13 @@ pub async fn start_game(
         },
     };
 
-    conn.send(GamePackets::StartGame(start_game))
-        .await
-        .map_err(LoginError::ConnectionError)?;
+    conn.send(GamePackets::StartGame(start_game)).await?;
     conn.send(GamePackets::PlayStatus(PlayStatusPacket {
         status: PlayStatusType::PlayerSpawn,
     }))
-    .await
-    .map_err(LoginError::ConnectionError)?;
-    conn.flush().await.map_err(LoginError::ConnectionError)?;
+    .await?;
+    
+    conn.flush().await?;
 
     Ok(())
 }

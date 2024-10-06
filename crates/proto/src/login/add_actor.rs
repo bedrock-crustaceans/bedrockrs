@@ -1,4 +1,4 @@
-use bedrockrs_core::{int::LE, Vec2, Vec3};
+use bedrockrs_core::{Vec2, Vec3};
 use bedrockrs_shared::{actor_runtime_id::ActorRuntimeID, actor_unique_id::ActorUniqueID};
 
 use crate::{
@@ -27,21 +27,21 @@ pub async fn add_actor(
         target_runtime_id: ActorRuntimeID(403),
         actor_type: ActorType::Pig.to_string(),
         position: Vec3 {
-            x: LE::new(4.0),
-            y: LE::new(8.0),
-            z: LE::new(7.0),
+            x: 4.0,
+            y: 8.0,
+            z: 7.0,
         },
         velocity: Vec3 {
-            x: LE::new(4.0),
-            y: LE::new(8.0),
-            z: LE::new(7.0),
+            x: 4.0,
+            y: 8.0,
+            z: 7.0,
         },
         rotation: Vec2 {
-            x: LE::new(270.0),
-            y: LE::new(90.0),
+            x: 270.0,
+            y: 90.0,
         },
-        y_head_rotation: LE::new(45.0),
-        y_body_rotation: LE::new(90.0),
+        y_head_rotation: 45.0,
+        y_body_rotation: 90.0,
         attributes: vec![],
         actor_data: vec![],
         synced_properties: PropertySyncData {
@@ -51,13 +51,8 @@ pub async fn add_actor(
         actor_links: vec![],
     };
 
-    conn.send(GamePackets::AddEntity(add_actor))
-        .await
-        .map_err(|e| LoginError::ConnectionError(e))?;
-
-    conn.flush()
-        .await
-        .map_err(|e| LoginError::ConnectionError(e))?;
+    conn.send(GamePackets::AddEntity(add_actor)).await?;
+    conn.flush().await?;
 
     Ok(())
 }

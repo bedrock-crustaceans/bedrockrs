@@ -40,26 +40,16 @@ pub async fn packs(
                 }
             };
 
-            match conn
-                .send(GamePackets::ResourcePacksInfo(resource_packs_info))
-                .await
-            {
-                Ok(_) => {}
-                Err(e) => return Err(LoginError::ConnectionError(e)),
-            };
-
-            match conn.flush().await {
-                Ok(_) => {}
-                Err(e) => return Err(LoginError::ConnectionError(e)),
-            };
+            conn.send(GamePackets::ResourcePacksInfo(resource_packs_info)).await?;
+            conn.flush().await?;
 
             //////////////////////////////////////
             // Resource Pack Client Response
             // (/Client Cache Status Packet)
             //////////////////////////////////////
 
-            match conn.recv().await {
-                Ok(GamePackets::ClientCacheStatus(mut client_cache_status)) => {
+            match conn.recv().await? {
+                GamePackets::ClientCacheStatus(mut client_cache_status) => {
                     match provider.on_client_cache_status_pk(&mut client_cache_status) {
                         LoginProviderStatus::ContinueLogin => {}
                         LoginProviderStatus::AbortLogin { reason } => {
@@ -67,12 +57,10 @@ pub async fn packs(
                         }
                     };
 
-                    if let Err(e) = conn.set_cache_supported(client_cache_status.cache_supported).await {
-                        return Err(LoginError::ConnectionError(e));
-                    }
+                    conn.set_cache_supported(client_cache_status.cache_supported).await?;
 
-                    match conn.recv().await {
-                        Ok(GamePackets::ResourcePackClientResponse(mut resource_pack_client_response)) => {
+                    match conn.recv().await? {
+                        GamePackets::ResourcePackClientResponse(mut resource_pack_client_response) => {
                             match provider.on_resource_packs_response_pk(&mut resource_pack_client_response) {
                                 LoginProviderStatus::ContinueLogin => {}
                                 LoginProviderStatus::AbortLogin { reason } => {
@@ -80,28 +68,26 @@ pub async fn packs(
                                 }
                             };
                         }
-                        Ok(other) => {
+                        other => {
                             return Err(LoginError::FormatError(format!(
                                 "Expected ClientCacheStatus or ResourcePackClientResponse packet, got: {other:?}"
                             )))
                         }
-                        Err(e) => { return Err(LoginError::ConnectionError(e)) }
                     }
-                }
-                Ok(GamePackets::ResourcePackClientResponse(mut resource_pack_client_response)) => {
+                } 
+                GamePackets::ResourcePackClientResponse(mut resource_pack_client_response) => {
                     match provider.on_resource_packs_response_pk(&mut resource_pack_client_response) {
                         LoginProviderStatus::ContinueLogin => {}
                         LoginProviderStatus::AbortLogin { reason } => {
                             return Err(LoginError::Abort { reason });
                         }
                     };
-                }
-                Ok(other) => {
+                } 
+                other => {
                     return Err(LoginError::FormatError(format!(
                         "Expected ClientCacheStatus or ResourcePackClientResponse packet, got: {other:?}"
                     )))
                 }
-                Err(e) => { return Err(LoginError::ConnectionError(e)) }
             }
 
             //////////////////////////////////////
@@ -128,25 +114,15 @@ pub async fn packs(
                 }
             };
 
-            match conn
-                .send(GamePackets::ResourcePackStack(resource_packs_stack))
-                .await
-            {
-                Ok(_) => {}
-                Err(e) => return Err(LoginError::ConnectionError(e)),
-            };
-
-            match conn.flush().await {
-                Ok(_) => {}
-                Err(e) => return Err(LoginError::ConnectionError(e)),
-            };
+            conn.send(GamePackets::ResourcePackStack(resource_packs_stack)).await?;
+            conn.flush().await?;
 
             //////////////////////////////////////
             // Resource Pack Client Response
             //////////////////////////////////////
 
-            match conn.recv().await {
-                Ok(GamePackets::ResourcePackClientResponse(mut resource_pack_client_response)) => {
+            match conn.recv().await? {
+                GamePackets::ResourcePackClientResponse(mut resource_pack_client_response) => {
                     match provider.on_resource_packs_response_pk(&mut resource_pack_client_response)
                     {
                         LoginProviderStatus::ContinueLogin => {}
@@ -155,16 +131,15 @@ pub async fn packs(
                         }
                     };
                 }
-                Ok(other) => {
+                other => {
                     return Err(LoginError::FormatError(format!(
                         "Expected ResourcePackClientResponse packet, got: {other:?}"
                     )))
                 }
-                Err(e) => return Err(LoginError::ConnectionError(e)),
             }
         }
         LoginProviderPacks::DirectNetworkTransfer { .. } => {
-            todo!("impl LoginProviderbedrockrs_addon::DirectNetworkTransfer in login process")
+            todo!("impl LoginProvider bedrockrs::DirectNetworkTransfer in login process")
         }
     };
 
