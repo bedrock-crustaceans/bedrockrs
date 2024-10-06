@@ -1,5 +1,5 @@
-use bedrockrs_proto_core::ProtoCodec;
 use super::item_stack_id_variant::ItemStackIdVariant;
+use bedrockrs_proto_core::ProtoCodec;
 
 #[derive(Debug, Clone)]
 pub enum ItemStackDescriptor {

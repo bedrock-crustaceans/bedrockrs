@@ -1,7 +1,7 @@
+use byteorder::WriteBytesExt;
 use std::io::{Cursor, Write};
 use std::sync::Arc;
 use std::time::Duration;
-use byteorder::WriteBytesExt;
 use tokio::select;
 use tokio::sync::{broadcast, watch};
 use tokio::time::interval;

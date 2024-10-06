@@ -1,5 +1,5 @@
-use bedrockrs_macros::ProtoCodec;
 use crate::types::block_definition::BlockDefinition;
+use bedrockrs_macros::ProtoCodec;
 
 #[derive(Debug, Clone, ProtoCodec)]
 pub struct BlockEntry {

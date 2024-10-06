@@ -1,5 +1,5 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::types::item_stack_descriptor::ItemStackDescriptor;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 49)]
 #[derive(ProtoCodec, Debug, Clone)]

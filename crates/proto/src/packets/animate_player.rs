@@ -3,8 +3,8 @@ use bedrockrs_macros::gamepacket;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
-use std::io::Cursor;
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
+use std::io::Cursor;
 use varint_rs::{VarintReader, VarintWriter};
 
 #[gamepacket(id = 44)]

@@ -3,9 +3,9 @@ use std::io::{Cursor, Read};
 
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
-use byteorder::{LittleEndian, ReadBytesExt};
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
+use byteorder::{LittleEndian, ReadBytesExt};
 use jsonwebtoken::{DecodingKey, Validation};
 use serde_json::Value;
 use varint_rs::VarintReader;

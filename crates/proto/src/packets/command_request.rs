@@ -1,5 +1,5 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::types::command_origin_data::CommandOriginData;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 77)]
 #[derive(ProtoCodec, Debug, Clone)]

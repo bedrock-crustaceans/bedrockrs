@@ -1,7 +1,7 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::types::pack_info_behavior::BehaviorPackInfoType;
 use crate::types::pack_info_resource::ResourcePackInfoType;
 use crate::types::pack_url::PackURL;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 6)]
 #[derive(ProtoCodec, Debug, Clone)]

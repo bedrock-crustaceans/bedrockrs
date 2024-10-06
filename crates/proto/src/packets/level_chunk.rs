@@ -1,8 +1,8 @@
-use varint_rs::VarintWriter;
 use crate::types::chunk_pos::ChunkPos;
 use bedrockrs_macros::gamepacket;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
+use varint_rs::VarintWriter;
 
 #[gamepacket(id = 58)]
 #[derive(Debug, Clone)]
@@ -40,10 +40,7 @@ impl ProtoCodec for LevelChunkPacket {
             todo!("implement sending with cached blobs.")
         }
 
-        let len = self
-            .serialized_chunk_data
-            .len()
-            .try_into()?;
+        let len = self.serialized_chunk_data.len().try_into()?;
 
         stream.write_u32_varint(len)?;
         stream.extend_from_slice(&self.serialized_chunk_data);

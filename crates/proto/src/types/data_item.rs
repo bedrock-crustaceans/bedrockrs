@@ -1,6 +1,6 @@
+use crate::types::block_pos::BlockPos;
 use bedrockrs_core::Vec3;
 use bedrockrs_macros::ProtoCodec;
-use crate::types::block_pos::BlockPos;
 
 #[derive(ProtoCodec, Debug, Clone)]
 pub struct DataItem {
