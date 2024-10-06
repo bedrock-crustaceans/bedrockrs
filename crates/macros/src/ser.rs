@@ -32,10 +32,10 @@ fn build_ser_field(fields: &[&Field], f_prefix: Option<TokenStream>) -> TokenStr
             let name = f.ident.clone().unwrap_or(Ident::new(&format!("e{i}"), Span::call_site()));
             let final_name = if let Some(prefix) = &f_prefix {
                 quote! { #prefix.#name }
-            } else { 
+            } else {
                 quote! { #name }
             };
-            
+
             let ty = f.ty.clone();
             let flags = get_attrs(f.attrs.as_slice()).expect("Error while getting attrs");
 
@@ -47,7 +47,7 @@ fn build_ser_field(fields: &[&Field], f_prefix: Option<TokenStream>) -> TokenStr
                 return quote! {
                     {
                         let len: #repr = #final_name.len().try_into()?;
-                        
+
                         #vec_ser;
 
                         for i in &#final_name {
@@ -70,7 +70,7 @@ fn build_ser_field(fields: &[&Field], f_prefix: Option<TokenStream>) -> TokenStr
             }
 
             let ser = build_ser_instance(flags.endianness, &ty, final_name);
-            
+
             quote! {
                 #ser;
             }

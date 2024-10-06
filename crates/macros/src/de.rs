@@ -28,12 +28,12 @@ fn build_de_field(fields: &[&Field]) -> TokenStream {
             let name = f.ident.clone().unwrap_or(Ident::new(&format!("e{i}"), Span::call_site()));
             let ty = f.ty.clone();
             let flags = get_attrs(f.attrs.as_slice()).expect("Error while getting attrs");
-            
+
             if let Some(repr) = flags.vec_repr {
                 let vec_des = build_de_instance(flags.vec_endianness, &repr);
                 let inner_ty = extract_inner_type_from_vec(&ty).expect("Failed to get inner Vec type").clone();
                 let des = build_de_instance(flags.endianness, &inner_ty);
-                
+
                 return quote! {
                     let #name = {
                         let len: #repr = #vec_des;
@@ -43,18 +43,18 @@ fn build_de_field(fields: &[&Field]) -> TokenStream {
                         for _ in 0..len {
                             vec.push(#des);
                         };
-                        
+
                         vec
                     };
                 }
             }
-            
+
             if flags.nbt {
                 return quote! {
                     let #name: #ty = ::nbtx::from_bytes::<::nbtx::NetworkLittleEndian, _>(stream)?;
                 }
             }
-            
+
             if flags.str {
                 return quote! {
                     let #name: #ty = <String as ::bedrockrs_proto_core::ProtoCodec>::proto_deserialize(stream)?.try_into()?;
@@ -62,7 +62,7 @@ fn build_de_field(fields: &[&Field]) -> TokenStream {
             }
 
             let des = build_de_instance(flags.endianness, &ty);
-            
+
             quote! {
                 let #name: #ty = #des;
             }
