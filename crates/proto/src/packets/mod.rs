@@ -57,3 +57,4 @@ pub mod open_sign;
 pub mod award_achievement;
 pub mod camera_shake;
 pub mod emote;
+pub mod available_entity_identifiers;

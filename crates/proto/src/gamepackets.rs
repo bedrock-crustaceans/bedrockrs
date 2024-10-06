@@ -60,6 +60,7 @@ use bedrockrs_macros::gamepackets;
 use bedrockrs_proto_core::{error::ProtoCodecError, GamePacket, ProtoCodec};
 use std::io::{Cursor, Write};
 use varint_rs::{VarintReader, VarintWriter};
+use crate::packets::available_entity_identifiers::AvailableEntityIdentifiersPacket;
 use crate::packets::award_achievement::AwardAchievementPacket;
 use crate::packets::camera_shake::CameraShakePacket;
 use crate::packets::emote::EmotePacket;
@@ -178,7 +179,7 @@ gamepackets! {
     UpdateSoftEnum: _,
     Ping: _,
     SpawnParticleEffect: _,
-    AvailableEntityIdentifiers: _,
+    AvailableEntityIdentifiers: AvailableEntityIdentifiersPacket,
     LevelSoundEventV2: _,
     ChunkPublisherUpdate: ChunkPublisherUpdatePacket,
     BiomeDefinitionList: _,

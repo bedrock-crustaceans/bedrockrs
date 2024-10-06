@@ -50,3 +50,4 @@ pub mod title_type;
 pub mod item_entry;
 pub mod block_entry;
 pub mod block_definition;
+pub mod entity_info;
