@@ -28,8 +28,8 @@ impl ProtoCodec for MovePlayerPacket {
 
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
         let player_runtime_id = ActorRuntimeID::proto_deserialize(stream)?;
-        let position = <Vec3::<f32> as ProtoCodecLE>::proto_deserialize(stream)?;
-        let rotation = <Vec2::<f32> as ProtoCodecLE>::proto_deserialize(stream)?;
+        let position = <Vec3<f32> as ProtoCodecLE>::proto_deserialize(stream)?;
+        let rotation = <Vec2<f32> as ProtoCodecLE>::proto_deserialize(stream)?;
         let head_rotation = <f32 as ProtoCodecLE>::proto_deserialize(stream)?;
         let position_mode = u8::proto_deserialize(stream)?;
         let on_ground = bool::proto_deserialize(stream)?;
