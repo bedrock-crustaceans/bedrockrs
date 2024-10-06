@@ -26,7 +26,7 @@ impl TransportLayerConnection {
                     .map_err(|err| TransportLayerError::RakNetError(RaknetError::SendError(err)))?;
             }
         }
-        
+
         Ok(())
     }
 
@@ -47,7 +47,7 @@ impl TransportLayerConnection {
                 stream.write_all(recv_stream.into_inner())?;
             }
         }
-        
+
         Ok(())
     }
 

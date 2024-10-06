@@ -76,7 +76,7 @@ impl Listener {
         self.listener.start().await?;
         Ok(())
     }
-    
+
     pub async fn stop(&mut self) -> Result<(), ListenerError> {
         self.listener.stop().await?;
         Ok(())
