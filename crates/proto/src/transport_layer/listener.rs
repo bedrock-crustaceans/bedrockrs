@@ -3,35 +3,31 @@ use crate::transport_layer::TransportLayerConnection;
 
 pub enum TransportLayerListener {
     RaknetUDP(rak_rs::Listener),
-    NetherNet(/* TODO */),
+    // TODO NetherNet(/* TODO */),
 }
 
 impl TransportLayerListener {
     pub async fn start(&mut self) -> Result<(), TransportLayerError> {
         match self {
-            TransportLayerListener::RaknetUDP(listener) => match listener.start().await {
-                Ok(_) => Ok(()),
-                Err(e) => Err(TransportLayerError::RaknetUDPError(
-                    RaknetError::ServerError(e),
-                )),
-            },
-            _ => {
-                todo!()
-            }
+            TransportLayerListener::RaknetUDP(listener) => listener.start().await.map_err(|err| TransportLayerError::RaknetUDPError(RaknetError::ServerError(err)))?,
+        };
+        
+        Ok(())
+    }
+    
+    pub async fn stop(&mut self) -> Result<(), TransportLayerError> {
+        match self {
+            TransportLayerListener::RaknetUDP(listener) => listener.stop().await.map_err(|err| TransportLayerError::RaknetUDPError(RaknetError::ServerError(err)))?,
         }
+        
+        Ok(())
     }
 
     pub async fn accept(&mut self) -> Result<TransportLayerConnection, TransportLayerError> {
-        match self {
-            TransportLayerListener::RaknetUDP(listener) => match listener.accept().await {
-                Ok(conn) => Ok(TransportLayerConnection::RaknetUDP(conn)),
-                Err(e) => Err(TransportLayerError::RaknetUDPError(
-                    RaknetError::ServerError(e),
-                )),
-            },
-            _ => {
-                todo!()
-            }
-        }
+        let conn = match self {
+            TransportLayerListener::RaknetUDP(listener) => TransportLayerConnection::RaknetUDP(listener.accept().await.map_err(|err| TransportLayerError::RaknetUDPError(RaknetError::ServerError(err)))?),
+        };
+        
+        Ok(conn)
     }
 }

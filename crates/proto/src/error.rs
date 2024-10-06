@@ -44,32 +44,20 @@ pub enum ConnectionError {
     CompressionMethodMismatch(u8),
 }
 
-#[derive(Error, Debug, Clone)]
+#[derive(Error, Debug)]
 pub enum CompressionError {
     #[error("Zlib Error: {0}")]
     ZlibError(#[from] Arc<dyn Error + Send + Sync>),
     #[error("Snappy Error: {0}")]
     SnappyError(#[from] Arc<IOError>),
     #[error("IO Error: {0}")]
-    IOError(Arc<IOError>),
+    IOError(IOError),
 }
 
 #[derive(Error, Debug)]
-pub enum LoginError {
-    #[error("Connection Error: {0}")]
-    ConnectionError(#[from] ConnectionError),
-    #[error("Login aborted, reason: {reason}")]
-    Abort { reason: String },
-    #[error("Wrong protocol version (client: {client}, server: {server:?})")]
-    WrongProtocolVersion { client: i32, server: Vec<i32> },
-    #[error("Format Error: {0}")]
-    FormatError(String),
-}
-
-#[derive(Error, Debug, Clone)]
 pub enum TransportLayerError {
     #[error("IO Error: {0}")]
-    IOError(#[from] Arc<IOError>),
+    IOError(#[from] IOError),
     #[error("Raknet UDP Error: {0}")]
     RaknetUDPError(#[from] RaknetError),
 }
@@ -79,7 +67,7 @@ pub enum RaknetError {
     #[error("Error while Receive: {0}")]
     RecvError(#[from] RecvError),
     #[error("Error while Send: {0}")]
-    SendError(SendQueueError),
+    SendError(#[from] SendQueueError),
     #[error("Server Error: {0}")]
     ServerError(#[from] ServerError),
     #[error("Format Error: {0}")]

@@ -45,7 +45,7 @@ impl Listener {
         // generate a random guid
         let guid: u64 = rand::thread_rng().next_u64();
 
-        // Setup the motd
+        // Set up the motd
         rak_listener.motd = Motd {
             edition: String::from(MINECRAFT_EDITION_MOTD),
             version: display_version,
@@ -73,17 +73,17 @@ impl Listener {
     }
 
     pub async fn start(&mut self) -> Result<(), ListenerError> {
-        match self.listener.start().await {
-            Ok(_) => Ok(()),
-            Err(e) => Err(ListenerError::TransportListenerError(e)),
-        }
+        self.listener.start().await?;
+        Ok(())
+    }
+    
+    pub async fn stop(&mut self) -> Result<(), ListenerError> {
+        self.listener.stop().await?;
+        Ok(())
     }
 
     pub async fn accept(&mut self) -> Result<Connection, ListenerError> {
-        let rak_conn = match self.listener.accept().await {
-            Ok(c) => c,
-            Err(e) => return Err(ListenerError::TransportListenerError(e)),
-        };
+        let rak_conn = self.listener.accept().await?;
 
         Ok(Connection::from_transport_conn(rak_conn))
     }

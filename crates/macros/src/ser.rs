@@ -3,7 +3,11 @@ use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
 use syn::{Attribute, DataEnum, DataStruct, Field, Fields, Type};
 
-fn build_ser_instance(endianness: Option<ProtoCodecEndianness>, f_type: &Type, f_name: TokenStream) -> TokenStream {
+fn build_ser_instance(
+    endianness: Option<ProtoCodecEndianness>,
+    f_type: &Type,
+    f_name: TokenStream,
+) -> TokenStream {
     match endianness {
         None => {
             quote! { <#f_type as ::bedrockrs_proto_core::ProtoCodec>::proto_serialize(&#f_name, stream)? }
@@ -77,7 +81,10 @@ fn build_ser_field(fields: &[&Field], f_prefix: Option<TokenStream>) -> TokenStr
     }
 }
 
-fn build_ser_fields(fields: Fields, f_prefix: Option<TokenStream>) -> (TokenStream, Option<TokenStream>) {
+fn build_ser_fields(
+    fields: Fields,
+    f_prefix: Option<TokenStream>,
+) -> (TokenStream, Option<TokenStream>) {
     let i_fields = match fields {
         Fields::Named(ref v) => Some(v.named.iter().clone()),
         Fields::Unnamed(ref v) => Some(v.unnamed.iter().clone()),
@@ -111,7 +118,7 @@ fn build_ser_fields(fields: Fields, f_prefix: Option<TokenStream>) -> (TokenStre
         }
         Fields::Unit => None,
     };
-    
+
     (ser, fields)
 }
 
@@ -133,7 +140,7 @@ pub fn build_ser_enum(data_enum: &DataEnum, attrs: &[Attribute]) -> TokenStream 
                 .clone()
                 .unwrap_or_else(|| panic!("Missing discriminant for {:?}", var.ident))
                 .1;
-            
+
             let enum_type_ser = build_ser_instance(endian.clone(), &repr, quote! {#desc});
             let name = var.ident.clone();
             let (ser, fields) = build_ser_fields(var.fields.clone(), None);
@@ -142,21 +149,21 @@ pub fn build_ser_enum(data_enum: &DataEnum, attrs: &[Attribute]) -> TokenStream 
                 quote! {
                     Self::#name #fields => {
                         #enum_type_ser;
-                        
+
                         #ser
                     }
                 }
-            } else { 
+            } else {
                 quote! {
                     Self::#name => {
                         #enum_type_ser;
-                        
+
                         #ser
                     }
                 }
             }
         });
-        
+
         quote! {
             match self {
                 #(#variants),*
