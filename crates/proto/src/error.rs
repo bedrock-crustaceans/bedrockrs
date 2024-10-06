@@ -59,7 +59,7 @@ pub enum TransportLayerError {
     #[error("IO Error: {0}")]
     IOError(#[from] IOError),
     #[error("Raknet UDP Error: {0}")]
-    RaknetUDPError(#[from] RaknetError),
+    RakNetError(#[from] RaknetError),
 }
 
 #[derive(Error, Debug, Clone)]

@@ -37,7 +37,7 @@ impl Listener {
             Ok(v) => v,
             Err(e) => {
                 return Err(ListenerError::TransportListenerError(
-                    TransportLayerError::RaknetUDPError(RaknetError::ServerError(e)),
+                    TransportLayerError::RakNetError(RaknetError::ServerError(e)),
                 ));
             }
         };
@@ -62,7 +62,7 @@ impl Listener {
         };
 
         Ok(Self {
-            listener: TransportLayerListener::RaknetUDP(rak_listener),
+            listener: TransportLayerListener::RakNet(rak_listener),
             name,
             sub_name,
             player_max,
