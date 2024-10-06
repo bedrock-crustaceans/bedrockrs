@@ -18,7 +18,7 @@ mod play_status;
 pub mod provider;
 mod set_title;
 
-pub async fn login_to_server(
+pub async fn login_sequence(
     conn: &mut ConnectionShard,
     mut provider: impl LoginProviderServer,
 ) -> Result<(), LoginError> {
@@ -33,11 +33,4 @@ pub async fn login_to_server(
 
     start_game(conn, &mut provider).await?;
     Ok(())
-}
-
-pub async fn login_to_client(
-    conn: &mut Connection,
-    provider: impl LoginProviderClient,
-) -> Result<(), LoginError> {
-    todo!()
 }
