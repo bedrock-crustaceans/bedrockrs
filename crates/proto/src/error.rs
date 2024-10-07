@@ -32,9 +32,9 @@ pub enum ConnectionError {
     #[error("Connection Closed")]
     ConnectionClosed,
     #[error("Transport Error: {0}")]
-    TransportError(TransportLayerError),
+    TransportError(#[from] TransportLayerError),
     #[error("Compression Error: {0}")]
-    CompressError(CompressionError),
+    CompressError(#[from] CompressionError),
     // TODO: Move into RakNet Error enum
     #[error("Invalid RakNet Header, expected: {RAKNET_GAME_PACKET_ID}, got: {0}")]
     InvalidRakNetHeader(u8),
@@ -47,9 +47,9 @@ pub enum ConnectionError {
 #[derive(Error, Debug)]
 pub enum CompressionError {
     #[error("Zlib Error: {0}")]
-    ZlibError(#[from] Arc<dyn Error + Send + Sync>),
+    ZlibError(#[from] Box<dyn Error + Send + Sync>),
     #[error("Snappy Error: {0}")]
-    SnappyError(#[from] Arc<IOError>),
+    SnappyError(#[from] IOError),
     #[error("IO Error: {0}")]
     IOError(IOError),
 }

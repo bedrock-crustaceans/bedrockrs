@@ -1,3 +1,4 @@
+use std::convert::Infallible;
 use std::io::Error as IOError;
 use std::num::{ParseIntError, TryFromIntError};
 use std::string::FromUtf8Error;
@@ -33,4 +34,10 @@ pub enum ProtoCodecError {
     InvalidGamePacketID(u16),
     #[error("Expected format got mismatched: {0}")]
     FormatMismatch(String),
+}
+
+impl From<Infallible> for ProtoCodecError {
+    fn from(value: Infallible) -> Self {
+        Self::FromIntError(value.into())
+    }
 }
