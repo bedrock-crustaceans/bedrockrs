@@ -1,8 +1,8 @@
-use std::io;
-use std::io::Write;
-use std::sync::Arc;
-
 use crate::error::CompressionError;
+use flate2::{write::DeflateEncoder, read::DeflateDecoder};
+use flate2::Compression as CompressionLevel;
+use snap::{write::FrameEncoder as SnapEncoder, read::FrameDecoder as SnapDecoder};
+use std::io::{Read, Write};
 
 #[derive(Clone)]
 pub enum Compression {
@@ -69,64 +69,76 @@ impl Compression {
     /// Compress the given uncompressed src stream into the given dst stream
     /// with the compressed data
     #[inline]
-    pub fn compress(&self, src: &[u8], dst: &mut Vec<u8>) -> Result<(), CompressionError> {
-        match self {
+    pub fn compress(&self, src: Vec<u8>) -> Result<Vec<u8>, CompressionError> {
+        let buf = match self {
             Compression::Zlib {
-                threshold: _,
+                threshold,
                 compression_level,
             } => {
-                let mut encoder = flate2::write::DeflateEncoder::new(
-                    dst,
-                    flate2::Compression::new(*compression_level as u32),
-                );
+                if *threshold as usize >= src.len() {
+                    src
+                } else {
+                    let dst = Vec::with_capacity(src.len() + 1);
 
-                encoder
-                    .write_all(src)
-                    .map_err(|e| CompressionError::ZlibError(Arc::new(e)))
-            }
-            Compression::Snappy { .. } => {
-                let mut encoder = snap::write::FrameEncoder::new(dst);
+                    let mut encoder =
+                        DeflateEncoder::new(dst, CompressionLevel::new(*compression_level as u32));
 
-                encoder
-                    .write_all(src)
-                    .map_err(|e| CompressionError::SnappyError(Arc::new(e)))
+                    encoder
+                        .write_all(src.as_slice())
+                        .map_err(|err| CompressionError::ZlibError(Box::new(err)))?;
+
+                    encoder
+                        .finish()
+                        .map_err(|err| CompressionError::ZlibError(Box::new(err)))?
+                }
             }
-            Compression::None => {
-                // unnecessary copying, this fn shouldn't be called when `compression_needed` returns false
-                dst.write_all(src)
-                    .map_err(|e| CompressionError::IOError(Arc::new(e)))
+            Compression::Snappy { threshold } => {
+                if *threshold as usize >= src.len() {
+                    src
+                } else {
+                    let dst = Vec::with_capacity(src.len());
+
+                    let mut encoder = SnapEncoder::new(dst);
+
+                    encoder
+                        .write_all(src.as_slice())
+                        .map_err(|e| CompressionError::SnappyError(e))?;
+
+                    encoder
+                        .into_inner()
+                        .map_err(|err| CompressionError::SnappyError(err.into_error()))?
+                }
             }
-        }
+            Compression::None => src,
+        };
+
+        Ok(buf)
     }
 
     /// Decompress the given compressed src stream into the given dst stream
     /// with the decompressed data
     #[inline]
-    pub fn decompress(&self, src: &[u8], dst: &mut Vec<u8>) -> Result<(), CompressionError> {
-        match self {
+    pub fn decompress(&self, src: Vec<u8>) -> Result<Vec<u8>, CompressionError> {
+        let buf = match self {
             Compression::Zlib { .. } => {
-                let mut decoder = flate2::read::DeflateDecoder::new(src);
-
-                match io::copy(&mut decoder, dst) {
-                    Ok(_) => Ok(()),
-                    Err(e) => Err(CompressionError::ZlibError(Arc::new(e))),
-                }
+                let mut dst = Vec::with_capacity(src.len());
+                
+                let mut decoder = DeflateDecoder::new(src.as_slice());
+                decoder.read_to_end(&mut dst)?;
+                
+                dst
             }
             Compression::Snappy { .. } => {
-                let mut decoder = snap::read::FrameDecoder::new(src);
-
-                match io::copy(&mut decoder, dst) {
-                    Ok(_) => Ok(()),
-                    Err(e) => Err(CompressionError::SnappyError(Arc::new(e))),
-                }
+                let mut dst = Vec::with_capacity(src.len());
+                
+                let mut decoder = SnapDecoder::new(src.as_slice());
+                decoder.read_to_end(&mut dst)?;
+                
+                dst
             }
-            Compression::None => {
-                // unnecessary copying, this fn shouldn't be called when `compression_needed` returns false
-                match dst.write_all(src) {
-                    Ok(_) => Ok(()),
-                    Err(e) => Err(CompressionError::IOError(Arc::new(e))),
-                }
-            }
-        }
+            Compression::None => src,
+        };
+        
+        Ok(buf)
     }
 }
