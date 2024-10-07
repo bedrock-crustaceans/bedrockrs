@@ -17,12 +17,13 @@ pub struct Connection {
     /// Represents the connections internal transport layer, this allows using different
     /// transport layers with the client or proxies, this can improve performance.
     connection: TransportLayerConnection,
-    /// Represents the connections' compression, the compression gets initialized in the
+    /// Represents the Connection's compression, the compression gets initialized in the
     /// login process.
     pub compression: Option<Compression>,
     /// Represents the connections encryption, the encryption gets initialized in the
     /// login process, if encryption is allowed.
     pub encryption: Option<Encryption>,
+    /// Determines if the Connection does support caching.
     pub cache_supported: bool,
 }
 
@@ -83,7 +84,7 @@ impl Connection {
 
         // Send the data
         self.connection
-            .send(&Cursor::new(&encrypted_stream))
+            .send(&encrypted_stream)
             .await
             .map_err(ConnectionError::TransportError)
     }
