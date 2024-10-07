@@ -12,4 +12,9 @@ impl ProtoCodec for Xuid {
     fn proto_deserialize(buf: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
         Ok(Xuid::try_from(String::proto_deserialize(buf)?)?)
     }
+
+    fn get_size_prediction(&self) -> usize {
+        // 20 = u64::MAX as String
+        size_of::<u32>() + 20
+    }
 }

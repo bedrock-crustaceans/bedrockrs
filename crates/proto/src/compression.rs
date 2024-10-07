@@ -1,7 +1,7 @@
 use crate::error::CompressionError;
-use flate2::{write::DeflateEncoder, read::DeflateDecoder};
 use flate2::Compression as CompressionLevel;
-use snap::{write::FrameEncoder as SnapEncoder, read::FrameDecoder as SnapDecoder};
+use flate2::{read::DeflateDecoder, write::DeflateEncoder};
+use snap::{read::FrameDecoder as SnapDecoder, write::FrameEncoder as SnapEncoder};
 use std::io::{Read, Write};
 
 #[derive(Clone)]
@@ -122,23 +122,23 @@ impl Compression {
         let buf = match self {
             Compression::Zlib { .. } => {
                 let mut dst = Vec::with_capacity(src.len());
-                
+
                 let mut decoder = DeflateDecoder::new(src.as_slice());
                 decoder.read_to_end(&mut dst)?;
-                
+
                 dst
             }
             Compression::Snappy { .. } => {
                 let mut dst = Vec::with_capacity(src.len());
-                
+
                 let mut decoder = SnapDecoder::new(src.as_slice());
                 decoder.read_to_end(&mut dst)?;
-                
+
                 dst
             }
             Compression::None => src,
         };
-        
+
         Ok(buf)
     }
 }

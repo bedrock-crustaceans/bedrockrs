@@ -20,7 +20,7 @@ impl ProtoCodec for LevelChunkPacket {
     fn proto_serialize(
         &self,
         stream: &mut Vec<u8>,
-    ) -> Result<(), bedrockrs_proto_core::error::ProtoCodecError> {
+    ) -> Result<(), ProtoCodecError> {
         self.chunk_position.proto_serialize(stream)?;
         self.dimension_id.proto_serialize(stream)?;
 
@@ -54,5 +54,10 @@ impl ProtoCodec for LevelChunkPacket {
         stream: &mut std::io::Cursor<&[u8]>,
     ) -> Result<Self, bedrockrs_proto_core::error::ProtoCodecError> {
         todo!()
+    }
+
+    fn get_size_prediction(&self) -> usize {
+        // TODO
+        1
     }
 }

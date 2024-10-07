@@ -1,7 +1,6 @@
 use io::Error as IOError;
 use std::error::Error;
 use std::io;
-use std::sync::Arc;
 
 use bedrockrs_proto_core::error::ProtoCodecError;
 use rak_rs::connection::queue::SendQueueError;

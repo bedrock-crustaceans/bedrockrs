@@ -24,7 +24,11 @@ fn build_ser_instance(
     }
 }
 
-fn build_ser_field(fields: &[&Field], f_prefix: Option<TokenStream>) -> TokenStream {
+fn build_ser_field(
+    fields: &[&Field],
+    f_prefix: Option<TokenStream>,
+    vec_by_ref: bool,
+) -> TokenStream {
     let code = fields
         .iter()
         .enumerate()
@@ -44,13 +48,19 @@ fn build_ser_field(fields: &[&Field], f_prefix: Option<TokenStream>) -> TokenStr
                 let inner_ty = extract_inner_type_from_vec(&ty).expect("Failed to get inner Vec type").clone();
                 let ser = build_ser_instance(flags.endianness, &inner_ty, quote!{ i });
 
+                let vec_prefix = if vec_by_ref {
+                    quote! { & }
+                } else { 
+                    quote! {}
+                };
+                
                 return quote! {
                     {
                         let len: #repr = #final_name.len().try_into()?;
 
                         #vec_ser;
 
-                        for i in &#final_name {
+                        for i in #vec_prefix #final_name {
                             #ser;
                         };
                     };
@@ -59,7 +69,7 @@ fn build_ser_field(fields: &[&Field], f_prefix: Option<TokenStream>) -> TokenStr
 
             if flags.nbt {
                 return quote! {
-                    ::nbtx::to_bytes_in::<::nbtx::NetworkLittleEndian>(stream, &#final_name)?;
+                    ::nbtx::to_bytes_in::<::nbtx::NetworkLittleEndian>(&stream, &#final_name)?;
                 }
             }
 
@@ -84,6 +94,7 @@ fn build_ser_field(fields: &[&Field], f_prefix: Option<TokenStream>) -> TokenStr
 fn build_ser_fields(
     fields: Fields,
     f_prefix: Option<TokenStream>,
+    vec_by_ref: bool,
 ) -> (TokenStream, Option<TokenStream>) {
     let i_fields = match fields {
         Fields::Named(ref v) => Some(v.named.iter().clone()),
@@ -92,7 +103,7 @@ fn build_ser_fields(
     };
 
     let ser = if let Some(i_fields) = i_fields {
-        build_ser_field(Vec::from_iter(i_fields).as_slice(), f_prefix)
+        build_ser_field(Vec::from_iter(i_fields).as_slice(), f_prefix, vec_by_ref)
     } else {
         quote! {}
     };
@@ -123,7 +134,7 @@ fn build_ser_fields(
 }
 
 pub fn build_ser_struct(data_struct: &DataStruct) -> TokenStream {
-    let (ser, _) = build_ser_fields(data_struct.fields.clone(), Some(quote! { self }));
+    let (ser, _) = build_ser_fields(data_struct.fields.clone(), Some(quote! { self }), true);
 
     quote! {
         #ser
@@ -143,7 +154,7 @@ pub fn build_ser_enum(data_enum: &DataEnum, attrs: &[Attribute]) -> TokenStream 
 
             let enum_type_ser = build_ser_instance(endian.clone(), &repr, quote! {#desc});
             let name = var.ident.clone();
-            let (ser, fields) = build_ser_fields(var.fields.clone(), None);
+            let (ser, fields) = build_ser_fields(var.fields.clone(), None, false);
 
             if let Some(fields) = fields {
                 quote! {

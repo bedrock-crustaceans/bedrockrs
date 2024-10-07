@@ -14,6 +14,10 @@ macro_rules! impl_proto_tuple {
             fn proto_deserialize(_stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
                 Ok(())
             }
+
+            fn get_size_prediction(&self) -> usize {
+                0
+            }
         }
     };
     ($name:ident, $size:literal) => {
@@ -34,6 +38,10 @@ macro_rules! impl_proto_tuple {
                 });
 
                 Ok(tuple)
+            }
+
+            fn get_size_prediction(&self) -> usize {
+                self.0.get_size_prediction() * $size
             }
         }
     };

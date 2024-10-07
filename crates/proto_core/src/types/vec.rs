@@ -27,6 +27,10 @@ macro_rules! impl_proto_vec2 {
                     y: T::proto_deserialize(stream)?,
                 })
             }
+
+            fn get_size_prediction(&self) -> usize {
+                self.x.get_size_prediction() * 2
+            }
         }
     };
 }
@@ -54,6 +58,10 @@ macro_rules! impl_proto_vec3 {
                     y: T::proto_deserialize(stream)?,
                     z: T::proto_deserialize(stream)?,
                 })
+            }
+
+            fn get_size_prediction(&self) -> usize {
+                self.x.get_size_prediction() * 3
             }
         }
     };

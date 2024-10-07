@@ -50,4 +50,8 @@ impl ProtoCodec for DisconnectPlayerPacket {
 
         Ok(Self { reason, message })
     }
+
+    fn get_size_prediction(&self) -> usize {
+        self.reason.get_size_prediction() + self.message.get_size_prediction()
+    }
 }

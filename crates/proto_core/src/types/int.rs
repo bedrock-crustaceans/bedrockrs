@@ -17,7 +17,7 @@ impl ProtoCodec for u8 {
     }
 
     fn get_size_prediction(&self) -> usize {
-        1
+        size_of::<u8>()
     }
 }
 
@@ -31,12 +31,12 @@ impl ProtoCodec for i8 {
     }
 
     fn get_size_prediction(&self) -> usize {
-        1
+        size_of::<i8>()
     }
 }
 
 macro_rules! impl_proto_codec_le {
-    ($int:ident, $size:literal) => {
+    ($int:ident) => {
         paste! {
             impl ProtoCodecLE for $int {
                 fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
@@ -46,9 +46,9 @@ macro_rules! impl_proto_codec_le {
                 fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
                     Ok(ReadBytesExt::[<read_ $int>]::<LittleEndian>(stream)?)
                 }
-                
+
                 fn get_size_prediction(&self) -> usize {
-                    $size
+                    size_of::<$int>()
                 }
             }
         }
@@ -56,7 +56,7 @@ macro_rules! impl_proto_codec_le {
 }
 
 macro_rules! impl_proto_codec_be {
-    ($int:ident, $size:literal) => {
+    ($int:ident) => {
         paste! {
             impl ProtoCodecBE for $int {
                 fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
@@ -66,9 +66,9 @@ macro_rules! impl_proto_codec_be {
                 fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
                     Ok(ReadBytesExt::[<read_ $int>]::<BigEndian>(stream)?)
                 }
-                
+
                 fn get_size_prediction(&self) -> usize {
-                    $size
+                    size_of::<$int>()
                 }
             }
         }
@@ -76,7 +76,7 @@ macro_rules! impl_proto_codec_be {
 }
 
 macro_rules! impl_proto_codec_var {
-    ($int:ident, $size:literal) => {
+    ($int:ident) => {
         paste! {
             impl ProtoCodecVAR for $int {
                 fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
@@ -86,42 +86,42 @@ macro_rules! impl_proto_codec_var {
                 fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
                     Ok(VarintReader::[<read_ $int _varint>](stream)?)
                 }
-                
+
                 fn get_size_prediction(&self) -> usize {
-                    $size
+                    size_of::<$int>()
                 }
             }
         }
     };
 }
 
-impl_proto_codec_le!(u16, 2);
-impl_proto_codec_le!(i16, 2);
-impl_proto_codec_le!(u32, 4);
-impl_proto_codec_le!(i32, 4);
-impl_proto_codec_le!(u64, 8);
-impl_proto_codec_le!(i64, 8);
-impl_proto_codec_le!(u128, 16);
-impl_proto_codec_le!(i128, 16);
-impl_proto_codec_le!(f32, 4);
-impl_proto_codec_le!(f64, 8);
+impl_proto_codec_le!(u16);
+impl_proto_codec_le!(i16);
+impl_proto_codec_le!(u32);
+impl_proto_codec_le!(i32);
+impl_proto_codec_le!(u64);
+impl_proto_codec_le!(i64);
+impl_proto_codec_le!(u128);
+impl_proto_codec_le!(i128);
+impl_proto_codec_le!(f32);
+impl_proto_codec_le!(f64);
 
-impl_proto_codec_be!(u16, 2);
-impl_proto_codec_be!(i16, 2);
-impl_proto_codec_be!(u32, 4);
-impl_proto_codec_be!(i32, 4);
-impl_proto_codec_be!(u64, 8);
-impl_proto_codec_be!(i64, 8);
-impl_proto_codec_be!(u128, 16);
-impl_proto_codec_be!(i128, 16);
-impl_proto_codec_be!(f32, 4);
-impl_proto_codec_be!(f64, 8);
+impl_proto_codec_be!(u16);
+impl_proto_codec_be!(i16);
+impl_proto_codec_be!(u32);
+impl_proto_codec_be!(i32);
+impl_proto_codec_be!(u64);
+impl_proto_codec_be!(i64);
+impl_proto_codec_be!(u128);
+impl_proto_codec_be!(i128);
+impl_proto_codec_be!(f32);
+impl_proto_codec_be!(f64);
 
-impl_proto_codec_var!(u16, 2);
-impl_proto_codec_var!(i16, 2);
-impl_proto_codec_var!(u32, 4);
-impl_proto_codec_var!(i32, 4);
-impl_proto_codec_var!(u64, 8);
-impl_proto_codec_var!(i64, 8);
-impl_proto_codec_var!(u128, 16);
-impl_proto_codec_var!(i128, 16);
+impl_proto_codec_var!(u16);
+impl_proto_codec_var!(i16);
+impl_proto_codec_var!(u32);
+impl_proto_codec_var!(i32);
+impl_proto_codec_var!(u64);
+impl_proto_codec_var!(i64);
+impl_proto_codec_var!(u128);
+impl_proto_codec_var!(i128);

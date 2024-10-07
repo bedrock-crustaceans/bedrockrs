@@ -37,4 +37,10 @@ impl ProtoCodec for PackURL {
 
         Ok(Self { uuid, version, url })
     }
+
+    fn get_size_prediction(&self) -> usize {
+        self.uuid.get_size_prediction()
+            + self.version.get_size_prediction()
+            + self.url.get_size_prediction()
+    }
 }

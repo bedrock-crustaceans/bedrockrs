@@ -30,6 +30,13 @@ macro_rules! impl_proto_option {
                     true => Some(T::proto_deserialize(stream)?),
                 })
             }
+
+            fn get_size_prediction(&self) -> usize {
+                match self {
+                    Some(v) => T::get_size_prediction(v) + size_of::<u8>(),
+                    None => size_of::<u8>(),
+                }
+            }
         }
     };
 }

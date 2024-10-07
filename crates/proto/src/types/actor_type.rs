@@ -482,4 +482,8 @@ impl ProtoCodec for ActorType {
     ) -> Result<Self, bedrockrs_proto_core::error::ProtoCodecError> {
         unimplemented!()
     }
+
+    fn get_size_prediction(&self) -> usize {
+        unimplemented!()
+    }
 }

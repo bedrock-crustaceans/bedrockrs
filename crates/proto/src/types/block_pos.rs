@@ -29,4 +29,8 @@ impl ProtoCodec for BlockPos {
             z: buf.read_i32_varint()?,
         })
     }
+
+    fn get_size_prediction(&self) -> usize {
+        size_of::<i32>() + size_of::<u32>() + size_of::<i32>()
+    }
 }

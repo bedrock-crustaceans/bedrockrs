@@ -29,4 +29,9 @@ impl ProtoCodec for String {
 
         Ok(String::from_utf8(string_buf)?)
     }
+
+    fn get_size_prediction(&self) -> usize {
+        // 4 = u32 String size
+        self.len() + 4
+    }
 }

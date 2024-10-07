@@ -15,4 +15,8 @@ impl ProtoCodec for ActorUniqueID {
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
         Ok(Self(stream.read_i64_varint()?))
     }
+
+    fn get_size_prediction(&self) -> usize {
+        size_of::<i64>()
+    }
 }

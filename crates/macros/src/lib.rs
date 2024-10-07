@@ -8,6 +8,7 @@ use syn::{parse_macro_input, Data, DeriveInput, Lit, Token};
 mod attr;
 mod de;
 mod ser;
+mod size;
 
 #[proc_macro_derive(
     ProtoCodec,
@@ -56,6 +57,10 @@ pub fn proto_codec_derive(item: proc_macro::TokenStream) -> proc_macro::TokenStr
                 ::log::trace!("ProtoDeserialize: {}", stringify!(#name));
                 #de
                 Ok(val)
+            }
+
+            fn get_size_prediction(&self) -> usize {
+                1
             }
         }
     };

@@ -23,4 +23,8 @@ impl ProtoCodec for bool {
     {
         Ok(!matches!(stream.read_u8()?, 0))
     }
+
+    fn get_size_prediction(&self) -> usize {
+        size_of::<u8>()
+    }
 }

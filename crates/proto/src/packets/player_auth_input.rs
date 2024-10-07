@@ -3,7 +3,6 @@ use crate::types::input_data::InputData;
 use crate::types::input_mode::InputMode;
 use crate::types::interaction_model::InteractionModel;
 use crate::types::play_mode::PlayMode;
-use bedrockrs_core::int::{LE, VAR};
 use bedrockrs_core::{Vec2, Vec3};
 use bedrockrs_macros::gamepacket;
 use bedrockrs_proto_core::error::ProtoCodecError;
@@ -63,7 +62,7 @@ impl ProtoCodec for PlayerAuthInputPacket {
             2 => PlayMode::Screen,
             3 => PlayMode::Viewer,
             4 => {
-                let vr_gaze_direction = ProtoCodec::proto_deserialize(stream)?;
+                let vr_gaze_direction = ProtoCodecLE::proto_deserialize(stream)?;
                 PlayMode::Reality(vr_gaze_direction)
             }
             5 => PlayMode::Placement,

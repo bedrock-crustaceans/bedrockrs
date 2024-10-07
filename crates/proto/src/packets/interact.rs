@@ -25,7 +25,7 @@ impl ProtoCodec for InteractPacket {
 
         u8::proto_serialize(&action, stream)?;
 
-        if let InteractAction::InteractUpdate(pos) = self.action {
+        if let InteractAction::InteractUpdate(pos) | InteractAction::StopRiding(pos) = self.action {
             ProtoCodecLE::proto_serialize(&pos, stream)?;
         }
 
