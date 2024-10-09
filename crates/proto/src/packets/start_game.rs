@@ -173,7 +173,7 @@ impl ::bedrockrs_proto_core::ProtoCodec for StartGamePacket {
             stream,
         )?;
         ::nbtx::to_bytes_in::<::nbtx::NetworkLittleEndian, >(
-            stream.as_mut(),
+            &mut stream,
             &self.player_property_data
         )?;
         <u64 as ::bedrockrs_proto_core::ProtoCodecLE>::proto_serialize(
