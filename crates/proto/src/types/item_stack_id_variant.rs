@@ -1,7 +1,7 @@
-use std::io::Cursor;
-use varint_rs::{VarintReader, VarintWriter};
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::{ProtoCodec, ProtoCodecVAR};
+use std::io::Cursor;
+use varint_rs::{VarintReader, VarintWriter};
 
 #[derive(Debug, Clone)]
 #[repr(transparent)]

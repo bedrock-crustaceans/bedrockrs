@@ -46,7 +46,7 @@ fn build_ser_field(
             if let Some(repr) = flags.vec_repr {
                 let vec_ser = build_ser_instance(flags.vec_endianness, &repr, quote! { len });
                 let inner_ty = extract_inner_type_from_vec(&ty).expect("Failed to get inner Vec type").clone();
-                let ser = build_ser_instance(flags.endianness, &inner_ty, quote!{ i });
+                let ser = build_ser_instance(flags.endianness, &inner_ty, quote! { i });
 
                 let vec_prefix = if vec_by_ref {
                     quote! { & }
@@ -64,19 +64,19 @@ fn build_ser_field(
                             #ser;
                         };
                     };
-                }
+                };
             }
 
             if flags.nbt {
                 return quote! {
                     ::nbtx::to_bytes_in::<::nbtx::NetworkLittleEndian>(stream, &#final_name)?;
-                }
+                };
             }
 
             if flags.str {
                 return quote! {
                     <String as ::bedrockrs_proto_core::ProtoCodec>::proto_serialize(&ToString::to_string(&#final_name) stream)?;
-                }
+                };
             }
 
             let ser = build_ser_instance(flags.endianness, &ty, final_name);

@@ -46,19 +46,19 @@ fn build_de_field(fields: &[&Field]) -> TokenStream {
 
                         vec
                     };
-                }
+                };
             }
 
             if flags.nbt {
                 return quote! {
                     let #name: #ty = ::nbtx::from_bytes::<::nbtx::NetworkLittleEndian, _>(stream)?;
-                }
+                };
             }
 
             if flags.str {
                 return quote! {
                     let #name: #ty = <String as ::bedrockrs_proto_core::ProtoCodec>::proto_deserialize(stream)?.try_into()?;
-                }
+                };
             }
 
             let des = build_de_instance(flags.endianness, &ty);
@@ -66,7 +66,7 @@ fn build_de_field(fields: &[&Field]) -> TokenStream {
             quote! {
                 let #name: #ty = #des;
             }
-    });
+        });
 
     quote! {
         #(#code)*

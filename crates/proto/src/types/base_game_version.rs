@@ -1,7 +1,6 @@
-use std::io::Cursor;
-use bedrockrs_macros::ProtoCodec;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
+use std::io::Cursor;
 
 #[derive(Debug, Clone)]
 #[repr(transparent)]
