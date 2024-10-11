@@ -1,7 +1,6 @@
-extern crate core;
-
 pub mod compression;
 pub mod connection;
+pub mod connection_shard;
 pub mod encryption;
 pub mod error;
 pub mod gamepackets;

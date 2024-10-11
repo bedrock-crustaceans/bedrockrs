@@ -231,7 +231,7 @@ gamepackets! {
     CameraPresets: _,
     UnlockedRecipes: _,
     CameraInstruction: _,
-    CompressedBiomeDefinitionList: _,
+    BiomeDefinitionListCompressed: _,
     TrimData: _,
     OpenSign: OpenSignPacket,
     AgentAnimation: _,
@@ -300,12 +300,10 @@ fn write_gamepacket_header(
 
     // Set the next 2 bits as the sub client sender id
     // Never more than an 8-bit integer due to being 2 bits big
-    gamepacket_header |=
-        (<SubClientID as Into<u8>>::into(subclient_sender_id) as u16 >> 10) & 0b0000_1100_0000_0000;
+    gamepacket_header |= (Into::<u16>::into(subclient_sender_id) >> 10) & 0b0000_1100_0000_0000;
     // Set the next 2 bits as the sub client target id
     // Never more than an 8-bit integer due to being 2 bits big
-    gamepacket_header |=
-        (<SubClientID as Into<u8>>::into(subclient_target_id) as u16 >> 12) & 0b0011_0000_0000_0000;
+    gamepacket_header |= (Into::<u16>::into(subclient_target_id) >> 12) & 0b0011_0000_0000_0000;
 
     // Since the size of the header is also included in the batched packet size,
     // we need to write it to a temporary buffer
@@ -323,7 +321,7 @@ fn write_gamepacket_header(
     Ok(())
 }
 
-fn get_gamepacket_header_size_prediction() -> usize {
+const fn get_gamepacket_header_size_prediction() -> usize {
     // 2 = gamepacket header (varint u32, only 14 bites can be treated as an u16)
     // 4 = gamepacket length size (varint u32)
     2 + 4

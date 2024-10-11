@@ -5,7 +5,7 @@ use flate2::{read::DeflateDecoder, write::DeflateEncoder};
 use snap::{read::FrameDecoder as SnapDecoder, write::FrameEncoder as SnapEncoder};
 use std::io::{Cursor, Read, Write};
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum Compression {
     Zlib {
         threshold: u16,

@@ -1,14 +1,12 @@
 use crate::compression::Compression;
+use crate::connection_shard::{ConnectionShardRecv, ConnectionShardSend};
 use crate::encryption::Encryption;
 use crate::error::ConnectionError;
 use crate::gamepackets::GamePackets;
 use crate::sub_client::SubClientID;
 use crate::transport_layer::TransportLayerConnection;
 use std::io::Cursor;
-use std::time::Duration;
-use tokio::select;
-use tokio::sync::{broadcast, watch};
-use tokio::time::interval;
+use tokio::sync::{broadcast, oneshot, watch};
 
 pub struct Connection {
     /// Represents the Connection's internal transport layer, which may vary.
@@ -108,178 +106,182 @@ impl Connection {
         self.transport_layer.close().await;
     }
 
-    pub async fn into_shard(
-        mut self,
-        flush_interval: Duration,
-        packet_buffer_size: usize,
-    ) -> ConnectionShard {
-        let (sd_pk_send, mut tk_pk_recv) = broadcast::channel::<GamePackets>(packet_buffer_size);
-        let (tk_pk_send, sh_pk_recv) =
-            broadcast::channel::<Result<GamePackets, ConnectionError>>(packet_buffer_size);
-
-        let (shard_flush_request_sender, mut task_flush_request_receiver) = watch::channel(());
-        let (task_flush_complete_sender, mut shard_flush_complete_receiver) = watch::channel(());
-
-        let (shard_close_sender, mut task_close_receiver) = watch::channel(());
-
-        let (shard_compression_sender, mut task_compression_receiver) =
-            watch::channel(self.compression.clone());
-        let (shard_compression_request_sender, mut task_compression_request_receiver) =
-            watch::channel(());
-        let (mut task_compression_sender, shard_compression_receiver) =
-            watch::channel(self.compression.clone());
-
-        let (shard_encryption_sender, mut task_encryption_receiver) =
-            watch::channel(self.encryption.clone());
-        let (shard_encryption_request_sender, mut task_encryption_request_receiver) =
-            watch::channel(());
-        let (mut task_encryption_sender, shard_encryption_receiver) =
-            watch::channel(self.encryption.clone());
-
-        let (shard_cache_supported_sender, mut task_cache_supported_receiver) =
-            watch::channel(self.cache_supported.clone());
-        let (shard_cache_supported_request_sender, mut task_cache_supported_request_receiver) =
-            watch::channel(());
-        let (mut task_cache_supported_sender, shard_cache_supported_receiver) =
-            watch::channel(self.cache_supported.clone());
-
-        tokio::spawn(async move {
-            let mut flush_interval = interval(flush_interval);
-            let mut send_buffer = vec![];
-
-            'select_loop: loop {
-                select! {
-                    _ = task_close_receiver.changed() => {
-                        break 'select_loop
-                    }
-                    res = task_compression_receiver.changed() => {
-                        if let Err(_) = res {
-                            break 'select_loop
-                        }
-
-                        self.compression = task_compression_receiver.borrow_and_update().to_owned();
-                    }
-                    res = task_encryption_receiver.changed() => {
-                        if let Err(_) = res {
-                            break 'select_loop
-                        }
-
-                        self.encryption = task_encryption_receiver.borrow_and_update().to_owned();
-                    }
-                    res = task_cache_supported_receiver.changed() => {
-                        if let Err(_) = res {
-                            break 'select_loop
-                        }
-
-                        self.cache_supported = task_cache_supported_receiver.borrow_and_update().to_owned();
-                    }
-                    res = task_compression_request_receiver.changed() => {
-                        if let Err(_) = res {
-                            break 'select_loop
-                        }
-
-                        if let Err(_) = task_compression_sender.send(self.compression.clone()) {
-                            break 'select_loop
-                        }
-                    }
-                    res = task_encryption_request_receiver.changed() => {
-                        if let Err(_) = res {
-                            break 'select_loop
-                        }
-
-                        if let Err(_) = task_encryption_sender.send(self.encryption.clone()) {
-                            break 'select_loop
-                        }
-                    }
-                    res = task_cache_supported_request_receiver.changed() => {
-                        if let Err(_) = res {
-                            break 'select_loop
-                        }
-
-                        if let Err(_) = task_cache_supported_sender.send(self.cache_supported.clone()) {
-                            break 'select_loop
-                        }
-                    }
-                    res = self.recv() => {
-                        match res {
-                            Ok(pks) => {
-                                for pk in pks {
-                                    if tk_pk_send.send(Ok(pk)).is_err() {
-                                        break 'select_loop
-                                    }
-                                }
-                            }
-                            Err(e) => {
-                                if tk_pk_send.send(Err(e)).is_err() {
-                                    break 'select_loop
-                                }
-                            }
-                        }
-                    }
-                    res = tk_pk_recv.recv() => {
-                        if res.is_err() {
-                            break 'select_loop
-                        }
-
-                        match res {
-                            Ok(pk) => { send_buffer.push(pk); }
-                            Err(e) => { break 'select_loop }
-                        };
-                    }
-                    res = task_flush_request_receiver.changed() => {
-                        if res.is_err() {
-                            break 'select_loop
-                        }
-
-                        if !send_buffer.is_empty() {
-                            if let Err(_) = self.send(send_buffer.as_slice()).await {
-                                break 'select_loop
-                            }
-
-                            if task_flush_complete_sender.send(()).is_err() {
-                                break 'select_loop
-                            }
-
-                            send_buffer = vec![];
-                        }
-                    }
-                    _ = flush_interval.tick() => {
-                        if !send_buffer.is_empty() {
-                            if (self.send(send_buffer.as_slice()).await).is_err() {
-                                break 'select_loop
-                            }
-
-                            send_buffer = vec![];
-                        }
-                    }
-                }
-            }
-
-            self.transport_layer.close().await;
-        });
-
-        ConnectionShard {
-            pk_sender: sd_pk_send,
-            pk_receiver: sh_pk_recv,
-
-            flush_sender: shard_flush_request_sender,
-            flush_receiver: shard_flush_complete_receiver,
-
-            close_sender: shard_close_sender,
-
-            compression_sender: shard_compression_sender,
-            compression_request_sender: shard_compression_request_sender,
-            compression_receiver: shard_compression_receiver,
-
-            encryption_sender: shard_encryption_sender,
-            encryption_request_sender: shard_encryption_request_sender,
-            encryption_receiver: shard_encryption_receiver,
-
-            cache_supported_sender: shard_cache_supported_sender,
-            cache_supported_request_sender: shard_cache_supported_request_sender,
-            cache_supported_receiver: shard_cache_supported_receiver,
-        }
+    pub async fn into_shard(self) -> (ConnectionShardSend, ConnectionShardRecv) {
+        let (sender, receiver) = oneshot::channel();
     }
+
+    // pub async fn into_shard(
+    //     mut self,
+    //     flush_interval: Duration,
+    //     packet_buffer_size: usize,
+    // ) -> ConnectionShard {
+    //     let (sd_pk_send, mut tk_pk_recv) = broadcast::channel::<GamePackets>(packet_buffer_size);
+    //     let (tk_pk_send, sh_pk_recv) =
+    //         broadcast::channel::<Result<GamePackets, ConnectionError>>(packet_buffer_size);
+    //
+    //     let (shard_flush_request_sender, mut task_flush_request_receiver) = watch::channel(());
+    //     let (task_flush_complete_sender, mut shard_flush_complete_receiver) = watch::channel(());
+    //
+    //     let (shard_close_sender, mut task_close_receiver) = watch::channel(());
+    //
+    //     let (shard_compression_sender, mut task_compression_receiver) =
+    //         watch::channel(self.compression.clone());
+    //     let (shard_compression_request_sender, mut task_compression_request_receiver) =
+    //         watch::channel(());
+    //     let (mut task_compression_sender, shard_compression_receiver) =
+    //         watch::channel(self.compression.clone());
+    //
+    //     let (shard_encryption_sender, mut task_encryption_receiver) =
+    //         watch::channel(self.encryption.clone());
+    //     let (shard_encryption_request_sender, mut task_encryption_request_receiver) =
+    //         watch::channel(());
+    //     let (mut task_encryption_sender, shard_encryption_receiver) =
+    //         watch::channel(self.encryption.clone());
+    //
+    //     let (shard_cache_supported_sender, mut task_cache_supported_receiver) =
+    //         watch::channel(self.cache_supported.clone());
+    //     let (shard_cache_supported_request_sender, mut task_cache_supported_request_receiver) =
+    //         watch::channel(());
+    //     let (mut task_cache_supported_sender, shard_cache_supported_receiver) =
+    //         watch::channel(self.cache_supported.clone());
+    //
+    //     tokio::spawn(async move {
+    //         let mut flush_interval = interval(flush_interval);
+    //         let mut send_buffer = vec![];
+    //
+    //         'select_loop: loop {
+    //             select! {
+    //                 _ = task_close_receiver.changed() => {
+    //                     break 'select_loop
+    //                 }
+    //                 res = task_compression_receiver.changed() => {
+    //                     if let Err(_) = res {
+    //                         break 'select_loop
+    //                     }
+    //
+    //                     self.compression = task_compression_receiver.borrow_and_update().to_owned();
+    //                 }
+    //                 res = task_encryption_receiver.changed() => {
+    //                     if let Err(_) = res {
+    //                         break 'select_loop
+    //                     }
+    //
+    //                     self.encryption = task_encryption_receiver.borrow_and_update().to_owned();
+    //                 }
+    //                 res = task_cache_supported_receiver.changed() => {
+    //                     if let Err(_) = res {
+    //                         break 'select_loop
+    //                     }
+    //
+    //                     self.cache_supported = task_cache_supported_receiver.borrow_and_update().to_owned();
+    //                 }
+    //                 res = task_compression_request_receiver.changed() => {
+    //                     if let Err(_) = res {
+    //                         break 'select_loop
+    //                     }
+    //
+    //                     if let Err(_) = task_compression_sender.send(self.compression.clone()) {
+    //                         break 'select_loop
+    //                     }
+    //                 }
+    //                 res = task_encryption_request_receiver.changed() => {
+    //                     if let Err(_) = res {
+    //                         break 'select_loop
+    //                     }
+    //
+    //                     if let Err(_) = task_encryption_sender.send(self.encryption.clone()) {
+    //                         break 'select_loop
+    //                     }
+    //                 }
+    //                 res = task_cache_supported_request_receiver.changed() => {
+    //                     if let Err(_) = res {
+    //                         break 'select_loop
+    //                     }
+    //
+    //                     if let Err(_) = task_cache_supported_sender.send(self.cache_supported.clone()) {
+    //                         break 'select_loop
+    //                     }
+    //                 }
+    //                 res = self.recv() => {
+    //                     match res {
+    //                         Ok(pks) => {
+    //                             for pk in pks {
+    //                                 if tk_pk_send.send(Ok(pk)).is_err() {
+    //                                     break 'select_loop
+    //                                 }
+    //                             }
+    //                         }
+    //                         Err(e) => {
+    //                             if tk_pk_send.send(Err(e)).is_err() {
+    //                                 break 'select_loop
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //                 res = tk_pk_recv.recv() => {
+    //                     if res.is_err() {
+    //                         break 'select_loop
+    //                     }
+    //
+    //                     match res {
+    //                         Ok(pk) => { send_buffer.push(pk); }
+    //                         Err(e) => { break 'select_loop }
+    //                     };
+    //                 }
+    //                 res = task_flush_request_receiver.changed() => {
+    //                     if res.is_err() {
+    //                         break 'select_loop
+    //                     }
+    //
+    //                     if !send_buffer.is_empty() {
+    //                         if let Err(_) = self.send(send_buffer.as_slice()).await {
+    //                             break 'select_loop
+    //                         }
+    //
+    //                         if task_flush_complete_sender.send(()).is_err() {
+    //                             break 'select_loop
+    //                         }
+    //
+    //                         send_buffer = vec![];
+    //                     }
+    //                 }
+    //                 _ = flush_interval.tick() => {
+    //                     if !send_buffer.is_empty() {
+    //                         if (self.send(send_buffer.as_slice()).await).is_err() {
+    //                             break 'select_loop
+    //                         }
+    //
+    //                         send_buffer = vec![];
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //
+    //         self.transport_layer.close().await;
+    //     });
+    //
+    //     ConnectionShard {
+    //         pk_sender: sd_pk_send,
+    //         pk_receiver: sh_pk_recv,
+    //
+    //         flush_sender: shard_flush_request_sender,
+    //         flush_receiver: shard_flush_complete_receiver,
+    //
+    //         close_sender: shard_close_sender,
+    //
+    //         compression_sender: shard_compression_sender,
+    //         compression_request_sender: shard_compression_request_sender,
+    //         compression_receiver: shard_compression_receiver,
+    //
+    //         encryption_sender: shard_encryption_sender,
+    //         encryption_request_sender: shard_encryption_request_sender,
+    //         encryption_receiver: shard_encryption_receiver,
+    //
+    //         cache_supported_sender: shard_cache_supported_sender,
+    //         cache_supported_request_sender: shard_cache_supported_request_sender,
+    //         cache_supported_receiver: shard_cache_supported_receiver,
+    //     }
+    // }
 }
 
 pub struct ConnectionShard {
