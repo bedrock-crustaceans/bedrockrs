@@ -4,32 +4,29 @@ use crate::error::ConnectionError;
 use crate::gamepackets::GamePackets;
 use crate::sub_client::SubClientID;
 use crate::transport_layer::TransportLayerConnection;
-use byteorder::WriteBytesExt;
-use std::io::{Cursor, Write};
-use std::sync::Arc;
+use std::io::Cursor;
 use std::time::Duration;
 use tokio::select;
-use tokio::sync::{broadcast, mpsc, watch};
+use tokio::sync::{broadcast, watch};
 use tokio::time::interval;
 
 pub struct Connection {
-    /// Represents the connections internal transport layer, this allows using different
-    /// transport layers with the client or proxies, this can improve performance.
-    connection: TransportLayerConnection,
-    /// Represents the Connection's compression, the compression gets initialized in the
+    /// Represents the Connection's internal transport layer, which may vary.
+    transport_layer: TransportLayerConnection,
+    /// Represents the Connection's Compression, the compression gets initialized in the
     /// login process.
     pub compression: Option<Compression>,
     /// Represents the connections encryption, the encryption gets initialized in the
-    /// login process, if encryption is allowed.
+    /// login process, if encryption is enabled.
     pub encryption: Option<Encryption>,
     /// Determines if the Connection does support caching.
     pub cache_supported: bool,
 }
 
 impl Connection {
-    pub fn from_transport_conn(conn: TransportLayerConnection) -> Self {
+    pub(crate) fn from_transport_conn(conn: TransportLayerConnection) -> Self {
         Self {
-            connection: conn,
+            transport_layer: conn,
             compression: None,
             encryption: None,
             cache_supported: false,
@@ -45,31 +42,31 @@ impl Connection {
         let mut gamepacket_stream = Vec::with_capacity(gamepacket_stream_size);
 
         // Batch all gamepackets together
-        for gamepacket in gamepackets {
+        gamepackets.iter().try_for_each(|gamepacket| {
             gamepacket.pk_serialize(
                 &mut gamepacket_stream,
                 SubClientID::PrimaryClient,
                 SubClientID::PrimaryClient,
-            )?
-        }
+            )
+        })?;
 
-        // Compress the stream with the given Compression
+        // Compress the stream with the given optional Compression
         if let Some(compression) = &self.compression {
             gamepacket_stream = compression.compress(&gamepacket_stream)?;
         }
 
-        // Compress the stream with the given Compression
+        // Encrypt the stream with the given optional Encryption
         if let Some(encryption) = &mut self.encryption {
             gamepacket_stream = encryption.encrypt(&gamepacket_stream)?;
         }
 
-        self.connection.send(&gamepacket_stream).await?;
+        self.transport_layer.send(&gamepacket_stream).await?;
 
         Ok(())
     }
 
     pub async fn send_raw(&mut self, data: &[u8]) -> Result<(), ConnectionError> {
-        self.connection.send(data).await?;
+        self.transport_layer.send(data).await?;
 
         Ok(())
     }
@@ -78,7 +75,7 @@ impl Connection {
         let mut stream = vec![];
 
         // Receive data and turn it into cursor
-        match self.connection.recv(&mut stream).await {
+        match self.transport_layer.recv(&mut stream).await {
             Ok(_) => {}
             Err(e) => return Err(ConnectionError::TransportError(e)),
         };
@@ -144,7 +141,7 @@ impl Connection {
         let mut stream = vec![];
 
         // Send the data
-        match self.connection.recv(&mut stream).await {
+        match self.transport_layer.recv(&mut stream).await {
             Ok(_) => {}
             Err(e) => return Err(ConnectionError::TransportError(e)),
         }
@@ -153,7 +150,7 @@ impl Connection {
     }
 
     pub async fn close(self) {
-        self.connection.close().await;
+        self.transport_layer.close().await;
     }
 
     pub async fn into_shard(
@@ -303,7 +300,7 @@ impl Connection {
                 }
             }
 
-            self.connection.close().await;
+            self.transport_layer.close().await;
         });
 
         ConnectionShard {
