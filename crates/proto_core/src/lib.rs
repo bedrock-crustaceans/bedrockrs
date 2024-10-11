@@ -35,6 +35,6 @@ pub trait GamePacket: Sized + ProtoCodec {
 
     #[inline]
     fn get_size_prediction(&self) -> usize {
-        <Self as ProtoCodec>::get_size_prediction(&self)
+        <Self as ProtoCodec>::get_size_prediction(self)
     }
 }

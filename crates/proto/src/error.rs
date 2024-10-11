@@ -24,8 +24,6 @@ pub enum ListenerError {
 
 #[derive(Error, Debug)]
 pub enum ConnectionError {
-    #[error("IO Error: {0}")]
-    IOError(#[from] IOError),
     #[error("Proto Codec Error: {0}")]
     ProtoCodecError(#[from] ProtoCodecError),
     #[error("Connection Closed")]
@@ -34,13 +32,15 @@ pub enum ConnectionError {
     TransportError(#[from] TransportLayerError),
     #[error("Compression Error: {0}")]
     CompressError(#[from] CompressionError),
+    #[error("Encryption Error: {0}")]
+    EncryptionError(#[from] EncryptionError),
     // TODO: Move into RakNet Error enum
     #[error("Invalid RakNet Header, expected: {RAKNET_GAME_PACKET_ID}, got: {0}")]
     InvalidRakNetHeader(u8),
     #[error("Unknown Compression method, got: {0}")]
     CompressionMethodUnknown(u8),
-    #[error("Wrong Compression method")]
-    CompressionMethodMismatch(u8),
+    #[error("IO Error: {0}")]
+    IOError(#[from] IOError),
 }
 
 #[derive(Error, Debug)]
@@ -49,6 +49,12 @@ pub enum CompressionError {
     ZlibError(#[from] Box<dyn Error + Send + Sync>),
     #[error("Snappy Error: {0}")]
     SnappyError(#[from] IOError),
+    #[error("IO Error: {0}")]
+    IOError(IOError),
+}
+
+#[derive(Error, Debug)]
+pub enum EncryptionError {
     #[error("IO Error: {0}")]
     IOError(IOError),
 }

@@ -59,4 +59,8 @@ impl ProtoCodec for MovePlayerPacket {
             tick,
         })
     }
+
+    fn get_size_prediction(&self) -> usize {
+        todo!()
+    }
 }

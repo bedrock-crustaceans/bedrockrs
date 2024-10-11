@@ -161,4 +161,8 @@ impl ProtoCodec for PlayerAuthInputPacket {
             analog_move_vec,
         })
     }
+
+    fn get_size_prediction(&self) -> usize {
+        todo!()
+    }
 }

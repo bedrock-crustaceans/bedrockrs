@@ -66,14 +66,16 @@ pub enum DisconnectReason {
     IncompatiblePack = 59,
     OutOfStorage = 60,
     InvalidLevel = 61,
-    DisconnectPacket_DEPRECATED = 62,
+    #[deprecated]
+    DisconnectPacket = 62,
     BlockMismatch = 63,
     InvalidHeights = 64,
     InvalidWidths = 65,
     ConnectionLost = 66,
     ZombieConnection = 67,
     Shutdown = 68,
-    ReasonNotSet_DEPRECATED = 69,
+    #[deprecated]
+    ReasonNotSet = 69,
     LoadingStateTimeout = 70,
     ResourcePackLoadingFailed = 71,
     SearchingForSessionLoadingScreenFailed = 72,

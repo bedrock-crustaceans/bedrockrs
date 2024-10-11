@@ -22,6 +22,10 @@ impl ProtoCodec for HandshakeServerToClientPacket {
     fn proto_deserialize(cursor: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
         todo!()
     }
+
+    fn get_size_prediction(&self) -> usize {
+        todo!()
+    }
 }
 
 //

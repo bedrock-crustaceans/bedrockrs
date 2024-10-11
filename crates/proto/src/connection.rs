@@ -1,17 +1,16 @@
-use byteorder::WriteBytesExt;
-use std::io::{Cursor, Write};
-use std::sync::Arc;
-use std::time::Duration;
-use tokio::select;
-use tokio::sync::{broadcast, watch};
-use tokio::time::interval;
-
 use crate::compression::Compression;
 use crate::encryption::Encryption;
 use crate::error::ConnectionError;
 use crate::gamepackets::GamePackets;
 use crate::sub_client::SubClientID;
 use crate::transport_layer::TransportLayerConnection;
+use byteorder::WriteBytesExt;
+use std::io::{Cursor, Write};
+use std::sync::Arc;
+use std::time::Duration;
+use tokio::select;
+use tokio::sync::{broadcast, mpsc, watch};
+use tokio::time::interval;
 
 pub struct Connection {
     /// Represents the connections internal transport layer, this allows using different
@@ -38,63 +37,39 @@ impl Connection {
     }
 
     pub async fn send(&mut self, gamepackets: &[GamePackets]) -> Result<(), ConnectionError> {
-        let mut pk_stream = vec![];
+        let gamepacket_stream_size = gamepackets
+            .iter()
+            .map(GamePackets::get_size_prediction)
+            .sum::<usize>();
+        
+        let mut gamepacket_stream = Vec::with_capacity(gamepacket_stream_size);
 
         // Batch all gamepackets together
-        for game_packet in gamepackets {
-            // Write gamepacket
-            game_packet
-                .pk_serialize(
-                    &mut pk_stream,
-                    SubClientID::PrimaryClient,
-                    SubClientID::PrimaryClient,
-                )
-                .map_err(ConnectionError::ProtoCodecError)?
+        for gamepacket in gamepackets {
+            gamepacket.pk_serialize(
+                &mut gamepacket_stream,
+                SubClientID::PrimaryClient,
+                SubClientID::PrimaryClient,
+            )?
         }
 
-        // Compress the data depending on compression method
-        let compressed_stream = match &self.compression {
-            Some(compression) => {
-                let mut compressed_stream = vec![];
+        // Compress the stream with the given Compression
+        if let Some(compression) = &self.compression {
+            gamepacket_stream = compression.compress(&gamepacket_stream)?;
+        }
 
-                compressed_stream.write_u8(compression.id_u8())?;
+        // Compress the stream with the given Compression
+        if let Some(encryption) = &mut self.encryption {
+            gamepacket_stream = encryption.encrypt(&gamepacket_stream)?;
+        }
 
-                // TODO: Overflow checking
-                if compression.needed() && pk_stream.len() as u16 > compression.threshold() {
-                    compression
-                        .compress(pk_stream.as_slice(), &mut compressed_stream)
-                        .map_err(ConnectionError::CompressError)?;
-                } else {
-                    compressed_stream.write(pk_stream.as_slice())?;
-                };
+        self.connection.send(&gamepacket_stream).await?;
 
-                compressed_stream
-            }
-            // If no compression is set none copy the packet stream
-            None => pk_stream,
-        };
-
-        // Encrypt the compressed data
-        let encrypted_stream = match &self.encryption {
-            Some(encryption) => {
-                todo!("Encrypt the data (after compression)")
-            }
-            None => compressed_stream,
-        };
-
-        // Send the data
-        self.connection
-            .send(&encrypted_stream)
-            .await
-            .map_err(ConnectionError::TransportError)
+        Ok(())
     }
 
     pub async fn send_raw(&mut self, data: &[u8]) -> Result<(), ConnectionError> {
-        // Send the data
-        match self.connection.send(&Cursor::new(data)).await {
-            Ok(_) => {}
-            Err(e) => return Err(ConnectionError::TransportError(e)),
-        }
+        self.connection.send(data).await?;
 
         Ok(())
     }
@@ -186,9 +161,8 @@ impl Connection {
         flush_interval: Duration,
         packet_buffer_size: usize,
     ) -> ConnectionShard {
-        let (shard_pk_sender, mut task_pk_receiver) =
-            broadcast::channel::<GamePackets>(packet_buffer_size);
-        let (task_pk_sender, shard_pk_receiver) =
+        let (sd_pk_send, mut tk_pk_recv) = broadcast::channel::<GamePackets>(packet_buffer_size);
+        let (tk_pk_send, sh_pk_recv) =
             broadcast::channel::<Result<GamePackets, ConnectionError>>(packet_buffer_size);
 
         let (shard_flush_request_sender, mut task_flush_request_receiver) = watch::channel(());
@@ -278,19 +252,19 @@ impl Connection {
                         match res {
                             Ok(pks) => {
                                 for pk in pks {
-                                    if task_pk_sender.send(Ok(pk)).is_err() {
+                                    if tk_pk_send.send(Ok(pk)).is_err() {
                                         break 'select_loop
                                     }
                                 }
                             }
                             Err(e) => {
-                                if task_pk_sender.send(Err(e)).is_err() {
+                                if tk_pk_send.send(Err(e)).is_err() {
                                     break 'select_loop
                                 }
                             }
                         }
                     }
-                    res = task_pk_receiver.recv() => {
+                    res = tk_pk_recv.recv() => {
                         if res.is_err() {
                             break 'select_loop
                         }
@@ -333,8 +307,8 @@ impl Connection {
         });
 
         ConnectionShard {
-            pk_sender: shard_pk_sender,
-            pk_receiver: shard_pk_receiver,
+            pk_sender: sd_pk_send,
+            pk_receiver: sh_pk_recv,
 
             flush_sender: shard_flush_request_sender,
             flush_receiver: shard_flush_complete_receiver,

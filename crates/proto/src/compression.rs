@@ -1,4 +1,5 @@
 use crate::error::CompressionError;
+use byteorder::WriteBytesExt;
 use flate2::Compression as CompressionLevel;
 use flate2::{read::DeflateDecoder, write::DeflateEncoder};
 use snap::{read::FrameDecoder as SnapDecoder, write::FrameEncoder as SnapEncoder};
@@ -24,35 +25,14 @@ pub enum Compression {
 }
 
 impl Compression {
-    /// Used for identifying the compression method used by a given packet
-    #[inline]
-    pub const fn id_u8(&self) -> u8 {
-        match self {
-            Compression::Zlib { .. } => 0x00,
-            Compression::Snappy { .. } => 0x01,
-            Compression::None => u8::MAX,
-        }
-    }
-
     /// Used in the NetworkSettingsPacket to identify which
-    /// CompressionMethod should be used
+    /// CompressionMethod should be used for the Connection.
     #[inline]
     pub const fn id_u16(&self) -> u16 {
         match self {
-            Compression::Zlib { .. } => 0x0000,
-            Compression::Snappy { .. } => 0x0001,
+            Compression::Zlib { .. } => 0,
+            Compression::Snappy { .. } => 1,
             Compression::None => u16::MAX,
-        }
-    }
-
-    /// Specifies if functions like [`Self::compress`] and [`Self::decompress`] need to be used.
-    /// This is necessary for optimizing compression.
-    #[inline]
-    pub const fn needed(&self) -> bool {
-        match self {
-            Compression::Zlib { .. } => true,
-            Compression::Snappy { .. } => true,
-            Compression::None => false,
         }
     }
 
@@ -61,58 +41,67 @@ impl Compression {
     pub fn threshold(&self) -> u16 {
         match self {
             Compression::Zlib { threshold, .. } => *threshold,
-            Compression::Snappy { threshold, .. } => *threshold,
+            Compression::Snappy { threshold } => *threshold,
             Compression::None => 0,
         }
     }
 
     /// Compress the given uncompressed src stream into the given dst stream
-    /// with the compressed data
+    /// with the compressed data.
     #[inline]
-    pub fn compress(&self, src: Vec<u8>) -> Result<Vec<u8>, CompressionError> {
-        let buf = match self {
+    pub fn compress(&self, src: &Vec<u8>) -> Result<Vec<u8>, CompressionError> {
+        // Add one extra byte for the compression method id
+        let mut dst = Vec::with_capacity(src.len() + 1);
+
+        if self.threshold() as usize >= src.len() {
+            // CompressionMethod ID for No Compression
+            dst.write_u8(u8::MAX)?;
+            dst.write_all(src.as_slice())?;
+
+            return Ok(dst);
+        }
+
+        let dst = match self {
             Compression::Zlib {
-                threshold,
-                compression_level,
+                compression_level, ..
             } => {
-                if *threshold as usize >= src.len() {
-                    src
-                } else {
-                    let dst = Vec::with_capacity(src.len() + 1);
+                // CompressionMethod ID for Zlib
+                dst.write_u8(0)?;
+                
+                let mut encoder =
+                    DeflateEncoder::new(dst, CompressionLevel::new(*compression_level as u32));
 
-                    let mut encoder =
-                        DeflateEncoder::new(dst, CompressionLevel::new(*compression_level as u32));
+                encoder
+                    .write_all(src.as_slice())
+                    .map_err(|err| CompressionError::ZlibError(Box::new(err)))?;
 
-                    encoder
-                        .write_all(src.as_slice())
-                        .map_err(|err| CompressionError::ZlibError(Box::new(err)))?;
-
-                    encoder
-                        .finish()
-                        .map_err(|err| CompressionError::ZlibError(Box::new(err)))?
-                }
+                encoder
+                    .finish()
+                    .map_err(|err| CompressionError::ZlibError(Box::new(err)))?
             }
-            Compression::Snappy { threshold } => {
-                if *threshold as usize >= src.len() {
-                    src
-                } else {
-                    let dst = Vec::with_capacity(src.len());
+            Compression::Snappy { .. } => {
+                // CompressionMethod ID for Zlib
+                dst.write_u8(1)?;
+                
+                let mut encoder = SnapEncoder::new(dst);
 
-                    let mut encoder = SnapEncoder::new(dst);
+                encoder
+                    .write_all(src.as_slice())
+                    .map_err(|e| CompressionError::SnappyError(e))?;
 
-                    encoder
-                        .write_all(src.as_slice())
-                        .map_err(|e| CompressionError::SnappyError(e))?;
-
-                    encoder
-                        .into_inner()
-                        .map_err(|err| CompressionError::SnappyError(err.into_error()))?
-                }
+                encoder
+                    .into_inner()
+                    .map_err(|err| CompressionError::SnappyError(err.into_error()))?
             }
-            Compression::None => src,
+            Compression::None => {
+                // Compression method id for No Compression
+                dst.write_u8(u8::MAX)?;
+                dst.write_all(src.as_slice())?;
+                dst
+            },
         };
 
-        Ok(buf)
+        Ok(dst)
     }
 
     /// Decompress the given compressed src stream into the given dst stream

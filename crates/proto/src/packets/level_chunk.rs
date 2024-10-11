@@ -17,10 +17,7 @@ pub struct LevelChunkPacket {
 }
 
 impl ProtoCodec for LevelChunkPacket {
-    fn proto_serialize(
-        &self,
-        stream: &mut Vec<u8>,
-    ) -> Result<(), ProtoCodecError> {
+    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         self.chunk_position.proto_serialize(stream)?;
         self.dimension_id.proto_serialize(stream)?;
 

@@ -64,4 +64,8 @@ impl ProtoCodec for InteractPacket {
             target_runtime_id,
         })
     }
+
+    fn get_size_prediction(&self) -> usize {
+        todo!()
+    }
 }

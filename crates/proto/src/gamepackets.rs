@@ -1,68 +1,44 @@
 #![allow(non_upper_case_globals)]
 
-use crate::packets::add_actor::AddActorPacket;
-use crate::packets::add_painting::AddPaintingPacket;
-use crate::packets::add_player::AddPlayerPacket;
-use crate::packets::animate_player::AnimatePlayerPacket;
-use crate::packets::available_entity_identifiers::AvailableEntityIdentifiersPacket;
-use crate::packets::award_achievement::AwardAchievementPacket;
-use crate::packets::boss_event::BossEventPacket;
-use crate::packets::camera::CameraPacket;
-use crate::packets::camera_shake::CameraShakePacket;
-use crate::packets::change_dimension::ChangeDimensionPacket;
-use crate::packets::chunk_publisher_update::ChunkPublisherUpdatePacket;
-use crate::packets::chunk_radius_request::ChunkRadiusRequestPacket;
-use crate::packets::chunk_radius_updated::ChunkRadiusUpdatedPacket;
-use crate::packets::client_cache_status::ClientCacheStatusPacket;
-use crate::packets::command_request::CommandRequestPacket;
-use crate::packets::container_close::ContainerClosePacket;
-use crate::packets::container_open::ContainerOpenPacket;
-use crate::packets::correct_player_move_prediction::CorrectPlayerMovePredictionPacket;
-use crate::packets::debug_info::DebugInfoPacket;
-use crate::packets::emote::EmotePacket;
-use crate::packets::emote_list::EmoteListPacket;
-use crate::packets::handshake_server_to_client::HandshakeServerToClientPacket;
-use crate::packets::interact::InteractPacket;
-use crate::packets::inventory_content::InventoryContentPacket;
-use crate::packets::level_chunk::LevelChunkPacket;
-use crate::packets::loading_screen::LoadingScreenPacket;
-use crate::packets::login::LoginPacket;
-use crate::packets::mob_equipment::MobEquipmentPacket;
-use crate::packets::modal_form_request::ModalFormRequestPacket;
-use crate::packets::modal_form_response::ModalFormResponsePacket;
-use crate::packets::network_settings::NetworkSettingsPacket;
-use crate::packets::network_settings_request::NetworkSettingsRequestPacket;
-use crate::packets::open_sign::OpenSignPacket;
-use crate::packets::packet_violation_warning::PacketViolationWarningPacket;
-use crate::packets::play_status::PlayStatusPacket;
-use crate::packets::player_action::PlayerActionPacket;
-use crate::packets::player_auth_input::PlayerAuthInputPacket;
-use crate::packets::player_disconnect::DisconnectPlayerPacket;
-use crate::packets::player_hotbar::PlayerHotbarPacket;
-use crate::packets::player_move::MovePlayerPacket;
-use crate::packets::player_transfer::TransferPlayerPacket;
-use crate::packets::remove_actor::RemoveEntityPacket;
-use crate::packets::resource_packs_info::ResourcePacksInfoPacket;
-use crate::packets::resource_packs_response::ResourcePacksResponsePacket;
-use crate::packets::resource_packs_stack::ResourcePacksStackPacket;
-use crate::packets::respawn::RespawnPacket;
-use crate::packets::server_player_post_move_position::ServerPlayerPostMovePositionPacket;
-use crate::packets::server_settings_request::ServerSettingsRequestPacket;
-use crate::packets::server_settings_response::ServerSettingsResponsePacket;
-use crate::packets::set_commands_enabled::SetCommandsEnabledPacket;
-use crate::packets::set_local_player_as_initialized::SetLocalPlayerAsInitializedPacket;
-use crate::packets::set_time::SetTimePacket;
-use crate::packets::set_title::SetTitlePacket;
-use crate::packets::show_credits::ShowCreditsPacket;
-use crate::packets::show_profile::ShowProfilePacket;
-use crate::packets::start_game::StartGamePacket;
-use crate::packets::text_message::TextMessagePacket;
-use crate::packets::toast_request::ToastRequestPacket;
-use crate::packets::update_difficulty::UpdateDifficultyPacket;
-use crate::packets::update_player_gamemode::UpdatePlayerGamemodePacket;
+use crate::packets::{
+    add_actor::AddActorPacket, add_painting::AddPaintingPacket, add_player::AddPlayerPacket,
+    animate_player::AnimatePlayerPacket,
+    available_entity_identifiers::AvailableEntityIdentifiersPacket,
+    award_achievement::AwardAchievementPacket, boss_event::BossEventPacket, camera::CameraPacket,
+    camera_shake::CameraShakePacket, change_dimension::ChangeDimensionPacket,
+    chunk_publisher_update::ChunkPublisherUpdatePacket,
+    chunk_radius_request::ChunkRadiusRequestPacket, chunk_radius_updated::ChunkRadiusUpdatedPacket,
+    client_cache_status::ClientCacheStatusPacket, command_request::CommandRequestPacket,
+    container_close::ContainerClosePacket, container_open::ContainerOpenPacket,
+    correct_player_move_prediction::CorrectPlayerMovePredictionPacket, debug_info::DebugInfoPacket,
+    emote::EmotePacket, emote_list::EmoteListPacket,
+    handshake_server_to_client::HandshakeServerToClientPacket, interact::InteractPacket,
+    inventory_content::InventoryContentPacket, level_chunk::LevelChunkPacket,
+    loading_screen::LoadingScreenPacket, login::LoginPacket, mob_equipment::MobEquipmentPacket,
+    modal_form_request::ModalFormRequestPacket, modal_form_response::ModalFormResponsePacket,
+    network_settings::NetworkSettingsPacket,
+    network_settings_request::NetworkSettingsRequestPacket, open_sign::OpenSignPacket,
+    packet_violation_warning::PacketViolationWarningPacket, play_status::PlayStatusPacket,
+    player_action::PlayerActionPacket, player_auth_input::PlayerAuthInputPacket,
+    player_disconnect::DisconnectPlayerPacket, player_hotbar::PlayerHotbarPacket,
+    player_move::MovePlayerPacket, player_transfer::TransferPlayerPacket,
+    remove_actor::RemoveEntityPacket, resource_packs_info::ResourcePacksInfoPacket,
+    resource_packs_response::ResourcePacksResponsePacket,
+    resource_packs_stack::ResourcePacksStackPacket, respawn::RespawnPacket,
+    server_player_post_move_position::ServerPlayerPostMovePositionPacket,
+    server_settings_request::ServerSettingsRequestPacket,
+    server_settings_response::ServerSettingsResponsePacket,
+    set_commands_enabled::SetCommandsEnabledPacket,
+    set_local_player_as_initialized::SetLocalPlayerAsInitializedPacket, set_time::SetTimePacket,
+    set_title::SetTitlePacket, show_credits::ShowCreditsPacket, show_profile::ShowProfilePacket,
+    start_game::StartGamePacket, text_message::TextMessagePacket,
+    toast_request::ToastRequestPacket, update_difficulty::UpdateDifficultyPacket,
+    update_player_gamemode::UpdatePlayerGamemodePacket,
+};
 use crate::sub_client::SubClientID;
 use bedrockrs_macros::gamepackets;
-use bedrockrs_proto_core::{error::ProtoCodecError, GamePacket, ProtoCodec};
+use bedrockrs_proto_core::error::ProtoCodecError;
+use bedrockrs_proto_core::GamePacket;
 use std::io::{Cursor, Write};
 use varint_rs::{VarintReader, VarintWriter};
 
@@ -315,32 +291,38 @@ fn write_gamepacket_header(
 ) -> Result<(), ProtoCodecError> {
     // Since the (var)int is only storing 14 bytes, we can treat it as an u16
     // This is normally treated as u32 varint
-    let mut game_packet_header: u16 = 0;
+    let mut gamepacket_header: u16 = 0;
 
     // Set the first 10 bits as the packet id
     // Can never be more than a 16-bit integer due to being 10-bits big
     // Gamepacket IDs through 200-299 are used for spin-offs, they are free to use for custom packets
-    game_packet_header |= 0b0000_0011_1111_1111 & gamepacket_id;
+    gamepacket_header |= 0b0000_0011_1111_1111 & gamepacket_id;
 
     // Set the next 2 bits as the sub client sender id
     // Never more than an 8-bit integer due to being 2 bits big
-    game_packet_header |= (subclient_sender_id.proto_to() as u16 >> 10) & 0b0000_1100_0000_0000;
+    gamepacket_header |= (subclient_sender_id.proto_to() as u16 >> 10) & 0b0000_1100_0000_0000;
     // Set the next 2 bits as the sub client target id
     // Never more than an 8-bit integer due to being 2 bits big
-    game_packet_header |= (subclient_target_id.proto_to() as u16 >> 12) & 0b0011_0000_0000_0000;
+    gamepacket_header |= (subclient_target_id.proto_to() as u16 >> 12) & 0b0011_0000_0000_0000;
 
     // Since the size of the header is also included in the batched packet size,
     // we need to write it to a temporary buffer
-    let mut game_packet_header_buf = Vec::new();
+    let mut gamepacket_header_buf = Vec::new();
 
     // Write the gamepacket header into temporary buffer
-    game_packet_header_buf.write_u16_varint(game_packet_header)?;
+    gamepacket_header_buf.write_u16_varint(gamepacket_header)?;
 
     // Write the gamepacket length and the header length
-    stream.write_u32_varint(length + game_packet_header_buf.len() as u32)?;
+    stream.write_u32_varint(length + gamepacket_header_buf.len() as u32)?;
 
     // Write the final game packet header
-    stream.write_all(game_packet_header_buf.as_slice())?;
+    stream.write_all(gamepacket_header_buf.as_slice())?;
 
     Ok(())
+}
+
+fn get_gamepacket_header_size_prediction() -> usize {
+    // 2 = gamepacket header (actually varint u32, but since only 14 bites are written we can treat it as am u16)
+    // 4 = gamepacket length size 
+    2 + 4
 }

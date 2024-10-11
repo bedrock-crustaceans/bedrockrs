@@ -50,10 +50,10 @@ fn build_ser_field(
 
                 let vec_prefix = if vec_by_ref {
                     quote! { & }
-                } else { 
+                } else {
                     quote! {}
                 };
-                
+
                 return quote! {
                     {
                         let len: #repr = #final_name.len().try_into()?;

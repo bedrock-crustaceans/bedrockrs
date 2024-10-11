@@ -213,6 +213,15 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
         }
     });
 
+    let size_prediction = args.packets.clone();
+    let size_prediction = size_prediction.iter().map(|(name, value)| {
+        if let Some(v) = value {
+            quote! { GamePackets::#name(pk) => <#v as ::bedrockrs_proto_core::GamePacket>::get_size_prediction(pk), }
+        } else {
+            quote! { GamePackets::#name() => { todo!("impl GamePackets::{}", stringify!(name)); }, }
+        }
+    });
+
     let ser = args.packets.clone();
     let ser = ser.iter().map(|(name, value)| {
         if let Some(v) = value {
@@ -272,18 +281,21 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
         }
 
         impl GamePackets {
+            #[inline]
             pub fn compress(&self) -> bool {
                 match self {
                     #(#compress)*
                 };
             }
 
+            #[inline]
             pub fn encrypt(&self) -> bool {
                 match self {
                     #(#encrypt)*
                 };
             }
 
+            #[inline]
             pub fn pk_serialize(&self, stream: &mut Vec<u8>, subclient_sender_id: SubClientID, subclient_target_id: SubClientID) -> Result<(), ::bedrockrs_proto_core::error::ProtoCodecError> {
                 match self {
                     #(#ser)*
@@ -292,6 +304,7 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
                 Ok(())
             }
 
+            #[inline]
             pub fn pk_deserialize(stream: &mut Cursor<&[u8]>) -> Result<(GamePackets, SubClientID, SubClientID), ::bedrockrs_proto_core::error::ProtoCodecError> {
                 let (_length, gamepacket_id, subclient_sender_id, subclient_target_id) = match read_gamepacket_header(stream) {
                     Ok(val) => val,
@@ -306,6 +319,15 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
                 };
 
                 Ok((gamepacket, subclient_sender_id, subclient_target_id))
+            }
+
+            #[inline]
+            pub fn get_size_prediction(&self) -> usize {
+                let len = match self {
+                    #(#size_prediction)*
+                };
+                
+                len + get_gamepacket_header_size_prediction()
             }
         }
     };

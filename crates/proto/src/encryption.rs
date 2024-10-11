@@ -1,3 +1,5 @@
+use crate::error::EncryptionError;
+
 #[derive(Clone)]
 pub struct Encryption {
     send_counter: u64,
@@ -10,15 +12,15 @@ impl Encryption {
         unimplemented!()
     }
 
-    pub fn decrypt(&mut self, data: &Vec<u8>) -> Vec<u8> {
+    pub fn decrypt(&mut self, data: &Vec<u8>) ->Result<Vec<u8>, EncryptionError> {
         unimplemented!()
     }
 
-    pub fn encrypt(&mut self, data: &Vec<u8>) -> Vec<u8> {
+    pub fn encrypt(&mut self, src: &Vec<u8>) -> Result<Vec<u8>, EncryptionError> {
         unimplemented!()
     }
 
-    pub fn verify(&mut self, data: &Vec<u8>) -> Result<(), ()> {
+    pub fn verify(&mut self, src: &Vec<u8>) -> Result<(), EncryptionError> {
         unimplemented!()
     }
 }

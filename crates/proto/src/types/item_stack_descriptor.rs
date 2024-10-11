@@ -1,5 +1,5 @@
-use bedrockrs_macros::ProtoCodec;
 use super::item_stack_id_variant::ItemStackIdVariant;
+use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Debug, Clone)]
 #[repr(u8)]
