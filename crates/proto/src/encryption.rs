@@ -12,11 +12,11 @@ impl Encryption {
         unimplemented!()
     }
 
-    pub fn decrypt(&mut self, src: &Vec<u8>) ->Result<Vec<u8>, EncryptionError> {
+    pub fn decrypt(&mut self, src: Vec<u8>) ->Result<Vec<u8>, EncryptionError> {
         unimplemented!()
     }
 
-    pub fn encrypt(&mut self, src: &Vec<u8>) -> Result<Vec<u8>, EncryptionError> {
+    pub fn encrypt(&mut self, src: Vec<u8>) -> Result<Vec<u8>, EncryptionError> {
         unimplemented!()
     }
 

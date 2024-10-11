@@ -8,7 +8,7 @@ use rak_rs::connection::RecvError;
 use rak_rs::error::server::ServerError;
 use thiserror::Error;
 
-use crate::info::RAKNET_GAME_PACKET_ID;
+use crate::info::RAKNET_GAMEPACKET_ID;
 
 #[derive(Error, Debug)]
 pub enum ListenerError {
@@ -37,8 +37,6 @@ pub enum ConnectionError {
     // TODO: Move into RakNet Error enum
     #[error("Invalid RakNet Header, expected: {RAKNET_GAME_PACKET_ID}, got: {0}")]
     InvalidRakNetHeader(u8),
-    #[error("Unknown Compression method, got: {0}")]
-    CompressionMethodUnknown(u8),
     #[error("IO Error: {0}")]
     IOError(#[from] IOError),
 }
@@ -49,6 +47,8 @@ pub enum CompressionError {
     ZlibError(#[from] Box<dyn Error + Send + Sync>),
     #[error("Snappy Error: {0}")]
     SnappyError(#[from] IOError),
+    #[error("Unknown Compression Method: {0}")]
+    UnknownCompressionMethod(u8),
     #[error("IO Error: {0}")]
     IOError(IOError),
 }

@@ -24,9 +24,9 @@ pub struct Connection {
 }
 
 impl Connection {
-    pub(crate) fn from_transport_conn(conn: TransportLayerConnection) -> Self {
+    pub(crate) fn from_transport_conn(transport_layer: TransportLayerConnection) -> Self {
         Self {
-            transport_layer: conn,
+            transport_layer,
             compression: None,
             encryption: None,
             cache_supported: false,
@@ -52,12 +52,12 @@ impl Connection {
 
         // Compress the stream with the given optional Compression
         if let Some(compression) = &self.compression {
-            gamepacket_stream = compression.compress(&gamepacket_stream)?;
+            gamepacket_stream = compression.compress(gamepacket_stream)?;
         }
 
         // Encrypt the stream with the given optional Encryption
         if let Some(encryption) = &mut self.encryption {
-            gamepacket_stream = encryption.encrypt(&gamepacket_stream)?;
+            gamepacket_stream = encryption.encrypt(gamepacket_stream)?;
         }
 
         self.transport_layer.send(&gamepacket_stream).await?;
@@ -72,79 +72,35 @@ impl Connection {
     }
 
     pub async fn recv(&mut self) -> Result<Vec<GamePackets>, ConnectionError> {
-        let mut stream = vec![];
 
-        // Receive data and turn it into cursor
-        match self.transport_layer.recv(&mut stream).await {
-            Ok(_) => {}
-            Err(e) => return Err(ConnectionError::TransportError(e)),
-        };
+        let mut gamepacket_stream = self.transport_layer.recv().await?;
 
-        let stream = Cursor::new(stream.as_slice());
+        // Decrypt the stream with the given optional Encryption
+        if let Some(encryption) = &mut self.encryption {
+            gamepacket_stream = encryption.decrypt(gamepacket_stream)?;
+        }
 
-        let mut decrypted_stream = match &self.encryption {
-            Some(encryption) => {
-                todo!("Decrypt the data (before decompression)")
-            }
-            None => stream,
-        };
+        // Decompress the stream with the given optional Compression
+        if let Some(compression) = &self.compression {
+            gamepacket_stream = compression.decompress(gamepacket_stream)?;
+        }
 
-        let mut decompressed_stream = vec![];
-
-        // Decompress data
-        let mut decompressed_stream = match &self.compression {
-            Some(compression) => {
-                match LE::<u8>::read(&mut decrypted_stream) {
-                    Ok(v) => {
-                        if v.into_inner() != compression.id_u8() {
-                            // TODO: Handle invalid compression method
-                        }
-                    }
-                    Err(_) => {}
-                };
-
-                let pos = decrypted_stream.position() as usize;
-
-                compression
-                    .decompress(
-                        &decrypted_stream.into_inner()[pos..],
-                        &mut decompressed_stream,
-                    )
-                    .map_err(|e| ConnectionError::CompressError(e))?;
-
-                Cursor::new(decompressed_stream.as_slice())
-            }
-            None => decrypted_stream,
-        };
-
+        let mut gamepacket_stream = Cursor::new(gamepacket_stream.as_slice());
         let mut gamepackets = vec![];
-
-        // Read gamepacket loop
-        'gamepacket_read: loop {
-            // Deserialize gamepacket
-            match GamePackets::pk_deserialize(&mut decompressed_stream) {
-                Ok(v) => gamepackets.push(v.0),
-                Err(e) => return Err(ConnectionError::ProtoCodecError(e)),
-            };
-
-            // Is at the end of batched packet data cursor
-            // TODO: Overflow checking
-            if decompressed_stream.position() == decompressed_stream.get_ref().len() as u64 {
-                break 'gamepacket_read;
+        
+        loop {
+            if gamepacket_stream.position() == gamepacket_stream.get_ref().len() as u64 {
+                break;
             }
+            
+            gamepackets.push(GamePackets::pk_deserialize(&mut gamepacket_stream)?.0);
         }
 
         Ok(gamepackets)
     }
 
     pub async fn recv_raw(&mut self) -> Result<Vec<u8>, ConnectionError> {
-        let mut stream = vec![];
-
-        // Send the data
-        match self.transport_layer.recv(&mut stream).await {
-            Ok(_) => {}
-            Err(e) => return Err(ConnectionError::TransportError(e)),
-        }
+        let stream = self.transport_layer.recv().await?;
 
         Ok(stream)
     }

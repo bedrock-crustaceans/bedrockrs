@@ -1,9 +1,9 @@
 use crate::error::CompressionError;
-use byteorder::WriteBytesExt;
+use byteorder::{ReadBytesExt, WriteBytesExt};
 use flate2::Compression as CompressionLevel;
 use flate2::{read::DeflateDecoder, write::DeflateEncoder};
 use snap::{read::FrameDecoder as SnapDecoder, write::FrameEncoder as SnapEncoder};
-use std::io::{Read, Write};
+use std::io::{Cursor, Read, Write};
 
 #[derive(Clone)]
 pub enum Compression {
@@ -49,7 +49,7 @@ impl Compression {
     /// Compress the given uncompressed src stream into the given dst stream
     /// with the compressed data.
     #[inline]
-    pub fn compress(&self, src: &Vec<u8>) -> Result<Vec<u8>, CompressionError> {
+    pub fn compress(&self, src: Vec<u8>) -> Result<Vec<u8>, CompressionError> {
         // Add one extra byte for the compression method id
         let mut dst = Vec::with_capacity(src.len() + 1);
 
@@ -107,27 +107,36 @@ impl Compression {
     /// Decompress the given compressed src stream into the given dst stream
     /// with the decompressed data
     #[inline]
-    pub fn decompress(&self, src: Vec<u8>) -> Result<Vec<u8>, CompressionError> {
-        let buf = match self {
-            Compression::Zlib { .. } => {
-                let mut dst = Vec::with_capacity(src.len());
+    pub fn decompress(&self, mut src: Vec<u8>) -> Result<Vec<u8>, CompressionError> {
+        let mut stream = Cursor::new(src.as_slice());
 
+        let compression_method = stream.read_u8()?;
+
+        src.drain(..1);
+        
+        let dst = match compression_method {
+            0 => {
+                let mut dst = Vec::with_capacity(src.len());
+                
                 let mut decoder = DeflateDecoder::new(src.as_slice());
                 decoder.read_to_end(&mut dst)?;
-
+                
                 dst
             }
-            Compression::Snappy { .. } => {
+            1 => {
                 let mut dst = Vec::with_capacity(src.len());
-
+                
                 let mut decoder = SnapDecoder::new(src.as_slice());
                 decoder.read_to_end(&mut dst)?;
-
+                
                 dst
             }
-            Compression::None => src,
+            u8::MAX => {
+                src
+            }
+            other => return Err(CompressionError::UnknownCompressionMethod(other)),
         };
-
-        Ok(buf)
+        
+        Ok(dst)
     }
 }
