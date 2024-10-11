@@ -8,9 +8,11 @@ pub enum SubClientID {
     Client4,
 }
 
-impl SubClientID {
-    pub fn proto_from(val: u8) -> Result<Self, ProtoCodecError> {
-        match val {
+impl TryFrom<u8> for SubClientID {
+    type Error = ProtoCodecError;
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        match value {
             0 => Ok(SubClientID::PrimaryClient),
             1 => Ok(SubClientID::Client2),
             2 => Ok(SubClientID::Client3),
@@ -21,9 +23,11 @@ impl SubClientID {
             )),
         }
     }
+}
 
-    pub fn proto_to(&self) -> u8 {
-        match self {
+impl From<SubClientID> for u8 {
+    fn from(value: SubClientID) -> Self {
+        match value {
             SubClientID::PrimaryClient => 0,
             SubClientID::Client2 => 1,
             SubClientID::Client3 => 2,

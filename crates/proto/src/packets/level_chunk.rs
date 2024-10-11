@@ -2,18 +2,19 @@ use crate::types::chunk_pos::ChunkPos;
 use bedrockrs_macros::gamepacket;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
+use bedrockrs_shared::world::dimension::Dimension;
 use varint_rs::VarintWriter;
 
 #[gamepacket(id = 58)]
 #[derive(Debug, Clone)]
 pub struct LevelChunkPacket {
     pub chunk_position: ChunkPos,
-    pub dimension_id: VAR<i32>,
-    pub sub_chunk_count: VAR<u32>,
+    pub dimension_id: Dimension,
+    pub sub_chunk_count: u32,
     pub cache_enabled: bool,
     pub serialized_chunk_data: Vec<u8>,
     pub client_needs_to_request_subchunks: bool,
-    pub client_request_subchunk_limit: VAR<i32>,
+    pub client_request_subchunk_limit: i32,
 }
 
 impl ProtoCodec for LevelChunkPacket {
@@ -22,14 +23,12 @@ impl ProtoCodec for LevelChunkPacket {
         self.dimension_id.proto_serialize(stream)?;
 
         if !self.client_needs_to_request_subchunks {
-            self.sub_chunk_count.proto_serialize(stream)?;
+            stream.write_u32_varint(self.sub_chunk_count)?;
+        } else if !(self.client_request_subchunk_limit < 0) {
+            stream.write_u32_varint(u32::MAX - 1)?;
+            stream.write_i32_varint(self.client_request_subchunk_limit)?;
         } else {
-            if !(self.client_request_subchunk_limit.into_inner() < 0) {
-                stream.write_u32_varint(u32::MAX - 1)?;
-                self.client_request_subchunk_limit.proto_serialize(stream)?;
-            } else {
-                stream.write_u32_varint(u32::MAX)?;
-            }
+            stream.write_u32_varint(u32::MAX)?;
         }
 
         self.cache_enabled.proto_serialize(stream)?;

@@ -40,13 +40,18 @@ impl TransportLayerConnection {
 
                 let mut stream = Cursor::new(stream);
 
-                // Read the RakNet packet id
-                // TODO: Should we check if this is the correct one?
-                stream.read_u8()?;
-                
+                // Read the RakNet Packet ID
+                let raknet_packet_id = stream.read_u8()?;
+
+                if raknet_packet_id != RAKNET_GAMEPACKET_ID {
+                    return Err(TransportLayerError::RakNetError(
+                        RaknetError::InvalidRakNetHeader(raknet_packet_id),
+                    ));
+                };
+
                 let mut stream = stream.into_inner();
                 stream.drain(..1);
-                
+
                 stream
             }
         };

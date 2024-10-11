@@ -34,9 +34,6 @@ pub enum ConnectionError {
     CompressError(#[from] CompressionError),
     #[error("Encryption Error: {0}")]
     EncryptionError(#[from] EncryptionError),
-    // TODO: Move into RakNet Error enum
-    #[error("Invalid RakNet Header, expected: {RAKNET_GAME_PACKET_ID}, got: {0}")]
-    InvalidRakNetHeader(u8),
     #[error("IO Error: {0}")]
     IOError(#[from] IOError),
 }
@@ -75,6 +72,8 @@ pub enum RaknetError {
     SendError(#[from] SendQueueError),
     #[error("Server Error: {0}")]
     ServerError(#[from] ServerError),
+    #[error("Invalid RakNet Header, expected: {RAKNET_GAMEPACKET_ID}, got: {0}")]
+    InvalidRakNetHeader(u8),
     #[error("Format Error: {0}")]
     FormatError(String),
 }

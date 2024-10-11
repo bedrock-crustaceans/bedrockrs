@@ -38,7 +38,7 @@ impl Connection {
             .iter()
             .map(GamePackets::get_size_prediction)
             .sum::<usize>();
-        
+
         let mut gamepacket_stream = Vec::with_capacity(gamepacket_stream_size);
 
         // Batch all gamepackets together
@@ -72,7 +72,6 @@ impl Connection {
     }
 
     pub async fn recv(&mut self) -> Result<Vec<GamePackets>, ConnectionError> {
-
         let mut gamepacket_stream = self.transport_layer.recv().await?;
 
         // Decrypt the stream with the given optional Encryption
@@ -87,12 +86,12 @@ impl Connection {
 
         let mut gamepacket_stream = Cursor::new(gamepacket_stream.as_slice());
         let mut gamepackets = vec![];
-        
+
         loop {
             if gamepacket_stream.position() == gamepacket_stream.get_ref().len() as u64 {
                 break;
             }
-            
+
             gamepackets.push(GamePackets::pk_deserialize(&mut gamepacket_stream)?.0);
         }
 

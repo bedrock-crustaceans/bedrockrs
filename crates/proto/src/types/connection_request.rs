@@ -249,4 +249,9 @@ impl ProtoCodec for ConnectionRequest {
             raw_token: raw_token_jwt.claims,
         })
     }
+
+    fn get_size_prediction(&self) -> usize {
+        // TODO
+        1
+    }
 }

@@ -29,18 +29,11 @@ impl Listener {
         socket_addr: SocketAddr,
         nintendo_limited: bool,
     ) -> Result<Self, ListenerError> {
-        // Bind the Raknet Listener
-        let rak_listener = rak_rs::Listener::bind(socket_addr).await;
-
-        // Check for success
-        let mut rak_listener = match rak_listener {
-            Ok(v) => v,
-            Err(e) => {
-                return Err(ListenerError::TransportListenerError(
-                    TransportLayerError::RakNetError(RaknetError::ServerError(e)),
-                ));
-            }
-        };
+        let mut rak_listener = rak_rs::Listener::bind(socket_addr).await.map_err(|err| {
+            ListenerError::TransportListenerError(TransportLayerError::RakNetError(
+                RaknetError::ServerError(err),
+            ))
+        })?;
 
         // generate a random guid
         let guid: u64 = rand::thread_rng().next_u64();

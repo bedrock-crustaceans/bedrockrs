@@ -326,7 +326,7 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
                 let len = match self {
                     #(#size_prediction)*
                 };
-                
+
                 len + get_gamepacket_header_size_prediction()
             }
         }

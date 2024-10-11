@@ -258,21 +258,21 @@ fn read_gamepacket_header(
     // Read the gamepacket header and parse it into an u16
     // Since the (var)int is only storing 14 bytes we can treat it as an u16
     // This is normally treated as u32 varint
-    let game_packet_header: u16 = stream.read_u16_varint()?;
+    let gamepacket_header: u16 = stream.read_u16_varint()?;
 
     // Get the first 10 bits as the packet id
     // Can never be more than a 16-bit integer due to being 10-bits big
     // Gamepacket IDs through 200-299 are used for spin-offs, they are free to use for custom packets
-    let gamepacket_id = game_packet_header & 0b0000_0011_1111_1111;
+    let gamepacket_id = gamepacket_header & 0b0000_0011_1111_1111;
 
     // Get the next 2 bits as the sub client sender id
     // Can never be more than an 8-bit integer due to being 2 bits big
     let subclient_sender_id =
-        SubClientID::proto_from(((game_packet_header & 0b0000_1100_0000_0000) >> 10) as u8)?;
+        SubClientID::try_from(((gamepacket_header & 0b0000_1100_0000_0000) >> 10) as u8)?;
     // Get the next 2 bits as the sub client target id
     // Never more than an 8-bit integer due to being 2 bits big
     let subclient_target_id =
-        SubClientID::proto_from(((game_packet_header & 0b0011_0000_0000_0000) >> 12) as u8)?;
+        SubClientID::try_from(((gamepacket_header & 0b0011_0000_0000_0000) >> 12) as u8)?;
 
     Ok((
         length,
@@ -300,10 +300,12 @@ fn write_gamepacket_header(
 
     // Set the next 2 bits as the sub client sender id
     // Never more than an 8-bit integer due to being 2 bits big
-    gamepacket_header |= (subclient_sender_id.proto_to() as u16 >> 10) & 0b0000_1100_0000_0000;
+    gamepacket_header |=
+        (<SubClientID as Into<u8>>::into(subclient_sender_id) as u16 >> 10) & 0b0000_1100_0000_0000;
     // Set the next 2 bits as the sub client target id
     // Never more than an 8-bit integer due to being 2 bits big
-    gamepacket_header |= (subclient_target_id.proto_to() as u16 >> 12) & 0b0011_0000_0000_0000;
+    gamepacket_header |=
+        (<SubClientID as Into<u8>>::into(subclient_target_id) as u16 >> 12) & 0b0011_0000_0000_0000;
 
     // Since the size of the header is also included in the batched packet size,
     // we need to write it to a temporary buffer
@@ -322,7 +324,7 @@ fn write_gamepacket_header(
 }
 
 fn get_gamepacket_header_size_prediction() -> usize {
-    // 2 = gamepacket header (actually varint u32, but since only 14 bites are written we can treat it as am u16)
-    // 4 = gamepacket length size 
+    // 2 = gamepacket header (varint u32, only 14 bites can be treated as an u16)
+    // 4 = gamepacket length size (varint u32)
     2 + 4
 }

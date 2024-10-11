@@ -67,7 +67,7 @@ impl Compression {
             } => {
                 // CompressionMethod ID for Zlib
                 dst.write_u8(0)?;
-                
+
                 let mut encoder =
                     DeflateEncoder::new(dst, CompressionLevel::new(*compression_level as u32));
 
@@ -82,7 +82,7 @@ impl Compression {
             Compression::Snappy { .. } => {
                 // CompressionMethod ID for Zlib
                 dst.write_u8(1)?;
-                
+
                 let mut encoder = SnapEncoder::new(dst);
 
                 encoder
@@ -98,7 +98,7 @@ impl Compression {
                 dst.write_u8(u8::MAX)?;
                 dst.write_all(src.as_slice())?;
                 dst
-            },
+            }
         };
 
         Ok(dst)
@@ -113,30 +113,28 @@ impl Compression {
         let compression_method = stream.read_u8()?;
 
         src.drain(..1);
-        
+
         let dst = match compression_method {
             0 => {
                 let mut dst = Vec::with_capacity(src.len());
-                
+
                 let mut decoder = DeflateDecoder::new(src.as_slice());
                 decoder.read_to_end(&mut dst)?;
-                
+
                 dst
             }
             1 => {
                 let mut dst = Vec::with_capacity(src.len());
-                
+
                 let mut decoder = SnapDecoder::new(src.as_slice());
                 decoder.read_to_end(&mut dst)?;
-                
+
                 dst
             }
-            u8::MAX => {
-                src
-            }
+            u8::MAX => src,
             other => return Err(CompressionError::UnknownCompressionMethod(other)),
         };
-        
+
         Ok(dst)
     }
 }
