@@ -112,7 +112,7 @@ impl ConnectionSharedReceiver {
         Ok(self.encryption_receiver.borrow())
     }
 
-    pub async fn close(mut self) {
+    pub async fn close(self) {
         // Already closed if Error occurs
         let _ = self.close_sender.send(());
     }

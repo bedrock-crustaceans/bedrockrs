@@ -6,11 +6,9 @@ use crate::gamepackets::GamePackets;
 use crate::sub_client::SubClientID;
 use crate::transport_layer::TransportLayerConnection;
 use std::io::Cursor;
-use std::time::Duration;
-use futures::future::pending;
 use tokio::select;
-use tokio::sync::{broadcast, mpsc, oneshot, watch};
-use tokio::time::{Instant, Interval};
+use tokio::sync::{mpsc, watch};
+use tokio::time::Interval;
 
 pub struct Connection {
     /// Represents the Connection's internal transport layer, which may vary
@@ -107,7 +105,11 @@ impl Connection {
         self.transport_layer.close().await;
     }
 
-    pub async fn into_shards(mut self, mut flush_interval: Option<Interval>, gamepacket_buffer_size: usize) -> (ConnectionSharedSender, ConnectionSharedReceiver) {
+    pub async fn into_shards(
+        mut self,
+        mut flush_interval: Option<Interval>,
+        gamepacket_buffer_size: usize,
+    ) -> (ConnectionSharedSender, ConnectionSharedReceiver) {
         let (gamepacket_tx_task, gamepacket_rx_shard) = mpsc::channel(128);
         let (gamepacket_tx_shard, mut gamepacket_rx_task) = mpsc::channel(128);
         let (close_tx, mut close_rx) = watch::channel(());

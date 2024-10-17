@@ -472,13 +472,13 @@ impl ActorType {
 impl ProtoCodec for ActorType {
     fn proto_serialize(
         &self,
-        stream: &mut Vec<u8>,
+        _stream: &mut Vec<u8>,
     ) -> Result<(), bedrockrs_proto_core::error::ProtoCodecError> {
         unimplemented!()
     }
 
     fn proto_deserialize(
-        stream: &mut std::io::Cursor<&[u8]>,
+        _stream: &mut std::io::Cursor<&[u8]>,
     ) -> Result<Self, bedrockrs_proto_core::error::ProtoCodecError> {
         unimplemented!()
     }

@@ -22,7 +22,7 @@ pub struct MovePlayerPacket {
 }
 
 impl ProtoCodec for MovePlayerPacket {
-    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
+    fn proto_serialize(&self, _stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         unimplemented!();
     }
 

@@ -47,8 +47,8 @@ impl ProtoCodec for LevelChunkPacket {
     }
 
     fn proto_deserialize(
-        stream: &mut std::io::Cursor<&[u8]>,
-    ) -> Result<Self, bedrockrs_proto_core::error::ProtoCodecError> {
+        _stream: &mut std::io::Cursor<&[u8]>,
+    ) -> Result<Self, ProtoCodecError> {
         todo!()
     }
 

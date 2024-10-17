@@ -28,7 +28,7 @@ pub struct PlayerAuthInputPacket {
     pub analog_move_vec: Vec2<f32>,
 }
 
-macro_rules! set_bit {
+macro_rules! _set_bit {
     ($v:expr, $bit:expr) => {
         $v |= 1 << $bit
     };

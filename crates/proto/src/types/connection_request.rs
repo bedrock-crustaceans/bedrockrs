@@ -81,7 +81,7 @@ pub struct ConnectionRequest {
 }
 
 impl ProtoCodec for ConnectionRequest {
-    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError>
+    fn proto_serialize(&self, _stream: &mut Vec<u8>) -> Result<(), ProtoCodecError>
     where
         Self: Sized,
     {

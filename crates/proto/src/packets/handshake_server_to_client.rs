@@ -15,11 +15,11 @@ pub struct HandshakeServerToClientPacket {
 }
 
 impl ProtoCodec for HandshakeServerToClientPacket {
-    fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
+    fn proto_serialize(&self, _stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         todo!()
     }
 
-    fn proto_deserialize(cursor: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
+    fn proto_deserialize(_stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
         todo!()
     }
 
