@@ -41,7 +41,7 @@ macro_rules! get_bit {
 }
 
 impl ProtoCodec for PlayerAuthInputPacket {
-    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
+    fn proto_serialize(&self, _stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         todo!()
     }
 

@@ -6,7 +6,6 @@ use bedrockrs_shared::actor_unique_id::ActorUniqueID;
 pub struct InputData {
     pub ascend: bool,
     pub descend: bool,
-    #[deprecated]
     pub north_jump_deprecated: bool,
     pub jump_down: bool,
     pub sprint_down: bool,

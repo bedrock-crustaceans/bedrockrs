@@ -1,24 +1,26 @@
 use crate::compression::Compression;
-use crate::connection_shard::{ConnectionShardRecv, ConnectionShardSend};
+use crate::connection_shard::{ConnectionSharedReceiver, ConnectionSharedSender};
 use crate::encryption::Encryption;
 use crate::error::ConnectionError;
 use crate::gamepackets::GamePackets;
 use crate::sub_client::SubClientID;
 use crate::transport_layer::TransportLayerConnection;
 use std::io::Cursor;
-use tokio::sync::{broadcast, oneshot, watch};
+use std::time::Duration;
+use futures::future::pending;
+use tokio::select;
+use tokio::sync::{broadcast, mpsc, oneshot, watch};
+use tokio::time::{Instant, Interval};
 
 pub struct Connection {
-    /// Represents the Connection's internal transport layer, which may vary.
+    /// Represents the Connection's internal transport layer, which may vary
     transport_layer: TransportLayerConnection,
     /// Represents the Connection's Compression, the compression gets initialized in the
-    /// login process.
+    /// login process
     pub compression: Option<Compression>,
     /// Represents the connections encryption, the encryption gets initialized in the
-    /// login process, if encryption is enabled.
+    /// login process, if encryption is enabled
     pub encryption: Option<Encryption>,
-    /// Determines if the Connection does support caching.
-    pub cache_supported: bool,
 }
 
 impl Connection {
@@ -27,7 +29,6 @@ impl Connection {
             transport_layer,
             compression: None,
             encryption: None,
-            cache_supported: false,
         }
     }
 
@@ -106,348 +107,418 @@ impl Connection {
         self.transport_layer.close().await;
     }
 
-    pub async fn into_shard(self) -> (ConnectionShardSend, ConnectionShardRecv) {
-        let (sender, receiver) = oneshot::channel();
-    }
+    pub async fn into_shards(mut self, mut flush_interval: Option<Interval>, gamepacket_buffer_size: usize) -> (ConnectionSharedSender, ConnectionSharedReceiver) {
+        let (gamepacket_tx_task, gamepacket_rx_shard) = mpsc::channel(128);
+        let (gamepacket_tx_shard, mut gamepacket_rx_task) = mpsc::channel(128);
+        let (close_tx, mut close_rx) = watch::channel(());
+        let (flush_tx, mut flush_rx) = watch::channel(());
+        let (compression_tx, mut compression_rx) = watch::channel(None);
+        let (encryption_tx, mut encryption_rx) = watch::channel(None);
 
-    // pub async fn into_shard(
-    //     mut self,
-    //     flush_interval: Duration,
-    //     packet_buffer_size: usize,
-    // ) -> ConnectionShard {
-    //     let (sd_pk_send, mut tk_pk_recv) = broadcast::channel::<GamePackets>(packet_buffer_size);
-    //     let (tk_pk_send, sh_pk_recv) =
-    //         broadcast::channel::<Result<GamePackets, ConnectionError>>(packet_buffer_size);
-    //
-    //     let (shard_flush_request_sender, mut task_flush_request_receiver) = watch::channel(());
-    //     let (task_flush_complete_sender, mut shard_flush_complete_receiver) = watch::channel(());
-    //
-    //     let (shard_close_sender, mut task_close_receiver) = watch::channel(());
-    //
-    //     let (shard_compression_sender, mut task_compression_receiver) =
-    //         watch::channel(self.compression.clone());
-    //     let (shard_compression_request_sender, mut task_compression_request_receiver) =
-    //         watch::channel(());
-    //     let (mut task_compression_sender, shard_compression_receiver) =
-    //         watch::channel(self.compression.clone());
-    //
-    //     let (shard_encryption_sender, mut task_encryption_receiver) =
-    //         watch::channel(self.encryption.clone());
-    //     let (shard_encryption_request_sender, mut task_encryption_request_receiver) =
-    //         watch::channel(());
-    //     let (mut task_encryption_sender, shard_encryption_receiver) =
-    //         watch::channel(self.encryption.clone());
-    //
-    //     let (shard_cache_supported_sender, mut task_cache_supported_receiver) =
-    //         watch::channel(self.cache_supported.clone());
-    //     let (shard_cache_supported_request_sender, mut task_cache_supported_request_receiver) =
-    //         watch::channel(());
-    //     let (mut task_cache_supported_sender, shard_cache_supported_receiver) =
-    //         watch::channel(self.cache_supported.clone());
-    //
-    //     tokio::spawn(async move {
-    //         let mut flush_interval = interval(flush_interval);
-    //         let mut send_buffer = vec![];
-    //
-    //         'select_loop: loop {
-    //             select! {
-    //                 _ = task_close_receiver.changed() => {
-    //                     break 'select_loop
-    //                 }
-    //                 res = task_compression_receiver.changed() => {
-    //                     if let Err(_) = res {
-    //                         break 'select_loop
-    //                     }
-    //
-    //                     self.compression = task_compression_receiver.borrow_and_update().to_owned();
-    //                 }
-    //                 res = task_encryption_receiver.changed() => {
-    //                     if let Err(_) = res {
-    //                         break 'select_loop
-    //                     }
-    //
-    //                     self.encryption = task_encryption_receiver.borrow_and_update().to_owned();
-    //                 }
-    //                 res = task_cache_supported_receiver.changed() => {
-    //                     if let Err(_) = res {
-    //                         break 'select_loop
-    //                     }
-    //
-    //                     self.cache_supported = task_cache_supported_receiver.borrow_and_update().to_owned();
-    //                 }
-    //                 res = task_compression_request_receiver.changed() => {
-    //                     if let Err(_) = res {
-    //                         break 'select_loop
-    //                     }
-    //
-    //                     if let Err(_) = task_compression_sender.send(self.compression.clone()) {
-    //                         break 'select_loop
-    //                     }
-    //                 }
-    //                 res = task_encryption_request_receiver.changed() => {
-    //                     if let Err(_) = res {
-    //                         break 'select_loop
-    //                     }
-    //
-    //                     if let Err(_) = task_encryption_sender.send(self.encryption.clone()) {
-    //                         break 'select_loop
-    //                     }
-    //                 }
-    //                 res = task_cache_supported_request_receiver.changed() => {
-    //                     if let Err(_) = res {
-    //                         break 'select_loop
-    //                     }
-    //
-    //                     if let Err(_) = task_cache_supported_sender.send(self.cache_supported.clone()) {
-    //                         break 'select_loop
-    //                     }
-    //                 }
-    //                 res = self.recv() => {
-    //                     match res {
-    //                         Ok(pks) => {
-    //                             for pk in pks {
-    //                                 if tk_pk_send.send(Ok(pk)).is_err() {
-    //                                     break 'select_loop
-    //                                 }
-    //                             }
-    //                         }
-    //                         Err(e) => {
-    //                             if tk_pk_send.send(Err(e)).is_err() {
-    //                                 break 'select_loop
-    //                             }
-    //                         }
-    //                     }
-    //                 }
-    //                 res = tk_pk_recv.recv() => {
-    //                     if res.is_err() {
-    //                         break 'select_loop
-    //                     }
-    //
-    //                     match res {
-    //                         Ok(pk) => { send_buffer.push(pk); }
-    //                         Err(e) => { break 'select_loop }
-    //                     };
-    //                 }
-    //                 res = task_flush_request_receiver.changed() => {
-    //                     if res.is_err() {
-    //                         break 'select_loop
-    //                     }
-    //
-    //                     if !send_buffer.is_empty() {
-    //                         if let Err(_) = self.send(send_buffer.as_slice()).await {
-    //                             break 'select_loop
-    //                         }
-    //
-    //                         if task_flush_complete_sender.send(()).is_err() {
-    //                             break 'select_loop
-    //                         }
-    //
-    //                         send_buffer = vec![];
-    //                     }
-    //                 }
-    //                 _ = flush_interval.tick() => {
-    //                     if !send_buffer.is_empty() {
-    //                         if (self.send(send_buffer.as_slice()).await).is_err() {
-    //                             break 'select_loop
-    //                         }
-    //
-    //                         send_buffer = vec![];
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //
-    //         self.transport_layer.close().await;
-    //     });
-    //
-    //     ConnectionShard {
-    //         pk_sender: sd_pk_send,
-    //         pk_receiver: sh_pk_recv,
-    //
-    //         flush_sender: shard_flush_request_sender,
-    //         flush_receiver: shard_flush_complete_receiver,
-    //
-    //         close_sender: shard_close_sender,
-    //
-    //         compression_sender: shard_compression_sender,
-    //         compression_request_sender: shard_compression_request_sender,
-    //         compression_receiver: shard_compression_receiver,
-    //
-    //         encryption_sender: shard_encryption_sender,
-    //         encryption_request_sender: shard_encryption_request_sender,
-    //         encryption_receiver: shard_encryption_receiver,
-    //
-    //         cache_supported_sender: shard_cache_supported_sender,
-    //         cache_supported_request_sender: shard_cache_supported_request_sender,
-    //         cache_supported_receiver: shard_cache_supported_receiver,
-    //     }
-    // }
-}
+        let shards = (
+            ConnectionSharedSender {
+                gamepacket_sender: gamepacket_tx_shard,
+                close_sender: close_tx.clone(),
+                flush_sender: flush_tx,
+                compression_sender: compression_tx.clone(),
+                compression_receiver: compression_rx.clone(),
+                encryption_sender: encryption_tx.clone(),
+                encryption_receiver: encryption_rx.clone(),
+            },
+            ConnectionSharedReceiver {
+                gamepacket_receiver: gamepacket_rx_shard,
+                close_sender: close_tx.clone(),
+                compression_receiver: compression_rx.clone(),
+                encryption_receiver: encryption_rx.clone(),
+            },
+        );
 
-pub struct ConnectionShard {
-    pk_sender: broadcast::Sender<GamePackets>,
-    pk_receiver: broadcast::Receiver<Result<GamePackets, ConnectionError>>,
+        tokio::spawn(async move {
+            let mut gamepackets = Vec::with_capacity(gamepacket_buffer_size);
+            'select: loop {
+                select! {
+                    _ = close_rx.changed() => {
+                        break 'select;
+                    },
+                    // If flush interval is provided, await on its ticks
+                    _ = flush_interval.as_mut().unwrap().tick(), if flush_interval.is_some() => {
+                        self.send(gamepackets.as_slice()).await.unwrap();
+                        gamepackets.clear();
+                    },
+                    res = flush_rx.changed() => {
+                        if res.is_err() {
+                            break 'select;
+                        }
 
-    flush_sender: watch::Sender<()>,
-    flush_receiver: watch::Receiver<()>,
+                        self.send(gamepackets.as_slice()).await.unwrap();
+                        gamepackets.clear();
+                    },
+                    res = self.recv() => {
+                        match res {
+                            Ok(gamepackets) => for gamepacket in gamepackets {
+                                gamepacket_tx_task.send(Ok(gamepacket)).await.unwrap();
+                            },
+                            Err(err) => gamepacket_tx_task.send(Err(err)).await.unwrap(),
+                        }
+                    },
+                    res = gamepacket_rx_task.recv() => {
+                        match res {
+                            Some(gamepacket) => gamepackets.push(gamepacket),
+                            None => break 'select,
+                        }
+                    },
+                    res = compression_rx.changed() => {
+                        if res.is_err() {
+                            break 'select;
+                        }
 
-    close_sender: watch::Sender<()>,
+                        self.compression = compression_rx.borrow().clone();
+                    },
+                    res = encryption_rx.changed() => {
+                        if res.is_err() {
+                            break 'select;
+                        }
 
-    compression_sender: watch::Sender<Option<Compression>>,
-    compression_request_sender: watch::Sender<()>,
-    compression_receiver: watch::Receiver<Option<Compression>>,
+                        self.encryption = encryption_rx.borrow().clone();
+                    }
+                }
+            }
+        });
 
-    encryption_sender: watch::Sender<Option<Encryption>>,
-    encryption_request_sender: watch::Sender<()>,
-    encryption_receiver: watch::Receiver<Option<Encryption>>,
-
-    cache_supported_sender: watch::Sender<bool>,
-    cache_supported_request_sender: watch::Sender<()>,
-    cache_supported_receiver: watch::Receiver<bool>,
-}
-
-impl ConnectionShard {
-    pub async fn send(&mut self, pk: GamePackets) -> Result<(), ConnectionError> {
-        match self.pk_sender.send(pk) {
-            Ok(_) => Ok(()),
-            Err(_) => Err(ConnectionError::ConnectionClosed),
-        }
-    }
-
-    pub async fn recv(&mut self) -> Result<GamePackets, ConnectionError> {
-        self.pk_receiver
-            .recv()
-            .await
-            .unwrap_or_else(|_| Err(ConnectionError::ConnectionClosed))
-    }
-
-    pub async fn flush(&mut self) -> Result<(), ConnectionError> {
-        match self.flush_sender.send(()) {
-            Ok(_) => {}
-            Err(_) => return Err(ConnectionError::ConnectionClosed),
-        }
-
-        match self.flush_receiver.changed().await {
-            Ok(_) => Ok(()),
-            Err(_) => Err(ConnectionError::ConnectionClosed),
-        }
-    }
-
-    pub async fn close(mut self) -> Result<(), ConnectionError> {
-        match self.flush().await {
-            Ok(_) => {}
-            Err(e) => return Err(e),
-        }
-
-        match self.close_sender.send(()) {
-            Ok(_) => { /* has been closed successfully */ }
-            Err(_) => { /* has already been closed */ }
-        };
-
-        Ok(())
-    }
-
-    pub async fn set_compression(
-        &mut self,
-        compression: Option<Compression>,
-    ) -> Result<(), ConnectionError> {
-        match self.compression_sender.send(compression) {
-            Ok(_) => Ok(()),
-            Err(_) => Err(ConnectionError::ConnectionClosed),
-        }
-    }
-
-    pub async fn get_compression(&mut self) -> Result<Option<Compression>, ConnectionError> {
-        match self.compression_request_sender.send(()) {
-            Ok(_) => {}
-            Err(_) => return Err(ConnectionError::ConnectionClosed),
-        };
-
-        match self.compression_receiver.changed().await {
-            Ok(_) => Ok(self
-                .compression_receiver
-                .borrow_and_update()
-                .clone()
-                .to_owned()),
-            Err(_) => Err(ConnectionError::ConnectionClosed),
-        }
-    }
-
-    pub async fn set_encryption(
-        &mut self,
-        encryption: Option<Encryption>,
-    ) -> Result<(), ConnectionError> {
-        match self.encryption_sender.send(encryption) {
-            Ok(_) => Ok(()),
-            Err(_) => Err(ConnectionError::ConnectionClosed),
-        }
-    }
-
-    pub async fn get_encryption(&mut self) -> Result<Option<Encryption>, ConnectionError> {
-        match self.encryption_request_sender.send(()) {
-            Ok(_) => {}
-            Err(_) => return Err(ConnectionError::ConnectionClosed),
-        };
-
-        match self.encryption_receiver.changed().await {
-            Ok(_) => Ok(self
-                .encryption_receiver
-                .borrow_and_update()
-                .clone()
-                .to_owned()),
-            Err(_) => Err(ConnectionError::ConnectionClosed),
-        }
-    }
-
-    pub async fn set_cache_supported(
-        &mut self,
-        cache_supported: bool,
-    ) -> Result<(), ConnectionError> {
-        match self.cache_supported_sender.send(cache_supported) {
-            Ok(_) => Ok(()),
-            Err(_) => Err(ConnectionError::ConnectionClosed),
-        }
-    }
-
-    pub async fn get_cache_supported(&mut self) -> Result<bool, ConnectionError> {
-        match self.cache_supported_request_sender.send(()) {
-            Ok(_) => {}
-            Err(_) => return Err(ConnectionError::ConnectionClosed),
-        };
-
-        match self.cache_supported_receiver.changed().await {
-            Ok(_) => Ok(self
-                .cache_supported_receiver
-                .borrow_and_update()
-                .clone()
-                .to_owned()),
-            Err(_) => Err(ConnectionError::ConnectionClosed),
-        }
+        shards
     }
 }
 
-impl Clone for ConnectionShard {
-    fn clone(&self) -> Self {
-        Self {
-            pk_sender: self.pk_sender.clone(),
-            pk_receiver: self.pk_receiver.resubscribe(),
+// pub async fn into_shard(self) -> (ConnectionShardSend, ConnectionShardRecv) {
+//     let (sender, receiver) = oneshot::channel();
+// }
 
-            flush_sender: self.flush_sender.clone(),
-            flush_receiver: self.flush_receiver.clone(),
+//     pub async fn into_shard(
+//         mut self,
+//         flush_interval: Interval,
+//         packet_buffer_size: usize,
+//     ) -> ConnectionShard {
+//         let (sd_pk_send, mut tk_pk_recv) = broadcast::channel::<GamePackets>(packet_buffer_size);
+//         let (tk_pk_send, sh_pk_recv) =
+//             mpsc::channel::<Result<GamePackets, ConnectionError>>(packet_buffer_size);
+//
+//         let (shard_flush_request_sender, mut task_flush_request_receiver) = watch::channel(());
+//         let (task_flush_complete_sender, mut shard_flush_complete_receiver) = watch::channel(());
+//
+//         let (shard_close_sender, mut task_close_receiver) = watch::channel(());
+//
+//         let (shard_compression_sender, mut task_compression_receiver) =
+//             watch::channel(self.compression.clone());
+//         let (shard_compression_request_sender, mut task_compression_request_receiver) =
+//             watch::channel(());
+//         let (mut task_compression_sender, shard_compression_receiver) =
+//             watch::channel(self.compression.clone());
+//
+//         let (shard_encryption_sender, mut task_encryption_receiver) =
+//             watch::channel(self.encryption.clone());
+//         let (shard_encryption_request_sender, mut task_encryption_request_receiver) =
+//             watch::channel(());
+//         let (mut task_encryption_sender, shard_encryption_receiver) =
+//             watch::channel(self.encryption.clone());
+//
+//         let (shard_cache_supported_sender, mut task_cache_supported_receiver) =
+//             watch::channel(self.cache_supported.clone());
+//         let (shard_cache_supported_request_sender, mut task_cache_supported_request_receiver) =
+//             watch::channel(());
+//         let (mut task_cache_supported_sender, shard_cache_supported_receiver) =
+//             watch::channel(self.cache_supported.clone());
+//
+//         tokio::spawn(async move {
+//             let flush_interval = flush_interval;
+//             let send_buffer = vec![];
+//
+//             'select_loop: loop {
+//                 select! {
+//                     _ = task_close_receiver.changed() => {
+//                         break 'select_loop
+//                     }
+//                     res = task_compression_receiver.changed() => {
+//                         if let Err(_) = res {
+//                             break 'select_loop
+//                         }
+//
+//                         self.compression = task_compression_receiver.borrow_and_update().to_owned();
+//                     }
+//                     res = task_encryption_receiver.changed() => {
+//                         if let Err(_) = res {
+//                             break 'select_loop
+//                         }
+//
+//                         self.encryption = task_encryption_receiver.borrow_and_update().to_owned();
+//                     }
+//                     res = task_cache_supported_receiver.changed() => {
+//                         if let Err(_) = res {
+//                             break 'select_loop
+//                         }
+//
+//                         self.cache_supported = task_cache_supported_receiver.borrow_and_update().to_owned();
+//                     }
+//                     res = task_compression_request_receiver.changed() => {
+//                         if let Err(_) = res {
+//                             break 'select_loop
+//                         }
+//
+//                         if let Err(_) = task_compression_sender.send(self.compression.clone()) {
+//                             break 'select_loop
+//                         }
+//                     }
+//                     res = task_encryption_request_receiver.changed() => {
+//                         if let Err(_) = res {
+//                             break 'select_loop
+//                         }
+//
+//                         if let Err(_) = task_encryption_sender.send(self.encryption.clone()) {
+//                             break 'select_loop
+//                         }
+//                     }
+//                     res = task_cache_supported_request_receiver.changed() => {
+//                         if let Err(_) = res {
+//                             break 'select_loop
+//                         }
+//
+//                         if let Err(_) = task_cache_supported_sender.send(self.cache_supported.clone()) {
+//                             break 'select_loop
+//                         }
+//                     }
+//                     res = self.recv() => {
+//                         match res {
+//                             Ok(pks) => {
+//                                 for pk in pks {
+//                                     if tk_pk_send.send(Ok(pk)).is_err() {
+//                                         break 'select_loop
+//                                     }
+//                                 }
+//                             }
+//                             Err(e) => {
+//                                 if tk_pk_send.send(Err(e)).is_err() {
+//                                     break 'select_loop
+//                                 }
+//                             }
+//                         }
+//                     }
+//                     res = tk_pk_recv.recv() => {
+//                         if res.is_err() {
+//                             break 'select_loop
+//                         }
+//
+//                         match res {
+//                             Ok(pk) => { send_buffer.push(pk); }
+//                             Err(e) => { break 'select_loop }
+//                         };
+//                     }
+//                     res = task_flush_request_receiver.changed() => {
+//                         if res.is_err() {
+//                             break 'select_loop
+//                         }
+//
+//                         if !send_buffer.is_empty() {
+//                             if let Err(_) = self.send(send_buffer.as_slice()).await {
+//                                 break 'select_loop
+//                             }
+//
+//                             if task_flush_complete_sender.send(()).is_err() {
+//                                 break 'select_loop
+//                             }
+//
+//                             send_buffer = vec![];
+//                         }
+//                     }
+//                     _ = flush_interval.tick() => {
+//                         if !send_buffer.is_empty() {
+//                             if (self.send(send_buffer.as_slice()).await).is_err() {
+//                                 break 'select_loop
+//                             }
+//
+//                             send_buffer = vec![];
+//                         }
+//                     }
+//                 }
+//             }
+//
+//             self.transport_layer.close().await;
+//         });
+//
+//         ConnectionShard {
+//             pk_sender: sd_pk_send,
+//             pk_receiver: sh_pk_recv,
+//
+//             flush_sender: shard_flush_request_sender,
+//             flush_receiver: shard_flush_complete_receiver,
+//
+//             close_sender: shard_close_sender,
+//
+//             compression_sender: shard_compression_sender,
+//             compression_request_sender: shard_compression_request_sender,
+//             compression_receiver: shard_compression_receiver,
+//
+//             encryption_sender: shard_encryption_sender,
+//             encryption_request_sender: shard_encryption_request_sender,
+//             encryption_receiver: shard_encryption_receiver,
+//
+//             cache_supported_sender: shard_cache_supported_sender,
+//             cache_supported_request_sender: shard_cache_supported_request_sender,
+//             cache_supported_receiver: shard_cache_supported_receiver,
+//         }
+//     }
+// }
 
-            close_sender: self.close_sender.clone(),
-
-            compression_sender: self.compression_sender.clone(),
-            compression_request_sender: self.compression_request_sender.clone(),
-            compression_receiver: self.compression_receiver.clone(),
-
-            encryption_sender: self.encryption_sender.clone(),
-            encryption_request_sender: self.compression_request_sender.clone(),
-            encryption_receiver: self.encryption_receiver.clone(),
-
-            cache_supported_sender: self.cache_supported_sender.clone(),
-            cache_supported_request_sender: self.cache_supported_request_sender.clone(),
-            cache_supported_receiver: self.cache_supported_receiver.clone(),
-        }
-    }
-}
+// pub struct ConnectionShard {
+//     pk_sender: broadcast::Sender<GamePackets>,
+//     pk_receiver: broadcast::Receiver<Result<GamePackets, ConnectionError>>,
+//
+//     flush_sender: watch::Sender<()>,
+//     flush_receiver: watch::Receiver<()>,
+//
+//     compression_sender: watch::Sender<Option<Compression>>,
+//     compression_receiver: watch::Receiver<Option<Compression>>,
+//
+//     encryption_sender: watch::Sender<Option<Encryption>>,
+//     encryption_receiver: watch::Receiver<Option<Encryption>>,
+//
+//     cache_supported_sender: watch::Sender<bool>,
+//     cache_supported_receiver: watch::Receiver<bool>,
+// }
+//
+// impl ConnectionShard {
+//     pub async fn recv(&mut self) -> Result<GamePackets, ConnectionError> {
+//         self.pk_receiver
+//             .recv()
+//             .await
+//             .unwrap_or_else(|_| Err(ConnectionError::ConnectionClosed))
+//     }
+//
+//     pub async fn flush(&mut self) -> Result<(), ConnectionError> {
+//         match self.flush_sender.send(()) {
+//             Ok(_) => {}
+//             Err(_) => return Err(ConnectionError::ConnectionClosed),
+//         }
+//
+//         match self.flush_receiver.changed().await {
+//             Ok(_) => Ok(()),
+//             Err(_) => Err(ConnectionError::ConnectionClosed),
+//         }
+//     }
+//
+//     pub async fn close(mut self) -> Result<(), ConnectionError> {
+//         match self.flush().await {
+//             Ok(_) => {}
+//             Err(e) => return Err(e),
+//         }
+//
+//         match self.close_sender.send(()) {
+//             Ok(_) => { /* has been closed successfully */ }
+//             Err(_) => { /* has already been closed */ }
+//         };
+//
+//         Ok(())
+//     }
+//
+//     pub async fn set_compression(
+//         &mut self,
+//         compression: Option<Compression>,
+//     ) -> Result<(), ConnectionError> {
+//         match self.compression_sender.send(compression) {
+//             Ok(_) => Ok(()),
+//             Err(_) => Err(ConnectionError::ConnectionClosed),
+//         }
+//     }
+//
+//     pub async fn get_compression(&mut self) -> Result<Option<Compression>, ConnectionError> {
+//         match self.compression_request_sender.send(()) {
+//             Ok(_) => {}
+//             Err(_) => return Err(ConnectionError::ConnectionClosed),
+//         };
+//
+//         match self.compression_receiver.changed().await {
+//             Ok(_) => Ok(self
+//                 .compression_receiver
+//                 .borrow_and_update()
+//                 .clone()
+//                 .to_owned()),
+//             Err(_) => Err(ConnectionError::ConnectionClosed),
+//         }
+//     }
+//
+//     pub async fn set_encryption(
+//         &mut self,
+//         encryption: Option<Encryption>,
+//     ) -> Result<(), ConnectionError> {
+//         match self.encryption_sender.send(encryption) {
+//             Ok(_) => Ok(()),
+//             Err(_) => Err(ConnectionError::ConnectionClosed),
+//         }
+//     }
+//
+//     pub async fn get_encryption(&mut self) -> Result<Option<Encryption>, ConnectionError> {
+//         match self.encryption_request_sender.send(()) {
+//             Ok(_) => {}
+//             Err(_) => return Err(ConnectionError::ConnectionClosed),
+//         };
+//
+//         match self.encryption_receiver.changed().await {
+//             Ok(_) => Ok(self
+//                 .encryption_receiver
+//                 .borrow_and_update()
+//                 .clone()
+//                 .to_owned()),
+//             Err(_) => Err(ConnectionError::ConnectionClosed),
+//         }
+//     }
+//
+//     pub async fn set_cache_supported(
+//         &mut self,
+//         cache_supported: bool,
+//     ) -> Result<(), ConnectionError> {
+//         match self.cache_supported_sender.send(cache_supported) {
+//             Ok(_) => Ok(()),
+//             Err(_) => Err(ConnectionError::ConnectionClosed),
+//         }
+//     }
+//
+//     pub async fn get_cache_supported(&mut self) -> Result<bool, ConnectionError> {
+//         match self.cache_supported_request_sender.send(()) {
+//             Ok(_) => {}
+//             Err(_) => return Err(ConnectionError::ConnectionClosed),
+//         };
+//
+//         match self.cache_supported_receiver.changed().await {
+//             Ok(_) => Ok(self
+//                 .cache_supported_receiver
+//                 .borrow_and_update()
+//                 .clone()
+//                 .to_owned()),
+//             Err(_) => Err(ConnectionError::ConnectionClosed),
+//         }
+//     }
+// }
+//
+// impl Clone for ConnectionShard {
+//     fn clone(&self) -> Self {
+//         Self {
+//             pk_sender: self.pk_sender.clone(),
+//             pk_receiver: self.pk_receiver.resubscribe(),
+//
+//             flush_sender: self.flush_sender.clone(),
+//             flush_receiver: self.flush_receiver.clone(),
+//
+//             close_sender: self.close_sender.clone(),
+//
+//             compression_sender: self.compression_sender.clone(),
+//             compression_request_sender: self.compression_request_sender.clone(),
+//             compression_receiver: self.compression_receiver.clone(),
+//
+//             encryption_sender: self.encryption_sender.clone(),
+//             encryption_request_sender: self.compression_request_sender.clone(),
+//             encryption_receiver: self.encryption_receiver.clone(),
+//
+//             cache_supported_sender: self.cache_supported_sender.clone(),
+//             cache_supported_request_sender: self.cache_supported_request_sender.clone(),
+//             cache_supported_receiver: self.cache_supported_receiver.clone(),
+//         }
+//     }
+// }

@@ -38,7 +38,6 @@ use crate::packets::{
 use crate::sub_client::SubClientID;
 use bedrockrs_macros::gamepackets;
 use bedrockrs_proto_core::error::ProtoCodecError;
-use bedrockrs_proto_core::GamePacket;
 use std::io::{Cursor, Write};
 use varint_rs::{VarintReader, VarintWriter};
 
