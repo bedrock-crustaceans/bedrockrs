@@ -107,11 +107,12 @@ impl Connection {
 
     pub async fn into_shards(
         mut self,
-        mut flush_interval: Option<Interval>,
+        // TODO: Look into making flush_interval optional
+        mut flush_interval: Interval,
         gamepacket_buffer_size: usize,
     ) -> (ConnectionSharedSender, ConnectionSharedReceiver) {
-        let (gamepacket_tx_task, gamepacket_rx_shard) = mpsc::channel(128);
-        let (gamepacket_tx_shard, mut gamepacket_rx_task) = mpsc::channel(128);
+        let (gamepacket_tx_task, gamepacket_rx_shard) = mpsc::channel(gamepacket_buffer_size);
+        let (gamepacket_tx_shard, mut gamepacket_rx_task) = mpsc::channel(gamepacket_buffer_size);
         let (close_tx, mut close_rx) = watch::channel(());
         let (flush_tx, mut flush_rx) = watch::channel(());
         let (compression_tx, mut compression_rx) = watch::channel(None);
@@ -142,9 +143,9 @@ impl Connection {
                     _ = close_rx.changed() => {
                         break 'select;
                     },
-                    // If flush interval is provided, await on its ticks
-                    _ = flush_interval.as_mut().unwrap().tick(), if flush_interval.is_some() => {
+                    _ = flush_interval.tick() => {
                         self.send(gamepackets.as_slice()).await.unwrap();
+                        println!("Sent {gamepackets:#?}");
                         gamepackets.clear();
                     },
                     res = flush_rx.changed() => {
@@ -153,11 +154,13 @@ impl Connection {
                         }
 
                         self.send(gamepackets.as_slice()).await.unwrap();
+                        println!("Sent {gamepackets:#?}");
                         gamepackets.clear();
                     },
                     res = self.recv() => {
                         match res {
                             Ok(gamepackets) => for gamepacket in gamepackets {
+                                println!("Received {gamepacket:#?}");
                                 gamepacket_tx_task.send(Ok(gamepacket)).await.unwrap();
                             },
                             Err(err) => gamepacket_tx_task.send(Err(err)).await.unwrap(),
