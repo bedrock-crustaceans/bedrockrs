@@ -1,9 +1,8 @@
+use serde::{Deserialize, Serialize};
 use bedrockrs_core::{Vec2, Vec3};
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 use uuid::Uuid;
 
-use crate::types::block_entry::BlockEntry;
-use crate::types::item_entry::ItemEntry;
 use crate::types::level_settings::LevelSettings;
 use crate::types::network_permissions::NetworkPermissions;
 use crate::types::player_movement_settings::PlayerMovementSettings;
@@ -54,3 +53,27 @@ pub struct StartGamePacket {
     pub use_block_network_id_hashes: bool,
     pub network_permission: NetworkPermissions,
 }
+
+#[derive(Debug, Clone, ProtoCodec)]
+pub struct BlockEntry {
+    pub name: String,
+    #[nbt]
+    pub definition: BlockDefinition,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct BlockDefinition {
+    // TODO: Add fields
+}
+
+#[derive(Debug, Clone, ProtoCodec)]
+pub struct ItemEntry {
+    pub name: String,
+    /// Block IDs < 256 (can be negative)
+    /// Item IDs > 257
+    #[endianness(le)]
+    pub id: i16,
+    pub component_based: bool,
+}
+
