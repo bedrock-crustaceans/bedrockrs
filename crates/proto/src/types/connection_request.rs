@@ -167,7 +167,7 @@ impl ProtoCodec for ConnectionRequest {
                 jsonwebtoken::decode_header(&jwt_string).map_err(ProtoCodecError::JwtError)?;
 
             let mut jwt_validation = Validation::new(jwt_header.alg);
-            // TODO: This definitely is not right. Even Zuri-MC doesn't understand this.. I may understand it.. I do understand it, update I don't.
+            // TODO: This definitely is not right. Even Zuri-MC doesn't understand this.. I may understand it.. I do understand it, update I don't. But I now know someone that does, I hope
             // TODO: Someone else should find out how this works
             jwt_validation.insecure_disable_signature_validation();
             jwt_validation.set_required_spec_claims::<&str>(&[]);
@@ -244,6 +244,8 @@ impl ProtoCodec for ConnectionRequest {
         )
         .map_err(ProtoCodecError::JwtError)?;
 
+        println!("{certificate_chain:#?}");
+        
         Ok(Self {
             certificate_chain,
             raw_token: raw_token_jwt.claims,
