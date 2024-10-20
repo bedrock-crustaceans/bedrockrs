@@ -15,7 +15,6 @@ pub mod container_id;
 pub mod container_type;
 pub mod credits_state;
 pub mod data_item;
-pub mod disconnect_reason;
 pub mod edu_shared_uri_resource;
 pub mod entity_info;
 pub mod event_type;
