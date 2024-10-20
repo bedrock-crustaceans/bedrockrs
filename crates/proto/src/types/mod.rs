@@ -35,7 +35,6 @@ pub mod level_settings;
 pub mod loading_screen_action;
 pub mod modal_form_cancel_reason;
 pub mod network_permissions;
-pub mod pack_info_behavior;
 pub mod pack_info_resource;
 pub mod pack_url;
 pub mod play_mode;
