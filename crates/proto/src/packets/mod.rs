@@ -58,3 +58,4 @@ pub mod text_message;
 pub mod toast_request;
 pub mod update_difficulty;
 pub mod update_player_gamemode;
+pub mod handshake_client_to_server;

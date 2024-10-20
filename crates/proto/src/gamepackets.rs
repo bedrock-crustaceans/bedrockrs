@@ -40,12 +40,13 @@ use bedrockrs_macros::gamepackets;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use std::io::{Cursor, Write};
 use varint_rs::{VarintReader, VarintWriter};
+use crate::packets::handshake_client_to_server::HandshakeClientToServerPacket;
 
 gamepackets! {
     Login: LoginPacket,
     PlayStatus: PlayStatusPacket,
-    ServerToClientHandshake: HandshakeServerToClientPacket,
-    ClientToServerHandshake: _,
+    HandshakeServerToClient: HandshakeServerToClientPacket,
+    HandshakeClientToServer: HandshakeClientToServerPacket,
     DisconnectPlayer: DisconnectPlayerPacket,
     ResourcePacksInfo: ResourcePacksInfoPacket,
     ResourcePackStack: ResourcePacksStackPacket,
