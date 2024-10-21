@@ -25,8 +25,12 @@ pub enum Compression {
 }
 
 impl Compression {
-    /// Used in the NetworkSettingsPacket to identify which
-    /// CompressionMethod should be used for the Connection.
+    const ID_ZLIB: u8 = 0;
+    const ID_SNAPPY: u8 = 1;
+    const ID_NONE: u8 = u8::MAX;
+    
+    /// Used in the [NetworkSettingsPacket](crate::packets::network_settings::NetworkSettingsPacket)
+    /// to identify which Compression should be used for the Connection.
     #[inline]
     pub const fn id_u16(&self) -> u16 {
         match self {
@@ -51,13 +55,12 @@ impl Compression {
     #[inline]
     pub fn compress(&self, src: Vec<u8>) -> Result<Vec<u8>, CompressionError> {
         // Add one extra byte for the compression method id
-        let mut dst = Vec::with_capacity(src.len() + 1);
+        let mut dst = Vec::with_capacity(src.len() + size_of::<u8>());
 
         if self.threshold() as usize >= src.len() {
-            // CompressionMethod ID for No Compression
-            dst.write_u8(u8::MAX)?;
+            dst.write_u8(Self::ID_NONE)?;
             dst.write_all(src.as_slice())?;
-
+        
             return Ok(dst);
         }
 
@@ -65,8 +68,7 @@ impl Compression {
             Compression::Zlib {
                 compression_level, ..
             } => {
-                // CompressionMethod ID for Zlib
-                dst.write_u8(0)?;
+                dst.write_u8(Self::ID_ZLIB)?;
 
                 let mut encoder =
                     DeflateEncoder::new(dst, CompressionLevel::new(*compression_level as u32));
@@ -80,14 +82,13 @@ impl Compression {
                     .map_err(|err| CompressionError::ZlibError(Box::new(err)))?
             }
             Compression::Snappy { .. } => {
-                // CompressionMethod ID for Zlib
-                dst.write_u8(1)?;
+                dst.write_u8(Self::ID_SNAPPY)?;
 
                 let mut encoder = SnapEncoder::new(dst);
 
                 encoder
                     .write_all(src.as_slice())
-                    .map_err(|e| CompressionError::SnappyError(e))?;
+                    .map_err(CompressionError::SnappyError)?;
 
                 encoder
                     .into_inner()
@@ -95,8 +96,9 @@ impl Compression {
             }
             Compression::None => {
                 // Compression method id for No Compression
-                dst.write_u8(u8::MAX)?;
+                dst.write_u8(Self::ID_NONE)?;
                 dst.write_all(src.as_slice())?;
+                
                 dst
             }
         };
@@ -115,7 +117,7 @@ impl Compression {
         src.drain(..1);
 
         let dst = match compression_method {
-            0 => {
+            Self::ID_ZLIB => {
                 let mut dst = Vec::with_capacity(src.len());
 
                 let mut decoder = DeflateDecoder::new(src.as_slice());
@@ -123,7 +125,7 @@ impl Compression {
 
                 dst
             }
-            1 => {
+            Self::ID_SNAPPY => {
                 let mut dst = Vec::with_capacity(src.len());
 
                 let mut decoder = SnapDecoder::new(src.as_slice());
@@ -131,7 +133,7 @@ impl Compression {
 
                 dst
             }
-            u8::MAX => src,
+            Self::ID_NONE => src,
             other => return Err(CompressionError::UnknownCompressionMethod(other)),
         };
 
