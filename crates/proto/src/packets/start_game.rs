@@ -40,17 +40,17 @@ pub struct StartGamePacket {
     #[vec_endianness(var)]
     pub items: Vec<ItemEntry>,
     pub multiplayer_correlation_id: String,
-    pub enable_item_stack_net_manager: bool,
+    pub item_stack_net_manager: bool,
     pub server_version: String,
     // TODO: This can now be a concrete type rather than an NBT value.
     // How should we do this with the ProtoCodec macro?
     #[nbt]
     pub player_property_data: nbtx::Value,
     #[endianness(le)]
-    pub block_type_registry_checksum: u64,
+    pub block_state_checksum: u64,
     pub world_template_id: Uuid,
-    pub enable_clientside_world_generation: bool,
-    pub use_block_network_id_hashes: bool,
+    pub clientside_world_generation: bool,
+    pub block_id_hashes: bool,
     pub network_permission: NetworkPermissions,
 }
 
