@@ -143,24 +143,19 @@ impl Connection {
                     _ = close_rx.changed() => {
                         break 'select;
                     },
-                    _ = flush_interval.tick() => {
-                        self.send(gamepackets.as_slice()).await.unwrap();
-                        println!("Sent {gamepackets:#?}");
-                        gamepackets.clear();
-                    },
                     res = flush_rx.changed() => {
                         if res.is_err() {
                             break 'select;
                         }
 
                         self.send(gamepackets.as_slice()).await.unwrap();
-                        println!("Sent {gamepackets:#?}");
+                        //println!("Sent {gamepackets:#?}");
                         gamepackets.clear();
                     },
                     res = self.recv() => {
                         match res {
                             Ok(gamepackets) => for gamepacket in gamepackets {
-                                println!("Received {gamepacket:#?}");
+                                //println!("Received {gamepacket:#?}");
                                 gamepacket_tx_task.send(Ok(gamepacket)).await.unwrap();
                             },
                             Err(err) => gamepacket_tx_task.send(Err(err)).await.unwrap(),
