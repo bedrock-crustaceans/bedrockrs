@@ -47,7 +47,7 @@ pub struct LevelSettings {
     // TODO: Turn into enum
     #[endianness(var)]
     pub broadcasting_settings_platform: i32,
-    pub commands_enabled: bool,
+    pub commands: bool,
     pub texture_pack_required: bool,
     #[vec_repr(u32)]
     #[vec_endianness(var)]
@@ -77,7 +77,7 @@ pub struct LevelSettings {
     pub limited_world_depth: i32,
     pub new_nether: bool,
     pub edu_shared_uri_resource: EduSharedResourceUri,
-    pub force_experimental_gameplay: bool,
+    pub force_experimental_gameplay: Option<bool>,
     pub chat_restriction_level: ChatRestrictionLevel,
     pub disable_player_interactions: bool,
     pub server_id: String,

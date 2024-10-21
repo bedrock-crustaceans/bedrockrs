@@ -18,7 +18,7 @@ pub struct NetworkSettingsPacket {
     #[endianness(le)]
     pub compression_algorithm: u16,
     // TODO: Document what this field does
-    pub client_throttle_enabled: bool,
+    pub client_throttle: bool,
     // TODO: Document what this field does
     pub client_throttle_threshold: u8,
     // TODO: Document what this field does
