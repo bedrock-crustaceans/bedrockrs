@@ -15,8 +15,8 @@ impl ProtoCodec for BlockPos {
     fn proto_serialize(&self, buf: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         buf.write_i32_varint(self.x)?;
         // the y i32 height is serialized as an u32
-        unsafe { buf.write_u32_varint(transmute::<i32, u32>(self.x))? };
-        buf.write_i32_varint(self.x)?;
+        unsafe { buf.write_u32_varint(transmute::<i32, u32>(self.y))? };
+        buf.write_i32_varint(self.z)?;
 
         Ok(())
     }
