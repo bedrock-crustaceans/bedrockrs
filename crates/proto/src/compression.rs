@@ -28,7 +28,7 @@ impl Compression {
     const ID_ZLIB: u8 = 0;
     const ID_SNAPPY: u8 = 1;
     const ID_NONE: u8 = u8::MAX;
-    
+
     /// Used in the [NetworkSettingsPacket](crate::packets::network_settings::NetworkSettingsPacket)
     /// to identify which Compression should be used for the Connection.
     #[inline]
@@ -60,7 +60,7 @@ impl Compression {
         if self.threshold() as usize >= src.len() {
             dst.write_u8(Self::ID_NONE)?;
             dst.write_all(src.as_slice())?;
-        
+
             return Ok(dst);
         }
 
@@ -98,7 +98,7 @@ impl Compression {
                 // Compression method id for No Compression
                 dst.write_u8(Self::ID_NONE)?;
                 dst.write_all(src.as_slice())?;
-                
+
                 dst
             }
         };
