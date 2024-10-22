@@ -1,5 +1,6 @@
 #![allow(non_upper_case_globals)]
 
+use crate::packets::handshake_client_to_server::HandshakeClientToServerPacket;
 use crate::packets::{
     add_actor::AddActorPacket, add_painting::AddPaintingPacket, add_player::AddPlayerPacket,
     animate_player::AnimatePlayerPacket,
@@ -40,7 +41,6 @@ use bedrockrs_macros::gamepackets;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use std::io::{Cursor, Write};
 use varint_rs::{VarintReader, VarintWriter};
-use crate::packets::handshake_client_to_server::HandshakeClientToServerPacket;
 
 gamepackets! {
     Login: LoginPacket,

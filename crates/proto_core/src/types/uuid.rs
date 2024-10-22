@@ -1,7 +1,7 @@
-use std::io::Cursor;
-use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
+use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
+use std::io::Cursor;
 use uuid::Uuid;
 
 impl ProtoCodec for Uuid {

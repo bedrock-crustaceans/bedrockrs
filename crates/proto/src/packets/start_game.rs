@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
 use bedrockrs_core::{Vec2, Vec3};
 use bedrockrs_macros::{gamepacket, ProtoCodec};
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::types::level_settings::LevelSettings;
@@ -76,4 +76,3 @@ pub struct ItemEntry {
     pub id: i16,
     pub component_based: bool,
 }
-

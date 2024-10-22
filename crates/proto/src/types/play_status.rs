@@ -19,7 +19,7 @@ pub enum PlayStatusType {
     /// Displays "The server is running an incompatible edition of Minecraft. Failed to connect."
     FailedEditionMismatchVanillaToEdu = 6,
     /// Displays "Wow this server is popular! Check back later to see if space opens up. Server Full"
-    FailedServerFull = 7, 
+    FailedServerFull = 7,
     /// Displays "The server is not in Editor Mode. Failed to connect."
     FailedEditorMismatchEditorToVanilla = 8,
     /// Displays "The server is in Editor Mode. Failed to connect."

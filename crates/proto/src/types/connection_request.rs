@@ -245,7 +245,7 @@ impl ProtoCodec for ConnectionRequest {
         .map_err(ProtoCodecError::JwtError)?;
 
         println!("{certificate_chain:#?}");
-        
+
         Ok(Self {
             certificate_chain,
             raw_token: raw_token_jwt.claims,
