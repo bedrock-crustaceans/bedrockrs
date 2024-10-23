@@ -1,14 +1,16 @@
+mod shard;
+
 use crate::compression::Compression;
-use crate::connection_shard::{ConnectionSharedReceiver, ConnectionSharedSender};
 use crate::encryption::Encryption;
 use crate::error::ConnectionError;
 use crate::gamepackets::GamePackets;
-use crate::sub_client::SubClientID;
 use crate::transport_layer::TransportLayerConnection;
 use std::io::Cursor;
 use tokio::select;
 use tokio::sync::{mpsc, watch};
 use tokio::time::Interval;
+use crate::batch::{batch_gamepackets, separate_gamepackets};
+use crate::helper::ProtoHelper;
 
 pub struct Connection {
     /// Represents the Connection's internal transport layer, which may vary
@@ -30,32 +32,8 @@ impl Connection {
         }
     }
 
-    pub async fn send(&mut self, gamepackets: &[GamePackets]) -> Result<(), ConnectionError> {
-        let gamepacket_stream_size = gamepackets
-            .iter()
-            .map(GamePackets::get_size_prediction)
-            .sum::<usize>();
-
-        let mut gamepacket_stream = Vec::with_capacity(gamepacket_stream_size);
-
-        // Batch all gamepackets together
-        gamepackets.iter().try_for_each(|gamepacket| {
-            gamepacket.pk_serialize(
-                &mut gamepacket_stream,
-                SubClientID::PrimaryClient,
-                SubClientID::PrimaryClient,
-            )
-        })?;
-
-        // Compress the stream with the given optional Compression
-        if let Some(compression) = &self.compression {
-            gamepacket_stream = compression.compress(gamepacket_stream)?;
-        }
-
-        // Encrypt the stream with the given optional Encryption
-        if let Some(encryption) = &mut self.encryption {
-            gamepacket_stream = encryption.encrypt(gamepacket_stream)?;
-        }
+    pub async fn send<T: ProtoHelper>(&mut self, gamepackets: &[T::GamePacketType]) -> Result<(), ConnectionError> {
+        let gamepacket_stream = batch_gamepackets::<T>(gamepackets, &self.compression, &mut self.encryption)?;
 
         self.transport_layer.send(&gamepacket_stream).await?;
 
@@ -68,30 +46,11 @@ impl Connection {
         Ok(())
     }
 
-    pub async fn recv(&mut self) -> Result<Vec<GamePackets>, ConnectionError> {
-        let mut gamepacket_stream = self.transport_layer.recv().await?;
+    pub async fn recv<T: ProtoHelper>(&mut self) -> Result<Vec<T::GamePacketType>, ConnectionError> {
+        let gamepacket_stream = self.transport_layer.recv().await?;
 
-        // Decrypt the stream with the given optional Encryption
-        if let Some(encryption) = &mut self.encryption {
-            gamepacket_stream = encryption.decrypt(gamepacket_stream)?;
-        }
-
-        // Decompress the stream with the given optional Compression
-        if let Some(compression) = &self.compression {
-            gamepacket_stream = compression.decompress(gamepacket_stream)?;
-        }
-
-        let mut gamepacket_stream = Cursor::new(gamepacket_stream.as_slice());
-        let mut gamepackets = vec![];
-
-        loop {
-            if gamepacket_stream.position() == gamepacket_stream.get_ref().len() as u64 {
-                break;
-            }
-
-            gamepackets.push(GamePackets::pk_deserialize(&mut gamepacket_stream)?.0);
-        }
-
+        let gamepackets = separate_gamepackets::<T>(gamepacket_stream, &self.compression, &mut self.encryption)?;
+        
         Ok(gamepackets)
     }
 

@@ -1,5 +1,3 @@
-#![allow(non_upper_case_globals)]
-
 use crate::packets::handshake_client_to_server::HandshakeClientToServerPacket;
 use crate::packets::{
     add_actor::AddActorPacket, add_painting::AddPaintingPacket, add_player::AddPlayerPacket,

@@ -8,13 +8,13 @@ fn build_de_instance(endianness: Option<ProtoCodecEndianness>, f_type: &Type) ->
         None => {
             quote! { <#f_type as ::bedrockrs_proto_core::ProtoCodec>::proto_deserialize(stream)? }
         }
-        Some(ProtoCodecEndianness::LE) => {
+        Some(ProtoCodecEndianness::Le) => {
             quote! { <#f_type as ::bedrockrs_proto_core::ProtoCodecLE>::proto_deserialize(stream)? }
         }
-        Some(ProtoCodecEndianness::BE) => {
+        Some(ProtoCodecEndianness::Be) => {
             quote! { <#f_type as ::bedrockrs_proto_core::ProtoCodecBE>::proto_deserialize(stream)? }
         }
-        Some(ProtoCodecEndianness::VAR) => {
+        Some(ProtoCodecEndianness::Var) => {
             quote! { <#f_type as ::bedrockrs_proto_core::ProtoCodecVAR>::proto_deserialize(stream)? }
         }
     }

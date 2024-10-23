@@ -24,7 +24,7 @@ impl ProtoCodec for LevelChunkPacket {
 
         if !self.client_needs_to_request_subchunks {
             stream.write_u32_varint(self.sub_chunk_count)?;
-        } else if !(self.client_request_subchunk_limit < 0) {
+        } else if self.client_request_subchunk_limit >= 0 {
             stream.write_u32_varint(u32::MAX - 1)?;
             stream.write_i32_varint(self.client_request_subchunk_limit)?;
         } else {

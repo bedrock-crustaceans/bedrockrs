@@ -280,9 +280,9 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
             #(#variants)*
         }
 
-        impl GamePackets {
+        impl ::bedrockrs_proto_core::GamePacketsAll for GamePackets {
             #[inline]
-            pub fn compress(&self) -> bool {
+            fn compress(&self) -> bool {
                 match self {
                     #(#compress)*
                 };
@@ -296,7 +296,7 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
             }
 
             #[inline]
-            pub fn pk_serialize(&self, stream: &mut Vec<u8>, subclient_sender_id: SubClientID, subclient_target_id: SubClientID) -> Result<(), ::bedrockrs_proto_core::error::ProtoCodecError> {
+            fn pk_serialize(&self, stream: &mut Vec<u8>, subclient_sender_id: SubClientID, subclient_target_id: SubClientID) -> Result<(), ::bedrockrs_proto_core::error::ProtoCodecError> {
                 match self {
                     #(#ser)*
                 };
@@ -305,7 +305,7 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
             }
 
             #[inline]
-            pub fn pk_deserialize(stream: &mut Cursor<&[u8]>) -> Result<(GamePackets, SubClientID, SubClientID), ::bedrockrs_proto_core::error::ProtoCodecError> {
+            fn pk_deserialize(stream: &mut Cursor<&[u8]>) -> Result<(GamePackets, SubClientID, SubClientID), ::bedrockrs_proto_core::error::ProtoCodecError> {
                 let (_length, gamepacket_id, subclient_sender_id, subclient_target_id) = match read_gamepacket_header(stream) {
                     Ok(val) => val,
                     Err(err) => return Err(err),
@@ -322,7 +322,7 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
             }
 
             #[inline]
-            pub fn get_size_prediction(&self) -> usize {
+            fn get_size_prediction(&self) -> usize {
                 let len = match self {
                     #(#size_prediction)*
                 };

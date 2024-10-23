@@ -12,13 +12,13 @@ fn build_ser_instance(
         None => {
             quote! { <#f_type as ::bedrockrs_proto_core::ProtoCodec>::proto_serialize(&#f_name, stream)? }
         }
-        Some(ProtoCodecEndianness::LE) => {
+        Some(ProtoCodecEndianness::Le) => {
             quote! { <#f_type as ::bedrockrs_proto_core::ProtoCodecLE>::proto_serialize(&#f_name, stream)? }
         }
-        Some(ProtoCodecEndianness::BE) => {
+        Some(ProtoCodecEndianness::Be) => {
             quote! { <#f_type as ::bedrockrs_proto_core::ProtoCodecBE>::proto_serialize(&#f_name, stream)? }
         }
-        Some(ProtoCodecEndianness::VAR) => {
+        Some(ProtoCodecEndianness::Var) => {
             quote! { <#f_type as ::bedrockrs_proto_core::ProtoCodecVAR>::proto_serialize(&#f_name, stream)? }
         }
     }

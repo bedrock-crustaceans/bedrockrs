@@ -3,9 +3,9 @@ use syn::{Attribute, Error, GenericArgument, PathArguments, Type};
 
 #[derive(Clone)]
 pub enum ProtoCodecEndianness {
-    LE,
-    BE,
-    VAR,
+    Le,
+    Be,
+    Var,
 }
 
 #[derive(Default)]
@@ -29,19 +29,19 @@ macro_rules! endianness {
 
             // #[endianness(le)]
             if meta.path.is_ident("le") {
-                $flags.$name = Some(ProtoCodecEndianness::LE);
+                $flags.$name = Some(ProtoCodecEndianness::Le);
                 return Ok(());
             }
 
             // #[endianness(be)]
             if meta.path.is_ident("be") {
-                $flags.$name = Some(ProtoCodecEndianness::BE);
+                $flags.$name = Some(ProtoCodecEndianness::Be);
                 return Ok(());
             }
 
             // #[endianness(var)]
             if meta.path.is_ident("var") {
-                $flags.$name = Some(ProtoCodecEndianness::VAR);
+                $flags.$name = Some(ProtoCodecEndianness::Var);
                 return Ok(());
             }
 

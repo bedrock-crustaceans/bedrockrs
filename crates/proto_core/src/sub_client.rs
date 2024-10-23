@@ -1,4 +1,4 @@
-use bedrockrs_proto_core::error::ProtoCodecError;
+use crate::error::ProtoCodecError;
 
 #[derive(Debug, Clone)]
 pub enum SubClientID {

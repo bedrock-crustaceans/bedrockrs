@@ -14,7 +14,7 @@ use varint_rs::VarintReader;
 pub struct ConnectionRequest {
     /// Array of Base64 encoded JSON Web Token certificates to authenticate the player.
     ///
-    /// The last certificate in the chain will have a property 'extraData' that contains player identity information including the XBL XUID (if the player was signed into XBL at the time of the connection).
+    /// The last certificate in the chain will have a property 'extraData' that contains player identity information including the XBL XUID (if the player was signed in to XBL at the time of the connection).
     pub certificate_chain: Vec<BTreeMap<String, Value>>,
     /// Base64 encoded JSON Web Token that contains other relevant client properties.
     ///
@@ -48,7 +48,7 @@ pub struct ConnectionRequest {
     ///   - PieceId
     ///   - IsDefault
     ///   - PieceType
-    ///   - ProuctId
+    ///   - ProductId
     /// - PieceTintColors = Array of:
     ///   - PieceType
     ///   - Colors = Array of color hexstrings
@@ -80,6 +80,18 @@ pub struct ConnectionRequest {
     pub raw_token: BTreeMap<String, Value>,
 }
 
+fn read_i32_string(stream: &mut Cursor<&[u8]>) -> Result<String, ProtoCodecError> {
+    let len = stream
+        .read_i32::<LittleEndian>()?
+        .try_into()
+        .map_err(ProtoCodecError::FromIntError)?;
+
+    let mut string_buf = vec![0; len];
+    stream.read_exact(&mut string_buf)?;
+
+    Ok(String::from_utf8(string_buf)?)
+}
+
 impl ProtoCodec for ConnectionRequest {
     fn proto_serialize(&self, _stream: &mut Vec<u8>) -> Result<(), ProtoCodecError>
     where
@@ -96,58 +108,40 @@ impl ProtoCodec for ConnectionRequest {
     {
         let mut certificate_chain: Vec<BTreeMap<String, Value>> = vec![];
 
-        // read the ConnectionRequests length
+        // Read the ConnectionRequests length, Mojang stores it as a String
         // (certificate_chain len + raw_token len + 8)
         // 8 = i32 len + i32 len (length of certificate_chain's len and raw_token's len)
         // can be ignored, other lengths are provided
         stream.read_u32_varint()?;
 
-        // read length of certificate_chain vec
-        let certificate_chain_len = stream.read_i32::<LittleEndian>()?;
-
-        let certificate_chain_len = certificate_chain_len
-            .try_into()
-            .map_err(ProtoCodecError::FromIntError)?;
-
-        let mut certificate_chain_buf = vec![0; certificate_chain_len];
-
-        // read string data (certificate_chain)
-        stream.read_exact(&mut certificate_chain_buf)?;
-
-        // transform into string
-        let certificate_chain_string = String::from_utf8(certificate_chain_buf)?;
+        let certificate_chain_string = read_i32_string(stream)?;
 
         // parse certificate chain string into json
-        let certificate_chain_json = serde_json::from_str(&certificate_chain_string)?;
+        let mut certificate_chain_json = serde_json::from_str(&certificate_chain_string)?;
 
         let certificate_chain_json_jwts = match certificate_chain_json {
-            Value::Object(mut v) => {
-                match v.get_mut("chain") {
-                    None => {
-                        // the certificate chain should always be an object with just an array of
-                        // JWTs called "chain"
-                        return Err(ProtoCodecError::FormatMismatch(String::from(
-                            "Missing element \"chain\" in JWT certificate_chain",
-                        )));
-                    }
-                    Some(v) => {
-                        match v.take() {
-                            Value::Array(v) => v,
-                            other => {
-                                // the certificate chain should always be an object with just an
-                                // array of JWTs called "chain"
-                                return Err(ProtoCodecError::FormatMismatch(format!("Expected \"chain\" in JWT certificate_chain to be an Array, but got {other:?}")));
-                            }
-                        }
+            Value::Object(ref mut v) => {
+                let chain = v.get_mut("chain").ok_or(ProtoCodecError::FormatMismatch(
+                    "Missing element chain in JWT certificate_chain",
+                ))?;
+
+                match chain {
+                    Value::Array(v) => v,
+                    _ => {
+                        // the certificate chain should always be an object with just an
+                        // array of JWTs called "chain"
+                        return Err(ProtoCodecError::FormatMismatch(
+                            "Expected chain in JWT certificate_chain to be of type Array",
+                        ));
                     }
                 }
             }
-            other => {
+            _ => {
                 // the certificate chain should always be an object with just an array of
                 // JWTs called "chain"
-                return Err(ProtoCodecError::FormatMismatch(format!(
-                    "Expected Object in base of JWT certificate_chain, got {other:?}"
-                )));
+                return Err(ProtoCodecError::FormatMismatch(
+                    "Expected Object in base of JWT certificate_chain",
+                ));
             }
         };
 
@@ -156,15 +150,17 @@ impl ProtoCodec for ConnectionRequest {
         for jwt_json in certificate_chain_json_jwts {
             let jwt_string = match jwt_json {
                 Value::String(str) => str,
-                other => {
+                _ => {
                     // the certificate chain's should always be a jwt string
-                    return Err(ProtoCodecError::FormatMismatch(format!("Expected chain array in certificate_chain to just contain Strings, but got {other:?}")));
+                    return Err(ProtoCodecError::FormatMismatch(
+                        "Expected chain array in certificate_chain to just contain Strings",
+                    ));
                 }
             };
 
             // Extract header
             let jwt_header =
-                jsonwebtoken::decode_header(&jwt_string).map_err(ProtoCodecError::JwtError)?;
+                jsonwebtoken::decode_header(jwt_string).map_err(ProtoCodecError::JwtError)?;
 
             let mut jwt_validation = Validation::new(jwt_header.alg);
             // TODO: This definitely is not right. Even Zuri-MC doesn't understand this.. I may understand it.. I do understand it, update I don't. But I now know someone that does, I hope
@@ -174,14 +170,11 @@ impl ProtoCodec for ConnectionRequest {
 
             // Is first jwt, use self-signed header from x5u
             if key_data.is_empty() {
-                let x5u = match jwt_header.x5u {
-                    None => {
-                        return Err(ProtoCodecError::FormatMismatch(String::from(
-                            "Expected x5u in JWT header",
-                        )));
-                    }
-                    Some(ref v) => v.as_bytes(),
-                };
+                let x5u = jwt_header.x5u.ok_or(ProtoCodecError::FormatMismatch(
+                    "Expected x5u in JWT header",
+                ))?;
+
+                let x5u = x5u.as_bytes();
 
                 key_data = BASE64_STANDARD
                     .decode(x5u)
@@ -196,35 +189,28 @@ impl ProtoCodec for ConnectionRequest {
             )
             .map_err(ProtoCodecError::JwtError)?;
 
-            key_data = match jwt.claims.get("identityPublicKey") {
-                None => return Err(ProtoCodecError::FormatMismatch(String::from("Expected identityPublicKey field in JWT for validation"))),
-                Some(v) => match v {
-                    Value::String(str) => match BASE64_STANDARD.decode(str.as_bytes()) {
-                        Ok(v) => v,
-                        Err(e) => return Err(ProtoCodecError::Base64DecodeError(e)),
-                    },
-                    other => return Err(ProtoCodecError::FormatMismatch(format!("Expected identityPublicKey field in JWT to be of type String, got {other:?}"))),
-                },
+            let identity_field =
+                jwt.claims
+                    .get("identityPublicKey")
+                    .ok_or(ProtoCodecError::FormatMismatch(
+                        "Missing identityPublicKey field in JWT for validation",
+                    ))?;
+
+            key_data = match identity_field {
+                Value::String(str) => BASE64_STANDARD
+                    .decode(str.as_bytes())
+                    .map_err(ProtoCodecError::Base64DecodeError)?,
+                _ => {
+                    return Err(ProtoCodecError::FormatMismatch(
+                        "Expected identityPublicKey field in JWT to be of type String",
+                    ))
+                }
             };
 
             certificate_chain.push(jwt.claims);
         }
 
-        // read length of certificate_chain vec
-        let raw_token_len = stream.read_i32::<LittleEndian>()?;
-
-        let raw_token_len = raw_token_len
-            .try_into()
-            .map_err(ProtoCodecError::FromIntError)?;
-
-        let mut raw_token_buf = vec![0; raw_token_len];
-
-        // read string data (certificate_chain)
-        stream.read_exact(&mut raw_token_buf)?;
-
-        // transform into string
-        let raw_token_string =
-            String::from_utf8(raw_token_buf).map_err(ProtoCodecError::UTF8Error)?;
+        let raw_token_string = read_i32_string(stream)?;
 
         // Extract header
         let raw_token_jwt_header =
@@ -237,18 +223,20 @@ impl ProtoCodec for ConnectionRequest {
         jwt_validation.set_required_spec_claims::<&str>(&[]);
 
         // Decode the jwt string into a jwt object
-        let raw_token_jwt = jsonwebtoken::decode::<BTreeMap<String, Value>>(
+        let raw_token = jsonwebtoken::decode::<BTreeMap<String, Value>>(
             &raw_token_string,
-            &DecodingKey::from_ec_der(&vec![]),
+            &DecodingKey::from_ec_der(&[]),
             &jwt_validation,
         )
-        .map_err(ProtoCodecError::JwtError)?;
+        .map_err(ProtoCodecError::JwtError)?
+        .claims;
 
         println!("{certificate_chain:#?}");
+        println!("{raw_token:#?}");
 
         Ok(Self {
             certificate_chain,
-            raw_token: raw_token_jwt.claims,
+            raw_token,
         })
     }
 

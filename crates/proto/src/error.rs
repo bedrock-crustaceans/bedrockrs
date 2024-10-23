@@ -30,30 +30,8 @@ pub enum ConnectionError {
     ConnectionClosed,
     #[error("Transport Error: {0}")]
     TransportError(#[from] TransportLayerError),
-    #[error("Compression Error: {0}")]
-    CompressError(#[from] CompressionError),
-    #[error("Encryption Error: {0}")]
-    EncryptionError(#[from] EncryptionError),
     #[error("IO Error: {0}")]
     IOError(#[from] IOError),
-}
-
-#[derive(Error, Debug)]
-pub enum CompressionError {
-    #[error("Zlib Error: {0}")]
-    ZlibError(#[from] Box<dyn Error + Send + Sync>),
-    #[error("Snappy Error: {0}")]
-    SnappyError(#[from] IOError),
-    #[error("Unknown Compression Method: {0}")]
-    UnknownCompressionMethod(u8),
-    #[error("IO Error: {0}")]
-    IOError(IOError),
-}
-
-#[derive(Error, Debug)]
-pub enum EncryptionError {
-    #[error("IO Error: {0}")]
-    IOError(IOError),
 }
 
 #[derive(Error, Debug)]

@@ -1,6 +1,5 @@
 pub mod compression;
 pub mod connection;
-pub mod connection_shard;
 pub mod encryption;
 pub mod error;
 pub mod gamepackets;
@@ -10,4 +9,6 @@ pub mod packets;
 pub mod sub_client;
 pub mod transport_layer;
 pub mod types;
-mod version;
+pub mod version;
+pub mod batch;
+pub mod helper;

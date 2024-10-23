@@ -1,4 +1,4 @@
-use crate::error::EncryptionError;
+use bedrockrs_proto_core::error::EncryptionError;
 
 #[derive(Debug, Clone)]
 pub struct Encryption {
@@ -20,7 +20,7 @@ impl Encryption {
         unimplemented!()
     }
 
-    pub fn verify(&mut self, _src: &Vec<u8>) -> Result<(), EncryptionError> {
+    pub fn verify(&mut self, _src: &[u8]) -> Result<(), EncryptionError> {
         unimplemented!()
     }
 }
