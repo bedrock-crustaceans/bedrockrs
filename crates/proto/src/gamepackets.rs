@@ -1,3 +1,4 @@
+use bedrockrs_proto_core::sub_client::SubClientID;
 use crate::packets::handshake_client_to_server::HandshakeClientToServerPacket;
 use crate::packets::{
     add_actor::AddActorPacket, add_painting::AddPaintingPacket, add_player::AddPlayerPacket,
@@ -34,7 +35,6 @@ use crate::packets::{
     toast_request::ToastRequestPacket, update_difficulty::UpdateDifficultyPacket,
     update_player_gamemode::UpdatePlayerGamemodePacket,
 };
-use crate::sub_client::SubClientID;
 use bedrockrs_macros::gamepackets;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use std::io::{Cursor, Write};

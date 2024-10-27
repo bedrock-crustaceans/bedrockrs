@@ -1,5 +1,4 @@
 use io::Error as IOError;
-use std::error::Error;
 use std::io;
 
 use bedrockrs_proto_core::error::ProtoCodecError;

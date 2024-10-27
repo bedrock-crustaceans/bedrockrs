@@ -289,7 +289,7 @@ pub fn gamepackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
             }
 
             #[inline]
-            pub fn encrypt(&self) -> bool {
+            fn encrypt(&self) -> bool {
                 match self {
                     #(#encrypt)*
                 };

@@ -1,12 +1,16 @@
-use std::io::Cursor;
 use crate::compression::Compression;
 use crate::encryption::Encryption;
 use crate::helper::ProtoHelper;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::sub_client::SubClientID;
 use bedrockrs_proto_core::GamePacketsAll;
+use std::io::Cursor;
 
-pub fn batch_gamepackets<T: ProtoHelper>(gamepackets: &[T::GamePacketType], compression: &Option<Compression>, encryption: &mut Option<Encryption>) -> Result<Vec<u8>, ProtoCodecError> {
+pub fn batch_gamepackets<T: ProtoHelper>(
+    gamepackets: &[T::GamePacketType],
+    compression: &Option<Compression>,
+    encryption: &mut Option<Encryption>,
+) -> Result<Vec<u8>, ProtoCodecError> {
     let gamepacket_stream_size = gamepackets
         .iter()
         .map(T::GamePacketType::get_size_prediction)
@@ -32,18 +36,22 @@ pub fn batch_gamepackets<T: ProtoHelper>(gamepackets: &[T::GamePacketType], comp
     if let Some(encryption) = encryption {
         gamepacket_stream = encryption.encrypt(gamepacket_stream)?;
     }
-    
+
     Ok(gamepacket_stream)
 }
 
-pub fn separate_gamepackets<T: ProtoHelper>(mut gamepacket_stream: Vec<u8>, compression: &Option<Compression>, encryption: &mut Option<Encryption>) -> Result<Vec<T::GamePacketType>, ProtoCodecError> {
+pub fn separate_gamepackets<T: ProtoHelper>(
+    mut gamepacket_stream: Vec<u8>,
+    compression: &Option<Compression>,
+    encryption: &mut Option<Encryption>,
+) -> Result<Vec<T::GamePacketType>, ProtoCodecError> {
     // Decrypt the stream with the given optional Encryption
-    if let Some(encryption) = &mut encryption {
+    if let Some(encryption) = encryption {
         gamepacket_stream = encryption.decrypt(gamepacket_stream)?;
     }
 
     // Decompress the stream with the given optional Compression
-    if let Some(compression) = &compression {
+    if let Some(compression) = compression {
         gamepacket_stream = compression.decompress(gamepacket_stream)?;
     }
 
@@ -60,5 +68,3 @@ pub fn separate_gamepackets<T: ProtoHelper>(mut gamepacket_stream: Vec<u8>, comp
 
     Ok(gamepackets)
 }
-
-
