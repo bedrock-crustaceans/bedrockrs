@@ -13,7 +13,7 @@ pub async fn shard<'t, T: ProtoHelper + Send + Sync + 't>(
     // TODO: Look into making flush_interval optional
     flush_interval: Interval,
     gamepacket_buffer_size: usize,
-) -> (ConnectionSharedSender<T>, ConnectionSharedReceiver<T>) where <T as ProtoHelper>::GamePacketType: Send + Sync + 'static {
+) -> (ConnectionShardSender<T>, ConnectionShardReceiver<T>) where <T as ProtoHelper>::GamePacketType: Send + Sync + 'static {
     let (gamepacket_tx_task, gamepacket_rx_shard) = mpsc::channel(gamepacket_buffer_size);
     let (gamepacket_tx_shard, mut gamepacket_rx_task) = mpsc::channel(gamepacket_buffer_size);
     let (close_tx, mut close_rx) = watch::channel(());
@@ -22,7 +22,7 @@ pub async fn shard<'t, T: ProtoHelper + Send + Sync + 't>(
     let (encryption_tx, mut encryption_rx) = watch::channel(None);
 
     let shards = (
-        ConnectionSharedSender {
+        ConnectionShardSender {
             gamepacket_sender: gamepacket_tx_shard,
             close_sender: close_tx.clone(),
             flush_sender: flush_tx,
@@ -31,7 +31,7 @@ pub async fn shard<'t, T: ProtoHelper + Send + Sync + 't>(
             encryption_sender: encryption_tx.clone(),
             encryption_receiver: encryption_rx.clone(),
         },
-        ConnectionSharedReceiver {
+        ConnectionShardReceiver {
             gamepacket_receiver: gamepacket_rx_shard,
             close_sender: close_tx.clone(),
             compression_receiver: compression_rx.clone(),
@@ -92,7 +92,7 @@ pub async fn shard<'t, T: ProtoHelper + Send + Sync + 't>(
 }
 
 #[derive(Debug, Clone)]
-pub struct ConnectionSharedSender<T: ProtoHelper + Send + Sync> {
+pub struct ConnectionShardSender<T: ProtoHelper + Send + Sync> {
     gamepacket_sender: mpsc::Sender<T::GamePacketType>,
 
     close_sender: watch::Sender<()>,
@@ -106,7 +106,7 @@ pub struct ConnectionSharedSender<T: ProtoHelper + Send + Sync> {
     encryption_receiver: watch::Receiver<Option<Encryption>>,
 }
 
-impl<T: ProtoHelper + Send + Sync > ConnectionSharedSender<T> {
+impl<T: ProtoHelper + Send + Sync > ConnectionShardSender<T> {
     pub async fn send(&mut self, packet: T::GamePacketType) -> Result<(), ConnectionError> {
         self.gamepacket_sender
             .send(packet)
@@ -165,7 +165,7 @@ impl<T: ProtoHelper + Send + Sync > ConnectionSharedSender<T> {
 }
 
 #[derive(Debug)]
-pub struct ConnectionSharedReceiver<T: ProtoHelper + Send + Sync > {
+pub struct ConnectionShardReceiver<T: ProtoHelper + Send + Sync > {
     pub(crate) gamepacket_receiver: mpsc::Receiver<Result<T::GamePacketType, ConnectionError>>,
 
     pub(crate) close_sender: watch::Sender<()>,
@@ -174,7 +174,7 @@ pub struct ConnectionSharedReceiver<T: ProtoHelper + Send + Sync > {
     pub(crate) encryption_receiver: watch::Receiver<Option<Encryption>>,
 }
 
-impl<T: ProtoHelper + Send + Sync > ConnectionSharedReceiver<T> {
+impl<T: ProtoHelper + Send + Sync > ConnectionShardReceiver<T> {
     pub async fn recv(&mut self) -> Result<T::GamePacketType, ConnectionError> {
         self.gamepacket_receiver
             .recv()
