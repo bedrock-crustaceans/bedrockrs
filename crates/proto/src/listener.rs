@@ -4,10 +4,11 @@ use rak_rs::mcpe::motd::Gamemode;
 use rak_rs::Motd;
 use rand::RngCore;
 
-use crate::error::{ListenerError, RaknetError, TransportLayerError};
-use crate::info::{MINECRAFT_EDITION_MOTD};
 use crate::connection::Connection;
+use crate::error::{ListenerError, RaknetError, TransportLayerError};
+use crate::info::MINECRAFT_EDITION_MOTD;
 use crate::transport_layer::TransportLayerListener;
+use crate::version::v729::info::PROTOCOL_VERSION;
 
 pub struct Listener {
     listener: TransportLayerListener,

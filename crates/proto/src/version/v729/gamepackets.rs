@@ -1,4 +1,3 @@
-use bedrockrs_proto_core::sub_client::SubClientID;
 use crate::version::v729::packets::handshake_client_to_server::HandshakeClientToServerPacket;
 use crate::version::v729::packets::{
     add_actor::AddActorPacket, add_painting::AddPaintingPacket, add_player::AddPlayerPacket,
@@ -37,6 +36,7 @@ use crate::version::v729::packets::{
 };
 use bedrockrs_macros::gamepackets;
 use bedrockrs_proto_core::error::ProtoCodecError;
+use bedrockrs_proto_core::sub_client::SubClientID;
 use std::io::{Cursor, Write};
 use varint_rs::{VarintReader, VarintWriter};
 

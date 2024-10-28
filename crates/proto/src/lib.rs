@@ -1,4 +1,4 @@
-pub mod batch;
+pub mod codec;
 pub mod compression;
 pub mod connection;
 pub mod encryption;

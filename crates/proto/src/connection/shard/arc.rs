@@ -6,7 +6,7 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 
 pub fn shard<T: ProtoHelper>(connection: Connection) -> ConnectionShared<T> {
-    ConnectionShared::<T>{
+    ConnectionShared::<T> {
         connection: Arc::new(RwLock::new(connection)),
         queue_send: Arc::new(RwLock::new(Vec::new())),
         queue_recv: Arc::new(RwLock::new(VecDeque::new())),
@@ -40,31 +40,31 @@ impl<T: ProtoHelper> ConnectionShared<T> {
         queue_recv.make_contiguous();
         queue_recv.drain(..).collect::<Vec<_>>()
     }
-    
+
     pub async fn send(&mut self) -> Result<(), ConnectionError> {
         let mut gamepackets = self.queue_send.write().await;
         let mut conn = self.connection.write().await;
-        
+
         conn.send::<T>(gamepackets.as_slice()).await?;
-        
+
         gamepackets.clear();
-        
+
         Ok(())
     }
-    
+
     pub async fn recv(&mut self) -> Result<(), ConnectionError> {
         let mut conn = self.connection.write().await;
-        
+
         let gamepackets = conn.recv::<T>().await?;
-        
+
         if !gamepackets.is_empty() {
             let mut queue_recv = self.queue_recv.write().await;
-            
+
             for gamepacket in gamepackets {
                 queue_recv.push_back(gamepacket);
             }
         }
-        
+
         Ok(())
     }
 }
