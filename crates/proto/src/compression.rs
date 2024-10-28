@@ -29,7 +29,7 @@ impl Compression {
     const ID_SNAPPY: u8 = 1;
     const ID_NONE: u8 = u8::MAX;
 
-    /// Used in the [NetworkSettingsPacket](crate::packets::network_settings::NetworkSettingsPacket)
+    /// Used in the [NetworkSettingsPacket](crate::version::v729::packets::network_settings::NetworkSettingsPacket)
     /// to identify which Compression should be used for the Connection.
     #[inline]
     pub const fn id_u16(&self) -> u16 {
