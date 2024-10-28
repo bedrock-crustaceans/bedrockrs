@@ -23,8 +23,8 @@ pub fn decode_gamepackets<T: ProtoHelper>(
     compression: &Option<Compression>,
     encryption: &mut Option<Encryption>,
 ) -> Result<Vec<T::GamePacketType>, ProtoCodecError> {
-    gamepacket_stream = compress_gamepackets::<T>(gamepacket_stream, compression)?;
-    gamepacket_stream = encrypt_gamepackets::<T>(gamepacket_stream, encryption)?;
+    gamepacket_stream = decrypt_gamepackets::<T>(gamepacket_stream, encryption)?;
+    gamepacket_stream = decompress_gamepackets::<T>(gamepacket_stream, compression)?;
     let gamepackets = separate_gamepackets::<T>(gamepacket_stream)?;
 
     Ok(gamepackets)
