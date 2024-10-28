@@ -53,7 +53,7 @@ fn batch_gamepackets<T: ProtoHelper>(
     Ok(gamepacket_stream)
 }
 
-pub fn separate_gamepackets<T: ProtoHelper>(
+fn separate_gamepackets<T: ProtoHelper>(
     gamepacket_stream: Vec<u8>,
 ) -> Result<Vec<T::GamePacketType>, ProtoCodecError> {
     let mut gamepacket_stream = Cursor::new(gamepacket_stream.as_slice());

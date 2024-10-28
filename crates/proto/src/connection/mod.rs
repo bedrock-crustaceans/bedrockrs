@@ -1,6 +1,6 @@
 pub mod shard;
 
-use crate::codec::{batch_gamepackets, separate_gamepackets};
+use crate::codec::{encode_gamepackets, decode_gamepackets};
 use crate::compression::Compression;
 use crate::encryption::Encryption;
 use crate::error::ConnectionError;
@@ -32,7 +32,7 @@ impl Connection {
         gamepackets: &[T::GamePacketType],
     ) -> Result<(), ConnectionError> {
         let gamepacket_stream =
-            batch_gamepackets::<T>(gamepackets, &self.compression, &mut self.encryption)?;
+            encode_gamepackets::<T>(gamepackets, &self.compression, &mut self.encryption)?;
 
         self.transport_layer.send(&gamepacket_stream).await?;
 
@@ -51,7 +51,7 @@ impl Connection {
         let gamepacket_stream = self.transport_layer.recv().await?;
 
         let gamepackets =
-            separate_gamepackets::<T>(gamepacket_stream, &self.compression, &mut self.encryption)?;
+            decode_gamepackets::<T>(gamepacket_stream, &self.compression, &mut self.encryption)?;
 
         Ok(gamepackets)
     }
