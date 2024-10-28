@@ -3,4 +3,5 @@
 pub mod gamepackets;
 pub mod packets;
 pub mod types;
-mod helper;
+pub mod helper;
+pub mod info;

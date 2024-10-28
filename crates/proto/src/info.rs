@@ -1,5 +1,4 @@
 pub const RAKNET_GAMEPACKET_ID: u8 = 0xfe;
-pub const PROTOCOL_VERSION: i32 = 685;
 pub const MINECRAFT_EDITION_MOTD: &str = "MCPE";
 
 pub const MAGIC: [u8; 16] = [
