@@ -7,7 +7,7 @@ use tokio::sync::RwLock;
 
 pub fn shard<T: ProtoHelper>(connection: Connection) -> ConnectionShared<T> {
     ConnectionShared::<T>{
-        conn: Arc::new(RwLock::new(connection)),
+        connection: Arc::new(RwLock::new(connection)),
         queue_send: Arc::new(RwLock::new(Vec::new())),
         queue_recv: Arc::new(RwLock::new(VecDeque::new())),
     }
@@ -15,7 +15,7 @@ pub fn shard<T: ProtoHelper>(connection: Connection) -> ConnectionShared<T> {
 
 #[derive(Clone)]
 pub struct ConnectionShared<T: ProtoHelper> {
-    conn: Arc<RwLock<Connection>>,
+    connection: Arc<RwLock<Connection>>,
     queue_send: Arc<RwLock<Vec<T::GamePacketType>>>,
     queue_recv: Arc<RwLock<VecDeque<T::GamePacketType>>>,
 }
@@ -43,7 +43,7 @@ impl<T: ProtoHelper> ConnectionShared<T> {
     
     pub async fn send(&mut self) -> Result<(), ConnectionError> {
         let mut gamepackets = self.queue_send.write().await;
-        let mut conn = self.conn.write().await;
+        let mut conn = self.connection.write().await;
         
         conn.send::<T>(gamepackets.as_slice()).await?;
         
@@ -53,7 +53,7 @@ impl<T: ProtoHelper> ConnectionShared<T> {
     }
     
     pub async fn recv(&mut self) -> Result<(), ConnectionError> {
-        let mut conn = self.conn.write().await;
+        let mut conn = self.connection.write().await;
         
         let gamepackets = conn.recv::<T>().await?;
         
