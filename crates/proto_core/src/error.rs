@@ -9,6 +9,7 @@ use jsonwebtoken::errors::Error as JwtError;
 use nbtx::NbtError;
 use serde_json::error::Error as JsonError;
 use thiserror::Error;
+use uuid::Error as UuidError;
 
 #[derive(Error, Debug)]
 pub enum ProtoCodecError {
@@ -24,6 +25,8 @@ pub enum ProtoCodecError {
     JsonError(#[from] JsonError),
     #[error("Jwt Error: {0}")]
     JwtError(#[from] JwtError),
+    #[error("Uuid Error: {0}")]
+    UuidError(UuidError),
     #[error("Base64 decoding Error: {0}")]
     Base64DecodeError(#[from] Base64DecodeError),
     #[error("XUID could not be parsed : {0}")]
