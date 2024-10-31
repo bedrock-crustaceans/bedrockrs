@@ -45,8 +45,8 @@ pub enum ProtoCodecError {
 }
 
 impl From<Infallible> for ProtoCodecError {
-    fn from(value: Infallible) -> Self {
-        Self::FromIntError(value.into())
+    fn from(_: Infallible) -> Self {
+        unreachable!()
     }
 }
 
