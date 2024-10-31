@@ -26,7 +26,7 @@ pub enum ProtoCodecError {
     #[error("Jwt Error: {0}")]
     JwtError(#[from] JwtError),
     #[error("Uuid Error: {0}")]
-    UuidError(UuidError),
+    UuidError(#[from] UuidError),
     #[error("Base64 decoding Error: {0}")]
     Base64DecodeError(#[from] Base64DecodeError),
     #[error("XUID could not be parsed : {0}")]
