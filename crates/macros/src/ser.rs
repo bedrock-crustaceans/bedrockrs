@@ -75,7 +75,7 @@ fn build_ser_field(
 
             if flags.str {
                 return quote! {
-                    <String as ::bedrockrs_proto_core::ProtoCodec>::proto_serialize(ToString::to_string(&#final_name), stream)?;
+                    <String as ::bedrockrs_proto_core::ProtoCodec>::proto_serialize(&ToString::to_string(&#final_name), stream)?;
                 };
             }
 
