@@ -57,7 +57,11 @@ fn build_de_field(fields: &[&Field]) -> TokenStream {
 
             if flags.str {
                 return quote! {
-                    let #name: #ty = <String as ::bedrockrs_proto_core::ProtoCodec>::proto_deserialize(stream)?.as_str().try_into()?;
+                    let #name: #ty = {
+                        let string = <String as ::bedrockrs_proto_core::ProtoCodec>::proto_deserialize(stream)?;
+                        let str = string.as_str();
+                        #ty::try_from(str)?
+                    };
                 };
             }
 
