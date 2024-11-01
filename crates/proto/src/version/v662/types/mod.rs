@@ -1,5 +1,3 @@
-mod actor;
-
 macro_rules! export {
     ($name:ident) => {
         mod $name;
@@ -10,3 +8,4 @@ macro_rules! export {
 export!(connection_request);
 export!(experiment);
 export!(item);
+export!(actor_metadata);

@@ -3,7 +3,7 @@ use bedrockrs_core::{Vec2, Vec3};
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
 use bedrockrs_shared::world::gamemode::Gamemode;
-use crate::version::v662::types::ItemStackDescriptor;
+use crate::version::v662::types::{ActorMetaData, ItemStackDescriptor};
 
 #[gamepacket(id = 9)]
 #[derive(ProtoCodec, Debug, Clone)]
@@ -22,6 +22,5 @@ pub struct AddPlayerPacket {
     pub head_yaw: f32,
     pub carried_item: ItemStackDescriptor,
     pub gamemode: Gamemode,
-    pub EntityMetadata: EntityMetadata,
-    
+    pub actor_meta_data: ActorMetaData,
 }
