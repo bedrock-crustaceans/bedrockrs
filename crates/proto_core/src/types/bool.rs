@@ -1,3 +1,4 @@
+use std::mem::size_of;
 use byteorder::{ReadBytesExt, WriteBytesExt};
 use std::io::Cursor;
 

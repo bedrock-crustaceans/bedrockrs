@@ -1,3 +1,4 @@
+use std::mem::size_of;
 use crate::endian::{ProtoCodecBE, ProtoCodecLE, ProtoCodecVAR};
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;

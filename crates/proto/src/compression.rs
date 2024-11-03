@@ -1,3 +1,4 @@
+use std::mem::size_of;
 use bedrockrs_proto_core::error::CompressionError;
 use byteorder::{ReadBytesExt, WriteBytesExt};
 use flate2::Compression as CompressionLevel;

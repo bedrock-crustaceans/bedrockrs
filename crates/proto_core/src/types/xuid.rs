@@ -1,3 +1,4 @@
+use std::mem::size_of;
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 use std::io::Cursor;
