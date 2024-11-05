@@ -1,4 +1,3 @@
-use std::io::Cursor;
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]

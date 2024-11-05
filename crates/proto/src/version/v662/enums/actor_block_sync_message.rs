@@ -1,5 +1,6 @@
 pub mod ActorBlockSyncMessage {
     use bedrockrs_macros::ProtoCodec;
+    
     #[derive(ProtoCodec)]
     pub enum MessageId {
         NONE = 0,
