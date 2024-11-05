@@ -1,6 +1,5 @@
 use bedrockrs_macros::ProtoCodec;
 
-
 #[derive(ProtoCodec)]
 pub enum ContainerID {
     None = -1,
