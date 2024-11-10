@@ -5,7 +5,56 @@
 
 version: 2
 updates:
+  # Main crate dependencies
   - package-ecosystem: "cargo" # See documentation for possible values
-    directory: "/" # Location of package manifests
+    directory: "/" # Location of main package manifest
+    schedule:
+      interval: "daily"
+
+# INTERNAL CRATES DEPENDABOT CHECKS:
+# (Fix issue #57)
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/addon" # Location of internal crate "addon"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/core" # Location of internal crate "core"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/form" # Location of internal crate "form"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/paletted_storage" # Location of internal crate "paletted_storage"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/proto" # Location of internal crate "proto"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/proto_core" # Location of internal crate "proto_core"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/proto_macros" # Location of internal crate "proto_macros"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/shared" # Location of internal crate "shared"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/world" # Location of internal crate "world"
     schedule:
       interval: "daily"
