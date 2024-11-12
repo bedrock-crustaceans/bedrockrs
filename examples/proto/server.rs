@@ -46,7 +46,7 @@ async fn main() {
         "1.0".to_string(),
         100,
         10,
-        SocketAddr::V4(SocketAddrV4::from_str("127.0.0.1:19132").unwrap()),
+        "127.0.0.1:19132".parse().unwrap(),
         false,
     )
     .await
@@ -124,12 +124,12 @@ async fn handle_login(mut conn: Connection) {
     println!("{:#?}", conn.recv::<ProtoHelperV729>().await.unwrap());
     println!("ResourcePackClientResponse");
 
-    conn.send::<ProtoHelperV729>(&[GamePackets::DisconnectPlayer(DisconnectPlayerPacket {
-        reason: DisconnectReason::Unknown,
-        message: Some(String::from("IDK")),
-    })])
-    .await
-    .unwrap();
+    // conn.send::<ProtoHelperV729>(&[GamePackets::DisconnectPlayer(DisconnectPlayerPacket {
+    //     reason: DisconnectReason::Unknown,
+    //     message: Some(String::from("IDK")),
+    // })])
+    // .await
+    // .unwrap();
 
     // let packet1 = StartGamePacket {
     //     target_actor_id: ActorUniqueID(609),

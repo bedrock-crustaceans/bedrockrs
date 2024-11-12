@@ -12,6 +12,9 @@ bedrockrs_shared = { path = "crates/shared" }
 
 bedrockrs_proto = { path = "crates/proto", optional = true }
 bedrockrs_proto_core = { path = "crates/proto_core", optional = true }
+
+bedrockrs_server = { path = "crates/server", optional = true }
+
 bedrockrs_macros = { path = "crates/macros", optional = true }
 
 bedrockrs_addon = { path = "crates/addon", optional = true }
@@ -27,10 +30,11 @@ tokio = { version = "1.40", features = ["full"] }
 nbtx = { git = "https://github.com/bedrock-crustaceans/nbtx" }
 
 [features]
-full = ["addon", "proto", "world"]
+full = ["addons", "world", "proto", "server"]
 
-addon = ["dep:bedrockrs_addon"]
+addons = ["dep:bedrockrs_addon"]
 proto = ["dep:bedrockrs_proto", "dep:bedrockrs_proto_core", "dep:bedrockrs_macros"]
+server = ["dep:bedrockrs_server"]
 world = ["dep:bedrockrs_world", "dep:bedrockrs_paletted_storage"]
 
 [[example]]
