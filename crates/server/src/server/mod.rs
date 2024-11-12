@@ -1,10 +1,6 @@
 use std::error::Error;
 use bedrockrs_proto::listener::Listener;
 use shipyard::World;
-use crate::entity::Entity;
-use crate::entity::player::Player;
-use crate::entity::position::Pos;
-use crate::entity::velocity::Vel;
 use crate::error::LoginError;
 use crate::login::login;
 
