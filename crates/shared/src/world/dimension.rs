@@ -1,6 +1,6 @@
 use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec, Debug, Clone)]
+#[derive(ProtoCodec, Debug, Clone, Eq, PartialEq, Copy, Hash)]
 #[enum_repr(i32)]
 #[enum_endianness(var)]
 pub enum Dimension {
