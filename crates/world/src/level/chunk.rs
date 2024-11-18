@@ -1,16 +1,10 @@
-use crate::level::file_interface;
-use crate::level::file_interface::RawWorldTrait;
-use crate::level::level::{Level, LevelError, LevelModificationProvider};
-use crate::level::sub_chunk;
-use crate::level::sub_chunk::{SubChunkDecoder, SubChunkTrait};
+use crate::level::level::{ LevelError, LevelModificationProvider};
+use crate::level::sub_chunk::{SubChunkTrait};
 use crate::level::world_block::WorldBlockTrait;
 use bedrockrs_core::Vec2;
 use bedrockrs_shared::world::dimension::Dimension;
-use mojang_leveldb::error::DBError;
-use std::fmt::Debug;
 
-pub trait LevelChunkTrait<UserLevel: LevelModificationProvider>: Sized
-{
+pub trait LevelChunkTrait<UserLevel: LevelModificationProvider>: Sized {
     type UserLevel = UserLevel;
     type UserBlock = UserLevel::UserBlockType;
     type UserSubchunk = UserLevel::UserSubChunkType;
@@ -31,6 +25,7 @@ pub mod default_impl {
     use super::*;
     use std::marker::PhantomData;
 
+    #[allow(dead_code)]
     pub struct LevelChunk<UserState, UserSubChunkType> {
         bounds: Vec2<i8>,
         xz: Vec2<i32>,
@@ -59,9 +54,8 @@ pub mod default_impl {
             UserState,
             UserBlockType: WorldBlockTrait<UserState = UserState>,
             UserSubChunkType: SubChunkTrait<UserState = UserState, BlockType = UserBlockType>,
-            UserLevelInterface: LevelModificationProvider<UserSubChunkType = UserSubChunkType>
-        >
-        LevelChunkTrait<UserLevelInterface> for LevelChunk<UserState, UserSubChunkType>
+            UserLevelInterface: LevelModificationProvider<UserSubChunkType = UserSubChunkType>,
+        > LevelChunkTrait<UserLevelInterface> for LevelChunk<UserState, UserSubChunkType>
     {
         type Err = LevelError;
 

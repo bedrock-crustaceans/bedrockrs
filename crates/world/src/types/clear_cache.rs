@@ -22,6 +22,7 @@ pub struct ClearCacheContainer<KeyType: Hash + Eq + Clone, CachedValue> {
     cache_information: HashMap<KeyType, ClearCacheContainerValue<CachedValue>>,
 }
 
+#[allow(dead_code)]
 impl<KeyType: Hash + Eq + Clone, CachedValue> ClearCacheContainer<KeyType, CachedValue> {
     pub fn new() -> Self {
         Self {

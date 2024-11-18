@@ -1,16 +1,15 @@
-use std::marker::PhantomData;
+use crate::level::db_interface::bedrock_key::ChunkKey;
 use crate::level::db_interface::config::{read_options, write_options};
+use crate::level::file_interface::{DatabaseBatchHolder, RawWorldTrait};
 use crate::types::buffer_slide::SlideBuffer;
 use mojang_leveldb::error::DBError;
 use mojang_leveldb::*;
-use crate::level::db_interface::bedrock_key::ChunkKey;
-use crate::level::file_interface::{DatabaseBatchHolder, RawWorldTrait};
+use std::marker::PhantomData;
 
 pub struct LevelDBInterface<UserState> {
     db: DB,
-    phantom_data: PhantomData<UserState>
+    phantom_data: PhantomData<UserState>,
 }
-
 
 pub trait LevelDBKey {
     fn estimate_size(&self) -> usize;
@@ -24,7 +23,10 @@ impl<UserState> LevelDBInterface<UserState> {
             create_if_missing,
         };
         let db = DB::open(path, opts)?;
-        Ok(Self { db, phantom_data: PhantomData })
+        Ok(Self {
+            db,
+            phantom_data: PhantomData,
+        })
     }
 
     pub fn get(
@@ -47,10 +49,7 @@ impl<UserState> LevelDBInterface<UserState> {
     }
 
     pub fn build_key(key: &impl LevelDBKey) -> Vec<u8> {
-        let mut key_bytes: Vec<u8> = Vec::with_capacity(key.estimate_size());
-        unsafe {
-            key_bytes.set_len(key.estimate_size()); // Spooky unsafe
-        }
+        let mut key_bytes: Vec<u8> = vec![0; key.estimate_size()];
         let mut buff = SlideBuffer::new(&mut key_bytes);
         key.write_key(&mut buff);
         key_bytes
@@ -74,11 +73,20 @@ impl<UserState> RawWorldTrait for LevelDBInterface<UserState> {
     type Err = DBError;
     type UserState = UserState;
 
-    fn set_subchunk_raw(&mut self, chunk_info: ChunkKey, chunk_bytes: &[u8], _: &mut Self::UserState) -> Result<(), Self::Err> {
+    fn set_subchunk_raw(
+        &mut self,
+        chunk_info: ChunkKey,
+        chunk_bytes: &[u8],
+        _: &mut Self::UserState,
+    ) -> Result<(), Self::Err> {
         self.set(&chunk_info, write_options(), chunk_bytes)
     }
 
-    fn get_subchunk_raw(&mut self, chunk_info: ChunkKey, _: &mut Self::UserState) -> Result<Option<Vec<u8>>, Self::Err> {
+    fn get_subchunk_raw(
+        &mut self,
+        chunk_info: ChunkKey,
+        _: &mut Self::UserState,
+    ) -> Result<Option<Vec<u8>>, Self::Err> {
         let information = self.get(&chunk_info, read_options())?;
         if information.is_none() {
             Ok(None)
@@ -87,15 +95,27 @@ impl<UserState> RawWorldTrait for LevelDBInterface<UserState> {
         }
     }
 
-    fn chunk_exists(&mut self, chunk_info: ChunkKey, _: &mut Self::UserState) -> Result<bool, Self::Err> {
+    fn chunk_exists(
+        &mut self,
+        chunk_info: ChunkKey,
+        _: &mut Self::UserState,
+    ) -> Result<bool, Self::Err> {
         self.exists(&chunk_info)
     }
 
-    fn write_subchunk_batch(&mut self, subchunk_batch_info: Vec<DatabaseBatchHolder>, _: &mut Self::UserState) -> Result<(), Self::Err> {
+    fn write_subchunk_batch(
+        &mut self,
+        subchunk_batch_info: Vec<DatabaseBatchHolder>,
+        _: &mut Self::UserState,
+    ) -> Result<(), Self::Err> {
         self.write_batch(subchunk_batch_info)
     }
 
-    fn exist_chunk(&mut self, chunk_info: ChunkKey, _: &mut Self::UserState) -> Result<(), Self::Err> {
+    fn exist_chunk(
+        &mut self,
+        chunk_info: ChunkKey,
+        _: &mut Self::UserState,
+    ) -> Result<(), Self::Err> {
         self.set(&chunk_info, write_options(), &[])
     }
 
@@ -103,11 +123,18 @@ impl<UserState> RawWorldTrait for LevelDBInterface<UserState> {
         Self::build_key(key)
     }
 
-    fn new(path: &str, create_if_missing: bool, _: &mut Self::UserState) -> Result<Self, Self::Err> {
+    fn new(
+        path: &str,
+        create_if_missing: bool,
+        _: &mut Self::UserState,
+    ) -> Result<Self, Self::Err> {
         Self::new(path, create_if_missing)
     }
 
-    fn generated_chunks(&mut self, state: &mut Self::UserState) -> Result<Vec<ChunkKey>, Self::Err> {
+    fn generated_chunks(
+        &mut self,
+        _: &mut Self::UserState,
+    ) -> Result<Vec<ChunkKey>, Self::Err> {
         todo!()
         //FIXME: Need to fork mojang-leveldb and add support for iterating the keys
     }

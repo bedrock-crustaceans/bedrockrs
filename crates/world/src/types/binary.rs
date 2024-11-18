@@ -1,6 +1,4 @@
 use byteorder::ByteOrder;
-use len_trait::Len;
-use mojang_leveldb::LevelDBManagedBytes;
 use thiserror::Error;
 
 #[derive(Debug)]
@@ -195,7 +193,6 @@ impl From<Vec<u8>> for BinaryBuffer {
         }
     }
 }
-
 
 #[cfg(test)]
 mod tests {

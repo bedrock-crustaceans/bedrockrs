@@ -1,4 +1,3 @@
-use bedrockrs_core::Vec2;
 use bedrockrs_shared::world::dimension::Dimension;
 use bedrockrs_world::level::level::default_impl;
 use bedrockrs_world::level::level::default_impl::State;
@@ -34,11 +33,13 @@ fn world_test() {
         chunk.set_block((5, 1, 5).into(), WorldBlock::new("minecraft:stone".into()))
     );
     const range: i32 = 20;
-    let chnk = SubChunk::<WorldBlock<State>, State>::empty(1, &mut State{});
+    let chnk = SubChunk::<WorldBlock<State>, State>::empty(1, &mut State {});
     for x in -range..=range {
         for z in -range..=range {
             for y in -2..=10i8 {
-                level.set_sub_chunk(chnk.clone(), (x, z).into(), y, Dimension::Overworld).unwrap()
+                level
+                    .set_sub_chunk(chnk.clone(), (x, z).into(), y, Dimension::Overworld)
+                    .unwrap()
             }
         }
     }

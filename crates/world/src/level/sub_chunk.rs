@@ -1,11 +1,8 @@
 use crate::level::world_block::WorldBlockTrait;
 use crate::types::binary::BinaryBuffer;
 use bedrockrs_core::Vec3;
-use std::fs::File;
-use std::io;
-use std::io::Write;
 
-pub type BlockLayer<T> = (Box::<[u16; 4096]>, Vec<T>);
+pub type BlockLayer<T> = (Box<[u16; 4096]>, Vec<T>);
 pub struct SubchunkTransitionalData<BlockType> {
     y_level: i8,
     data_version: u8,
@@ -21,7 +18,7 @@ impl<BlockType> SubchunkTransitionalData<BlockType> {
         }
     }
 
-    pub fn new_layer(&mut self, data: (Box::<[u16; 4096]>, Vec<BlockType>)) {
+    pub fn new_layer(&mut self, data: (Box<[u16; 4096]>, Vec<BlockType>)) {
         self.layers.push(data);
     }
 }
@@ -75,13 +72,12 @@ pub trait SubChunkTrait: Sized {
 pub mod default_impl {
     use super::*;
     use crate::level::world_block::BlockTransitionalState;
+    use crate::types::binary::BinaryInterfaceError;
     use crate::types::miner::idx_3_to_1;
     use anyhow::anyhow;
     use byteorder::LittleEndian;
-    use len_trait::Len;
     use std::io::Cursor;
     use std::marker::PhantomData;
-    use crate::types::binary::BinaryInterfaceError;
 
     pub struct SubChunkDecoderImpl<UserBlockType: WorldBlockTrait, UserState> {
         _block_marker: PhantomData<UserBlockType>,
@@ -99,7 +95,6 @@ pub mod default_impl {
             bytes: &mut BinaryBuffer,
             state: &mut Self::UserState,
         ) -> Result<SubchunkTransitionalData<Self::BlockType>, Self::Err> {
-            dump_to_bin_file("chunk_info.bin", bytes.poll_buffer().unwrap()).unwrap();
             let version = bytes
                 .read::<LittleEndian, u8>()
                 .ok_or(anyhow!("Failed To Read Subchunk Version"))?;
@@ -168,6 +163,7 @@ pub mod default_impl {
             Ok(transitiondata)
         }
 
+        // TODO: Handle 0, 2, 3, 4 ,5 ,6 7, also handle 1
         fn write_as_bytes(
             chunk_state: SubchunkTransitionalData<Self::BlockType>,
             network: bool,
@@ -187,7 +183,7 @@ pub mod default_impl {
 
                 let mut current_word = 0u32;
                 let mut bits_written = 0;
-                layer.0.iter().try_for_each( |element| {
+                layer.0.iter().try_for_each(|element| {
                     let element = *element as u32;
                     if bits_written + bits_per_block > 32 {
                         buffer.write::<LittleEndian, u32>(current_word)?;
@@ -234,8 +230,9 @@ pub mod default_impl {
                 active_layer: 0,
                 _state_tag: PhantomData,
             };
-            val.blocks
-                .push(Box::new(std::array::from_fn(|_| Self::BlockType::air(state))));
+            val.blocks.push(Box::new(std::array::from_fn(|_| {
+                Self::BlockType::air(state)
+            })));
             val
         }
 
@@ -315,8 +312,9 @@ pub mod default_impl {
         }
 
         fn add_sub_layer(&mut self, state: &mut Self::UserState) {
-            self.blocks
-                .push(Box::new(std::array::from_fn(|_| Self::BlockType::air(state))));
+            self.blocks.push(Box::new(std::array::from_fn(|_| {
+                Self::BlockType::air(state)
+            })));
         }
 
         fn get_sub_layer_count(&self) -> usize {
@@ -377,11 +375,7 @@ pub mod default_impl {
         }
     }
 }
-fn dump_to_bin_file(path: &str, buffer: &[u8]) -> io::Result<()> {
-    let mut file = File::create(path)?;
-    file.write_all(buffer)?;
-    Ok(())
-}
+
 fn bits_needed_to_store(val: u32) -> u8 {
     if val == 0 {
         1
