@@ -1,5 +1,6 @@
 use bedrockrs_core::Vec3;
 
+#[allow(dead_code)]
 pub fn idx_3_to_1<T: Clone + Copy + Into<usize>>(vec: Vec3<T>, width: T, height: T) -> usize
 where
     usize: From<T>,

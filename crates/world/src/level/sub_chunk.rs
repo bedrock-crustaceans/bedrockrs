@@ -1,8 +1,9 @@
-use crate::level::world_block::WorldBlockTrait;
 use crate::types::binary::BinaryBuffer;
 use bedrockrs_core::Vec3;
 
 pub type BlockLayer<T> = (Box<[u16; 4096]>, Vec<T>);
+
+#[allow(dead_code)]
 pub struct SubchunkTransitionalData<BlockType> {
     y_level: i8,
     data_version: u8,

@@ -72,7 +72,7 @@ where
         mut state: UserState,
     ) -> Result<Self, DBError> {
         let db = UserWorldInterface::new(path, create_db_if_missing, &mut state)?;
-        let mut this = Self {
+        let this = Self {
             db,
             state,
             rw_cache,
