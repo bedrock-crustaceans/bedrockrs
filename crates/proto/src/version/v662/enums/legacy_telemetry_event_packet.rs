@@ -23,7 +23,7 @@ pub mod LegacyTelemetryEventPacket {
         AgentCreated = 9,
         PatternRemovedObsolete = 10,
         SlashCommand = 11,
-        DeprecatedFishBucketed = 12,
+        #[deprecated] FishBucketed = 12,
         MobBorn = 13,
         PetDiedObsolete = 14,
         POICauldronUsed = 15,

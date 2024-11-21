@@ -10,11 +10,11 @@ pub enum BuildPlatform {
     UWP = 7,
     Win32 = 8,
     Dedicated = 9,
-    TvOsDeprecated = 10,
-    Sony = 11,
-    Nx = 12,
+    #[deprecated] TvOs = 10,
+    Sony = 11, /// PlayStation
+    Nx = 12, /// Nintendo Switch
     Xbox = 13,
-    WindowsPhoneDeprecated = 14,
+    #[deprecated] WindowsPhone = 14,
     Linux = 15,
     Unknown = -1,
 }
