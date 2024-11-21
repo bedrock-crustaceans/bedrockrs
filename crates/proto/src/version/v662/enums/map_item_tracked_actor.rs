@@ -6,6 +6,6 @@ pub mod MapItemTrackedActor {
         Entity = 0,
         BlockEntity = 1,
         Other = 2,
-        COUNT = 3,
+        Count = 3,
     }
 }
