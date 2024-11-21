@@ -1,4 +1,4 @@
-pub mod PositionTracingDBServerBroadcastPacket {
+pub mod PositionTrackingDBServerBroadcastPacket {
     use bedrockrs_macros::ProtoCodec;
     
     #[derive(ProtoCodec)]
