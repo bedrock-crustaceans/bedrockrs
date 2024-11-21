@@ -60,7 +60,7 @@ export!(inventory_layout);
 export!(inventory_left_tab_index);
 export!(inventory_right_tab_index);
 export!(inventory_source); // Mod
-export!(inventory_source_type); // TODO
+export!(inventory_source_type);
 export!(item_descriptor); // Mod
 export!(item_release_inventory_transaction); // Mod
 export!(item_stack_net_result);
