@@ -1,7 +1,7 @@
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]
-pub enum MinecraftPackedIds {
+pub enum MinecraftPacketIds {
     KeepAlive = 0,
     Login = 1,
     PlayStatus = 2,
