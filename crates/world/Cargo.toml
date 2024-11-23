@@ -9,11 +9,11 @@ bedrockrs_shared = { path = "../shared" }
 
 nbtx = { git = "https://github.com/bedrock-crustaceans/nbtx" }
 
-mojang-leveldb = "0.6"
+mojang-leveldb = "0.7.0"
 thiserror = "1.0"
 byteorder = "1.5"
 uuid = { version = "1.10", features = ["v4"] }
-bytemuck = {version = "1.19.0", features = ["must_cast"]}
+bytemuck = { version = "1.19.0", features = ["must_cast"] }
 len-trait = "0.6.1"
 anyhow = "1.0.93"
 concat-idents = "1.1.5"

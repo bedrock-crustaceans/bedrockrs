@@ -1,4 +1,5 @@
-use crate::level::chunk_cache::{ChunkCacheKey, SubchunkCacheKey};
+use crate::level::chunk::LevelChunkTrait;
+use crate::level::chunk_cache::SubchunkCacheKey;
 use crate::level::db_interface::bedrock_key::ChunkKey;
 use crate::level::file_interface::DatabaseBatchHolder;
 use crate::level::file_interface::RawWorldTrait;
@@ -9,9 +10,12 @@ use crate::types::clear_cache::ClearCacheContainer;
 use bedrockrs_core::Vec2;
 use bedrockrs_shared::world::dimension::Dimension;
 use mojang_leveldb::error::DBError;
+use std::cmp::min;
+use std::collections::hash_set::Iter;
 use std::collections::HashSet;
 use std::fmt::Debug;
 use std::marker::PhantomData;
+use std::vec;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -43,7 +47,7 @@ pub struct Level<
     state: UserState,
     rw_cache: bool,
     cached_sub_chunks: ClearCacheContainer<SubchunkCacheKey, UserSubChunkType>,
-    chunk_existence: HashSet<ChunkCacheKey>,
+    chunk_existence: HashSet<(Dimension, Vec2<i32>)>,
     _block_type_marker: PhantomData<UserBlockType>,
     _decoder_marker: PhantomData<UserSubChunkDecoder>,
 }
@@ -54,7 +58,6 @@ impl<
         UserBlockType: WorldBlockTrait<UserState = UserState>,
         UserSubChunkType: SubChunkTrait<UserState = UserState, BlockType = UserBlockType>,
         UserSubChunkDecoder: SubChunkDecoder<UserState = UserState, BlockType = UserBlockType>,
-        //UserChunkType: LevelChunkTrait<UserState, UserWorldInterface, UserBlockType, UserSubChunkType, UserSubChunkDecoder>
     > Level<UserState, UserWorldInterface, UserBlockType, UserSubChunkType, UserSubChunkDecoder>
 where
     LevelError: From<<UserSubChunkDecoder as SubChunkDecoder>::Err>,
@@ -72,7 +75,7 @@ where
         mut state: UserState,
     ) -> Result<Self, DBError> {
         let db = UserWorldInterface::new(path, create_db_if_missing, &mut state)?;
-        let this = Self {
+        let mut this = Self {
             db,
             state,
             rw_cache,
@@ -81,22 +84,61 @@ where
             _block_type_marker: PhantomData,
             _decoder_marker: PhantomData,
         };
+        this.chunk_existence = this.db.generated_chunks(&mut this.state)?;
 
         Ok(this)
     }
 
-    pub fn chunk_exists(
-        &mut self,
-        xz: Vec2<i32>,
-        dimension: Dimension,
-    ) -> Result<bool, LevelError> {
-        Ok(self
-            .db
-            .chunk_exists(ChunkKey::chunk_marker(xz, dimension), &mut self.state)?)
+    /// # Safety
+    /// This function is marked as `unsafe` because it allows the caller to bypass the caching systems.
+    /// If modifications are made directly to the underlying database, the cache may become desynchronized,
+    /// potentially leading to inconsistent.
+    ///
+    /// # When Safe to Use
+    /// It is safe to use this function if you can guarantee that no information held in the cache
+    /// will be modified or invalidated by your changes.
+    pub unsafe fn underlying_world_interface(&mut self) -> &mut UserWorldInterface {
+        &mut self.db
+    }
+
+    pub fn chunk_exists(&mut self, xz: Vec2<i32>, dimension: Dimension) -> bool {
+        self.chunk_existence.contains(&(dimension, xz))
     }
 
     fn close_wrap(&mut self) {
         self.cull();
+    }
+
+    pub fn existence_chunks(&self) -> Iter<'_, (Dimension, Vec2<i32>)> {
+        self.chunk_existence.iter()
+    }
+
+    pub fn get_chunk_keys(&mut self, dim: Dimension) -> Vec<Vec2<i32>> {
+        self.chunk_existence.iter().map(|(dim, pos)| *pos).collect()
+    }
+    pub fn get_chunks<T: LevelChunkTrait<Self, UserLevel = Self>>(
+        &mut self,
+        dim: Dimension,
+        min_max: Vec2<i8>,
+    ) -> Result<Vec<T>, T::Err> {
+        let positions: Vec<_> = self
+            .chunk_existence
+            .iter()
+            .filter_map(
+                |(chunk_dim, pos)| {
+                    if *chunk_dim == dim {
+                        Some(*pos)
+                    } else {
+                        None
+                    }
+                },
+            )
+            .collect();
+
+        positions
+            .into_iter()
+            .map(|pos| T::load_from_world(min_max, pos, dim, self))
+            .collect()
     }
 
     pub fn get_sub_chunk(
@@ -117,19 +159,28 @@ where
             .db
             .get_subchunk_raw(ChunkKey::new_subchunk(xz, dim, y), &mut self.state)?;
         let out = match raw_bytes {
-            None => Ok(UserSubChunkType::empty(y, &mut self.state)),
+            None => Ok::<(i8, Option<UserSubChunkType>), LevelError>((y, None)),
             Some(bytes) => {
                 let mut bytes: BinaryBuffer = bytes.into();
                 let data = UserSubChunkDecoder::decode_bytes_as_chunk(&mut bytes, &mut self.state)?;
-                UserSubChunkType::decode_from_raw(data, &mut self.state)
+                Ok((
+                    y,
+                    Some(UserSubChunkType::decode_from_raw(data, &mut self.state)?),
+                ))
             }
         }?;
         if self.rw_cache {
-            let new = out.state_clone(&mut self.state);
-            self.cached_sub_chunks
-                .insert(SubchunkCacheKey::new(xz, y, dim), new);
+            if let Some(data) = &out.1 {
+                let new = data.state_clone(&mut self.state);
+                self.cached_sub_chunks
+                    .insert(SubchunkCacheKey::new(xz, y, dim), new);
+            }
         }
-        Ok(out)
+        if let None = &out.1 {
+            Ok(UserSubChunkType::empty(out.0, self.state()))
+        } else {
+            Ok(out.1.unwrap())
+        }
     }
 
     pub fn set_sub_chunk(
@@ -151,19 +202,40 @@ where
             )?;
             let key = ChunkKey::new_subchunk(xz, dim, y);
             self.db.set_subchunk_raw(key, &raw, &mut self.state)?;
-            self.db
-                .exist_chunk(ChunkKey::chunk_marker(xz, dim), &mut self.state)?;
+            self.handle_exist(xz, dim);
         }
         Ok(())
     }
 
-    //FIXME: Fix the fact perform_flush and cull both violate the rules of write_subchunk_batch by also writing exist keys with it
-    // They also share the same function so it will be worth making the function a member func and just passing the pointer
+    pub fn set_chunk<UserChunkType: LevelChunkTrait<Self, UserLevel = Self>>(
+        &mut self,
+        chnk: UserChunkType,
+        xz_override: Option<Vec2<i32>>,
+        dim_override: Option<Dimension>,
+    ) -> Result<(), UserChunkType::Err> {
+        chnk.write_to_world(self, xz_override, dim_override)
+    }
+
+    pub fn get_chunk<UserChunkType: LevelChunkTrait<Self, UserLevel = Self>>(
+        &mut self,
+        min_max: Vec2<i8>,
+        xz: Vec2<i32>,
+        dim: Dimension,
+    ) -> Result<UserChunkType, UserChunkType::Err> {
+        UserChunkType::load_from_world(min_max, xz, dim, self)
+    }
+
+    fn handle_exist(&mut self, xz: Vec2<i32>, dim: Dimension) {
+        self.chunk_existence.insert((dim, xz));
+    }
+
+    //TODO: They also share the same function so it will be worth making the function a member func and just passing the pointer
 
     //TODO: Make cull/clear return a Result type to allow for nicer error handling
 
     fn perform_flush(&mut self) {
-        let mut write_batch = Vec::new();
+        let mut batch_info: Vec<(ChunkKey, Vec<u8>)> = Vec::new();
+        let mut exist_info: Vec<ChunkKey> = Vec::new();
         self.cached_sub_chunks.cull(|user_key, data| {
             let raw = UserSubChunkDecoder::write_as_bytes(
                 data.to_raw(user_key.y, &mut self.state)
@@ -172,36 +244,27 @@ where
                 &mut self.state,
             )
             .expect("Failed to translate to bytes");
-            let mut subchunk_key_info = UserWorldInterface::build_key(&ChunkKey::new_subchunk(
-                user_key.xz,
-                user_key.dim,
-                user_key.y,
-            ));
-            let key_info_end = subchunk_key_info.len();
-            subchunk_key_info.extend(raw);
-            let len = subchunk_key_info.len();
-            write_batch.push(DatabaseBatchHolder::new(
-                subchunk_key_info,
-                0..key_info_end,
-                key_info_end..len,
-            ));
-            let mut chunk_key =
-                UserWorldInterface::build_key(&ChunkKey::chunk_marker(user_key.xz, user_key.dim));
-            let end = chunk_key.len();
-            let len = chunk_key.len();
-            chunk_key.extend([0]);
-            write_batch.push(DatabaseBatchHolder::new(chunk_key, 0..end, end..len));
+            let key = ChunkKey::new_subchunk(user_key.xz, user_key.dim, user_key.y);
+
+            batch_info.push((key, raw));
+            exist_info.push(ChunkKey::chunk_marker(user_key.xz, user_key.dim));
         });
-        if write_batch.len() != 0 {
+        if !batch_info.is_empty() {
             self.db
-                .write_subchunk_batch(write_batch, &mut self.state)
+                .write_subchunk_batch(batch_info, &mut self.state)
+                .unwrap()
+        }
+        if !exist_info.is_empty() {
+            self.db
+                .write_subchunk_marker_batch(exist_info, &mut self.state)
                 .unwrap()
         }
     }
 
     fn cull(&mut self) {
-        let mut write_batch = Vec::new();
-        self.cached_sub_chunks.cull(|user_key, data| {
+        let mut batch_info: Vec<(ChunkKey, Vec<u8>)> = Vec::new();
+        let mut exist_info: Vec<ChunkKey> = Vec::new();
+        self.cached_sub_chunks.clear(|user_key, data| {
             let raw = UserSubChunkDecoder::write_as_bytes(
                 data.to_raw(user_key.y, &mut self.state)
                     .expect("Failed to dump to raw"),
@@ -209,29 +272,21 @@ where
                 &mut self.state,
             )
             .expect("Failed to translate to bytes");
-            let mut subchunk_key_info = UserWorldInterface::build_key(&ChunkKey::new_subchunk(
-                user_key.xz,
-                user_key.dim,
-                user_key.y,
-            ));
-            let key_info_end = subchunk_key_info.len();
-            subchunk_key_info.extend(raw);
-            let len = subchunk_key_info.len();
-            write_batch.push(DatabaseBatchHolder::new(
-                subchunk_key_info,
-                0..key_info_end,
-                key_info_end..len,
-            ));
-            let mut chunk_key =
-                UserWorldInterface::build_key(&ChunkKey::chunk_marker(user_key.xz, user_key.dim));
-            let end = chunk_key.len();
-            let len = chunk_key.len();
-            chunk_key.extend([0]);
-            write_batch.push(DatabaseBatchHolder::new(chunk_key, 0..end, end..len));
+            let key = ChunkKey::new_subchunk(user_key.xz, user_key.dim, user_key.y);
+
+            batch_info.push((key, raw));
+            exist_info.push(ChunkKey::chunk_marker(user_key.xz, user_key.dim));
         });
-        self.db
-            .write_subchunk_batch(write_batch, &mut self.state)
-            .unwrap()
+        if !batch_info.is_empty() {
+            self.db
+                .write_subchunk_batch(batch_info, &mut self.state)
+                .unwrap()
+        }
+        if !exist_info.is_empty() {
+            self.db
+                .write_subchunk_marker_batch(exist_info, &mut self.state)
+                .unwrap()
+        }
     }
 }
 
@@ -270,6 +325,16 @@ pub trait LevelModificationProvider {
         y: i8,
         dim: Dimension,
     ) -> Result<Self::UserSubChunkType, LevelError>;
+    fn set_subchunk(
+        &mut self,
+        xz: Vec2<i32>,
+        y: i8,
+        dim: Dimension,
+        chnk: Self::UserSubChunkType,
+    ) -> Result<(), LevelError>;
+
+    fn state(&mut self) -> &mut Self::UserState;
+    fn chunk_exists(&mut self, xz: Vec2<i32>, dimension: Dimension) -> bool;
 }
 
 impl<
@@ -303,21 +368,45 @@ where
     ) -> Result<Self::UserSubChunkType, LevelError> {
         self.get_sub_chunk(xz, y, dim)
     }
+
+    fn set_subchunk(
+        &mut self,
+        xz: Vec2<i32>,
+        y: i8,
+        dim: Dimension,
+        chnk: Self::UserSubChunkType,
+    ) -> Result<(), LevelError> {
+        self.set_sub_chunk(chnk, xz, y, dim)
+    }
+
+    fn state(&mut self) -> &mut Self::UserState {
+        &mut self.state
+    }
+
+    fn chunk_exists(&mut self, xz: Vec2<i32>, dimension: Dimension) -> bool {
+        self.chunk_exists(xz, dimension)
+    }
 }
 
 #[cfg(feature = "default-impl")]
 pub mod default_impl {
     use super::*;
+    use crate::level::chunk::default_impl::LevelChunk;
     use crate::level::db_interface::db::LevelDBInterface;
     use crate::level::sub_chunk::default_impl::{SubChunk, SubChunkDecoderImpl};
     use crate::level::world_block::default_impl::WorldBlock;
 
-    pub struct State {}
+    pub struct BedrockState {}
+    pub type RawInterface = LevelDBInterface<BedrockState>;
+    pub type BedrockWorldBlock = WorldBlock<BedrockState>;
+    pub type BedrockSubChunk = SubChunk<BedrockWorldBlock, BedrockState>;
+    pub type BedrockSubChunkDecoder = SubChunkDecoderImpl<BedrockWorldBlock, BedrockState>;
     pub type BedrockLevel = Level<
-        State,
-        LevelDBInterface<State>,
-        WorldBlock<State>,
-        SubChunk<WorldBlock<State>, State>,
-        SubChunkDecoderImpl<WorldBlock<State>, State>,
+        BedrockState,
+        RawInterface,
+        BedrockWorldBlock,
+        BedrockSubChunk,
+        BedrockSubChunkDecoder,
     >;
+    pub type BedrockChunk = LevelChunk<BedrockState, BedrockSubChunk>;
 }

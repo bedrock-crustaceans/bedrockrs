@@ -9,3 +9,26 @@ pub enum Dimension {
     End = 2,
     Undefined = 3,
 }
+
+impl From<i32> for Dimension {
+    fn from(value: i32) -> Self {
+        match value {
+            0 => Self::Overworld,
+            1 => Self::Nether,
+            2 => Self::End,
+            3 => Self::Undefined,
+            _ => {panic!("Invalid Dim")}
+        }
+    }
+}
+
+impl From<Dimension> for i32 {
+    fn from(value: Dimension) -> i32 {
+        match value {
+            Dimension::Overworld => 0,
+            Dimension::Nether => 1,
+            Dimension::End => 2,
+            Dimension::Undefined => 3,
+        }
+    }
+}

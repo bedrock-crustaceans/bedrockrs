@@ -1,3 +1,4 @@
+pub mod biome;
 pub mod chunk;
 pub mod chunk_cache;
 pub mod db_interface;

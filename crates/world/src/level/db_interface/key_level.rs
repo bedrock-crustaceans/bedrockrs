@@ -1,4 +1,4 @@
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum KeyTypeTag {
     Data3D = 43,  // 2B  "+"  Heightmap (256x2 bytes)
     Version = 44, // 2C  ","  1 byte version

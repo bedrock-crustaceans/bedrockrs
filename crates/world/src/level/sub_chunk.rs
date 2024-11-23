@@ -1,3 +1,4 @@
+use crate::level::biome::BiomeTransitionInformation;
 use crate::types::binary::BinaryBuffer;
 use bedrockrs_core::Vec3;
 
@@ -56,6 +57,7 @@ pub trait SubChunkTrait: Sized {
         state: &mut Self::UserState,
     ) -> Result<SubchunkTransitionalData<Self::BlockType>, Self::Err>;
     fn get_block(&self, xyz: Vec3<u8>) -> Option<&Self::BlockType>;
+    fn get_block_mut(&mut self, xyz: Vec3<u8>) -> Option<&mut Self::BlockType>;
     fn set_block(&mut self, xyz: Vec3<u8>, block: Self::BlockType) -> Result<(), Self::Err>;
 
     fn get_active_layer(&self) -> u8;
@@ -65,14 +67,17 @@ pub trait SubChunkTrait: Sized {
     fn get_sub_layer_count(&self) -> usize;
 
     fn get_y(&self) -> i8;
+    fn set_y(&mut self, y: i8) -> i8;
 
     fn state_clone(&self, _: &mut Self::UserState) -> Self;
+
+    fn is_empty(&self) -> bool;
 }
 
 #[cfg(feature = "default-impl")]
 pub mod default_impl {
     use super::*;
-    use crate::level::world_block::BlockTransitionalState;
+    use crate::level::world_block::{BlockTransitionalState, WorldBlockTrait};
     use crate::types::binary::BinaryInterfaceError;
     use crate::types::miner::idx_3_to_1;
     use anyhow::anyhow;
@@ -180,7 +185,7 @@ pub mod default_impl {
                 .write::<LittleEndian, i8>(chunk_state.y_level)?;
             for layer in chunk_state.layers {
                 let bits_per_block = bits_needed_to_store(layer.1.len() as u32);
-                buffer.write::<LittleEndian, u8>(bits_per_block << 1 + (network as u8))?;
+                buffer.write::<LittleEndian, u8>(bits_per_block << (1 + (network as u8)))?;
 
                 let mut current_word = 0u32;
                 let mut bits_written = 0;
@@ -214,7 +219,26 @@ pub mod default_impl {
         blocks: Vec<Box<[UserBlockType; 4096]>>,
         y_index: i8,
         active_layer: u8,
+        is_empty: bool,
         _state_tag: PhantomData<UserState>,
+    }
+    impl<UserBlockType: WorldBlockTrait<UserState = UserState>, UserState>
+        SubChunk<UserBlockType, UserState>
+    {
+        pub fn force_non_empty(&mut self) {
+            self.is_empty = false;
+        }
+
+        pub fn force_empty(&mut self) {
+            self.is_empty = false;
+        }
+
+        pub fn replace(&mut self, other: Self) {
+            self.blocks = other.blocks;
+            self.y_index = other.y_index;
+            self.active_layer = other.active_layer;
+            self.is_empty = other.is_empty;
+        }
     }
 
     impl<UserBlockType: WorldBlockTrait<UserState = UserState>, UserState> SubChunkTrait
@@ -229,6 +253,7 @@ pub mod default_impl {
                 blocks: Vec::with_capacity(1),
                 y_index,
                 active_layer: 0,
+                is_empty: true,
                 _state_tag: PhantomData,
             };
             val.blocks.push(Box::new(std::array::from_fn(|_| {
@@ -242,12 +267,12 @@ pub mod default_impl {
             state: &mut Self::UserState,
         ) -> Result<Self, Self::Err> {
             let mut building = Self::empty(data.y_level, state);
+            building.is_empty = false;
             for _ in 1..data.layers.len() {
                 building.add_sub_layer(state);
             }
-            let mut layer_index = 0u8;
-            for (indices, blocks) in data.layers {
-                building.set_active_layer(layer_index);
+            for (layer_index, (indices, blocks)) in data.layers.into_iter().enumerate() {
+                building.set_active_layer(layer_index as u8);
 
                 for z in 0u8..16u8 {
                     for y in 0u8..16u8 {
@@ -262,8 +287,6 @@ pub mod default_impl {
                         }
                     }
                 }
-
-                layer_index += 1;
             }
             Ok(building)
         }
@@ -290,12 +313,19 @@ pub mod default_impl {
             layer.get(idx_3_to_1::<u8>(xyz, 16u8, 16u8))
         }
 
+        fn get_block_mut(&mut self, xyz: Vec3<u8>) -> Option<&mut Self::BlockType> {
+            let layer: &mut [Self::BlockType; 4096] =
+                self.blocks.get_mut(self.active_layer as usize)?;
+            layer.get_mut(idx_3_to_1::<u8>(xyz, 16u8, 16u8))
+        }
+
         fn set_block(&mut self, xyz: Vec3<u8>, block: Self::BlockType) -> Result<(), Self::Err> {
             let layer: &mut [Self::BlockType; 4096] = self
                 .blocks
                 .get_mut(self.active_layer as usize)
                 .ok_or(anyhow!("Failed to get layer"))?;
             layer[idx_3_to_1::<u8>(xyz, 16u8, 16u8)] = block;
+            self.is_empty = false;
             Ok(())
         }
         fn get_active_layer(&self) -> u8 {
@@ -326,14 +356,23 @@ pub mod default_impl {
             self.y_index
         }
 
+        fn set_y(&mut self, y: i8) -> i8 {
+            self.y_index = y;
+            self.y_index
+        }
+
         fn state_clone(&self, _: &mut Self::UserState) -> Self {
-            println!("{}", self.blocks.len());
             Self {
                 blocks: self.blocks.clone(),
                 y_index: self.y_index,
                 active_layer: self.active_layer,
+                is_empty: self.is_empty,
                 _state_tag: PhantomData,
             }
+        }
+
+        fn is_empty(&self) -> bool {
+            self.is_empty
         }
     }
 
@@ -371,6 +410,7 @@ pub mod default_impl {
                 active_layer: self.active_layer,
                 _state_tag: PhantomData,
                 blocks: self.blocks.clone(),
+                is_empty: self.is_empty,
                 y_index: self.y_index.clone(),
             }
         }

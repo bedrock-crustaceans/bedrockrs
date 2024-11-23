@@ -1,4 +1,7 @@
 use crate::level::db_interface::bedrock_key::ChunkKey;
+use bedrockrs_core::Vec2;
+use bedrockrs_shared::world::dimension::Dimension;
+use std::collections::HashSet;
 use std::ops::Range;
 
 pub struct DatabaseBatchHolder {
@@ -51,7 +54,13 @@ pub trait RawWorldTrait: Sized {
 
     fn write_subchunk_batch(
         &mut self,
-        subchunk_batch_info: Vec<DatabaseBatchHolder>,
+        subchunk_batch_info: Vec<(ChunkKey, Vec<u8>)>,
+        state: &mut Self::UserState,
+    ) -> Result<(), Self::Err>;
+
+    fn write_subchunk_marker_batch(
+        &mut self,
+        subchunk_batch_info: Vec<ChunkKey>,
         state: &mut Self::UserState,
     ) -> Result<(), Self::Err>;
 
@@ -69,7 +78,8 @@ pub trait RawWorldTrait: Sized {
         state: &mut Self::UserState,
     ) -> Result<Self, Self::Err>;
 
-    fn generated_chunks(&mut self, state: &mut Self::UserState)
-        -> Result<Vec<ChunkKey>, Self::Err>;
-
+    fn generated_chunks(
+        &mut self,
+        state: &mut Self::UserState,
+    ) -> Result<HashSet<(Dimension, Vec2<i32>)>, Self::Err>;
 }

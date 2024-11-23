@@ -10,3 +10,8 @@ where
         + usize::from(vec.z) * usize::from(width) * usize::from(height))
     .into()
 }
+
+#[allow(dead_code)]
+pub fn in_bounds<T: std::cmp::PartialOrd>(min: T, max: T, val: T) -> bool {
+    val >= min && val <= max
+}

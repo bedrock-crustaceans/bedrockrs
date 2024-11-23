@@ -1,9 +1,14 @@
 use crate::level::db_interface::bedrock_key::ChunkKey;
 use crate::level::db_interface::config::{read_options, write_options};
+use crate::level::db_interface::key_level::KeyTypeTag;
 use crate::level::file_interface::{DatabaseBatchHolder, RawWorldTrait};
-use crate::types::buffer_slide::SlideBuffer;
+use crate::types::buffer_slide::{BetterCursor, SlideBuffer};
+use bedrockrs_core::Vec2;
+use bedrockrs_shared::world::dimension::Dimension;
 use mojang_leveldb::error::DBError;
 use mojang_leveldb::*;
+use std::collections::HashSet;
+use std::io::BufRead;
 use std::marker::PhantomData;
 
 pub struct LevelDBInterface<UserState> {
@@ -55,10 +60,22 @@ impl<UserState> LevelDBInterface<UserState> {
         key_bytes
     }
 
-    pub fn write_batch(&mut self, batch_buffer: Vec<DatabaseBatchHolder>) -> Result<(), DBError> {
+    pub fn write_batch(&mut self, batch_buffer: Vec<(ChunkKey, Vec<u8>)>) -> Result<(), DBError> {
         let mut wb = WriteBatch::new();
-        for batch_info in &batch_buffer {
-            wb.put(batch_info.key(), batch_info.data());
+        let mut keys: Vec<Vec<u8>> = Vec::new();
+        for (key, raw) in &batch_buffer {
+            keys.push(Self::build_key(key));
+            wb.put(&keys[keys.len() - 1], &raw);
+        }
+        self.db.write(write_options(), wb)
+    }
+
+    pub fn write_key(&mut self, batch_buffer: Vec<ChunkKey>) -> Result<(), DBError> {
+        let mut wb = WriteBatch::new();
+        let mut keys: Vec<Vec<u8>> = Vec::new();
+        for (key) in &batch_buffer {
+            keys.push(Self::build_key(key));
+            wb.put(&keys[keys.len() - 1], &[]);
         }
         self.db.write(write_options(), wb)
     }
@@ -105,10 +122,18 @@ impl<UserState> RawWorldTrait for LevelDBInterface<UserState> {
 
     fn write_subchunk_batch(
         &mut self,
-        subchunk_batch_info: Vec<DatabaseBatchHolder>,
+        subchunk_batch_info: Vec<(ChunkKey, Vec<u8>)>,
         _: &mut Self::UserState,
     ) -> Result<(), Self::Err> {
         self.write_batch(subchunk_batch_info)
+    }
+
+    fn write_subchunk_marker_batch(
+        &mut self,
+        subchunk_batch_info: Vec<ChunkKey>,
+        _: &mut Self::UserState,
+    ) -> Result<(), Self::Err> {
+        self.write_key(subchunk_batch_info)
     }
 
     fn exist_chunk(
@@ -134,9 +159,40 @@ impl<UserState> RawWorldTrait for LevelDBInterface<UserState> {
     fn generated_chunks(
         &mut self,
         _: &mut Self::UserState,
-    ) -> Result<Vec<ChunkKey>, Self::Err> {
-        todo!()
-        //FIXME: Need to fork mojang-leveldb and add support for iterating the keys
+    ) -> Result<HashSet<(Dimension, Vec2<i32>)>, Self::Err> {
+        let mut out_set = HashSet::new();
+        for (key, _) in self.db.iter(read_options()) {
+            if key.len() != 9 && key.len() != 13 {
+                continue;
+            }
+            if KeyTypeTag::from_byte(*key.get().get(8).unwrap_or(&255)) == Some(KeyTypeTag::Version)
+            {
+                let mut buff = BetterCursor::new(key.get());
+                let x = buff
+                    .read::<i32>()
+                    .ok_or(DBError::Unknown("Failed To Read X From Key".into()))?;
+                let y = buff
+                    .read::<i32>()
+                    .ok_or(DBError::Unknown("Failed To Read Y From Key".into()))?;
+                out_set.insert((Dimension::Overworld, (x, y).into()));
+            } else if KeyTypeTag::from_byte(*key.get().get(12).unwrap_or(&255))
+                == Some(KeyTypeTag::Version)
+            {
+                let mut buff = BetterCursor::new(key.get());
+                let x = buff
+                    .read::<i32>()
+                    .ok_or(DBError::Unknown("Failed To Read X From Key".into()))?;
+                let y = buff
+                    .read::<i32>()
+                    .ok_or(DBError::Unknown("Failed To Read Y From Key".into()))?;
+                out_set.insert((
+                    // This is actually a safe unwrap since we read from index 12 above we know all indexes before 12 must also exist
+                    Dimension::from(buff.read::<i32>().unwrap()),
+                    (x, y).into(),
+                ));
+            }
+        }
+        Ok(out_set)
     }
 }
 

@@ -88,7 +88,7 @@ pub mod default_impl {
 
     impl<T> std::fmt::Debug for WorldBlock<T> {
         fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-            write!(f, "ID: {}, States: {:?}", self.id, self.states)
+            write!(f, "WorldBlock(ID: {}, States: {:?})", self.id, self.states)
         }
     }
 

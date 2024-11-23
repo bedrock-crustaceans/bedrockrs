@@ -90,8 +90,6 @@ impl<KeyType: Hash + Eq + Clone, CachedValue> ClearCacheContainer<KeyType, Cache
             let information = self.cache_information.remove(&key).unwrap();
             on_culled(key, information.internal);
         }
-        // let new_map = self.cache_information.drain().collect();
-        // self.cache_information = new_map;
     }
 
     pub fn clear<F: FnMut(KeyType, CachedValue)>(&mut self, mut on_culled: F) {
