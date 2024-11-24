@@ -1,13 +1,13 @@
 use bytemuck::Pod;
 use std::io::{Error, ErrorKind, Seek, SeekFrom};
-use std::ops::IndexMut;
+use std::ops::{Deref, IndexMut};
 
-pub struct SlideBuffer<'a, Container: IndexMut<usize, Output = u8> + ?Sized> {
+pub struct SlideBuffer<'a, Container: IndexMut<usize, Output = u8> + ?Sized + len_trait::len::Len> {
     container: &'a mut Container,
     index: usize,
 }
 
-impl<'a, Container: IndexMut<usize, Output = u8>> SlideBuffer<'a, Container> {
+impl<'a, Container: IndexMut<usize, Output = u8> + len_trait::Len> SlideBuffer<'a, Container> {
     pub fn new(container: &'a mut Container) -> Self {
         Self {
             container,
@@ -26,6 +26,24 @@ impl<'a, Container: IndexMut<usize, Output = u8>> SlideBuffer<'a, Container> {
     pub fn push_byte(&mut self, val: u8) {
         self.index += 1;
         self.container[self.index - 1] = val;
+    }
+
+    pub fn size(&self) -> usize {
+        self.container.len() - self.index
+    }
+
+    pub fn pos(&self) -> usize {
+        self.index
+    }
+}
+impl<
+        'a,
+        Container: IndexMut<usize, Output = u8> + ?Sized + len_trait::len::Len + Deref<Target = [u8]>,
+    > Deref for SlideBuffer<'a, Container>
+{
+    type Target = [u8];
+    fn deref(&self) -> &Self::Target {
+        self.container.deref()
     }
 }
 

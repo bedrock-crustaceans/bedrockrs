@@ -68,11 +68,12 @@ impl<KeyType: Hash + Eq + Clone, CachedValue> ClearCacheContainer<KeyType, Cache
         self.sequence_id - 1
     }
 
+    #[optick_attr::profile]
     pub fn cull<F: FnMut(KeyType, CachedValue)>(&mut self, mut on_culled: F) {
         if self.sequence_id != 0 && self.sequence_id % self.clear_threshold != 0 {
             return;
         }
-
+        optick::event!("Flush Began");
         let max_distance = self.clear_threshold / 10; // This grabs the maximum distance the seq ID can be and still be kept in the cache
         let dropped_keys = self
             .cache_information
@@ -86,13 +87,17 @@ impl<KeyType: Hash + Eq + Clone, CachedValue> ClearCacheContainer<KeyType, Cache
             })
             .collect::<Vec<_>>();
 
-        for key in dropped_keys {
-            let information = self.cache_information.remove(&key).unwrap();
-            on_culled(key, information.internal);
+        {
+            optick::event!("User Cache Clear Call");
+            for key in dropped_keys {
+                let information = self.cache_information.remove(&key).unwrap();
+                on_culled(key, information.internal);
+            }
         }
     }
 
     pub fn clear<F: FnMut(KeyType, CachedValue)>(&mut self, mut on_culled: F) {
+        optick::event!("User Cache Clear Call");
         for (key, val) in self.cache_information.drain() {
             on_culled(key, val.internal)
         }

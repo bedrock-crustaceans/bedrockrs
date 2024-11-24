@@ -201,6 +201,7 @@ pub mod default_impl {
         }
 
         // TODO: Handle 0, 2, 3, 4 ,5 ,6 7, also handle 1
+        #[optick_attr::profile]
         fn write_as_bytes(
             chunk_state: SubchunkTransitionalData<Self::BlockType>,
             network: bool,
@@ -215,6 +216,7 @@ pub mod default_impl {
                 .write::<LittleEndian, u8>(chunk_state.layers.len() as u8)?
                 .write::<LittleEndian, i8>(chunk_state.y_level)?;
             for layer in chunk_state.layers {
+                optick::event!("To Encoded");
                 let bits_per_block = bits_needed_to_store(layer.1.len() as u32);
                 buffer.write::<LittleEndian, u8>(bits_per_block << (1 + (network as u8)))?;
 
@@ -325,6 +327,7 @@ pub mod default_impl {
             })
         }
 
+        #[optick_attr::profile]
         fn to_raw(
             &self,
             y_level: i8,

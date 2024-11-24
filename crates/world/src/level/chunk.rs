@@ -64,44 +64,11 @@ where
     fn get_subchunk_mut(&mut self, y: i8) -> Option<&mut Self::UserSubchunk>;
     fn pos(&self) -> Vec2<i32>;
 
-    fn fill(
+    fn fill_chunk(
         &mut self,
-        block: &<<Self as LevelChunkTrait<UserLevel>>::UserSubchunk as SubChunkTrait>::BlockType,
-        filter: FillFilter<
-            <<Self as LevelChunkTrait<UserLevel>>::UserSubchunk as SubChunkTrait>::BlockType,
-        >,
-    ) -> Result<(), FillError>
-    where
-        <<Self as LevelChunkTrait<UserLevel>>::UserSubchunk as SubChunkTrait>::Err: Debug,
-    {
-        let pos = self.pos();
-        for y in self.min_max().x..self.min_max().y {
-            let subchunk = self
-                .get_subchunk_mut(y)
-                .ok_or(FillError::MissingSubchunk(y))?;
-            for z in 0..16u8 {
-                for y in 0..16u8 {
-                    for x in 0..16u8 {
-                        let blk = subchunk
-                            .get_block((x, y, z).into())
-                            .ok_or(FillError::BlockIndexDidntReturn(x, y, z))?;
-                        if match &filter {
-                            FillFilter::Blanket => true,
-                            FillFilter::Replace(mask) => mask == blk,
-                            FillFilter::Avoid(mask) => mask != blk,
-                            FillFilter::Precedence(func) => {
-                                func(blk, (x, y, z).into(), pos, subchunk.get_y())
-                            }
-                        } {
-                            subchunk.set_block((x, y, z).into(), block.clone()).unwrap()
-                        }
-                    }
-                }
-            }
-        }
-
-        Ok(())
-    }
+        block: Self::UserBlock,
+        filter: FillFilter<Self::UserBlock>,
+    ) -> Result<(), FillError>;
 }
 
 #[cfg(feature = "default-impl")]
@@ -119,22 +86,31 @@ pub mod default_impl {
     use std::vec::Vec;
 
     #[allow(dead_code)]
-    pub struct LevelChunk<UserState, UserSubChunkType> {
+    pub struct LevelChunk<
+        UserState,
+        UserSubChunkType,
+        UserLevelInterface: LevelModificationProvider,
+    > {
         bounds: Vec2<i8>,
         xz: Vec2<i32>,
         dim: Dimension,
         sections: Vec<UserSubChunkType>,
         phantom_data: PhantomData<UserState>,
+        _phantom_data: PhantomData<UserLevelInterface>,
     }
 
-    impl<UserState, UserSubChunkType> Deref for LevelChunk<UserState, UserSubChunkType> {
+    impl<UserState, UserSubChunkType, UserLevelInterface: LevelModificationProvider> Deref
+        for LevelChunk<UserState, UserSubChunkType, UserLevelInterface>
+    {
         type Target = Vec<UserSubChunkType>;
         fn deref(&self) -> &Self::Target {
             &self.sections
         }
     }
 
-    impl<UserState, UserSubChunkType> DerefMut for LevelChunk<UserState, UserSubChunkType> {
+    impl<UserState, UserSubChunkType, UserLevelInterface: LevelModificationProvider> DerefMut
+        for LevelChunk<UserState, UserSubChunkType, UserLevelInterface>
+    {
         fn deref_mut(&mut self) -> &mut Self::Target {
             &mut self.sections
         }
@@ -144,7 +120,8 @@ pub mod default_impl {
             UserState,
             UserBlockType: WorldBlockTrait<UserState = UserState>,
             UserSubChunkType: SubChunkTrait<UserState = UserState, BlockType = UserBlockType>,
-        > LevelChunk<UserState, UserSubChunkType>
+            UserLevelInterface: LevelModificationProvider,
+        > LevelChunk<UserState, UserSubChunkType, UserLevelInterface>
     {
         fn true_index(min_max: Vec2<i8>, raw_index: i8) -> i8 {
             #[cfg(debug_assertions)]
@@ -177,11 +154,13 @@ pub mod default_impl {
         }
 
         pub fn get_subchunk(&self, idx: i8) -> Option<&UserSubChunkType> {
-            self.sections.get(Self::real_y(idx) as usize)
+            self.sections
+                .get(Self::true_index(self.bounds, idx) as usize)
         }
 
         pub fn get_subchunk_mut(&mut self, idx: i8) -> Option<&mut UserSubChunkType> {
-            self.sections.get_mut(Self::real_y(idx) as usize)
+            self.sections
+                .get_mut(Self::true_index(self.bounds, idx) as usize)
         }
 
         pub fn set_subchunk(&mut self, y: i8, mut chnk: UserSubChunkType) {
@@ -204,6 +183,7 @@ pub mod default_impl {
                 sections: ret_subchunks,
                 dim,
                 phantom_data: PhantomData,
+                _phantom_data: PhantomData,
             }
         }
     }
@@ -213,29 +193,30 @@ pub mod default_impl {
             UserBlockType: WorldBlockTrait<UserState = UserState>,
             UserSubChunkType: SubChunkTrait<UserState = UserState, BlockType = UserBlockType>,
             UserLevelInterface: LevelModificationProvider<
-                UserSubChunkType = UserSubChunkType,
                 UserBlockType = UserBlockType,
                 UserState = UserState,
+                UserSubChunkType = UserSubChunkType,
                 Error = LevelError<<<UserLevelInterface as LevelModificationProvider>::UserWorldInterface as RawWorldTrait>::Err,
-                    <UserSubChunkType as SubChunkTrait>::Err,
-                    <<UserLevelInterface as LevelModificationProvider>::UserSubChunkDecoder as SubChunkDecoder>::Err>
+                    <<UserLevelInterface as LevelModificationProvider>::UserSubChunkDecoder as SubChunkDecoder>::Err,
+                    <UserSubChunkType as SubChunkTrait>::Err,>,
             >,
-        > LevelChunkTrait<UserLevelInterface> for LevelChunk<UserState, UserSubChunkType>
+        > LevelChunkTrait<UserLevelInterface> for LevelChunk<UserState, UserSubChunkType, UserLevelInterface>
     where
         <UserLevelInterface as LevelModificationProvider>::UserWorldInterface: RawWorldTrait,
         <UserLevelInterface as LevelModificationProvider>::UserSubChunkDecoder: SubChunkDecoder,
+        <UserLevelInterface as LevelModificationProvider>::UserBlockType: WorldBlockTrait,
         <UserSubChunkType as SubChunkTrait>::Err: Debug,
         <<UserLevelInterface as LevelModificationProvider>::UserWorldInterface as RawWorldTrait>::Err: Debug,
         <<UserLevelInterface as LevelModificationProvider>::UserSubChunkDecoder as SubChunkDecoder>::Err: Debug,
     {
         type UserLevel = UserLevelInterface;
-        type UserBlock = UserLevelInterface::UserBlockType;
-        type UserSubchunk = UserLevelInterface::UserSubChunkType;
-        type UserState = UserLevelInterface::UserState;
+        type UserBlock = UserBlockType;
+        type UserSubchunk = UserSubChunkType;
+        type UserState = UserState;
         type Err = LevelError<
             <UserLevelInterface::UserWorldInterface as RawWorldTrait>::Err,
-            <UserLevelInterface::UserSubChunkType as SubChunkTrait>::Err,
             <UserLevelInterface::UserSubChunkDecoder as SubChunkDecoder>::Err,
+            <UserLevelInterface::UserSubChunkType as SubChunkTrait>::Err,
         >;
 
         #[optick_attr::profile]
@@ -275,9 +256,11 @@ pub mod default_impl {
                 dim,
                 sections: unsafe { std::mem::transmute(subchunk_list) },
                 phantom_data: PhantomData,
+                _phantom_data: PhantomData
             })
         }
 
+        #[optick_attr::profile]
         fn write_to_world(
             self,
             level: &mut Self::UserLevel,
@@ -337,6 +320,34 @@ pub mod default_impl {
 
         fn pos(&self) -> Vec2<i32> {
             self.xz
+        }
+
+        fn fill_chunk(&mut self, block: Self::UserBlock, filter: FillFilter<Self::UserBlock>) -> Result<(), FillError> {
+            let pos = self.pos();
+            for y_level in self.bounds.x..self.bounds.y {
+                let subchunk = self.get_subchunk_mut(y_level)
+                    .ok_or(FillError::MissingSubchunk(y_level))?;
+                for z in 0..16u8 {
+                    for y in 0..16u8 {
+                        for x in 0..16u8 {
+                            let blk = subchunk
+                                .get_block((x, y, z).into())
+                                .ok_or(FillError::BlockIndexDidntReturn(x, y, z))?;
+                            if match &filter {
+                                FillFilter::Blanket => true,
+                                FillFilter::Replace(mask) => mask == blk,
+                                FillFilter::Avoid(mask) => mask != blk,
+                                FillFilter::Precedence(func) => {
+                                    func(blk, (x, y, z).into(), pos, subchunk.get_y())
+                                }
+                            } {
+                                subchunk.set_block((x, y, z).into(), block.clone()).unwrap()
+                            }
+                        }
+                    }
+                }
+            }
+            Ok(())
         }
     }
 }

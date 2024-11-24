@@ -10,7 +10,6 @@ use crate::types::binary::BinaryBuffer;
 use crate::types::clear_cache::ClearCacheContainer;
 use bedrockrs_core::Vec2;
 use bedrockrs_shared::world::dimension::Dimension;
-use mojang_leveldb::error::DBError;
 use std::collections::hash_set::Iter;
 use std::collections::HashSet;
 use std::error::Error;
@@ -89,7 +88,7 @@ where
             db,
             state,
             rw_cache,
-            cached_sub_chunks: ClearCacheContainer::with_threshold(8192),
+            cached_sub_chunks: ClearCacheContainer::with_threshold(1024),
             chunk_existence: HashSet::new(),
             _block_type_marker: PhantomData,
             _decoder_marker: PhantomData,
@@ -185,18 +184,25 @@ where
                 >,
             >((y, None)),
             Some(bytes) => {
-                let mut bytes: BinaryBuffer = bytes.into();
-                let data = level_try!(
-                    SubChunkDecodeError,
-                    UserSubChunkDecoder::decode_bytes_as_chunk(&mut bytes, &mut self.state)
-                );
-                Ok((
-                    y,
-                    Some(level_try!(
-                        SubChunkError,
-                        UserSubChunkType::decode_from_raw(data, &mut self.state)
-                    )),
-                ))
+                if bytes.len() < 100 {
+                    // This happens when there is no layers
+                    let out = (y, None);
+                    Ok(out)
+                } else {
+                    let mut bytes: BinaryBuffer = bytes.into();
+                    let data = level_try!(
+                        SubChunkDecodeError,
+                        UserSubChunkDecoder::decode_bytes_as_chunk(&mut bytes, &mut self.state)
+                    );
+                    let out = (
+                        y,
+                        Some(level_try!(
+                            SubChunkError,
+                            UserSubChunkType::decode_from_raw(data, &mut self.state)
+                        )),
+                    );
+                    Ok(out)
+                }
             }
         }?;
         if self.rw_cache {
@@ -213,6 +219,7 @@ where
         }
     }
 
+    #[optick_attr::profile]
     pub fn set_sub_chunk(
         &mut self,
         data: UserSubChunkType,
@@ -246,6 +253,7 @@ where
         Ok(())
     }
 
+    #[optick_attr::profile]
     pub fn set_chunk<UserChunkType: LevelChunkTrait<Self, UserLevel = Self>>(
         &mut self,
         chnk: UserChunkType,
@@ -256,7 +264,17 @@ where
     }
 
     #[optick_attr::profile]
-    pub fn get_chunk<UserChunkType: LevelChunkTrait<Self, UserLevel = Self>>(
+    pub fn get_chunk<
+        UserChunkType: LevelChunkTrait<
+            Self,
+            UserLevel = Self,
+            Err = LevelError<
+                UserWorldInterface::Err,
+                UserSubChunkDecoder::Err,
+                UserSubChunkType::Err,
+            >,
+        >,
+    >(
         &mut self,
         min_max: Vec2<i8>,
         xz: Vec2<i32>,
@@ -273,6 +291,7 @@ where
 
     //TODO: Make cull/clear return a Result type to allow for nicer error handling
 
+    #[optick_attr::profile]
     fn perform_flush(&mut self) {
         let mut batch_info: Vec<(ChunkKey, Vec<u8>)> = Vec::new();
         let mut exist_info: Vec<ChunkKey> = Vec::new();
@@ -360,6 +379,7 @@ pub trait LevelModificationProvider {
         y: i8,
         dim: Dimension,
     ) -> Result<Self::UserSubChunkType, Self::Error>;
+
     fn set_subchunk(
         &mut self,
         xz: Vec2<i32>,
@@ -425,12 +445,12 @@ where
 pub mod default_impl {
     use super::*;
     use crate::level::chunk::default_impl::LevelChunk;
-    use crate::level::db_interface::db::LevelDBInterface;
+    use crate::level::db_interface::rusty::RustyDBInterface;
     use crate::level::sub_chunk::default_impl::{SubChunk, SubChunkDecoderImpl};
     use crate::level::world_block::default_impl::WorldBlock;
 
     pub struct BedrockState {}
-    pub type RawInterface = LevelDBInterface<BedrockState>;
+    pub type RawInterface = RustyDBInterface<BedrockState>;
     pub type BedrockWorldBlock = WorldBlock<BedrockState>;
     pub type BedrockSubChunk = SubChunk<BedrockWorldBlock, BedrockState>;
     pub type BedrockSubChunkDecoder = SubChunkDecoderImpl<BedrockWorldBlock, BedrockState>;
@@ -441,5 +461,5 @@ pub mod default_impl {
         BedrockSubChunk,
         BedrockSubChunkDecoder,
     >;
-    pub type BedrockChunk = LevelChunk<BedrockState, BedrockSubChunk>;
+    pub type BedrockChunk = LevelChunk<BedrockState, BedrockSubChunk, BedrockLevel>;
 }
