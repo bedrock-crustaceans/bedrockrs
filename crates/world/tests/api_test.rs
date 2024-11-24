@@ -35,17 +35,28 @@ fn world_test() {
     .expect("Unexpected Fail");
     let first_count = level.get_chunk_keys(Dimension::Overworld).len();
     let res = level.get_chunk_keys(Dimension::Overworld);
-    println!("there are {} chunks! Parsing 1000! ", res.len());
-    for x in 0..1000 {
+    println!("there are {} chunks! Parsing ALL! ", res.len());
+    for x in 0..res.len() {
         let mut chunk = level
             .get_chunk::<BedrockChunk>((-4, 20).into(), res[x], Dimension::Overworld)
             .unwrap();
-        // chunk
-        //     .fill_chunk(
-        //         BedrockWorldBlock::new("minecraft:iron_block".into()),
-        //         FillFilter::Blanket,
-        //     )
-        //     .unwrap();
+
+        chunk
+            .fill_chunk(
+                BedrockWorldBlock::new("minecraft:glass".into()),
+                FillFilter::Replace(BedrockWorldBlock::new("minecraft:grass_block".into())),
+            )
+            .unwrap()
+            .fill_chunk(
+                BedrockWorldBlock::new("minecraft:glass".into()),
+                FillFilter::Replace(BedrockWorldBlock::new("minecraft:dirt".into())),
+            )
+            .unwrap()
+            .fill_chunk(
+                BedrockWorldBlock::new("minecraft:glass".into()),
+                FillFilter::Precedence(Box::new(|_, _, _, y| y > 0)),
+            )
+            .unwrap();
         level.set_chunk(chunk, None, None).unwrap()
     }
 }

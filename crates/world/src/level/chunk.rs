@@ -68,7 +68,7 @@ where
         &mut self,
         block: Self::UserBlock,
         filter: FillFilter<Self::UserBlock>,
-    ) -> Result<(), FillError>;
+    ) -> Result<&mut Self, FillError>;
 }
 
 #[cfg(feature = "default-impl")]
@@ -322,7 +322,7 @@ pub mod default_impl {
             self.xz
         }
 
-        fn fill_chunk(&mut self, block: Self::UserBlock, filter: FillFilter<Self::UserBlock>) -> Result<(), FillError> {
+        fn fill_chunk(&mut self, block: Self::UserBlock, filter: FillFilter<Self::UserBlock>) -> Result<&mut Self, FillError> {
             let pos = self.pos();
             for y_level in self.bounds.x..self.bounds.y {
                 let subchunk = self.get_subchunk_mut(y_level)
@@ -335,7 +335,8 @@ pub mod default_impl {
                                 .ok_or(FillError::BlockIndexDidntReturn(x, y, z))?;
                             if match &filter {
                                 FillFilter::Blanket => true,
-                                FillFilter::Replace(mask) => mask == blk,
+                                FillFilter::Replace(mask) =>
+                                    mask == blk,
                                 FillFilter::Avoid(mask) => mask != blk,
                                 FillFilter::Precedence(func) => {
                                     func(blk, (x, y, z).into(), pos, subchunk.get_y())
@@ -347,7 +348,7 @@ pub mod default_impl {
                     }
                 }
             }
-            Ok(())
+            Ok(self)
         }
     }
 }
