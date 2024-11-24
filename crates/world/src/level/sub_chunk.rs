@@ -82,19 +82,45 @@ pub mod default_impl {
     use crate::types::miner::idx_3_to_1;
     use anyhow::anyhow;
     use byteorder::LittleEndian;
+    use nbtx::NbtError;
     use std::io::Cursor;
     use std::marker::PhantomData;
     use std::mem::MaybeUninit;
+    use thiserror::Error;
 
     pub struct SubChunkDecoderImpl<UserBlockType: WorldBlockTrait, UserState> {
         _block_marker: PhantomData<UserBlockType>,
         _state_marker: PhantomData<UserState>,
     }
 
+    #[derive(Debug, Error)]
+    pub enum SubChunkDecoderError {
+        #[error("Missing Subchunk Version")]
+        SubChunkVersion,
+        #[error("Unknown Subchunk Version: {0}")]
+        UnknownVersion(u8),
+        #[error("Failed To Read Layer Count")]
+        LayerError,
+        #[error("Failed To Read Y Index")]
+        IndexError,
+        #[error("Failed To Read Palette Type")]
+        PaletteError,
+        #[error("Failed To Read Index Word")]
+        WordError,
+        #[error("Failed To Read Palette Count")]
+        PaletteCountError,
+        #[error("Failed To Slice NBT")]
+        SliceError,
+        #[error("Binary Interface Error: {0}")]
+        BinaryError(#[from] BinaryInterfaceError),
+        #[error("NBT Error: {0}")]
+        NBTError(#[from] NbtError),
+    }
+
     impl<UserBlockType: WorldBlockTrait<UserState = UserState>, UserState> SubChunkDecoder
         for SubChunkDecoderImpl<UserBlockType, UserState>
     {
-        type Err = anyhow::Error;
+        type Err = SubChunkDecoderError;
         type BlockType = UserBlockType;
         type UserState = UserState;
 
@@ -105,17 +131,17 @@ pub mod default_impl {
         ) -> Result<SubchunkTransitionalData<Self::BlockType>, Self::Err> {
             let version = bytes
                 .read::<LittleEndian, u8>()
-                .ok_or(anyhow!("Failed To Read Subchunk Version"))?;
+                .ok_or(SubChunkDecoderError::SubChunkVersion)?;
             if version != 8 && version != 9 {
-                return Err(anyhow!("Unknown Subchunk Version"));
+                return Err(SubChunkDecoderError::UnknownVersion(version));
             }
 
             let storage_layer_count = bytes
                 .read::<LittleEndian, u8>()
-                .ok_or(anyhow!("Failed To Read Layer Count"))?;
+                .ok_or(SubChunkDecoderError::LayerError)?;
             let y_index = bytes
                 .read::<LittleEndian, i8>()
-                .ok_or(anyhow!("Failed To Read Y Index"))?;
+                .ok_or(SubChunkDecoderError::IndexError)?;
 
             let mut transitiondata =
                 SubchunkTransitionalData::new(y_index, storage_layer_count as usize);
@@ -123,10 +149,10 @@ pub mod default_impl {
             for _ in 0..storage_layer_count {
                 let palette_type = bytes
                     .read::<LittleEndian, u8>()
-                    .ok_or(anyhow!("Failed To Read Palette Type"))?;
+                    .ok_or(SubChunkDecoderError::PaletteError)?;
                 if palette_type & 0x1 == 1 {
                     // TODO: Network Support
-                    panic!("Network Not Supported!");
+                    unimplemented!("Network Not Supported!");
                 }
                 let bits_per_block = palette_type >> 1;
                 let blocks_per_word = 32 / bits_per_block;
@@ -138,7 +164,7 @@ pub mod default_impl {
                 for _ in 0..word_count {
                     let mut word = bytes
                         .read::<LittleEndian, u32>()
-                        .ok_or(anyhow!("Failed To Read Word"))?;
+                        .ok_or(SubChunkDecoderError::WordError)?;
                     for _ in 0..blocks_per_word {
                         let index: u16 = (word & mask) as u16;
                         if pos == 4096 {
@@ -153,11 +179,14 @@ pub mod default_impl {
                 // TODO: Handle Network endian.
                 let palette_count = bytes
                     .read::<LittleEndian, u32>()
-                    .ok_or(anyhow!("Failed To Read Palette Count"))?;
+                    .ok_or(SubChunkDecoderError::PaletteCountError)?;
                 let mut blocks = Vec::with_capacity(palette_count as usize);
                 for _ in 0_usize..palette_count as usize {
-                    let cursor =
-                        &mut Cursor::new(bytes.poll_buffer().ok_or(anyhow!("Failed To Slice"))?);
+                    let cursor = &mut Cursor::new(
+                        bytes
+                            .poll_buffer()
+                            .ok_or(SubChunkDecoderError::SliceError)?,
+                    );
 
                     blocks.push(Self::BlockType::from_transition(
                         nbtx::from_bytes::<nbtx::LittleEndian, BlockTransitionalState>(cursor)?,
@@ -178,7 +207,7 @@ pub mod default_impl {
             state: &mut Self::UserState,
         ) -> Result<Vec<u8>, Self::Err> {
             if network {
-                panic!("Network handling isn't implemented yet");
+                unimplemented!("Network handling isn't implemented yet");
             }
             let mut buffer = BinaryBuffer::new();
             buffer
@@ -243,11 +272,16 @@ pub mod default_impl {
             self.is_empty = other.is_empty;
         }
     }
+    #[derive(Debug, Error)]
+    pub enum SubChunkError {
+        #[error("Failed To Get Layer: {0}")]
+        LayerError(u8),
+    }
 
     impl<UserBlockType: WorldBlockTrait<UserState = UserState>, UserState> SubChunkTrait
         for SubChunk<UserBlockType, UserState>
     {
-        type Err = anyhow::Error;
+        type Err = SubChunkError;
         type BlockType = UserBlockType;
         type UserState = UserState;
 
@@ -272,7 +306,7 @@ pub mod default_impl {
             state: &mut Self::UserState,
         ) -> Result<Self, Self::Err> {
             let mut layers: Vec<Box<[MaybeUninit<UserBlockType>; 4096]>> = (0..data.layers.len())
-                .map(|_| unsafe { MaybeUninit::uninit() })
+                .map(|_| unsafe { Box::new([const { MaybeUninit::uninit() }; 4096]) })
                 .collect();
             for (layer_index, (indices, blocks)) in data.layers.into_iter().enumerate() {
                 let layer: &mut Box<[MaybeUninit<UserBlockType>; 4096]> = &mut layers[layer_index];
@@ -323,7 +357,7 @@ pub mod default_impl {
             let layer: &mut [Self::BlockType; 4096] = self
                 .blocks
                 .get_mut(self.active_layer as usize)
-                .ok_or(anyhow!("Failed to get layer"))?;
+                .ok_or(SubChunkError::LayerError(self.active_layer))?;
             layer[idx_3_to_1::<u8>(xyz, 16u8, 16u8)] = block;
             self.is_empty = false;
             Ok(())

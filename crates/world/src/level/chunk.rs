@@ -107,9 +107,11 @@ where
 #[cfg(feature = "default-impl")]
 pub mod default_impl {
     use super::*;
+    use crate::level::file_interface::RawWorldTrait;
     use crate::level::level::LevelError;
-    use crate::level::sub_chunk::SubChunkTrait;
+    use crate::level::sub_chunk::{SubChunkDecoder, SubChunkTrait};
     use crate::level::world_block::WorldBlockTrait;
+    use serde::de::Error;
     use std::marker::PhantomData;
     use std::mem::MaybeUninit;
     use std::ops::{Deref, DerefMut};
@@ -214,14 +216,27 @@ pub mod default_impl {
                 UserSubChunkType = UserSubChunkType,
                 UserBlockType = UserBlockType,
                 UserState = UserState,
+                Error = LevelError<<<UserLevelInterface as LevelModificationProvider>::UserWorldInterface as RawWorldTrait>::Err,
+                    <UserSubChunkType as SubChunkTrait>::Err,
+                    <<UserLevelInterface as LevelModificationProvider>::UserSubChunkDecoder as SubChunkDecoder>::Err>
             >,
         > LevelChunkTrait<UserLevelInterface> for LevelChunk<UserState, UserSubChunkType>
+    where
+        <UserLevelInterface as LevelModificationProvider>::UserWorldInterface: RawWorldTrait,
+        <UserLevelInterface as LevelModificationProvider>::UserSubChunkDecoder: SubChunkDecoder,
+        <UserSubChunkType as SubChunkTrait>::Err: Debug,
+        <<UserLevelInterface as LevelModificationProvider>::UserWorldInterface as RawWorldTrait>::Err: Debug,
+        <<UserLevelInterface as LevelModificationProvider>::UserSubChunkDecoder as SubChunkDecoder>::Err: Debug,
     {
         type UserLevel = UserLevelInterface;
         type UserBlock = UserLevelInterface::UserBlockType;
         type UserSubchunk = UserLevelInterface::UserSubChunkType;
         type UserState = UserLevelInterface::UserState;
-        type Err = LevelError;
+        type Err = LevelError<
+            <UserLevelInterface::UserWorldInterface as RawWorldTrait>::Err,
+            <UserLevelInterface::UserSubChunkType as SubChunkTrait>::Err,
+            <UserLevelInterface::UserSubChunkDecoder as SubChunkDecoder>::Err,
+        >;
 
         #[optick_attr::profile]
         fn load_from_world(

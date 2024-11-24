@@ -5,6 +5,7 @@ use crate::level::file_interface::DatabaseBatchHolder;
 use crate::level::file_interface::RawWorldTrait;
 use crate::level::sub_chunk::{SubChunkDecoder, SubChunkTrait};
 use crate::level::world_block::WorldBlockTrait;
+use crate::level_try;
 use crate::types::binary::BinaryBuffer;
 use crate::types::clear_cache::ClearCacheContainer;
 use bedrockrs_core::Vec2;
@@ -12,17 +13,27 @@ use bedrockrs_shared::world::dimension::Dimension;
 use mojang_leveldb::error::DBError;
 use std::collections::hash_set::Iter;
 use std::collections::HashSet;
+use std::error::Error;
 use std::fmt::Debug;
 use std::marker::PhantomData;
 use thiserror::Error;
+// #[derive(Error, Debug)]
+// pub enum LevelError {
+//     #[error("DB Error: {0}")]
+//     Database(#[from] DBError),
+//
+//     #[error("Unknown: {0}")]
+//     Unknown(#[from] anyhow::Error),
+// }
 
 #[derive(Error, Debug)]
-pub enum LevelError {
-    #[error("DB Error: {0}")]
-    Database(#[from] DBError),
-
-    #[error("Unknown: {0}")]
-    Unknown(#[from] anyhow::Error),
+pub enum LevelError<DataBaseError: Debug, SubChunkDecodeError: Debug, SubChunkError: Debug> {
+    #[error(transparent)]
+    DatabaseError(DataBaseError),
+    #[error(transparent)]
+    SubChunkDecodeError(SubChunkDecodeError),
+    #[error(transparent)]
+    SubChunkError(SubChunkError),
 }
 
 #[allow(dead_code)]
@@ -33,13 +44,9 @@ pub struct Level<
     UserSubChunkType: SubChunkTrait<UserState = UserState, BlockType = UserBlockType>,
     UserSubChunkDecoder: SubChunkDecoder<UserState = UserState, BlockType = UserBlockType>,
 > where
-    LevelError: From<<UserSubChunkDecoder as SubChunkDecoder>::Err>,
-    LevelError: From<<UserSubChunkType as SubChunkTrait>::Err>,
-    LevelError: From<<UserWorldInterface as RawWorldTrait>::Err>,
     <UserSubChunkType as SubChunkTrait>::Err: Debug,
     <UserSubChunkDecoder as SubChunkDecoder>::Err: Debug,
     <UserWorldInterface as RawWorldTrait>::Err: Debug,
-    DBError: From<<UserWorldInterface as RawWorldTrait>::Err>,
 {
     db: UserWorldInterface,
     state: UserState,
@@ -58,21 +65,26 @@ impl<
         UserSubChunkDecoder: SubChunkDecoder<UserState = UserState, BlockType = UserBlockType>,
     > Level<UserState, UserWorldInterface, UserBlockType, UserSubChunkType, UserSubChunkDecoder>
 where
-    LevelError: From<<UserSubChunkDecoder as SubChunkDecoder>::Err>,
-    LevelError: From<<UserSubChunkType as SubChunkTrait>::Err>,
-    LevelError: From<<UserWorldInterface as RawWorldTrait>::Err>,
     <UserSubChunkType as SubChunkTrait>::Err: Debug,
     <UserSubChunkDecoder as SubChunkDecoder>::Err: Debug,
     <UserWorldInterface as RawWorldTrait>::Err: Debug,
-    DBError: From<<UserWorldInterface as RawWorldTrait>::Err>,
 {
+    //type RealError =
+    //    LevelError<UserWorldInterface::Err, UserSubChunkDecoder::Err, UserSubChunkType::Err>;
+
     pub fn open(
         path: &str,
         create_db_if_missing: bool,
         rw_cache: bool,
         mut state: UserState,
-    ) -> Result<Self, DBError> {
-        let db = UserWorldInterface::new(path, create_db_if_missing, &mut state)?;
+    ) -> Result<
+        Self,
+        LevelError<UserWorldInterface::Err, UserSubChunkDecoder::Err, UserSubChunkType::Err>,
+    > {
+        let db = level_try!(
+            DatabaseError,
+            UserWorldInterface::new(path, create_db_if_missing, &mut state)
+        );
         let mut this = Self {
             db,
             state,
@@ -82,8 +94,7 @@ where
             _block_type_marker: PhantomData,
             _decoder_marker: PhantomData,
         };
-        this.chunk_existence = this.db.generated_chunks(&mut this.state)?;
-
+        this.chunk_existence = level_try!(DatabaseError, this.db.generated_chunks(&mut this.state));
         Ok(this)
     }
 
@@ -147,7 +158,10 @@ where
         xz: Vec2<i32>,
         y: i8,
         dim: Dimension,
-    ) -> Result<UserSubChunkType, LevelError> {
+    ) -> Result<
+        UserSubChunkType,
+        LevelError<UserWorldInterface::Err, UserSubChunkDecoder::Err, UserSubChunkType::Err>,
+    > {
         if self.rw_cache {
             if let Some(chunk) = self
                 .cached_sub_chunks
@@ -156,17 +170,32 @@ where
                 return Ok(chunk.state_clone(&mut self.state));
             }
         }
-        let raw_bytes = self
-            .db
-            .get_subchunk_raw(ChunkKey::new_subchunk(xz, dim, y), &mut self.state)?;
+        let raw_bytes = level_try!(
+            DatabaseError,
+            self.db
+                .get_subchunk_raw(ChunkKey::new_subchunk(xz, dim, y), &mut self.state)
+        );
         let out = match raw_bytes {
-            None => Ok::<(i8, Option<UserSubChunkType>), LevelError>((y, None)),
+            None => Ok::<
+                (i8, Option<UserSubChunkType>),
+                LevelError<
+                    UserWorldInterface::Err,
+                    UserSubChunkDecoder::Err,
+                    UserSubChunkType::Err,
+                >,
+            >((y, None)),
             Some(bytes) => {
                 let mut bytes: BinaryBuffer = bytes.into();
-                let data = UserSubChunkDecoder::decode_bytes_as_chunk(&mut bytes, &mut self.state)?;
+                let data = level_try!(
+                    SubChunkDecodeError,
+                    UserSubChunkDecoder::decode_bytes_as_chunk(&mut bytes, &mut self.state)
+                );
                 Ok((
                     y,
-                    Some(UserSubChunkType::decode_from_raw(data, &mut self.state)?),
+                    Some(level_try!(
+                        SubChunkError,
+                        UserSubChunkType::decode_from_raw(data, &mut self.state)
+                    )),
                 ))
             }
         }?;
@@ -190,19 +219,28 @@ where
         xz: Vec2<i32>,
         y: i8,
         dim: Dimension,
-    ) -> Result<(), LevelError> {
+    ) -> Result<
+        (),
+        LevelError<UserWorldInterface::Err, UserSubChunkDecoder::Err, UserSubChunkType::Err>,
+    > {
         if self.rw_cache {
             self.cached_sub_chunks
                 .insert(SubchunkCacheKey::new(xz, y, dim), data);
             self.perform_flush();
         } else {
-            let raw = UserSubChunkDecoder::write_as_bytes(
-                data.to_raw(y, &mut self.state)?,
-                false,
-                &mut self.state,
-            )?;
+            let raw = level_try!(
+                SubChunkDecodeError,
+                UserSubChunkDecoder::write_as_bytes(
+                    level_try!(SubChunkError, data.to_raw(y, &mut self.state)),
+                    false,
+                    &mut self.state,
+                )
+            );
             let key = ChunkKey::new_subchunk(xz, dim, y);
-            self.db.set_subchunk_raw(key, &raw, &mut self.state)?;
+            level_try!(
+                DatabaseError,
+                self.db.set_subchunk_raw(key, &raw, &mut self.state)
+            );
             self.handle_exist(xz, dim);
         }
         Ok(())
@@ -240,12 +278,11 @@ where
         let mut exist_info: Vec<ChunkKey> = Vec::new();
         self.cached_sub_chunks.cull(|user_key, data| {
             let raw = UserSubChunkDecoder::write_as_bytes(
-                data.to_raw(user_key.y, &mut self.state)
-                    .expect("Failed to dump to raw"),
+                data.to_raw(user_key.y, &mut self.state).unwrap(),
                 false,
                 &mut self.state,
             )
-            .expect("Failed to translate to bytes");
+            .unwrap();
             let key = ChunkKey::new_subchunk(user_key.xz, user_key.dim, user_key.y);
 
             batch_info.push((key, raw));
@@ -268,12 +305,11 @@ where
         let mut exist_info: Vec<ChunkKey> = Vec::new();
         self.cached_sub_chunks.clear(|user_key, data| {
             let raw = UserSubChunkDecoder::write_as_bytes(
-                data.to_raw(user_key.y, &mut self.state)
-                    .expect("Failed to dump to raw"),
+                data.to_raw(user_key.y, &mut self.state).unwrap(),
                 false,
                 &mut self.state,
             )
-            .expect("Failed to translate to bytes");
+            .unwrap();
             let key = ChunkKey::new_subchunk(user_key.xz, user_key.dim, user_key.y);
 
             batch_info.push((key, raw));
@@ -301,13 +337,9 @@ impl<
     > Drop
     for Level<UserState, UserWorldInterface, UserBlockType, UserSubChunkType, UserSubChunkDecoder>
 where
-    LevelError: From<<UserSubChunkDecoder as SubChunkDecoder>::Err>,
-    LevelError: From<<UserSubChunkType as SubChunkTrait>::Err>,
-    LevelError: From<<UserWorldInterface as RawWorldTrait>::Err>,
     <UserSubChunkType as SubChunkTrait>::Err: Debug,
     <UserSubChunkDecoder as SubChunkDecoder>::Err: Debug,
     <UserWorldInterface as RawWorldTrait>::Err: Debug,
-    DBError: From<<UserWorldInterface as RawWorldTrait>::Err>,
 {
     fn drop(&mut self) {
         self.close_wrap()
@@ -320,20 +352,21 @@ pub trait LevelModificationProvider {
     type UserBlockType;
     type UserSubChunkType;
     type UserSubChunkDecoder;
+    type Error;
 
     fn get_sub_chunk(
         &mut self,
         xz: Vec2<i32>,
         y: i8,
         dim: Dimension,
-    ) -> Result<Self::UserSubChunkType, LevelError>;
+    ) -> Result<Self::UserSubChunkType, Self::Error>;
     fn set_subchunk(
         &mut self,
         xz: Vec2<i32>,
         y: i8,
         dim: Dimension,
         chnk: Self::UserSubChunkType,
-    ) -> Result<(), LevelError>;
+    ) -> Result<(), Self::Error>;
 
     fn state(&mut self) -> &mut Self::UserState;
     fn chunk_exists(&mut self, xz: Vec2<i32>, dimension: Dimension) -> bool;
@@ -348,26 +381,24 @@ impl<
     > LevelModificationProvider
     for Level<UserState, UserWorldInterface, UserBlockType, UserSubChunkType, UserSubChunkDecoder>
 where
-    LevelError: From<<UserSubChunkDecoder as SubChunkDecoder>::Err>,
-    LevelError: From<<UserSubChunkType as SubChunkTrait>::Err>,
-    LevelError: From<<UserWorldInterface as RawWorldTrait>::Err>,
     <UserSubChunkType as SubChunkTrait>::Err: Debug,
     <UserSubChunkDecoder as SubChunkDecoder>::Err: Debug,
     <UserWorldInterface as RawWorldTrait>::Err: Debug,
-    DBError: From<<UserWorldInterface as RawWorldTrait>::Err>,
 {
     type UserState = UserState;
     type UserWorldInterface = UserWorldInterface;
     type UserBlockType = UserBlockType;
     type UserSubChunkType = UserSubChunkType;
     type UserSubChunkDecoder = UserSubChunkDecoder;
+    type Error =
+        LevelError<UserWorldInterface::Err, UserSubChunkDecoder::Err, UserSubChunkType::Err>;
 
     fn get_sub_chunk(
         &mut self,
         xz: Vec2<i32>,
         y: i8,
         dim: Dimension,
-    ) -> Result<Self::UserSubChunkType, LevelError> {
+    ) -> Result<Self::UserSubChunkType, Self::Error> {
         self.get_sub_chunk(xz, y, dim)
     }
 
@@ -377,7 +408,7 @@ where
         y: i8,
         dim: Dimension,
         chnk: Self::UserSubChunkType,
-    ) -> Result<(), LevelError> {
+    ) -> Result<(), Self::Error> {
         self.set_sub_chunk(chnk, xz, y, dim)
     }
 

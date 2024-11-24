@@ -16,8 +16,7 @@ impl From<i32> for Dimension {
             0 => Self::Overworld,
             1 => Self::Nether,
             2 => Self::End,
-            3 => Self::Undefined,
-            _ => {panic!("Invalid Dim")}
+            _ => Self::Undefined,
         }
     }
 }

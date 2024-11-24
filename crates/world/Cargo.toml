@@ -20,6 +20,8 @@ concat-idents = "1.1.5"
 serde = "1.0.214"
 optick = { version = "1.3.4", features = ["enable"] }
 optick-attr = { version = "0.3.0", features = ["enable"] }
+rusty-leveldb = "3.0.2"
+miniz_oxide = "0.8.0"
 
 [profile.release]
 debug = true

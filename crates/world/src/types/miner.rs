@@ -15,3 +15,15 @@ where
 pub fn in_bounds<T: std::cmp::PartialOrd>(min: T, max: T, val: T) -> bool {
     val >= min && val <= max
 }
+
+#[macro_export]
+macro_rules! level_try {
+    ($name:ident, $expr:expr $(,)?) => {
+        match $expr {
+            Ok(val) => val,
+            Err(err) => {
+                return Err($crate::level::level::LevelError::$name(err));
+            }
+        }
+    };
+}
