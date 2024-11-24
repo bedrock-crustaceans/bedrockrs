@@ -10,12 +10,10 @@ use crate::types::clear_cache::ClearCacheContainer;
 use bedrockrs_core::Vec2;
 use bedrockrs_shared::world::dimension::Dimension;
 use mojang_leveldb::error::DBError;
-use std::cmp::min;
 use std::collections::hash_set::Iter;
 use std::collections::HashSet;
 use std::fmt::Debug;
 use std::marker::PhantomData;
-use std::vec;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -114,7 +112,10 @@ where
     }
 
     pub fn get_chunk_keys(&mut self, dim: Dimension) -> Vec<Vec2<i32>> {
-        self.chunk_existence.iter().map(|(dim, pos)| *pos).collect()
+        self.chunk_existence
+            .iter()
+            .filter_map(|(chunk_dim, pos)| if chunk_dim == &dim { Some(*pos) } else { None })
+            .collect()
     }
     pub fn get_chunks<T: LevelChunkTrait<Self, UserLevel = Self>>(
         &mut self,
@@ -216,6 +217,7 @@ where
         chnk.write_to_world(self, xz_override, dim_override)
     }
 
+    #[optick_attr::profile]
     pub fn get_chunk<UserChunkType: LevelChunkTrait<Self, UserLevel = Self>>(
         &mut self,
         min_max: Vec2<i8>,

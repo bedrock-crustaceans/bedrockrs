@@ -161,10 +161,17 @@ impl<UserState> RawWorldTrait for LevelDBInterface<UserState> {
         _: &mut Self::UserState,
     ) -> Result<HashSet<(Dimension, Vec2<i32>)>, Self::Err> {
         let mut out_set = HashSet::new();
+        let mut count = 0;
+        let mut nine_len_keys = 0;
+
         for (key, _) in self.db.iter(read_options()) {
-            if key.len() != 9 && key.len() != 13 {
+            count += 1;
+            if key.len() != 9
+            /*&& key.len() != 13*/
+            {
                 continue;
             }
+            nine_len_keys += 1;
             if KeyTypeTag::from_byte(*key.get().get(8).unwrap_or(&255)) == Some(KeyTypeTag::Version)
             {
                 let mut buff = BetterCursor::new(key.get());
@@ -175,23 +182,25 @@ impl<UserState> RawWorldTrait for LevelDBInterface<UserState> {
                     .read::<i32>()
                     .ok_or(DBError::Unknown("Failed To Read Y From Key".into()))?;
                 out_set.insert((Dimension::Overworld, (x, y).into()));
-            } else if KeyTypeTag::from_byte(*key.get().get(12).unwrap_or(&255))
-                == Some(KeyTypeTag::Version)
-            {
-                let mut buff = BetterCursor::new(key.get());
-                let x = buff
-                    .read::<i32>()
-                    .ok_or(DBError::Unknown("Failed To Read X From Key".into()))?;
-                let y = buff
-                    .read::<i32>()
-                    .ok_or(DBError::Unknown("Failed To Read Y From Key".into()))?;
-                out_set.insert((
-                    // This is actually a safe unwrap since we read from index 12 above we know all indexes before 12 must also exist
-                    Dimension::from(buff.read::<i32>().unwrap()),
-                    (x, y).into(),
-                ));
             }
+            //else if KeyTypeTag::from_byte(*key.get().get(12).unwrap_or(&255))
+            //     == Some(KeyTypeTag::Version)
+            // {
+            //     let mut buff = BetterCursor::new(key.get());
+            //     let x = buff
+            //         .read::<i32>()
+            //         .ok_or(DBError::Unknown("Failed To Read X From Key".into()))?;
+            //     let y = buff
+            //         .read::<i32>()
+            //         .ok_or(DBError::Unknown("Failed To Read Y From Key".into()))?;
+            //     out_set.insert((
+            //         // This is actually a safe unwrap since we read from index 12 above we know all indexes before 12 must also exist
+            //         Dimension::from(buff.read::<i32>().unwrap()),
+            //         (x, y).into(),
+            //     ));
+            // }
         }
+        println!("{count}, {}, {nine_len_keys}", out_set.len());
         Ok(out_set)
     }
 }

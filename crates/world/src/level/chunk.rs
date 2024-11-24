@@ -1,12 +1,33 @@
 use crate::level::level::LevelModificationProvider;
 use crate::level::sub_chunk::SubChunkTrait;
-use bedrockrs_core::Vec2;
+use crate::level::world_block::WorldBlockTrait;
+use bedrockrs_core::{Vec2, Vec3};
 use bedrockrs_shared::world::dimension::Dimension;
+use std::fmt::Debug;
+use thiserror::Error;
+
+pub enum FillFilter<UserBlockType: WorldBlockTrait> {
+    Blanket,
+    Replace(UserBlockType),
+    Avoid(UserBlockType),
+    Precedence(Box<dyn Fn(&UserBlockType, Vec3<u8>, Vec2<i32>, i8) -> bool>),
+}
+
+#[derive(Error, Debug)]
+pub enum FillError {
+    #[error("Attempted to fill Subchunk {0} and got none back")]
+    MissingSubchunk(i8),
+    #[error("Attempted to read block at x: {0}, y {1}, z: {2} and got None")]
+    BlockIndexDidntReturn(u8, u8, u8),
+}
 
 pub trait LevelChunkTrait<UserLevel: LevelModificationProvider>: Sized
 where
     <Self as LevelChunkTrait<UserLevel>>::UserSubchunk: SubChunkTrait,
+    <Self as LevelChunkTrait<UserLevel>>::UserBlock: WorldBlockTrait,
     <UserLevel as LevelModificationProvider>::UserSubChunkType: SubChunkTrait,
+    <<Self as LevelChunkTrait<UserLevel>>::UserSubchunk as SubChunkTrait>::BlockType:
+        WorldBlockTrait,
 {
     type UserLevel; // = UserLevel;
     type UserBlock; // = UserLevel::UserBlockType;
@@ -39,6 +60,48 @@ where
 
     /// This should return the min and max subchunk index
     fn min_max(&self) -> Vec2<i8>;
+    fn get_subchunk(&self, y: i8) -> Option<&Self::UserSubchunk>;
+    fn get_subchunk_mut(&mut self, y: i8) -> Option<&mut Self::UserSubchunk>;
+    fn pos(&self) -> Vec2<i32>;
+
+    fn fill(
+        &mut self,
+        block: &<<Self as LevelChunkTrait<UserLevel>>::UserSubchunk as SubChunkTrait>::BlockType,
+        filter: FillFilter<
+            <<Self as LevelChunkTrait<UserLevel>>::UserSubchunk as SubChunkTrait>::BlockType,
+        >,
+    ) -> Result<(), FillError>
+    where
+        <<Self as LevelChunkTrait<UserLevel>>::UserSubchunk as SubChunkTrait>::Err: Debug,
+    {
+        let pos = self.pos();
+        for y in self.min_max().x..self.min_max().y {
+            let subchunk = self
+                .get_subchunk_mut(y)
+                .ok_or(FillError::MissingSubchunk(y))?;
+            for z in 0..16u8 {
+                for y in 0..16u8 {
+                    for x in 0..16u8 {
+                        let blk = subchunk
+                            .get_block((x, y, z).into())
+                            .ok_or(FillError::BlockIndexDidntReturn(x, y, z))?;
+                        if match &filter {
+                            FillFilter::Blanket => true,
+                            FillFilter::Replace(mask) => mask == blk,
+                            FillFilter::Avoid(mask) => mask != blk,
+                            FillFilter::Precedence(func) => {
+                                func(blk, (x, y, z).into(), pos, subchunk.get_y())
+                            }
+                        } {
+                            subchunk.set_block((x, y, z).into(), block.clone()).unwrap()
+                        }
+                    }
+                }
+            }
+        }
+
+        Ok(())
+    }
 }
 
 #[cfg(feature = "default-impl")]
@@ -48,6 +111,7 @@ pub mod default_impl {
     use crate::level::sub_chunk::SubChunkTrait;
     use crate::level::world_block::WorldBlockTrait;
     use std::marker::PhantomData;
+    use std::mem::MaybeUninit;
     use std::ops::{Deref, DerefMut};
     use std::slice::{Iter, IterMut};
     use std::vec::Vec;
@@ -159,27 +223,42 @@ pub mod default_impl {
         type UserState = UserLevelInterface::UserState;
         type Err = LevelError;
 
+        #[optick_attr::profile]
         fn load_from_world(
             min_max: Vec2<i8>,
             xz: Vec2<i32>,
             dim: Dimension,
             level: &mut Self::UserLevel,
         ) -> Result<Self, Self::Err> {
-            let total_count = min_max.y - min_max.x;
-            let mut subchunk_list: Vec<_> = (min_max.x..min_max.y)
-                .map(|y| Self::UserSubchunk::empty(y, level.state()))
+            /// Safety: `MaybeUninit::uninit()` being called here is safe since below we are sure to init all the memory
+            let mut subchunk_list: Vec<MaybeUninit<UserSubChunkType>> = (min_max.x..min_max.y)
+                .map(|_| unsafe { MaybeUninit::uninit() })
                 .collect();
-
             for y in min_max.x..min_max.y {
-                let subchunk = level.get_sub_chunk(xz, y, dim)?;
-                let idx = Self::true_index(min_max, y) as usize;
-                subchunk_list[idx] = subchunk;
+                let subchunk = level.get_sub_chunk(xz, y, dim);
+                match subchunk {
+                    Ok(subchunk) => {
+                        let idx = Self::true_index(min_max, y) as usize;
+                        subchunk_list[idx].write(subchunk);
+                    }
+                    Err(err) => {
+                        for r in min_max.x..y {
+                            /// Safety: We are only dropping subchunks which came before this one meaning they have to be init
+                            unsafe {
+                                subchunk_list[Self::true_index(min_max, r) as usize]
+                                    .assume_init_drop();
+                            }
+                        }
+                        return Err(err);
+                    }
+                }
             }
+            /// Safety: Since `MaybeUninit` is a ZST the ABI of the two types is the same
             Ok(Self {
                 bounds: min_max,
                 xz,
                 dim,
-                sections: subchunk_list,
+                sections: unsafe { std::mem::transmute(subchunk_list) },
                 phantom_data: PhantomData,
             })
         }
@@ -230,6 +309,19 @@ pub mod default_impl {
 
         fn min_max(&self) -> Vec2<i8> {
             self.bounds
+        }
+
+        fn get_subchunk(&self, y: i8) -> Option<&Self::UserSubchunk> {
+            self.sections.get(Self::true_index(self.bounds, y) as usize)
+        }
+
+        fn get_subchunk_mut(&mut self, y: i8) -> Option<&mut Self::UserSubchunk> {
+            self.sections
+                .get_mut(Self::true_index(self.bounds, y) as usize)
+        }
+
+        fn pos(&self) -> Vec2<i32> {
+            self.xz
         }
     }
 }

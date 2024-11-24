@@ -84,6 +84,7 @@ pub mod default_impl {
     use byteorder::LittleEndian;
     use std::io::Cursor;
     use std::marker::PhantomData;
+    use std::mem::MaybeUninit;
 
     pub struct SubChunkDecoderImpl<UserBlockType: WorldBlockTrait, UserState> {
         _block_marker: PhantomData<UserBlockType>,
@@ -97,6 +98,7 @@ pub mod default_impl {
         type BlockType = UserBlockType;
         type UserState = UserState;
 
+        #[optick_attr::profile]
         fn decode_bytes_as_chunk(
             bytes: &mut BinaryBuffer,
             state: &mut Self::UserState,
@@ -222,6 +224,7 @@ pub mod default_impl {
         is_empty: bool,
         _state_tag: PhantomData<UserState>,
     }
+
     impl<UserBlockType: WorldBlockTrait<UserState = UserState>, UserState>
         SubChunk<UserBlockType, UserState>
     {
@@ -248,6 +251,7 @@ pub mod default_impl {
         type BlockType = UserBlockType;
         type UserState = UserState;
 
+        #[optick_attr::profile]
         fn empty(y_index: i8, state: &mut Self::UserState) -> Self {
             let mut val = Self {
                 blocks: Vec::with_capacity(1),
@@ -262,33 +266,29 @@ pub mod default_impl {
             val
         }
 
+        #[optick_attr::profile]
         fn decode_from_raw(
             data: SubchunkTransitionalData<Self::BlockType>,
             state: &mut Self::UserState,
         ) -> Result<Self, Self::Err> {
-            let mut building = Self::empty(data.y_level, state);
-            building.is_empty = false;
-            for _ in 1..data.layers.len() {
-                building.add_sub_layer(state);
-            }
+            let mut layers: Vec<Box<[MaybeUninit<UserBlockType>; 4096]>> = (0..data.layers.len())
+                .map(|_| unsafe { MaybeUninit::uninit() })
+                .collect();
             for (layer_index, (indices, blocks)) in data.layers.into_iter().enumerate() {
-                building.set_active_layer(layer_index as u8);
-
-                for z in 0u8..16u8 {
-                    for y in 0u8..16u8 {
-                        for x in 0u8..16u8 {
-                            building.set_block(
-                                (x, y, z).into(),
-                                Self::BlockType::from_other(
-                                    &blocks[indices[idx_3_to_1::<u8>((x, y, z).into(), 16, 16)]
-                                        as usize],
-                                ),
-                            )?;
-                        }
-                    }
+                let layer: &mut Box<[MaybeUninit<UserBlockType>; 4096]> = &mut layers[layer_index];
+                for whole_index in 0..4096usize {
+                    layer[whole_index].write(Self::BlockType::from_other(
+                        &blocks[indices[whole_index] as usize],
+                    ));
                 }
             }
-            Ok(building)
+            Ok(Self {
+                blocks: unsafe { std::mem::transmute(layers) },
+                y_index: data.y_level,
+                active_layer: 0,
+                is_empty: false,
+                _state_tag: PhantomData,
+            })
         }
 
         fn to_raw(

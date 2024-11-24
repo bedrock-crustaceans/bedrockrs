@@ -18,7 +18,8 @@ len-trait = "0.6.1"
 anyhow = "1.0.93"
 concat-idents = "1.1.5"
 serde = "1.0.214"
-
+optick = { version = "1.3.4", features = ["enable"] }
+optick-attr = { version = "0.3.0", features = ["enable"] }
 
 [profile.release]
 debug = true
