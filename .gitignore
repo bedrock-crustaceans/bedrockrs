@@ -19,3 +19,4 @@ Cargo.lock
 *.pdb
 
 world_path.txt
+*.bin
