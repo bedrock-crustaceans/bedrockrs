@@ -1,7 +1,10 @@
-pub mod persona {
+pub mod Persona {
     use bedrockrs_macros::ProtoCodec;
     
     #[derive(ProtoCodec)]
+    #[enum_repr(u32)]
+    #[enum_endianness(le)]
+    #[repr(u32)]
     pub enum AnimatedTextureType {
         None = 0,
         Face = 1,
@@ -10,6 +13,9 @@ pub mod persona {
     }
     
     #[derive(ProtoCodec)]
+    #[enum_repr(u32)]
+    #[enum_endianness(le)]
+    #[repr(u32)]
     pub enum AnimationExpression {
         Linear = 0,
         Blinking = 1,
