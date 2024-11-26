@@ -1,6 +1,5 @@
-use bedrockrs_core::Vec3;
 use bedrockrs_macros::ProtoCodec;
-use crate::version::v662::types::{BlockPos, CompoundTag};
+use crate::version::v662::types::{BlockPos, CompoundTag, Vec3};
 
 #[derive(ProtoCodec)]
 #[enum_repr(i8)]
@@ -18,5 +17,5 @@ pub enum DataItemType {
     Pos(BlockPos) = 6,
     #[endianness(var)]
     Int64(i64) = 7,
-    Vec3(Vec3<f32>) = 8,
+    Vec3(Vec3) = 8,
 }
