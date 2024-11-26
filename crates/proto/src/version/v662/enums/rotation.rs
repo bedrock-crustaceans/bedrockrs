@@ -1,6 +1,8 @@
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]
+#[enum_repr(i8)]
+#[repr(i8)]
 pub enum Rotation {
     None = 0,
     Rotate90 = 1,
