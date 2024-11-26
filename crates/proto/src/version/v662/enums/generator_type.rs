@@ -1,6 +1,8 @@
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]
+#[enum_repr(i32)]
+#[enum_endianness(var)]
 pub enum GeneratorType {
     Legacy = 0,
     Overworld = 1,
