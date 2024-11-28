@@ -5,3 +5,4 @@ pub mod helper;
 pub mod packets;
 pub mod types;
 pub mod info;
+pub mod enums;

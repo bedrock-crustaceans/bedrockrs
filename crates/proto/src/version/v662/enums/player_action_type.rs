@@ -1,11 +1,27 @@
 use bedrockrs_macros::ProtoCodec;
+use crate::version::v662::types::BlockPos;
 
 #[derive(ProtoCodec)]
+#[enum_repr(i32)]
+#[enum_endianness(var)]
+#[repr(i32)]
 pub enum PlayerActionType {
     Unknown = -1,
-    StartDestroyBlock = 0,
-    AbortDestroyBlock = 1,
-    StopDestroyBlock = 2,
+    StartDestroyBlock {
+        position: BlockPos,
+        #[endianness(var)]
+        facing: i32,
+    } = 0,
+    AbortDestroyBlock {
+        position: BlockPos,
+        #[endianness(var)]
+        facing: i32,
+    } = 1,
+    StopDestroyBlock {
+        position: BlockPos,
+        #[endianness(var)]
+        facing: i32,
+    } = 2,
     GetUpdatedBlock = 3,
     DropItem = 4,
     StartSleeping = 5,
@@ -21,7 +37,11 @@ pub enum PlayerActionType {
     StartGliding = 15,
     StopGliding = 16,
     DenyDestroyBlock = 17,
-    CrackBlock = 18,
+    CrackBlock {
+        position: BlockPos,
+        #[endianness(var)]
+        facing: i32,
+    } = 18,
     ChangeSkin = 19,
     DeprecatedUpdatedEnchantingSeed = 20,
     StartSwimming = 21,
@@ -29,8 +49,16 @@ pub enum PlayerActionType {
     StartSpinAttack = 23,
     StopSpinAttack = 24,
     InteractWithBlock = 25,
-    PredictDestroyBlock = 26,
-    ContinueDestroyBlock = 27,
+    PredictDestroyBlock {
+        position: BlockPos,
+        #[endianness(var)]
+        facing: i32,
+    } = 26,
+    ContinueDestroyBlock {
+        position: BlockPos,
+        #[endianness(var)]
+        facing: i32,
+    } = 27,
     StartItemUseOn = 28,
     StopItemUseOn = 29,
     HandledTeleport = 30,
