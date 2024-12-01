@@ -1,6 +1,9 @@
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]
+#[enum_repr(i32)]
+#[enum_endianness(var)]
+#[repr(i32)]
 pub enum LevelEvent {
     _9800 = 3617,
     Undefined = 0,

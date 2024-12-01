@@ -52,6 +52,9 @@ pub mod MinecraftEventing {
     }
     
     #[derive(ProtoCodec)]
+    #[enum_repr(i32)]
+    #[enum_endianness(le)]
+    #[repr(i32)]
     pub enum TeleportationCause {
         Unknown = 0,
         Projectile = 1,
