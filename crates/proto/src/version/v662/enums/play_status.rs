@@ -1,6 +1,9 @@
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]
+#[enum_repr(i32)]
+#[enum_endianness(be)]
+#[repr(i32)]
 pub enum PlayStatus {
     LoginSuccess = 0,
     LoginFailedClientOld = 1,
