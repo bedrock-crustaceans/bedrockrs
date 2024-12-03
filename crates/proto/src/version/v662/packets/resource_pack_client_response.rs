@@ -1,19 +1,11 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
+use crate::version::v662::enums::ResourcePackResponse;
 
 #[gamepacket(id = 8)]
-#[derive(ProtoCodec, Debug, Clone)]
+#[derive(ProtoCodec)]
 pub struct ResourcePackClientResponsePacket {
     pub response: ResourcePackResponse,
     #[vec_repr(u16)]
     #[vec_endianness(le)]
-    pub downloading_packs: Vec<String>
-}
-
-#[derive(ProtoCodec, Debug, Clone)]
-#[enum_repr(i8)]
-pub enum ResourcePackResponse {
-    Cancel = 1,
-    Downloading = 2,
-    DownloadingFinished = 3,
-    ResourcePackStackFinished = 4,
+    pub downloading_packs: Vec<String>,
 }

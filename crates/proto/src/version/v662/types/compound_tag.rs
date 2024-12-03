@@ -35,3 +35,5 @@ pub struct CompoundTag {
     pub tag_type: Type,
     pub tag_name: String,
 }
+
+// TODO: custom proto impl, because of enum variant serialization order.

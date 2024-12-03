@@ -2,7 +2,7 @@ use bedrockrs_macros::ProtoCodec;
 use bitflags::bitflags;
 
 bitflags! {
-    struct Flags: isize {
+    struct Flags: i32 {
         const UNDEFINED = 1;
         const TYPE_MASK = 0x000000ff;
         const MOB = 0x00000100;
@@ -157,6 +157,9 @@ bitflags! {
 }
 
 #[derive(ProtoCodec)]
+#[enum_repr(i32)]
+#[enum_endianness(le)]
+#[repr(i32)]
 pub enum ActorType {
     Undefined = Flags::UNDEFINED.bits(),
     TypeMask = Flags::TYPE_MASK.bits(),

@@ -211,5 +211,4 @@ pub enum MinecraftPacketIds {
     PlayerToggleCrafterSlotRequestPacket = 306,
     SetPlayerInventoryOptions = 307,
     SetHudPacket = 308,
-    EndId = 309,
 }

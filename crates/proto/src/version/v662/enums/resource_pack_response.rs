@@ -1,6 +1,8 @@
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]
+#[enum_repr(i8)]
+#[repr(i8)]
 pub enum ResourcePackResponse {
     Cancel = 1,
     Downloading = 2,
