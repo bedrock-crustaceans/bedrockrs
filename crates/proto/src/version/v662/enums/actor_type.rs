@@ -158,7 +158,7 @@ bitflags! {
 
 #[derive(ProtoCodec)]
 #[enum_repr(i32)]
-#[enum_endianness(le)]
+#[enum_endianness(var)]
 #[repr(i32)]
 pub enum ActorType {
     Undefined = Flags::UNDEFINED.bits(),
