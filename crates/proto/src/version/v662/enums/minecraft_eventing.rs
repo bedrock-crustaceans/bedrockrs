@@ -2,6 +2,9 @@ pub mod MinecraftEventing {
     use bedrockrs_macros::ProtoCodec;
     
     #[derive(ProtoCodec)]
+    #[enum_repr(i32)]
+    #[enum_endianness(var)]
+    #[repr(i32)]
     pub enum InteractionType {
         Breeding = 1,
         Taming = 2,
@@ -22,6 +25,9 @@ pub mod MinecraftEventing {
     }
     
     #[derive(ProtoCodec)]
+    #[enum_repr(i32)]
+    #[enum_endianness(var)]
+    #[repr(i32)]
     pub enum POIBlockInteractionType {
         None = 0,
         Extend = 1,
