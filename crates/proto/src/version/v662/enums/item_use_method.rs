@@ -1,6 +1,9 @@
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]
+#[enum_repr(i32)]
+#[enum_endianness(le)]
+#[repr(i32)]
 pub enum ItemUseMethod {
     Unknown = -1,
     EquipArmor = 0,
@@ -19,5 +22,4 @@ pub enum ItemUseMethod {
     Dyed = 13,
     Traded = 14,
     BrushingCompleted = 15,
-    Count = 16,
 }
