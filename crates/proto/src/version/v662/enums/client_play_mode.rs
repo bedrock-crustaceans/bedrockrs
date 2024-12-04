@@ -1,6 +1,9 @@
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]
+#[enum_repr(u32)]
+#[enum_endianness(var)]
+#[repr(u32)]
 pub enum ClientPlayMode {
     Normal = 0,
     Teaser = 1,

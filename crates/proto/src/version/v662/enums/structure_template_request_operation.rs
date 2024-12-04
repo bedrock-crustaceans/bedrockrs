@@ -1,6 +1,8 @@
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]
+#[enum_repr(i8)]
+#[repr(i8)]
 pub enum StructureTemplateRequestOperation {
     None = 0,
     ExportFromSaveMode = 1,

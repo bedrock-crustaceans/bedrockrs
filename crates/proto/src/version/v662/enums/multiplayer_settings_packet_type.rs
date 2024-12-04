@@ -1,8 +1,11 @@
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]
+#[enum_repr(i32)]
+#[enum_endianness(var)]
+#[repr(i32)]
 pub enum MultiplayerSettingsPacketType {
     EnableMultiplayer = 0,
     DisableMultiplayer = 1,
-    RefreshJoincode = 2,
+    RefreshJoinCode = 2,
 }
