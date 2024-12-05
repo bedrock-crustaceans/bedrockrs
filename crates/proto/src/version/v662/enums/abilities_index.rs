@@ -1,6 +1,8 @@
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]
+#[enum_repr(i8)]
+#[repr(i8)]
 pub enum AbilitiesIndex {
     Invalid = -1,
     Build = 0,
