@@ -1,6 +1,8 @@
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]
+#[enum_repr(i32)]
+#[enum_endianness(var)]
 pub enum HudElement {
     PaperDoll = 0,
     Armor = 1,
