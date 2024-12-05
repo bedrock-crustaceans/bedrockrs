@@ -128,3 +128,4 @@ export!(text_packet_type);
 export!(text_processing_event_origin);
 export!(ui_profile);
 export!(persona); // Mod
+export!(prediction_type);
