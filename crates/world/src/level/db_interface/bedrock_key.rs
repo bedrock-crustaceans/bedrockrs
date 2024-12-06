@@ -29,6 +29,15 @@ impl ChunkKey {
             y_index: None,
         }
     }
+
+    pub fn data3d(xz: Vec2<i32>, dim: Dimension) -> Self {
+        Self {
+            xz,
+            dim,
+            key_type: KeyTypeTag::Data3D,
+            y_index: None,
+        }
+    }
 }
 
 impl LevelDBKey for ChunkKey {

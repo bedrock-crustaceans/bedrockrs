@@ -5,7 +5,6 @@ use crate::level::file_interface::RawWorldTrait;
 use crate::types::buffer_slide::{BetterCursor, SlideBuffer};
 use bedrockrs_core::Vec2;
 use bedrockrs_shared::world::dimension::Dimension;
-use len_trait::Len;
 use miniz_oxide::deflate::{compress_to_vec, compress_to_vec_zlib, CompressionLevel};
 use miniz_oxide::inflate::{decompress_to_vec, decompress_to_vec_zlib};
 use rusty_leveldb::compressor::NoneCompressor;
@@ -98,6 +97,10 @@ impl<UserState> RustyDBInterface<UserState> {
         }
         batch
     }
+
+    pub fn get_key(&mut self, chunk_info: ChunkKey) -> Option<Vec<u8>> {
+        self.db.get(&Self::build_key(&chunk_info))
+    }
 }
 
 impl<UserState> RawWorldTrait for RustyDBInterface<UserState> {
@@ -134,9 +137,8 @@ impl<UserState> RawWorldTrait for RustyDBInterface<UserState> {
     fn write_subchunk_batch(
         &mut self,
         subchunk_batch_info: Vec<(ChunkKey, Vec<u8>)>,
-        state: &mut Self::UserState,
+        _: &mut Self::UserState,
     ) -> Result<(), Self::Err> {
-        //let mut information: Vec<Vec<u8>> = Vec::with_capacity(subchunk_batch_info.len());
         let mut data: Vec<u8> = vec![
             0;
             subchunk_batch_info

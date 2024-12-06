@@ -1,4 +1,3 @@
-use crate::level::biome::BiomeTransitionInformation;
 use crate::types::binary::BinaryBuffer;
 use bedrockrs_core::Vec3;
 
@@ -25,15 +24,20 @@ impl<BlockType> SubchunkTransitionalData<BlockType> {
     }
 }
 
+/// The trait which any decoder implementation must implement
 pub trait SubChunkDecoder {
     type Err;
     type BlockType;
     type UserState;
 
+    /// This function is responsible for decoding a stream of raw bytes into the intermediate structure used for creating subchunks
     fn decode_bytes_as_chunk(
         bytes: &mut BinaryBuffer,
         state: &mut Self::UserState,
     ) -> Result<SubchunkTransitionalData<Self::BlockType>, Self::Err>;
+
+    /// This function is responsible
+    /// for encoding the raw block data into a vector of bytes which the database layer can then save.
     fn write_as_bytes(
         chunk_state: SubchunkTransitionalData<Self::BlockType>,
         network: bool,
@@ -41,36 +45,55 @@ pub trait SubChunkDecoder {
     ) -> Result<Vec<u8>, Self::Err>;
 }
 
+/// The main trait that any subchunk type must implement
 pub trait SubChunkTrait: Sized {
     type Err;
     type BlockType;
     type UserState;
 
+    /// This must create a valid empty state for the subchunk.
+    /// This may be just an empty optional, or it may be defaulting to air
     fn empty(y_index: i8, state: &mut Self::UserState) -> Self;
+
+    /// This must create a valid "full" state for the subchunk from the transitional data
     fn decode_from_raw(
         data: SubchunkTransitionalData<Self::BlockType>,
         state: &mut Self::UserState,
     ) -> Result<Self, Self::Err>;
+
+    /// This must create a transitional state from the current subchunk information
     fn to_raw(
         &self,
         y_level: i8,
         state: &mut Self::UserState,
     ) -> Result<SubchunkTransitionalData<Self::BlockType>, Self::Err>;
+
+    /// Gets the block at the current position on the active layer
     fn get_block(&self, xyz: Vec3<u8>) -> Option<&Self::BlockType>;
+    /// Gets the block at the current position on the active layer
     fn get_block_mut(&mut self, xyz: Vec3<u8>) -> Option<&mut Self::BlockType>;
+    /// Sets the block at the current position on the active layer
     fn set_block(&mut self, xyz: Vec3<u8>, block: Self::BlockType) -> Result<(), Self::Err>;
 
+    /// Gets the active layer
     fn get_active_layer(&self) -> u8;
+    /// Sets the active layer
     fn set_active_layer(&mut self, idx: u8);
 
+    /// This generates a new empty sublayer for the subchunk. This may only apply to bedrock, and if so, just unimplement this function
     fn add_sub_layer(&mut self, state: &mut Self::UserState);
+    /// This returns the count of all sublayers
     fn get_sub_layer_count(&self) -> usize;
 
+    /// Gets the subchunk Y
     fn get_y(&self) -> i8;
+    /// Sets the subchunk Y
     fn set_y(&mut self, y: i8) -> i8;
 
-    fn state_clone(&self, _: &mut Self::UserState) -> Self;
+    /// This is used as a replacement for the normal clone functions. It allows access to the state
+    fn state_clone(&self, state: &mut Self::UserState) -> Self;
 
+    /// This returns if the subchunk is just air if so nothing is written to the database if this isn't desired behavior just always return false
     fn is_empty(&self) -> bool;
 }
 
@@ -80,7 +103,6 @@ pub mod default_impl {
     use crate::level::world_block::{BlockTransitionalState, WorldBlockTrait};
     use crate::types::binary::BinaryInterfaceError;
     use crate::types::miner::idx_3_to_1;
-    use anyhow::anyhow;
     use byteorder::LittleEndian;
     use nbtx::NbtError;
     use std::io::Cursor;
@@ -124,7 +146,6 @@ pub mod default_impl {
         type BlockType = UserBlockType;
         type UserState = UserState;
 
-        #[optick_attr::profile]
         fn decode_bytes_as_chunk(
             bytes: &mut BinaryBuffer,
             state: &mut Self::UserState,
@@ -150,10 +171,7 @@ pub mod default_impl {
                 let palette_type = bytes
                     .read::<LittleEndian, u8>()
                     .ok_or(SubChunkDecoderError::PaletteError)?;
-                if palette_type & 0x1 == 1 {
-                    // TODO: Network Support
-                    unimplemented!("Network Not Supported!");
-                }
+                let network = palette_type & 0x1 == 1;
                 let bits_per_block = palette_type >> 1;
                 let blocks_per_word = 32 / bits_per_block;
                 let word_count = (4096 + (blocks_per_word as i32) - 1) / (blocks_per_word as i32);
@@ -176,7 +194,6 @@ pub mod default_impl {
                     }
                 }
 
-                // TODO: Handle Network endian.
                 let palette_count = bytes
                     .read::<LittleEndian, u32>()
                     .ok_or(SubChunkDecoderError::PaletteCountError)?;
@@ -188,10 +205,19 @@ pub mod default_impl {
                             .ok_or(SubChunkDecoderError::SliceError)?,
                     );
 
-                    blocks.push(Self::BlockType::from_transition(
-                        nbtx::from_bytes::<nbtx::LittleEndian, BlockTransitionalState>(cursor)?,
-                        state,
-                    ));
+                    if network {
+                        blocks.push(Self::BlockType::from_transition(
+                            nbtx::from_bytes::<nbtx::NetworkLittleEndian, BlockTransitionalState>(
+                                cursor,
+                            )?,
+                            state,
+                        ));
+                    } else {
+                        blocks.push(Self::BlockType::from_transition(
+                            nbtx::from_bytes::<nbtx::LittleEndian, BlockTransitionalState>(cursor)?,
+                            state,
+                        ));
+                    }
                     let pos = cursor.position() as isize;
                     bytes.rebase(pos);
                 }
@@ -201,22 +227,17 @@ pub mod default_impl {
         }
 
         // TODO: Handle 0, 2, 3, 4 ,5 ,6 7, also handle 1
-        #[optick_attr::profile]
         fn write_as_bytes(
             chunk_state: SubchunkTransitionalData<Self::BlockType>,
             network: bool,
             state: &mut Self::UserState,
         ) -> Result<Vec<u8>, Self::Err> {
-            if network {
-                unimplemented!("Network handling isn't implemented yet");
-            }
             let mut buffer = BinaryBuffer::new();
             buffer
                 .write::<LittleEndian, u8>(chunk_state.data_version)?
                 .write::<LittleEndian, u8>(chunk_state.layers.len() as u8)?
                 .write::<LittleEndian, i8>(chunk_state.y_level)?;
             for layer in chunk_state.layers {
-                optick::event!("To Encoded");
                 let bits_per_block = bits_needed_to_store(layer.1.len() as u32);
                 buffer.write::<LittleEndian, u8>(bits_per_block << (1 + (network as u8)))?;
 
@@ -239,9 +260,15 @@ pub mod default_impl {
                 }
                 buffer.write::<LittleEndian, u32>(layer.1.len() as u32)?;
                 for blk in layer.1 {
-                    buffer.write::<LittleEndian, &[u8]>(&nbtx::to_le_bytes(
-                        &blk.into_transition(state),
-                    )?)?;
+                    if network {
+                        buffer.write::<LittleEndian, &[u8]>(&nbtx::to_net_bytes(
+                            &blk.into_transition(state),
+                        )?)?
+                    } else {
+                        buffer.write::<LittleEndian, &[u8]>(&nbtx::to_le_bytes(
+                            &blk.into_transition(state),
+                        )?)?
+                    };
                 }
             }
             Ok(buffer.into())
@@ -287,7 +314,6 @@ pub mod default_impl {
         type BlockType = UserBlockType;
         type UserState = UserState;
 
-        #[optick_attr::profile]
         fn empty(y_index: i8, state: &mut Self::UserState) -> Self {
             let mut val = Self {
                 blocks: Vec::with_capacity(1),
@@ -302,13 +328,12 @@ pub mod default_impl {
             val
         }
 
-        #[optick_attr::profile]
         fn decode_from_raw(
             data: SubchunkTransitionalData<Self::BlockType>,
-            state: &mut Self::UserState,
+            _: &mut Self::UserState,
         ) -> Result<Self, Self::Err> {
             let mut layers: Vec<Box<[MaybeUninit<UserBlockType>; 4096]>> = (0..data.layers.len())
-                .map(|_| unsafe { Box::new([const { MaybeUninit::uninit() }; 4096]) })
+                .map(|_| Box::new([const { MaybeUninit::uninit() }; 4096]))
                 .collect();
             for (layer_index, (indices, blocks)) in data.layers.into_iter().enumerate() {
                 let layer: &mut Box<[MaybeUninit<UserBlockType>; 4096]> = &mut layers[layer_index];
@@ -327,7 +352,6 @@ pub mod default_impl {
             })
         }
 
-        #[optick_attr::profile]
         fn to_raw(
             &self,
             y_level: i8,

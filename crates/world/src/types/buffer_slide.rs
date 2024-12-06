@@ -52,6 +52,7 @@ pub struct BetterCursor<'a> {
     index: usize,
 }
 
+#[allow(dead_code)]
 impl<'a> BetterCursor<'a> {
     pub fn new(data: &'a [u8]) -> Self {
         Self { data, index: 0 }

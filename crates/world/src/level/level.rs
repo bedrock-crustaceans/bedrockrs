@@ -1,7 +1,6 @@
 use crate::level::chunk::LevelChunkTrait;
 use crate::level::chunk_cache::SubchunkCacheKey;
 use crate::level::db_interface::bedrock_key::ChunkKey;
-use crate::level::file_interface::DatabaseBatchHolder;
 use crate::level::file_interface::RawWorldTrait;
 use crate::level::sub_chunk::{SubChunkDecoder, SubChunkTrait};
 use crate::level::world_block::WorldBlockTrait;
@@ -12,18 +11,37 @@ use bedrockrs_core::Vec2;
 use bedrockrs_shared::world::dimension::Dimension;
 use std::collections::hash_set::Iter;
 use std::collections::HashSet;
-use std::error::Error;
 use std::fmt::Debug;
 use std::marker::PhantomData;
 use thiserror::Error;
-// #[derive(Error, Debug)]
-// pub enum LevelError {
-//     #[error("DB Error: {0}")]
-//     Database(#[from] DBError),
-//
-//     #[error("Unknown: {0}")]
-//     Unknown(#[from] anyhow::Error),
-// }
+
+/// This is used when filtering chunks.
+/// `ChunkSelectionFilter::Dimension` is used to just check if the dimension is the same.
+/// `ChunkSelectionFilter::Filter` is used to perform more complex logic on the chunk to detect if it should be included
+pub enum ChunkSelectionFilter {
+    Dimension(Dimension),
+    Filter(Box<dyn FnMut(Dimension, Vec2<i32>) -> bool>),
+}
+
+/// This is used when filtering subchunks.
+///
+/// `SubchunkSelectionFilter::Dimension` is used to just check if the dimension is the same.
+///
+/// `SubchunkSelectionFilter::Filter`
+/// is used to perform more complex logic on the chunk to detect if it should be included
+pub enum SubchunkSelectionFilter {
+    Dimension(Dimension),
+    Filter(Box<dyn FnMut(Dimension, i8, Vec2<i32>) -> bool>),
+}
+
+impl ChunkSelectionFilter {
+    pub fn poll(&mut self, chunk_dim: Dimension, pos: Vec2<i32>) -> bool {
+        match self {
+            ChunkSelectionFilter::Dimension(dim) => dim == &chunk_dim,
+            ChunkSelectionFilter::Filter(func) => func(chunk_dim, pos),
+        }
+    }
+}
 
 #[derive(Error, Debug)]
 pub enum LevelError<DataBaseError: Debug, SubChunkDecodeError: Debug, SubChunkError: Debug> {
@@ -35,6 +53,8 @@ pub enum LevelError<DataBaseError: Debug, SubChunkDecodeError: Debug, SubChunkEr
     SubChunkError(SubChunkError),
 }
 
+pub struct ClosedLevel;
+
 #[allow(dead_code)]
 pub struct Level<
     UserState,
@@ -42,11 +62,7 @@ pub struct Level<
     UserBlockType: WorldBlockTrait<UserState = UserState>,
     UserSubChunkType: SubChunkTrait<UserState = UserState, BlockType = UserBlockType>,
     UserSubChunkDecoder: SubChunkDecoder<UserState = UserState, BlockType = UserBlockType>,
-> where
-    <UserSubChunkType as SubChunkTrait>::Err: Debug,
-    <UserSubChunkDecoder as SubChunkDecoder>::Err: Debug,
-    <UserWorldInterface as RawWorldTrait>::Err: Debug,
-{
+> {
     db: UserWorldInterface,
     state: UserState,
     rw_cache: bool,
@@ -56,6 +72,7 @@ pub struct Level<
     _decoder_marker: PhantomData<UserSubChunkDecoder>,
 }
 
+#[allow(dead_code)]
 impl<
         UserState,
         UserWorldInterface: RawWorldTrait<UserState = UserState>,
@@ -68,9 +85,7 @@ where
     <UserSubChunkDecoder as SubChunkDecoder>::Err: Debug,
     <UserWorldInterface as RawWorldTrait>::Err: Debug,
 {
-    //type RealError =
-    //    LevelError<UserWorldInterface::Err, UserSubChunkDecoder::Err, UserSubChunkType::Err>;
-
+    /// Simple function used to open the world
     pub fn open(
         path: &str,
         create_db_if_missing: bool,
@@ -109,49 +124,61 @@ where
         &mut self.db
     }
 
+    /// Checks if a given chunk exists
     pub fn chunk_exists(&mut self, xz: Vec2<i32>, dimension: Dimension) -> bool {
         self.chunk_existence.contains(&(dimension, xz))
     }
 
-    fn close_wrap(&mut self) {
-        self.cull();
+    /// Must call before destruction
+    fn close(mut self) -> ClosedLevel {
+        self.cull().unwrap();
+        ClosedLevel
     }
 
+    /// Returns all chunks (in the form of its key) that exist in the world
     pub fn existence_chunks(&self) -> Iter<'_, (Dimension, Vec2<i32>)> {
         self.chunk_existence.iter()
     }
 
-    pub fn get_chunk_keys(&mut self, dim: Dimension) -> Vec<Vec2<i32>> {
+    /// Fetches all chunk keys that satisfy the filter's constraints
+    pub fn get_chunk_keys(&mut self, mut filter: ChunkSelectionFilter) -> Vec<Vec2<i32>> {
         self.chunk_existence
             .iter()
-            .filter_map(|(chunk_dim, pos)| if chunk_dim == &dim { Some(*pos) } else { None })
+            .filter_map(|(chunk_dim, pos)| {
+                if filter.poll(chunk_dim.clone(), *pos) {
+                    Some(*pos)
+                } else {
+                    None
+                }
+            })
             .collect()
     }
+
+    /// Fetches all chunks that satisfy the filter
     pub fn get_chunks<T: LevelChunkTrait<Self, UserLevel = Self>>(
         &mut self,
-        dim: Dimension,
+        mut filter: ChunkSelectionFilter,
         min_max: Vec2<i8>,
     ) -> Result<Vec<T>, T::Err> {
         let positions: Vec<_> = self
             .chunk_existence
             .iter()
-            .filter_map(
-                |(chunk_dim, pos)| {
-                    if *chunk_dim == dim {
-                        Some(*pos)
-                    } else {
-                        None
-                    }
-                },
-            )
+            .filter_map(|(chunk_dim, pos)| {
+                if filter.poll(*chunk_dim, *pos) {
+                    Some((*chunk_dim, *pos))
+                } else {
+                    None
+                }
+            })
             .collect();
 
         positions
             .into_iter()
-            .map(|pos| T::load_from_world(min_max, pos, dim, self))
+            .map(|(dim, pos)| T::load_from_world(min_max, pos, dim, self))
             .collect()
     }
 
+    /// Fetches a subchunk at a given xyz and dimension
     pub fn get_sub_chunk(
         &mut self,
         xz: Vec2<i32>,
@@ -219,7 +246,7 @@ where
         }
     }
 
-    #[optick_attr::profile]
+    /// Sets a subchunk at the given xyz and dimension
     pub fn set_sub_chunk(
         &mut self,
         data: UserSubChunkType,
@@ -233,7 +260,7 @@ where
         if self.rw_cache {
             self.cached_sub_chunks
                 .insert(SubchunkCacheKey::new(xz, y, dim), data);
-            self.perform_flush();
+            level_try!(SubChunkDecodeError, self.perform_flush());
         } else {
             let raw = level_try!(
                 SubChunkDecodeError,
@@ -253,7 +280,9 @@ where
         Ok(())
     }
 
-    #[optick_attr::profile]
+    /// Sets a whole chunk in the saved position of the chunk and the saved dimension.
+    /// `xz_override` lets the xz position be replaced if copying the chunk
+    /// `dim_override` lets the dimension of the chunk be changed if copying the chunk
     pub fn set_chunk<UserChunkType: LevelChunkTrait<Self, UserLevel = Self>>(
         &mut self,
         chnk: UserChunkType,
@@ -263,7 +292,9 @@ where
         chnk.write_to_world(self, xz_override, dim_override)
     }
 
-    #[optick_attr::profile]
+    /// Fetches a chunk from the world at the given xz and dimension and with the given bounds
+    /// ### Note:
+    /// `min_max` is the min and max subchunks not blocks
     pub fn get_chunk<
         UserChunkType: LevelChunkTrait<
             Self,
@@ -287,12 +318,7 @@ where
         self.chunk_existence.insert((dim, xz));
     }
 
-    //TODO: They also share the same function so it will be worth making the function a member func and just passing the pointer
-
-    //TODO: Make cull/clear return a Result type to allow for nicer error handling
-
-    #[optick_attr::profile]
-    fn perform_flush(&mut self) {
+    fn perform_flush(&mut self) -> Result<(), UserSubChunkDecoder::Err> {
         let mut batch_info: Vec<(ChunkKey, Vec<u8>)> = Vec::new();
         let mut exist_info: Vec<ChunkKey> = Vec::new();
         self.cached_sub_chunks.cull(|user_key, data| {
@@ -300,13 +326,13 @@ where
                 data.to_raw(user_key.y, &mut self.state).unwrap(),
                 false,
                 &mut self.state,
-            )
-            .unwrap();
+            )?;
             let key = ChunkKey::new_subchunk(user_key.xz, user_key.dim, user_key.y);
 
             batch_info.push((key, raw));
             exist_info.push(ChunkKey::chunk_marker(user_key.xz, user_key.dim));
-        });
+            Ok(())
+        })?;
         if !batch_info.is_empty() {
             self.db
                 .write_subchunk_batch(batch_info, &mut self.state)
@@ -317,9 +343,10 @@ where
                 .write_subchunk_marker_batch(exist_info, &mut self.state)
                 .unwrap()
         }
+        Ok(())
     }
 
-    fn cull(&mut self) {
+    fn cull(&mut self) -> Result<(), UserSubChunkDecoder::Err> {
         let mut batch_info: Vec<(ChunkKey, Vec<u8>)> = Vec::new();
         let mut exist_info: Vec<ChunkKey> = Vec::new();
         self.cached_sub_chunks.clear(|user_key, data| {
@@ -327,13 +354,13 @@ where
                 data.to_raw(user_key.y, &mut self.state).unwrap(),
                 false,
                 &mut self.state,
-            )
-            .unwrap();
+            )?;
             let key = ChunkKey::new_subchunk(user_key.xz, user_key.dim, user_key.y);
 
             batch_info.push((key, raw));
             exist_info.push(ChunkKey::chunk_marker(user_key.xz, user_key.dim));
-        });
+            Ok(())
+        })?;
         if !batch_info.is_empty() {
             self.db
                 .write_subchunk_batch(batch_info, &mut self.state)
@@ -344,6 +371,7 @@ where
                 .write_subchunk_marker_batch(exist_info, &mut self.state)
                 .unwrap()
         }
+        Ok(())
     }
 }
 
@@ -355,13 +383,9 @@ impl<
         UserSubChunkDecoder: SubChunkDecoder<UserState = UserState, BlockType = UserBlockType>,
     > Drop
     for Level<UserState, UserWorldInterface, UserBlockType, UserSubChunkType, UserSubChunkDecoder>
-where
-    <UserSubChunkType as SubChunkTrait>::Err: Debug,
-    <UserSubChunkDecoder as SubChunkDecoder>::Err: Debug,
-    <UserWorldInterface as RawWorldTrait>::Err: Debug,
 {
     fn drop(&mut self) {
-        self.close_wrap()
+        panic!("Undroppable Type! Please call close on this type");
     }
 }
 
