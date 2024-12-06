@@ -1,0 +1,16 @@
+use bedrockrs_macros::{gamepacket, ProtoCodec};
+use crate::version::v662::enums::PlayerActionType;
+use crate::version::v662::types::{ActorRuntimeID, NetworkBlockPosition};
+
+#[gamepacket(id = 36)]
+#[derive(ProtoCodec)]
+pub struct PlayerActionPacket {
+    pub player_runtime_id: ActorRuntimeID,
+    pub action: PlayerActionType,
+    pub block_position: NetworkBlockPosition,
+    pub result_pos: NetworkBlockPosition,
+    #[endianness(var)]
+    pub face: i32,
+}
+
+// TODO: PlayerActionType is has enum variants, but this packet doesn't serialize them. Might require moving the variants into their specific type
