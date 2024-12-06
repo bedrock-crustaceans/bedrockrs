@@ -22,11 +22,6 @@ pub mod addon {
 
 #[cfg(feature = "world")]
 pub mod world {
-    pub use ::bedrockrs_world::*;
-
-    pub mod palette {
-        pub use ::bedrockrs_paletted_storage::*;
-    }
 }
 
 pub mod form {
