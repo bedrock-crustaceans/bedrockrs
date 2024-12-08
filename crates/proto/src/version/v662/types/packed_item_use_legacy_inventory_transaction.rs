@@ -1,6 +1,7 @@
+use bedrockrs_core::Vec3;
 use bedrockrs_macros::ProtoCodec;
 use crate::version::v662::enums::ItemUseInventoryTransaction;
-use crate::version::v662::types::{InventoryAction, NetworkBlockPosition, NetworkItemStackDescriptor, Vec3};
+use crate::version::v662::types::{InventoryAction, NetworkBlockPosition, NetworkItemStackDescriptor};
 
 #[derive(ProtoCodec)]
 struct ContainerSlotEntry {
@@ -27,8 +28,10 @@ pub enum PackedItemUseLegacyInventoryTransaction {
         #[endianness(var)]
         slot: i32,
         item: NetworkItemStackDescriptor,
-        from_position: Vec3,
-        click_position: Vec3,
+        #[endianness(le)]
+        from_position: Vec3<f32>,
+        #[endianness(le)]
+        click_position: Vec3<f32>,
         #[endianness(var)]
         target_block_id: u32,
     } = 0,
@@ -48,8 +51,10 @@ pub enum PackedItemUseLegacyInventoryTransaction {
         #[endianness(var)]
         slot: i32,
         item: NetworkItemStackDescriptor,
-        from_position: Vec3,
-        click_position: Vec3,
+        #[endianness(le)]
+        from_position: Vec3<f32>,
+        #[endianness(le)]
+        click_position: Vec3<f32>,
         #[endianness(var)]
         target_block_id: u32,
     } = 1

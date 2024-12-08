@@ -1,6 +1,7 @@
+use bedrockrs_core::Vec3;
 use bedrockrs_macros::ProtoCodec;
 use crate::version::v662::enums::{AnimationMode, Mirror, Rotation};
-use crate::version::v662::types::{ActorUniqueID, NetworkBlockPosition, Vec3};
+use crate::version::v662::types::{ActorUniqueID, NetworkBlockPosition};
 
 #[derive(ProtoCodec)]
 pub struct StructureSettings {
@@ -20,5 +21,6 @@ pub struct StructureSettings {
     pub integrity_value: f32,
     #[endianness(le)]
     pub integrity_seed: u32,
-    pub rotation_pivot: Vec3,
+    #[endianness(le)]
+    pub rotation_pivot: Vec3<f32>,
 }
