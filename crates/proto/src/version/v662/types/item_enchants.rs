@@ -1,8 +1,9 @@
 use bedrockrs_macros::ProtoCodec;
+use crate::version::v662::enums::Enchant;
 
 #[derive(ProtoCodec)]
 struct ItemEnchant {
-    pub enchant_type: i8,
+    pub enchant_type: Enchant::Type,
     pub enchant_level: i8,
 }
 
