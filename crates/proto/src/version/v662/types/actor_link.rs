@@ -8,5 +8,6 @@ pub struct ActorLink {
     pub actor_unique_id_b: ActorUniqueID, 
     pub link_type: ActorLinkType,
     pub immediate: bool,
-    pub passenger_initiated: bool, /// Whether the link was changed by the passenger
+    /// Whether the link was changed by the passenger
+    pub passenger_initiated: bool, 
 }
