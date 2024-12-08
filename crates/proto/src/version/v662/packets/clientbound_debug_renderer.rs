@@ -1,5 +1,5 @@
+use bedrockrs_core::Vec3;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
-use crate::version::v662::types::Vec3;
 
 #[derive(ProtoCodec)]
 #[enum_repr(u32)]
@@ -10,7 +10,8 @@ enum Type {
     ClearDebugMarkers = 1,
     AddDebugMarkerCube {
         text: String,
-        position: Vec3,
+        #[endianness(le)]
+        position: Vec3<f32>,
         #[endianness(le)]
         r: f32,
         #[endianness(le)]
