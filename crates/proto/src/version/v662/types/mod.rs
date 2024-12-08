@@ -17,7 +17,6 @@ export!(camera_preset);
 export!(camera_presets);
 export!(chunk_pos);
 export!(command_origin_data);
-export!(compound_tag);
 export!(container_mix_data_entry);
 export!(crafting_data_entry);
 export!(data_item);
@@ -72,6 +71,4 @@ export!(structure_settings);
 export!(sub_chunk_packet); // Mod
 export!(sub_chunk_pos);
 export!(synced_player_movement_settings);
-export!(vec_2);
-export!(vec_3);
 export!(web_socket_packet_data);
