@@ -9,8 +9,10 @@ pub mod PlayerPositionModeComponent {
         Normal = 0,
         Respawn = 1,
         Teleport {
-            teleportation_cause: MinecraftEventing::TeleportationCause, // TODO: same here. listed as int without an enum.
-            source_actor_type: ActorType, // TODO: listed as int without enum. ActorType is assumed, but it is a varint enum.
+            #[endianness(le)]
+            teleportation_cause: i32,
+            #[endianness(le)]
+            source_actor_type: i32,
         } = 2,
         OnlyHeadRot = 3,
     }
