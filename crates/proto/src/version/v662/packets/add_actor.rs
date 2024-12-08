@@ -1,5 +1,6 @@
+use bedrockrs_core::{Vec2, Vec3};
 use bedrockrs_macros::{gamepacket, ProtoCodec};
-use crate::version::v662::types::{ActorLink, ActorRuntimeID, ActorUniqueID, DataItem, PropertySyncData, Vec2, Vec3};
+use crate::version::v662::types::{ActorLink, ActorRuntimeID, ActorUniqueID, DataItem, PropertySyncData};
 
 #[derive(ProtoCodec)]
 struct AttributeEntry {
@@ -18,9 +19,12 @@ pub struct AddActorPacket {
     pub target_actor_id: ActorUniqueID,
     pub target_runtime_id: ActorRuntimeID,
     pub actor_type: String,
-    pub position: Vec3,
-    pub velocity: Vec3,
-    pub rotation: Vec2,
+    #[endianness(le)]
+    pub position: Vec3<f32>,
+    #[endianness(le)]
+    pub velocity: Vec3<f32>,
+    #[endianness(le)]
+    pub rotation: Vec2<f32>,
     #[endianness(le)]
     pub y_head_rotation: f32,
     #[endianness(le)]
@@ -30,7 +34,7 @@ pub struct AddActorPacket {
     pub attributes: Vec<AttributeEntry>,
     #[vec_repr(u32)]
     #[vec_endianness(var)]
-    pub actor_data: Vec<DataItem>, // TODO: Verify vec_repr & vec_endianness
+    pub actor_data: Vec<DataItem>, // VERIFY: vec_repr & vec_endianness
     pub synced_properties: PropertySyncData,
     #[vec_repr(u32)]
     #[vec_endianness(var)]
