@@ -18,7 +18,7 @@ pub enum Type {
     } = 2,
 }
 
-// TODO: verify the default_values. They seem to be incorrectly documented.
+// VERIFY: default_values. They seem to be incorrectly documented.
 
 #[gamepacket(id = 184)]
 #[derive(ProtoCodec)]
