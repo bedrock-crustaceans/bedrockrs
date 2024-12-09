@@ -1,14 +1,21 @@
-use bedrockrs_macros::{gamepacket, gamepackets, ProtoCodec};
-use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
 use crate::version::v662::enums::PlayerPositionModeComponent;
-use crate::version::v662::types::{Vec2, Vec3};
+use bedrockrs_core::{Vec2, Vec3};
+use bedrockrs_macros::{gamepacket, gamepackets, ProtoCodec};
+use bedrockrs_proto_core::error::ProtoCodecError;
+use bedrockrs_proto_core::{ProtoCodec, ProtoCodecLE, ProtoCodecVAR};
+use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
+use byteorder::{ReadBytesExt, WriteBytesExt};
+use std::io::{Cursor, Read};
+use std::mem::size_of;
+use tokio::io::AsyncReadExt;
 
 #[gamepacket(id = 19)]
-#[derive(ProtoCodec)]
 pub struct MovePlayerPacket {
     pub player_runtime_id: ActorRuntimeID,
-    pub position: Vec3,
-    pub rotation: Vec2,
+    #[endianness(le)]
+    pub position: Vec3<f32>,
+    #[endianness(le)]
+    pub rotation: Vec2<f32>,
     #[endianness(le)]
     pub y_head_rotation: f32,
     pub position_mode: PlayerPositionModeComponent::PositionMode,
@@ -18,4 +25,69 @@ pub struct MovePlayerPacket {
     pub tick: u64,
 }
 
-// TODO: custom proto impl because of enum variant serialization order
+impl ProtoCodec for MovePlayerPacket {
+    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
+        let mut position_mode_stream: Vec<u8> = Vec::new();
+        <PlayerPositionModeComponent::PositionMode as ProtoCodec>::proto_serialize(
+            &self.position_mode,
+            &mut position_mode_stream,
+        )?;
+        let mut position_mode_cursor = Cursor::new(position_mode_stream.as_slice());
+
+        <ActorRuntimeID as ProtoCodec>::proto_serialize(&self.player_runtime_id, stream)?;
+        <Vec3<f32> as ProtoCodecLE>::proto_serialize(&self.position, stream)?;
+        <Vec2<f32> as ProtoCodecLE>::proto_serialize(&self.rotation, stream)?;
+        <f32 as ProtoCodecLE>::proto_serialize(&self.y_head_rotation, stream)?;
+        stream.write_i8(position_mode_cursor.read_i8()?)?;
+        <bool as ProtoCodec>::proto_serialize(&self.on_ground, stream)?;
+        <ActorRuntimeID as ProtoCodec>::proto_serialize(&self.riding_runtime_id, stream)?;
+        position_mode_cursor.read_to_end(stream)?;
+        <u64 as ProtoCodecVAR>::proto_serialize(&self.tick, stream)?;
+
+        Ok(())
+    }
+
+    fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
+        let mut sub_stream = Vec::<u8>::new();
+
+        let player_runtime_id = <ActorRuntimeID as ProtoCodec>::proto_deserialize(stream)?;
+        let position = <Vec3<f32> as ProtoCodecLE>::proto_deserialize(stream)?;
+        let rotation = <Vec2<f32> as ProtoCodecLE>::proto_deserialize(stream)?;
+        let y_head_rotation = <f32 as ProtoCodecLE>::proto_deserialize(stream)?;
+        sub_stream.write_i8(stream.read_i8()?)?;
+        let on_ground = <bool as ProtoCodec>::proto_deserialize(stream)?;
+        let riding_runtime_id = <ActorRuntimeID as ProtoCodec>::proto_deserialize(stream)?;
+        stream.read_to_end(&mut sub_stream)?;
+
+        let mut sub_cursor = Cursor::new(sub_stream.as_slice());
+        let position_mode =
+            <PlayerPositionModeComponent::PositionMode as ProtoCodec>::proto_deserialize(
+                &mut sub_cursor,
+            )?;
+        let tick = <u64 as ProtoCodecVAR>::proto_deserialize(&mut sub_cursor)?;
+
+        Ok(Self {
+            player_runtime_id,
+            position,
+            rotation,
+            y_head_rotation,
+            position_mode,
+            on_ground,
+            riding_runtime_id,
+            tick,
+        })
+    }
+
+    fn get_size_prediction(&self) -> usize {
+        self.player_runtime_id.get_size_prediction()
+            + self.position.get_size_prediction()
+            + self.rotation.get_size_prediction()
+            + self.y_head_rotation.get_size_prediction()
+            + self.position_mode.get_size_prediction()
+            + self.on_ground.get_size_prediction()
+            + self.riding_runtime_id.get_size_prediction()
+            + self.tick.get_size_prediction()
+    }
+}
+
+// VERIFY: ProtoCodec impl
