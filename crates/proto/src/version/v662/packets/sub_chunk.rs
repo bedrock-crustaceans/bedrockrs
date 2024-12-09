@@ -86,7 +86,7 @@ impl ProtoCodec for SubChunkPacket {
 
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
         let cache_enabled = bool::proto_deserialize(stream)?;
-        let dimension_type = <i32 as ProtoCodecVAR>::proto_deserialize(stream)?;
+        let dimension_type = ProtoCodecVAR::proto_deserialize(stream)?;
         let center_pos = SubChunkPos::proto_deserialize(stream)?;
         let sub_chunk_data = {
             let len = <u32 as ProtoCodecLE>::proto_deserialize(stream)?;
@@ -117,7 +117,7 @@ impl ProtoCodec for SubChunkPacket {
                         false => None,
                     };
                 let blob_id = match cache_enabled {
-                    true => Some(<u64 as ProtoCodecLE>::proto_deserialize(stream)?),
+                    true => Some(ProtoCodecLE::proto_deserialize(stream)?),
                     false => None,
                 };
 
@@ -143,7 +143,7 @@ impl ProtoCodec for SubChunkPacket {
 
     fn get_size_prediction(&self) -> usize {
         self.cache_enabled.get_size_prediction()
-            + self.dimension_type.get_size_prediction()
+            + <i32 as ProtoCodecVAR>::get_size_prediction(&self.dimension_type)
             + self.center_pos.get_size_prediction()
             + size_of::<u32>()
             + self
@@ -152,21 +152,27 @@ impl ProtoCodec for SubChunkPacket {
                 .map(|i| {
                     i.sub_chunk_pos_offset.get_size_prediction()
                         + i.sub_chunk_request_result.get_size_prediction()
-                        + if (i.sub_chunk_request_result == SubChunkRequestResult::SuccessAllAir
+                        + match (i.sub_chunk_request_result == SubChunkRequestResult::SuccessAllAir
                             || self.cache_enabled)
                         {
-                            i.serialized_sub_chunk
+                            true => i
+                                .serialized_sub_chunk
                                 .as_ref()
                                 .unwrap()
-                                .get_size_prediction()
+                                .get_size_prediction(),
+                            false => 0,
                         }
                         + i.height_map_data_type.get_size_prediction()
-                        + if (i.height_map_data_type == HeightMapDataType::HasData) {
-                            let height_map = i.sub_chunk_height_map.as_ref().unwrap();
-                            height_map.len() * height_map[0].len() * size_of::<i8>()
+                        + match (i.height_map_data_type == HeightMapDataType::HasData) {
+                            true => {
+                                let height_map = i.sub_chunk_height_map.as_ref().unwrap();
+                                height_map.len() * height_map[0].len() * size_of::<i8>()
+                            }
+                            false => 0,
                         }
-                        + if (self.cache_enabled) {
-                            size_of::<u64>()
+                        + match (self.cache_enabled) {
+                            true => size_of::<u64>(),
+                            false => 0,
                         }
                 })
                 .sum::<usize>()

@@ -2,6 +2,9 @@ pub mod Editor {
     use bedrockrs_macros::ProtoCodec;
 
     #[derive(ProtoCodec)]
+    #[enum_repr(i32)]
+    #[enum_endianness(var)]
+    #[repr(i32)]
     pub enum WorldType {
         NonEditor = 0,
         EditorProject = 1,

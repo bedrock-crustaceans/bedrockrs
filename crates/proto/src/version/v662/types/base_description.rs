@@ -4,7 +4,7 @@ use bedrockrs_macros::ProtoCodec;
 #[derive(ProtoCodec)]
 pub struct InternalItemDescriptor {
     pub full_name: String,
-    #[endianess(le)]
+    #[endianness(le)]
     pub aux_value: u16
 }
 

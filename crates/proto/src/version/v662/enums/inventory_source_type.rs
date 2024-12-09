@@ -9,8 +9,7 @@ pub enum InventorySourceType {
     InvalidInventory = u32::MAX,
     ContainerInventory(ContainerID) = 0,
     GlobalInventory = 1,
-    #[endianness(var)]
-    WorldInteraction(u32) = 2,
+    WorldInteraction(#[endianness(var)] u32) = 2,
     CreativeInventory = 3,
     NonImplementedFeatureTODO = 99999,
 }
