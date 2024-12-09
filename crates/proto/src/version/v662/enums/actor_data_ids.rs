@@ -1,6 +1,3 @@
-use bedrockrs_macros::ProtoCodec;
-
-#[derive(ProtoCodec, Clone, Debug)]
 pub enum ActorDataIDs {
     Reserved0 = 0,
     StructuralIntegrity = 1,

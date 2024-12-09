@@ -22,3 +22,5 @@ pub enum NetworkItemStackDescriptor {
         user_data_buffer: String
     } = 1
 }
+
+// TODO: impl ProtoCodec

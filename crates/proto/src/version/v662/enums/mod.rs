@@ -20,7 +20,6 @@ export!(attribute_operands);
 export!(book_edit_action);
 export!(boss_event_update_type);
 export!(build_platform);
-export!(camera_preset); // Mod
 export!(camera_shake_action);
 export!(camera_shake_type);
 export!(chat_restriction_level);
@@ -44,7 +43,6 @@ export!(easing_type);
 export!(editor); // Mod
 export!(education_edition_offer);
 export!(enchant); // Mod
-export!(game_rule); // Mod
 export!(game_type);
 export!(generator_type);
 export!(hud_element);
@@ -66,8 +64,6 @@ export!(item_use_on_actor_inventory_transaction); // Mod
 export!(lab_table_reaction_type);
 export!(lesson_action);
 export!(level_event);
-export!(map_decoration); // Mod
-export!(map_item_tracked_actor); // Mod
 export!(minecraft_eventing); // Mod
 export!(minecraft_packet_ids);
 export!(mirror);
@@ -93,7 +89,6 @@ export!(resource_pack_response);
 export!(rotation);
 export!(score_packet_type);
 export!(scoreboard_identity_packet_type);
-export!(serialized_abilities_data); // Mod
 export!(server_auth_movement_mode);
 export!(show_store_offer_redirect_type);
 export!(simulation_type);
@@ -105,7 +100,6 @@ export!(structure_block_type);
 export!(structure_redstone_save_mode);
 export!(structure_template_request_operation);
 export!(structure_template_response_type);
-export!(tag); // Mod
 export!(text_packet_type);
 export!(text_processing_event_origin);
 export!(ui_profile);
