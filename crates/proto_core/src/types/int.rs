@@ -1,10 +1,10 @@
-use std::mem::size_of;
 use crate::endian::{ProtoCodecBE, ProtoCodecLE, ProtoCodecVAR};
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
 use paste::paste;
 use std::io::Cursor;
+use std::mem::size_of;
 use varint_rs::VarintReader;
 use varint_rs::VarintWriter;
 

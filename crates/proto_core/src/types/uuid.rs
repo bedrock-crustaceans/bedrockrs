@@ -1,8 +1,8 @@
-use std::mem::size_of;
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use std::io::Cursor;
+use std::mem::size_of;
 use uuid::Uuid;
 
 impl ProtoCodec for Uuid {
