@@ -1,12 +1,14 @@
 use uuid::Uuid;
+use bedrockrs_core::{Vec2, Vec3};
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::GameType;
-use crate::version::v662::types::{ActorRuntimeID, ActorUniqueID, CompoundTag, ItemData, LevelSettings, NetworkPermissions, SyncedPlayerMovementSettings, Vec2, Vec3};
+use crate::version::v662::types::{ActorRuntimeID, ActorUniqueID, ItemData, LevelSettings, NetworkPermissions, SyncedPlayerMovementSettings};
 
 #[derive(ProtoCodec)]
 struct BlockProperty {
     pub block_name: String,
-    pub block_definition: CompoundTag,
+    #[nbt]
+    pub block_definition: nbtx::Value, // TODO: NBT Structure
 }
 
 #[gamepacket(id = 11)]
@@ -15,8 +17,10 @@ pub struct StartGamePacket {
     pub target_actor_id: ActorUniqueID,
     pub target_runtime_id: ActorRuntimeID,
     pub actor_game_type: GameType,
-    pub position: Vec3,
-    pub rotation: Vec2,
+    #[endianness(le)]
+    pub position: Vec3<f32>,
+    #[endianness(le)]
+    pub rotation: Vec2<f32>,
     pub settings: LevelSettings,
     pub level_id: String,
     pub level_name: String,
@@ -36,7 +40,8 @@ pub struct StartGamePacket {
     pub multiplayer_correlation_id: String,
     pub enable_item_stack_net_manager: bool,
     pub server_version: String,
-    pub player_property_data: CompoundTag,
+    #[nbt]
+    pub player_property_data: nbtx::Value, // TODO: NBT Structure,
     #[endianness(le)]
     pub server_block_type_registry_checksum: u64,
     pub world_template_id: Uuid,
