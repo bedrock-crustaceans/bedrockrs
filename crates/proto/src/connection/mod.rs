@@ -1,6 +1,6 @@
 pub mod shard;
 
-use crate::codec::{encode_gamepackets, decode_gamepackets};
+use crate::codec::{decode_gamepackets, encode_gamepackets};
 use crate::compression::Compression;
 use crate::encryption::Encryption;
 use crate::error::ConnectionError;
