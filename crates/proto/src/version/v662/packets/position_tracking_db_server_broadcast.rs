@@ -1,5 +1,5 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
-use crate::version::v662::types::{CompoundTag, PositionTrackingId};
+use crate::version::v662::types::PositionTrackingId;
 
 #[derive(ProtoCodec)]
 #[enum_repr(i8)]
@@ -15,5 +15,6 @@ enum Action {
 pub struct PositionTrackingDBServerBroadcastPacket {
     pub action: Action,
     pub id: PositionTrackingId,
-    pub position_tracking_data: CompoundTag,
+    #[nbt]
+    pub position_tracking_data: nbtx::Value, // TODO: NBT Structure
 }
