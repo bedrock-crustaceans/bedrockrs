@@ -1,6 +1,6 @@
+use crate::version::v662::types::{ActorUniqueID, MolangVariableMap};
 use bedrockrs_core::Vec3;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
-use crate::version::v662::types::{ActorUniqueID, MolangVariableMap};
 
 #[gamepacket(id = 118)]
 #[derive(ProtoCodec)]

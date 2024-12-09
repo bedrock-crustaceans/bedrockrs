@@ -1,11 +1,11 @@
-use std::io::Cursor;
-use std::mem::size_of;
-use varint_rs::{VarintReader, VarintWriter};
+use crate::version::v662::enums::ActorBlockSyncMessage;
+use crate::version::v662::types::NetworkBlockPosition;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::{ProtoCodec, ProtoCodecVAR};
-use crate::version::v662::enums::ActorBlockSyncMessage;
-use crate::version::v662::types::NetworkBlockPosition;
+use std::io::Cursor;
+use std::mem::size_of;
+use varint_rs::{VarintReader, VarintWriter};
 
 struct BlocksChangedEntry {
     pub pos: NetworkBlockPosition,

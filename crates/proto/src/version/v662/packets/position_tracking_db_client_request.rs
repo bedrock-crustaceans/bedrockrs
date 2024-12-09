@@ -1,5 +1,5 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::types::PositionTrackingId;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[derive(ProtoCodec)]
 #[enum_repr(i8)]

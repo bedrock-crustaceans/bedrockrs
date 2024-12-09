@@ -1,5 +1,5 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::PacketCompressionAlgorithm;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 143)]
 #[derive(ProtoCodec)]

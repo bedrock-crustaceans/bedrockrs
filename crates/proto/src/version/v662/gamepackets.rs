@@ -1,10 +1,10 @@
+use crate::version::v662::packets::{DisconnectPacket, HandshakeClientToServerPacket, HandshakeServerToClientPacket, LoginPacket, PlayStatusPacket, ResourcePackClientResponsePacket, ResourcePacksInfoPacket, ResourcePacksStackPacket, SetTimePacket, TextMessagePacket};
+use crate::version::v729::packets::add_player::AddPlayerPacket;
 use bedrockrs_macros::gamepackets;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::sub_client::SubClientID;
 use std::io::{Cursor, Write};
 use varint_rs::{VarintReader, VarintWriter};
-use crate::version::v662::packets::{DisconnectPacket, HandshakeClientToServerPacket, HandshakeServerToClientPacket, LoginPacket, PlayStatusPacket, ResourcePackClientResponsePacket, ResourcePacksInfoPacket, ResourcePacksStackPacket, SetTimePacket, TextMessagePacket};
-use crate::version::v729::packets::add_player::AddPlayerPacket;
 
 gamepackets! {
     Login: LoginPacket,

@@ -1,5 +1,5 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::{CameraShakeAction, CameraShakeType};
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 159)]
 #[derive(ProtoCodec)]

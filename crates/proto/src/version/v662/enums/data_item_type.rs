@@ -1,6 +1,6 @@
+use crate::version::v662::types::BlockPos;
 use bedrockrs_core::Vec3;
 use bedrockrs_macros::ProtoCodec;
-use crate::version::v662::types::BlockPos;
 
 #[derive(ProtoCodec)]
 #[enum_repr(i8)]

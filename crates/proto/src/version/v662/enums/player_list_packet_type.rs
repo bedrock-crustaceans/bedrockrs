@@ -1,7 +1,7 @@
-use uuid::Uuid;
-use bedrockrs_macros::ProtoCodec;
 use crate::version::v662::enums::BuildPlatform;
 use crate::version::v662::types::{ActorUniqueID, SerializedSkin};
+use bedrockrs_macros::ProtoCodec;
+use uuid::Uuid;
 
 #[derive(ProtoCodec)]
 struct AddPlayerListEntry {

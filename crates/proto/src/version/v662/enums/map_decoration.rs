@@ -1,6 +1,6 @@
 pub mod MapDecoration {
     use bedrockrs_macros::ProtoCodec;
-    
+
     #[derive(ProtoCodec)]
     pub enum Type {
         MarkerWhite = 0,

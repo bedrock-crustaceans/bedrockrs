@@ -1,6 +1,6 @@
 pub mod ActorBlockSyncMessage {
     use bedrockrs_macros::ProtoCodec;
-    
+
     #[derive(ProtoCodec)]
     #[enum_repr(i64)]
     #[enum_endianness(var)]

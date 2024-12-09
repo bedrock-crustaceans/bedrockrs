@@ -1,6 +1,6 @@
-use bedrockrs_macros::ProtoCodec;
 use crate::version::v662::enums::IdentityDefinition;
 use crate::version::v662::types::ScoreboardId;
+use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]
 struct ScorePacketInfoChangeEntry {

@@ -1,6 +1,6 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::{ItemStackRequestActionType, TextProcessingEventOrigin};
 use crate::version::v662::types::ItemStackRequestSlotInfo;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[derive(ProtoCodec)]
 struct ActionsEntry {

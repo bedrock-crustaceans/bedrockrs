@@ -1,5 +1,5 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::types::MoveActorDeltaData;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 111)]
 #[derive(ProtoCodec)]

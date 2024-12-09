@@ -1,6 +1,6 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::{AttributeModifierOperation, AttributeOperands};
 use crate::version::v662::types::ActorRuntimeID;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[derive(ProtoCodec)]
 struct AttributeModifier {

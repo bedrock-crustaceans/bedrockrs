@@ -1,6 +1,6 @@
 pub mod PlayerPositionModeComponent {
-    use bedrockrs_macros::ProtoCodec;
     use crate::version::v662::enums::{ActorType, MinecraftEventing};
+    use bedrockrs_macros::ProtoCodec;
 
     #[derive(ProtoCodec)]
     #[enum_repr(i8)]

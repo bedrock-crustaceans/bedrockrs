@@ -1,5 +1,5 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::StructureTemplateResponseType;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 133)]
 #[derive(ProtoCodec)]

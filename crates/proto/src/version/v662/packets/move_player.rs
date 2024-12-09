@@ -1,12 +1,11 @@
 use crate::version::v662::enums::PlayerPositionModeComponent;
 use bedrockrs_core::{Vec2, Vec3};
-use bedrockrs_macros::{gamepacket, gamepackets, ProtoCodec};
+use bedrockrs_macros::gamepacket;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::{ProtoCodec, ProtoCodecLE, ProtoCodecVAR};
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
 use byteorder::{ReadBytesExt, WriteBytesExt};
 use std::io::{Cursor, Read};
-use std::mem::size_of;
 use tokio::io::AsyncReadExt;
 
 #[gamepacket(id = 19)]

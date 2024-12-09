@@ -1,5 +1,5 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::types::NetworkItemInstanceDescriptor;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[derive(ProtoCodec)]
 struct WriteEntry {

@@ -1,6 +1,6 @@
-use uuid::Uuid;
-use bedrockrs_macros::ProtoCodec;
 use crate::version::v662::types::{NetworkItemInstanceDescriptor, ShapedChemistryRecipe, ShapedRecipe, ShapelessRecipe, ShulkerBoxRecipe, SmithingTransformRecipe, SmithingTrimRecipe};
+use bedrockrs_macros::ProtoCodec;
+use uuid::Uuid;
 
 #[derive(ProtoCodec)]
 #[enum_repr(i32)]

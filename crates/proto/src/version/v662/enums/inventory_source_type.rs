@@ -1,5 +1,5 @@
-use bedrockrs_macros::ProtoCodec;
 use crate::version::v662::enums::ContainerID;
+use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]
 #[enum_repr(u32)]

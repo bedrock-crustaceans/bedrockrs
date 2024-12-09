@@ -1,5 +1,5 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::AgentActionType;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 181)]
 #[derive(ProtoCodec)]

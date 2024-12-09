@@ -1,5 +1,5 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::{MinecraftPacketIds, PacketViolationSeverity, PacketViolationType};
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 156)]
 #[derive(ProtoCodec)]

@@ -1,5 +1,5 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::LevelEvent;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 124)]
 #[derive(ProtoCodec)]

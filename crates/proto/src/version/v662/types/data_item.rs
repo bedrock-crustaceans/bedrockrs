@@ -1,5 +1,5 @@
-use bedrockrs_macros::ProtoCodec;
 use crate::version::v662::enums::DataItemType;
+use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]
 pub struct DataItem {

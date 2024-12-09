@@ -1,9 +1,9 @@
-use std::io::{Cursor, Read};
-use byteorder::{ReadBytesExt, WriteBytesExt};
-use bedrockrs_macros::{gamepacket, ProtoCodec};
+use crate::version::v662::enums::TextPacketType;
+use bedrockrs_macros::gamepacket;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
-use crate::version::v662::enums::TextPacketType;
+use byteorder::{ReadBytesExt, WriteBytesExt};
+use std::io::{Cursor, Read};
 
 #[gamepacket(id = 9)]
 pub struct TextPacket {

@@ -1,5 +1,5 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::ShowStoreOfferRedirectType;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 91)]
 #[derive(ProtoCodec)]

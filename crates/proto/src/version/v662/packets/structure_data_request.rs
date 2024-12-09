@@ -1,6 +1,6 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::StructureTemplateRequestOperation;
 use crate::version::v662::types::{NetworkBlockPosition, StructureSettings};
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 132)]
 #[derive(ProtoCodec)]

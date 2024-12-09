@@ -1,6 +1,6 @@
+use crate::version::v662::enums::PredictionType;
 use bedrockrs_core::Vec3;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
-use crate::version::v662::enums::PredictionType;
 
 #[gamepacket(id = 161)]
 #[derive(ProtoCodec)]

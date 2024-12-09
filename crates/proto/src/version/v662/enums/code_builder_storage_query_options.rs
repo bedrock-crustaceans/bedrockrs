@@ -1,6 +1,6 @@
 pub mod CodeBuilderStorageQueryOptions {
     use bedrockrs_macros::ProtoCodec;
-    
+
     #[derive(ProtoCodec)]
     #[enum_repr(i8)]
     #[repr(i8)]

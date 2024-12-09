@@ -1,5 +1,5 @@
-use uuid::Uuid;
 use bedrockrs_macros::ProtoCodec;
+use uuid::Uuid;
 
 #[derive(ProtoCodec)]
 pub struct CommandOriginData {

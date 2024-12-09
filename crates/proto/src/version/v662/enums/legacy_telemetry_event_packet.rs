@@ -1,6 +1,6 @@
 pub mod LegacyTelemetryEventPacket {
     use bedrockrs_macros::ProtoCodec;
-    
+
     #[derive(ProtoCodec)]
     pub enum AgentResult {
         ActionFail = 0,

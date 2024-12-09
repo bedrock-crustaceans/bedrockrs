@@ -1,6 +1,6 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::ComplexInventoryTransaction;
 use crate::version::v662::types::InventoryTransaction;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[derive(ProtoCodec)]
 struct LegacySetItemSlotsEntry {

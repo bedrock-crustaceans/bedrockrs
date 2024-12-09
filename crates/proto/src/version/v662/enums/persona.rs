@@ -1,6 +1,6 @@
 pub mod Persona {
     use bedrockrs_macros::ProtoCodec;
-    
+
     #[derive(ProtoCodec)]
     #[enum_repr(u32)]
     #[enum_endianness(le)]

@@ -1,6 +1,6 @@
 pub mod Tag {
     use bedrockrs_macros::ProtoCodec;
-    
+
     #[derive(ProtoCodec)]
     pub enum Type {
         End = 0,

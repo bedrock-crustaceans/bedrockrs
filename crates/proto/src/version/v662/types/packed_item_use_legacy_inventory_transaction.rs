@@ -1,7 +1,7 @@
-use bedrockrs_core::Vec3;
-use bedrockrs_macros::ProtoCodec;
 use crate::version::v662::enums::ItemUseInventoryTransaction;
 use crate::version::v662::types::{InventoryAction, NetworkBlockPosition, NetworkItemStackDescriptor};
+use bedrockrs_core::Vec3;
+use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]
 struct ContainerSlotEntry {

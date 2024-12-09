@@ -1,5 +1,5 @@
-use bedrockrs_macros::ProtoCodec;
 use crate::version::v662::enums::MolangVersion;
+use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]
 pub struct InternalItemDescriptor {

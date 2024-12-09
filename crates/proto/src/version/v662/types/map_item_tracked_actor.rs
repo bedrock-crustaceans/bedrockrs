@@ -1,6 +1,6 @@
 pub mod MapItemTrackedActor {
-    use bedrockrs_macros::ProtoCodec;
     use crate::version::v662::types::{ActorUniqueID, NetworkBlockPosition};
+    use bedrockrs_macros::ProtoCodec;
 
     #[derive(ProtoCodec)]
     #[enum_repr(i32)]

@@ -1,8 +1,8 @@
-use std::io::Cursor;
+use crate::version::v662::enums::Connection;
 use bedrockrs_macros::gamepacket;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
-use crate::version::v662::enums::Connection;
+use std::io::Cursor;
 
 #[gamepacket(id = 5)]
 pub struct DisconnectPacket {

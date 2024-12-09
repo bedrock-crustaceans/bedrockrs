@@ -1,6 +1,6 @@
 pub mod ItemUseOnActorInventoryTransaction {
     use bedrockrs_macros::ProtoCodec;
-    
+
     #[derive(ProtoCodec)]
     pub enum ActionType {
         Interact = 0,

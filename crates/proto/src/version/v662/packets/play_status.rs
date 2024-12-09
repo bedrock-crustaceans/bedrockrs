@@ -1,5 +1,5 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::PlayStatus;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 2)]
 #[derive(ProtoCodec)]

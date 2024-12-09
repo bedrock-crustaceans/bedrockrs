@@ -1,7 +1,7 @@
-use bedrockrs_core::Vec3;
-use bedrockrs_macros::ProtoCodec;
 use crate::version::v662::enums::{AnimationMode, Mirror, Rotation};
 use crate::version::v662::types::{ActorUniqueID, NetworkBlockPosition};
+use bedrockrs_core::Vec3;
+use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]
 pub struct StructureSettings {

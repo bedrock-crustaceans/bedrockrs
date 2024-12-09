@@ -1,6 +1,6 @@
-use uuid::Uuid;
-use bedrockrs_macros::ProtoCodec;
 use crate::version::v662::types::{NetworkItemInstanceDescriptor, RecipeIngredient};
+use bedrockrs_macros::ProtoCodec;
+use uuid::Uuid;
 
 #[derive(ProtoCodec)]
 pub struct ShapelessRecipe {

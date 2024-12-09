@@ -1,5 +1,5 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::types::MoveActorAbsoluteData;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 18)]
 #[derive(ProtoCodec)]

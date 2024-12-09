@@ -1,5 +1,5 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::PlayerPermissionLevel;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 185)]
 #[derive(ProtoCodec)]

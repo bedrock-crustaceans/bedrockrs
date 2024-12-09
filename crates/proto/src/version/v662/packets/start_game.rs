@@ -1,8 +1,8 @@
-use uuid::Uuid;
-use bedrockrs_core::{Vec2, Vec3};
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::GameType;
 use crate::version::v662::types::{ActorRuntimeID, ActorUniqueID, ItemData, LevelSettings, NetworkPermissions, SyncedPlayerMovementSettings};
+use bedrockrs_core::{Vec2, Vec3};
+use bedrockrs_macros::{gamepacket, ProtoCodec};
+use uuid::Uuid;
 
 #[derive(ProtoCodec)]
 struct BlockProperty {

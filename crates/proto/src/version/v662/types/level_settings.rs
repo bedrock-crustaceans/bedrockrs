@@ -1,6 +1,6 @@
-use bedrockrs_macros::ProtoCodec;
-use crate::version::v662::enums::{Difficulty, GameType, GeneratorType, Editor, EducationEditionOffer, Social, PlayerPermissionLevel, ChatRestrictionLevel};
+use crate::version::v662::enums::{ChatRestrictionLevel, Difficulty, Editor, EducationEditionOffer, GameType, GeneratorType, PlayerPermissionLevel, Social};
 use crate::version::v662::types::{BaseGameVersion, EduSharedUriResource, Experiments, GameRulesChangedPacketData, NetworkBlockPosition, SpawnSettings};
+use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]
 pub struct LevelSettings {

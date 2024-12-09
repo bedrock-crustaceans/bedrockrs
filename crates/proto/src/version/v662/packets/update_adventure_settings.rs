@@ -1,5 +1,5 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::types::AdventureSettings;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 188)]
 #[derive(ProtoCodec)]

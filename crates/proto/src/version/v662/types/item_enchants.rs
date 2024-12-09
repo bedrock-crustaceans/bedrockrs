@@ -1,5 +1,5 @@
-use bedrockrs_macros::ProtoCodec;
 use crate::version::v662::enums::Enchant;
+use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec)]
 struct ItemEnchant {

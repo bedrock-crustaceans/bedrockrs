@@ -1,6 +1,6 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::{ContainerID, ContainerType};
 use crate::version::v662::types::ActorUniqueID;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 80)]
 #[derive(ProtoCodec)]

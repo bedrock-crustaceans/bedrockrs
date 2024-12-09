@@ -1,6 +1,6 @@
+use crate::version::v662::types::ActorRuntimeID;
 use bedrockrs_core::Vec3;
 use bedrockrs_macros::ProtoCodec;
-use crate::version::v662::types::ActorRuntimeID;
 
 #[derive(ProtoCodec)]
 pub struct MoveActorAbsoluteData {

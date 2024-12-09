@@ -1,5 +1,5 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::types::{NetworkBlockPosition, StructureEditorData};
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 90)]
 #[derive(ProtoCodec)]

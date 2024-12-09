@@ -1,5 +1,5 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::ObjectiveSortOrder;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 107)]
 #[derive(ProtoCodec)]

@@ -1,6 +1,6 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::types::SubChunkPacket;
 use crate::version::v662::types::SubChunkPos;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 175)]
 #[derive(ProtoCodec)]

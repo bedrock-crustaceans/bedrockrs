@@ -1,5 +1,5 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::{HudElement, HudVisibility};
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 308)]
 #[derive(ProtoCodec)]

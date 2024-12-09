@@ -1,6 +1,6 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::ActorBlockSyncMessage;
 use crate::version::v662::types::NetworkBlockPosition;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 110)]
 #[derive(ProtoCodec)]
