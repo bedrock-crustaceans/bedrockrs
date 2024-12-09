@@ -1,6 +1,10 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
-use crate::version::v662::types::ActorUniqueID;
 use crate::version::v662::enums::{ActorDamageCause, ActorType, MinecraftEventing};
+use crate::version::v662::types::ActorUniqueID;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
+use bedrockrs_proto_core::error::ProtoCodecError;
+use bedrockrs_proto_core::{ProtoCodec, ProtoCodecVAR};
+use std::io::{Cursor, Read};
+use varint_rs::{VarintReader, VarintWriter};
 
 #[derive(ProtoCodec)]
 #[enum_repr(i32)]
@@ -91,7 +95,8 @@ enum Type {
         command_name: String,
         error_list: String,
     } = 11,
-    #[deprecated] FishBucketed = 12,
+    #[deprecated]
+    FishBucketed = 12,
     MobBorn {
         #[endianness(var)]
         baby_entity_type: i32,
@@ -154,11 +159,49 @@ enum Type {
 }
 
 #[gamepacket(id = 65)]
-#[derive(ProtoCodec)]
 pub struct LegacyTelemetryEventPacket {
     pub target_actor_id: ActorUniqueID,
     pub event_type: Type,
     pub use_player_id: i8,
 }
 
-// TODO: custom proto impl, enum variant serialization
+impl ProtoCodec for LegacyTelemetryEventPacket {
+    fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
+        let mut event_type_stream: Vec<u8> = Vec::new();
+        <Type as ProtoCodec>::proto_serialize(&self.event_type, &mut event_type_stream)?;
+        let mut event_type_cursor = Cursor::new(event_type_stream.as_slice());
+
+        <ActorUniqueID as ProtoCodec>::proto_serialize(&self.target_actor_id, stream)?;
+        stream.write_i32_varint(event_type_cursor.read_i32_varint()?)?;
+        <i8 as ProtoCodec>::proto_serialize(&self.use_player_id, stream)?;
+        event_type_cursor.read_to_end(stream)?;
+
+        Ok(())
+    }
+
+    fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
+        let mut event_type_stream: Vec<u8> = Vec::new();
+
+        let target_actor_id = <ActorUniqueID as ProtoCodec>::proto_deserialize(stream)?;
+        event_type_stream.write_i32_varint(stream.read_i32_varint()?)?;
+        let use_player_id = <i8 as ProtoCodec>::proto_deserialize(stream)?;
+        stream.read_to_end(&mut event_type_stream)?;
+
+        let mut event_type_cursor = Cursor::new(event_type_stream.as_slice());
+        let event_type = <Type as ProtoCodec>::proto_deserialize(&mut event_type_cursor)?;
+
+        Ok(Self {
+            target_actor_id,
+            event_type,
+            use_player_id,
+        })
+    }
+
+    fn get_size_prediction(&self) -> usize {
+        self.event_type.get_size_prediction()
+        + self.target_actor_id.get_size_prediction()
+        + self.use_player_id.get_size_prediction()
+    }
+}
+
+// VERIFY: ProtoCodec impl
