@@ -1,6 +1,6 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::{ContainerID, ContainerType};
-use crate::version::v662::types::{ActorUniqueID, CompoundTag};
+use crate::version::v662::types::ActorUniqueID;
 
 #[gamepacket(id = 81)]
 #[derive(ProtoCodec)]
@@ -10,5 +10,6 @@ pub struct UpdateEquipPacket {
     #[endianness(var)]
     pub size: i32,
     pub target_actor_id: ActorUniqueID,
-    pub data_tags: CompoundTag,
+    #[nbt]
+    pub data_tags: nbtx::Value, // TODO: NBT Structure
 }
