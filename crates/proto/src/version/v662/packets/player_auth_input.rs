@@ -94,6 +94,7 @@ struct ClientPredictedVehicleData {
 }
 
 #[gamepacket(id = 144)]
+#[derive(Clone, Debug)]
 pub struct PlayerAuthInputPacket {
     pub player_rotation: Vec2<f32>,
     pub player_position: Vec3<f32>,

@@ -7,6 +7,7 @@ use std::io::Cursor;
 use std::mem::size_of;
 
 #[gamepacket(id = 78)]
+#[derive(Clone, Debug)]
 pub struct CommandBlockUpdatePacket {
     pub is_block: bool,
     pub target_runtime_id: Option<ActorRuntimeID>, // Only if is_block is false

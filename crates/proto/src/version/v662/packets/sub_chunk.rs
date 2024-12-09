@@ -7,7 +7,7 @@ use std::cmp::PartialEq;
 use std::io::Cursor;
 use std::mem::size_of;
 
-#[derive(ProtoCodec, PartialEq)]
+#[derive(ProtoCodec, Clone, Debug, PartialEq)]
 #[enum_repr(i8)]
 #[repr(i8)]
 pub enum HeightMapDataType {
@@ -17,7 +17,7 @@ pub enum HeightMapDataType {
     AllTooLow = 3,
 }
 
-#[derive(ProtoCodec, PartialEq)]
+#[derive(ProtoCodec, Clone, Debug, PartialEq)]
 #[enum_repr(i8)]
 #[repr(i8)]
 pub enum SubChunkRequestResult {
@@ -30,6 +30,7 @@ pub enum SubChunkRequestResult {
     SuccessAllAir = 6,
 }
 
+#[derive(Clone, Debug)]
 struct SubChunkDataEntry {
     pub sub_chunk_pos_offset: SubChunkPosOffset,
     pub sub_chunk_request_result: SubChunkRequestResult,
@@ -40,6 +41,7 @@ struct SubChunkDataEntry {
 }
 
 #[gamepacket(id = 174)]
+#[derive(Clone, Debug)]
 pub struct SubChunkPacket {
     pub cache_enabled: bool,
     pub dimension_type: i32,

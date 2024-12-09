@@ -159,6 +159,7 @@ enum Type {
 }
 
 #[gamepacket(id = 65)]
+#[derive(Clone, Debug)]
 pub struct LegacyTelemetryEventPacket {
     pub target_actor_id: ActorUniqueID,
     pub event_type: Type,

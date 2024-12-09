@@ -9,6 +9,7 @@ use std::mem::size_of;
 use varint_rs::{VarintReader, VarintWriter};
 
 #[gamepacket(id = 120)]
+#[derive(Clone, Debug)]
 pub struct LevelSoundEventPacketV2 {
     pub event_id: Puv::Legacy::LevelSoundEvent,
     pub position: Vec3<f32>,

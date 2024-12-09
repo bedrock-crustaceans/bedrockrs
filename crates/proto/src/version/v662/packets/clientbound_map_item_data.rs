@@ -46,6 +46,7 @@ enum Type {
 }
 
 #[gamepacket(id = 67)]
+#[derive(Clone, Debug)]
 pub struct ClientboundMapItemDataPacket {
     pub map_id: ActorUniqueID,
     pub type_flags: Type,

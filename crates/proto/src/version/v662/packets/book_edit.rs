@@ -7,6 +7,7 @@ use std::mem::size_of;
 use std::io::{Cursor, Read};
 
 #[gamepacket(id = 97)]
+#[derive(Clone, Debug)]
 pub struct BookEditPacket {
     pub action: BookEditAction,
     pub book_slot: i8,

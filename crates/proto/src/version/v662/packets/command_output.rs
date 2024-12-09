@@ -17,6 +17,7 @@ struct OutputMessagesEntry {
 }
 
 #[gamepacket(id = 79)]
+#[derive(Clone, Debug)]
 pub struct CommandOutputPacket {
     pub origin_data: CommandOriginData,
     pub output_type: CommandOutputType,

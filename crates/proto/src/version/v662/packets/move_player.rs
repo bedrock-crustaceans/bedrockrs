@@ -8,6 +8,7 @@ use byteorder::{ReadBytesExt, WriteBytesExt};
 use std::io::{Cursor, Read};
 
 #[gamepacket(id = 19)]
+#[derive(Clone, Debug)]
 pub struct MovePlayerPacket {
     pub player_runtime_id: ActorRuntimeID,
     pub position: Vec3<f32>,

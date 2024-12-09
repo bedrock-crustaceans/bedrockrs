@@ -26,6 +26,7 @@ enum Action {
 }
 
 #[gamepacket(id = 44)]
+#[derive(Clone, Debug)]
 pub struct AnimatePacket {
     pub action: Action,
     pub target_runtime_id: ActorRuntimeID,

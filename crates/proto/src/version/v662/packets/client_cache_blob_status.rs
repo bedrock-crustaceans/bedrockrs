@@ -5,6 +5,7 @@ use std::io::Cursor;
 use std::mem::size_of;
 
 #[gamepacket(id = 135)]
+#[derive(Clone, Debug)]
 pub struct ClientCacheBlobStatusPacket {
     pub missing_blobs: Vec<u64>,
     pub obtained_blobs: Vec<u64>,
