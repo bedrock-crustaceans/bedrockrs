@@ -1,11 +1,13 @@
+use bedrockrs_core::Vec3;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::PlayerRespawnState;
-use crate::version::v662::types::{ActorRuntimeID, Vec3};
+use crate::version::v662::types::ActorRuntimeID;
 
 #[gamepacket(id = 45)]
 #[derive(ProtoCodec)]
 pub struct RespawnPacket {
-    pub position: Vec3,
+    #[endianness(le)]
+    pub position: Vec3<f32>,
     pub state: PlayerRespawnState,
     pub player_runtime_id: ActorRuntimeID,
 }
