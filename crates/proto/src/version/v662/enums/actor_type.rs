@@ -1,5 +1,4 @@
 use bedrockrs_macros::ProtoCodec;
-use bitflags::bitflags;
 
 mod flags {
     pub const UNDEFINED: i32 = 1;
