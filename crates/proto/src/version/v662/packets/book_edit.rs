@@ -3,9 +3,8 @@ use bedrockrs_macros::gamepacket;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 use byteorder::{ReadBytesExt, WriteBytesExt};
-use std::intrinsics::size_of;
+use std::mem::size_of;
 use std::io::{Cursor, Read};
-use tokio::io::AsyncReadExt;
 
 #[gamepacket(id = 97)]
 pub struct BookEditPacket {
@@ -31,7 +30,7 @@ impl ProtoCodec for BookEditPacket {
 
         action_stream.write_i8(stream.read_i8()?)?;
         let book_slot = <i8 as ProtoCodec>::proto_deserialize(stream)?;
-        stream.read_to_end(action_stream)?;
+        stream.read_to_end(&mut action_stream)?;
 
         let mut action_cursor = Cursor::new(action_stream.as_slice());
         let action = <BookEditAction as ProtoCodec>::proto_deserialize(&mut action_cursor)?;

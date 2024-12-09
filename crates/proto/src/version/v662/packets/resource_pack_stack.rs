@@ -1,7 +1,7 @@
 use crate::version::v662::types::{BaseGameVersion, Experiments};
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct PackEntry {
     pub id: String,
     pub version: String,
@@ -9,7 +9,7 @@ struct PackEntry {
 }
 
 #[gamepacket(id = 7)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct ResourcePackStackPacket {
     pub texture_pack_required: bool,
     #[vec_repr(u32)]

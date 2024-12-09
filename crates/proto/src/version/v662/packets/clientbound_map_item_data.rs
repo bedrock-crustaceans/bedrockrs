@@ -1,18 +1,22 @@
 use crate::version::v662::types::{ActorUniqueID, BlockPos, MapDecoration, MapItemTrackedActor};
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 use bedrockrs_proto_core::error::ProtoCodecError;
-use bedrockrs_proto_core::{ProtoCodec, ProtoCodecVAR};
+use bedrockrs_proto_core::ProtoCodec;
 use std::io::{Cursor, Read};
-use std::mem::size_of;
-use tokio::io::AsyncReadExt;
 use varint_rs::{VarintReader, VarintWriter};
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
+struct PixelsEntry {
+    #[endianness(var)]
+    pub pixel: u32,
+}
+
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(u32)]
 #[enum_endianness(var)]
 #[repr(u32)]
 enum Type {
-    Invalid = 0,
+    Invalid = 0x0,
     TextureUpdate {
         #[endianness(var)]
         texture_width: i32,
@@ -24,8 +28,8 @@ enum Type {
         y_tex_coordinate: i32,
         #[vec_repr(u32)]
         #[vec_endianness(var)]
-        pixels: Vec<u32>,
-    } = 1 << 1,
+        pixels: Vec<PixelsEntry>,
+    } = 0x2,
     DecorationUpdate {
         #[vec_repr(u32)]
         #[vec_endianness(var)]
@@ -33,12 +37,12 @@ enum Type {
         #[vec_repr(u32)]
         #[vec_endianness(var)]
         decoration_list: Vec<MapDecoration>,
-    } = 1 << 2,
+    } = 0x4,
     Creation {
         #[vec_repr(u32)]
         #[vec_endianness(var)]
         map_id_list: Vec<ActorUniqueID>,
-    } = 1 << 3,
+    } = 0x8,
 }
 
 #[gamepacket(id = 67)]
@@ -74,7 +78,7 @@ impl ProtoCodec for ClientboundMapItemDataPacket {
         let dimension = <i8 as ProtoCodec>::proto_deserialize(stream)?;
         let is_locked = <bool as ProtoCodec>::proto_deserialize(stream)?;
         let map_origin = <BlockPos as ProtoCodec>::proto_deserialize(stream)?;
-        stream.read_to_end(type_flags_stream)?;
+        stream.read_to_end(&mut type_flags_stream)?;
 
         let mut type_flags_cursor = Cursor::new(type_flags_stream.as_slice());
         let type_flags = <Type as ProtoCodec>::proto_deserialize(&mut type_flags_cursor)?;

@@ -2,7 +2,7 @@ use crate::version::v662::types::{ActorLink, ActorRuntimeID, ActorUniqueID, Data
 use bedrockrs_core::{Vec2, Vec3};
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct AttributeEntry {
     pub attribute_name: String,
     #[endianness(le)]
@@ -14,7 +14,7 @@ struct AttributeEntry {
 }
 
 #[gamepacket(id = 13)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct AddActorPacket {
     pub target_actor_id: ActorUniqueID,
     pub target_runtime_id: ActorRuntimeID,

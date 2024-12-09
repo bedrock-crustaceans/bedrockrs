@@ -5,14 +5,13 @@ use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::{ProtoCodec, ProtoCodecLE, ProtoCodecVAR};
 use byteorder::{ReadBytesExt, WriteBytesExt};
 use std::io::Cursor;
+use std::mem::size_of;
 use varint_rs::{VarintReader, VarintWriter};
 
 #[gamepacket(id = 120)]
 pub struct LevelSoundEventPacketV2 {
     pub event_id: Puv::Legacy::LevelSoundEvent,
-    #[endianness(le)]
     pub position: Vec3<f32>,
-    #[endianness(var)]
     pub data: i32,
     pub actor_identifier: String,
     pub baby_mob: bool,
@@ -62,9 +61,9 @@ impl ProtoCodec for LevelSoundEventPacketV2 {
     }
 
     fn get_size_prediction(&self) -> usize {
-        self.event_id.get_size_prediction()
-            + self.position.get_size_prediction()
-            + self.data.get_size_prediction()
+        size_of::<i8>()
+            + ProtoCodecLE::get_size_prediction(&self.position)
+            + ProtoCodecVAR::get_size_prediction(&self.data)
             + self.actor_identifier.get_size_prediction()
             + self.baby_mob.get_size_prediction()
             + self.global.get_size_prediction()

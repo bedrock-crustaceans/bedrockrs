@@ -1,7 +1,7 @@
 use bedrockrs_core::Vec3;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(u32)]
 #[enum_endianness(var)]
 #[repr(u32)]
@@ -26,7 +26,7 @@ enum Type {
 }
 
 #[gamepacket(id = 163)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct ClientboundDebugRendererPacket {
     pub debug_marker_type: Type,
 }

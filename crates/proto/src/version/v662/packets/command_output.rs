@@ -5,9 +5,9 @@ use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::{ProtoCodec, ProtoCodecVAR};
 use std::io::{Cursor, Read};
 use std::mem::size_of;
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use byteorder::{ReadBytesExt, WriteBytesExt};
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct OutputMessagesEntry {
     pub successful: bool,
     pub message_id: String,
@@ -21,8 +21,6 @@ pub struct CommandOutputPacket {
     pub origin_data: CommandOriginData,
     pub output_type: CommandOutputType,
     pub success_count: u32,
-    #[vec_repr(u32)]
-    #[vec_endianness(var)]
     pub output_messages: Vec<OutputMessagesEntry>,
 }
 
@@ -38,7 +36,7 @@ impl ProtoCodec for CommandOutputPacket {
         <CommandOriginData as ProtoCodec>::proto_serialize(&self.origin_data, stream)?;
         stream.write_i8(output_type_cursor.read_i8()?)?;
         <u32 as ProtoCodecVAR>::proto_serialize(&self.success_count, stream)?;
-        <u32 as ProtoCodecVAR>::proto_serialize(&self.output_messages.len().try_into(), stream)?;
+        <u32 as ProtoCodecVAR>::proto_serialize(&(self.output_messages.len() as u32), stream)?;
         for i in &self.output_messages {
             <OutputMessagesEntry as ProtoCodec>::proto_serialize(i, stream)?;
         }
@@ -54,7 +52,7 @@ impl ProtoCodec for CommandOutputPacket {
         output_type_stream.write_i8(stream.read_i8()?)?;
         let success_count = <u32 as ProtoCodecVAR>::proto_deserialize(stream)?;
         let output_messages = {
-            let len = <u32 as ProtoCodec>::proto_deserialize(stream)?;
+            let len = <u32 as ProtoCodecVAR>::proto_deserialize(stream)?;
             let mut vec = Vec::with_capacity(len.try_into()?);
             for _ in 0..len {
                 vec.push(<OutputMessagesEntry as ProtoCodec>::proto_deserialize(
@@ -63,7 +61,7 @@ impl ProtoCodec for CommandOutputPacket {
             }
             vec
         };
-        stream.read_to_end(output_type_stream)?;
+        stream.read_to_end(&mut output_type_stream)?;
 
         let mut output_type_cursor = Cursor::new(output_type_stream.as_slice());
         let output_type =

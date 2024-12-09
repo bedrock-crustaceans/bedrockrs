@@ -1,7 +1,7 @@
 use crate::version::v662::types::{InventorySource, NetworkItemStackDescriptor};
 use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct InventoryAction {
     pub source: InventorySource,
     #[endianness(le)]

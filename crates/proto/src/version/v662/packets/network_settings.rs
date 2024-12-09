@@ -2,7 +2,7 @@ use crate::version::v662::enums::PacketCompressionAlgorithm;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 143)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct NetworkSettingsPacket {
     #[endianness(le)]
     pub compression_threshold: u16,

@@ -1,7 +1,7 @@
 use bedrockrs_macros::ProtoCodec;
 use uuid::Uuid;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct CommandOriginData {
     #[endianness(var)]
     pub command_type: u32,

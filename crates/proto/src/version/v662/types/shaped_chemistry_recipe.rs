@@ -2,7 +2,7 @@ use crate::version::v662::types::{NetworkItemInstanceDescriptor, RecipeIngredien
 use bedrockrs_macros::ProtoCodec;
 use uuid::Uuid;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct ShapedChemistryRecipe {
     pub recipe_id: String,
     #[endianness(var)]

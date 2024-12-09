@@ -1,7 +1,7 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 115)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct NetworkStackLatencyPacket {
     #[endianness(le)]
     pub creation_time: u64,

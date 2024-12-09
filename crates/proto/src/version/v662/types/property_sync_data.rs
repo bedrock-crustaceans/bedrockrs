@@ -1,6 +1,6 @@
 use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct IntEntry {
     #[endianness(var)]
     pub property_index: u32,
@@ -8,7 +8,7 @@ struct IntEntry {
     pub data: f32,
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct FloatEntry {
     #[endianness(var)]
     pub property_index: u32,
@@ -16,7 +16,7 @@ struct FloatEntry {
     pub data: i32,
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct PropertySyncData {
     #[vec_repr(u32)]
     #[vec_endianness(var)]

@@ -3,7 +3,7 @@ use bedrockrs_macros::{gamepacket, ProtoCodec};
 use uuid::Uuid;
 
 #[gamepacket(id = 152)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct EmoteListPacket {
     pub runtime_id: ActorRuntimeID,
     #[vec_repr(u32)]

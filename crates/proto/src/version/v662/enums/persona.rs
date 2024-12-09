@@ -1,7 +1,7 @@
 pub mod Persona {
     use bedrockrs_macros::ProtoCodec;
 
-    #[derive(ProtoCodec)]
+    #[derive(ProtoCodec, Clone, Debug)]
     #[enum_repr(u32)]
     #[enum_endianness(le)]
     #[repr(u32)]
@@ -12,7 +12,7 @@ pub mod Persona {
         Body128x128 = 3,
     }
     
-    #[derive(ProtoCodec)]
+    #[derive(ProtoCodec, Clone, Debug)]
     #[enum_repr(u32)]
     #[enum_endianness(le)]
     #[repr(u32)]

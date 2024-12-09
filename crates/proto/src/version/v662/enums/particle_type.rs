@@ -1,6 +1,6 @@
 use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub enum ParticleType {
     Undefined = 0,
     Bubble = 1,

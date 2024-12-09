@@ -1,7 +1,7 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 306)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct PlayerToggleCrafterSlotRequestPacket {
     #[endianness(le)]
     pub pos_x: i32,

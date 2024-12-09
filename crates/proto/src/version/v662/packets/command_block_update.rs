@@ -18,7 +18,6 @@ pub struct CommandBlockUpdatePacket {
     pub last_output: String,
     pub name: String,
     pub track_output: bool,
-    #[endianness(le)]
     pub tick_delay: u32,
     pub should_execute_on_first_tick: bool,
 }

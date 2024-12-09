@@ -1,7 +1,7 @@
 use crate::version::v662::types::ItemEnchants;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct OptionsEntry {
     #[endianness(var)]
     pub cost: u32,
@@ -12,7 +12,7 @@ struct OptionsEntry {
 }
 
 #[gamepacket(id = 146)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct PlayerEnchantOptionsPacket {
     #[vec_repr(u32)]
     #[vec_endianness(var)]

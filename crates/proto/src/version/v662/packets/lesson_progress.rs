@@ -2,7 +2,7 @@ use crate::version::v662::enums::LessonAction;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 183)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct LessonProgressPacket {
     pub lesson_action: LessonAction,
     #[endianness(var)]

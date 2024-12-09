@@ -2,13 +2,10 @@ use crate::version::v662::types::ActorRuntimeID;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
-use futures::AsyncWriteExt;
 use std::io::{Cursor, Read};
-use std::mem::size_of;
-use tokio::io::AsyncReadExt;
 use varint_rs::{VarintReader, VarintWriter};
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i32)]
 #[enum_endianness(var)]
 #[repr(i32)]
@@ -52,7 +49,7 @@ impl ProtoCodec for AnimatePacket {
 
         action_stream.write_i32_varint(stream.read_i32_varint()?)?;
         let target_runtime_id = <ActorRuntimeID as ProtoCodec>::proto_deserialize(stream)?;
-        stream.read_to_end(action_stream)?;
+        stream.read_to_end(&mut action_stream)?;
 
         let mut action_cursor = Cursor::new(action_stream.as_slice());
         let action = <Action as ProtoCodec>::proto_deserialize(&mut action_cursor)?;

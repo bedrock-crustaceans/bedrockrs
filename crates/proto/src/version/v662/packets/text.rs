@@ -6,6 +6,7 @@ use byteorder::{ReadBytesExt, WriteBytesExt};
 use std::io::{Cursor, Read};
 
 #[gamepacket(id = 9)]
+#[derive(Clone, Debug)]
 pub struct TextPacket {
     pub message_type: TextPacketType,
     pub localize: bool,

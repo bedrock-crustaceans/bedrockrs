@@ -1,6 +1,6 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct BehaviourPackEntry {
     pub id: String,
     pub version: String,
@@ -12,7 +12,7 @@ struct BehaviourPackEntry {
     pub has_scripts: bool,
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct ResourcePackEntry {
     pub id: String,
     pub version: String,
@@ -25,14 +25,14 @@ struct ResourcePackEntry {
     pub is_ray_tracing_capable: bool,
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct CDNUrl {
     pub first: String,
     pub second: String,
 }
 
 #[gamepacket(id = 6)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct ResourcePacksInfoPacket {
     pub resource_pack_required: bool,
     pub has_addon_packs: bool,

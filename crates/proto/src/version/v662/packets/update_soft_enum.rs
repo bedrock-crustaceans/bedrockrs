@@ -2,7 +2,7 @@ use crate::version::v662::enums::SoftEnumUpdateType;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 114)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct UpdateSoftEnumPacket {
     pub enum_name: String,
     #[vec_repr(u32)]

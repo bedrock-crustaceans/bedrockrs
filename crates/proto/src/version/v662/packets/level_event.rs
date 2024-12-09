@@ -3,7 +3,7 @@ use bedrockrs_core::Vec3;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 25)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct LevelEventPacket {
     pub event_id: LevelEvent,
     #[endianness(le)]

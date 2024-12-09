@@ -1,6 +1,6 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct ItemsEntry {
     pub component_item_name: String,
     #[nbt]
@@ -8,7 +8,7 @@ struct ItemsEntry {
 }
 
 #[gamepacket(id = 162)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct ItemComponentPacket {
     #[vec_repr(u32)]
     #[vec_endianness(var)]

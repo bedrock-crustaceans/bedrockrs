@@ -2,7 +2,7 @@ use crate::version::v662::types::ActorRuntimeID;
 use bedrockrs_core::Vec3;
 use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct MoveActorAbsoluteData {
     pub actor_runtime_id: ActorRuntimeID,
     pub header: i8,

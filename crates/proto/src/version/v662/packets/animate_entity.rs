@@ -3,7 +3,7 @@ use crate::version::v662::types::ActorRuntimeID;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 158)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct AnimateEntityPacket {
     pub animation: String,
     pub next_state: String,

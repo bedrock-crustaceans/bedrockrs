@@ -1,7 +1,7 @@
 use crate::version::v662::types::ActorUniqueID;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct ClientPixelsListEntry {
     #[endianness(le)]
     pub pixel: u32,
@@ -10,7 +10,7 @@ struct ClientPixelsListEntry {
 }
 
 #[gamepacket(id = 68)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct MapInfoRequestPacket {
     pub map_unique_id: ActorUniqueID,
     #[vec_repr(u32)]

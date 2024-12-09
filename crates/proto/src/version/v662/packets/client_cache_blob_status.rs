@@ -6,18 +6,14 @@ use std::mem::size_of;
 
 #[gamepacket(id = 135)]
 pub struct ClientCacheBlobStatusPacket {
-    #[vec_repr(u32)]
-    #[vec_endianness(var)]
     pub missing_blobs: Vec<u64>,
-    #[vec_repr(u32)]
-    #[vec_endianness(var)]
     pub obtained_blobs: Vec<u64>,
 }
 
 impl ProtoCodec for ClientCacheBlobStatusPacket {
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
-        <u32 as ProtoCodecVAR>::proto_serialize(self.missing_blobs.len().try_into()?, stream)?;
-        <u32 as ProtoCodecVAR>::proto_serialize(self.obtained_blobs.len().try_into()?, stream)?;
+        <u32 as ProtoCodecVAR>::proto_serialize(&(self.missing_blobs.len() as u32), stream)?;
+        <u32 as ProtoCodecVAR>::proto_serialize(&(self.obtained_blobs.len() as u32), stream)?;
         for i in &self.missing_blobs {
             <u64 as ProtoCodecLE>::proto_serialize(i, stream)?;
         }

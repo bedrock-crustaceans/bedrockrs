@@ -1,6 +1,6 @@
 use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i16)]
 #[enum_endianness(le)]
 #[repr(i16)]

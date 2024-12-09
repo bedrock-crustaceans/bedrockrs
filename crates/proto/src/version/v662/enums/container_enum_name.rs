@@ -1,6 +1,6 @@
 use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub enum ContainerEnumName {
     AnvilInputContainer = 0,
     AnvilMaterialContainer = 1,

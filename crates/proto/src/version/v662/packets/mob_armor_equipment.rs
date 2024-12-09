@@ -2,7 +2,7 @@ use crate::version::v662::types::{ActorRuntimeID, NetworkItemStackDescriptor};
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 32)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct MobArmorEquipmentPacket {
     pub target_runtime_id: ActorRuntimeID,
     pub head: NetworkItemStackDescriptor,

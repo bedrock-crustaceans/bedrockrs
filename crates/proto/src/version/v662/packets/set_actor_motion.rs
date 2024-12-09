@@ -3,7 +3,7 @@ use bedrockrs_core::Vec3;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 40)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct SetActorMotionPacket {
     pub target_runtime_id: ActorRuntimeID,
     #[endianness(le)]

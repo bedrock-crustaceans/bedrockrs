@@ -5,7 +5,7 @@ use bedrockrs_macros::{gamepacket, ProtoCodec};
 use uuid::Uuid;
 
 #[gamepacket(id = 12)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct AddPlayerPacket {
     pub uuid: Uuid,
     pub player_name: String,

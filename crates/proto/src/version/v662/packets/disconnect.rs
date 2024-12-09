@@ -5,6 +5,7 @@ use bedrockrs_proto_core::ProtoCodec;
 use std::io::Cursor;
 
 #[gamepacket(id = 5)]
+#[derive(Clone, Debug)]
 pub struct DisconnectPacket {
     pub reason: Connection::DisconnectFailReason,
     pub message: Option<String>

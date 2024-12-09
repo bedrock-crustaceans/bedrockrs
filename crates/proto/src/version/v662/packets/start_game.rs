@@ -4,7 +4,7 @@ use bedrockrs_core::{Vec2, Vec3};
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 use uuid::Uuid;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct BlockProperty {
     pub block_name: String,
     #[nbt]
@@ -12,7 +12,7 @@ struct BlockProperty {
 }
 
 #[gamepacket(id = 11)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct StartGamePacket {
     pub target_actor_id: ActorUniqueID,
     pub target_runtime_id: ActorRuntimeID,

@@ -3,7 +3,7 @@ use bedrockrs_core::Vec3;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 157)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct MotionPredictionHintsPacket {
     pub runtime_id: ActorRuntimeID,
     #[endianness(le)]

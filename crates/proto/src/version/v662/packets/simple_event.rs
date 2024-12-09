@@ -1,6 +1,6 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(u16)]
 #[enum_endianness(le)]
 #[repr(u16)]
@@ -12,7 +12,7 @@ enum Subtype {
 }
 
 #[gamepacket(id = 64)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct SimpleEventPacket {
     pub simple_event_type: Subtype,
 }

@@ -1,7 +1,7 @@
 pub mod SerializedAbilitiesData {
     use bedrockrs_macros::ProtoCodec;
 
-    #[derive(ProtoCodec)]
+    #[derive(ProtoCodec, Clone, Debug)]
     pub enum SerializedAbilitiesLayer {
         CustomCache = 0,
         Base = 1,

@@ -3,7 +3,7 @@ use crate::version::v662::types::SubChunkPos;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 175)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct SubChunkRequestPacket {
     #[endianness(var)]
     pub dimension_type: i32,

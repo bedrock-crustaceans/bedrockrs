@@ -1,7 +1,7 @@
 pub mod MapItemTrackedActor {
     use bedrockrs_macros::ProtoCodec;
 
-    #[derive(ProtoCodec)]
+    #[derive(ProtoCodec, Clone, Debug)]
     pub enum Type {
         Entity = 0,
         BlockEntity = 1,

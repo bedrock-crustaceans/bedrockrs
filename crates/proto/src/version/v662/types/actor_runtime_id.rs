@@ -4,6 +4,7 @@ use std::io::Cursor;
 use std::mem::size_of;
 use varint_rs::{VarintReader, VarintWriter};
 
+#[derive(Clone, Debug)]
 pub struct ActorRuntimeID(pub u64);
 
 impl ProtoCodec for ActorRuntimeID {

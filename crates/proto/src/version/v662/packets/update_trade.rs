@@ -3,7 +3,7 @@ use crate::version::v662::types::ActorUniqueID;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 80)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct UpdateTradePacket {
     pub container_id: ContainerID,
     pub container_type: ContainerType,

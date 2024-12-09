@@ -42,11 +42,8 @@ struct SubChunkDataEntry {
 #[gamepacket(id = 174)]
 pub struct SubChunkPacket {
     pub cache_enabled: bool,
-    #[endianness(var)]
     pub dimension_type: i32,
     pub center_pos: SubChunkPos,
-    #[vec_repr(u32)]
-    #[vec_endianness(le)]
     pub sub_chunk_data: Vec<SubChunkDataEntry>,
 }
 
@@ -59,8 +56,8 @@ impl ProtoCodec for SubChunkPacket {
         for i in &self.sub_chunk_data {
             i.sub_chunk_pos_offset.proto_serialize(stream)?;
             i.sub_chunk_request_result.proto_serialize(stream)?;
-            if (i.sub_chunk_request_result == SubChunkRequestResult::SuccessAllAir
-                || self.cache_enabled)
+            if i.sub_chunk_request_result == SubChunkRequestResult::SuccessAllAir
+                || self.cache_enabled
             {
                 i.serialized_sub_chunk
                     .as_ref()
@@ -68,7 +65,7 @@ impl ProtoCodec for SubChunkPacket {
                     .proto_serialize(stream)?;
             }
             i.height_map_data_type.proto_serialize(stream)?;
-            if (i.height_map_data_type == HeightMapDataType::HasData) {
+            if i.height_map_data_type == HeightMapDataType::HasData {
                 let height_map = i.sub_chunk_height_map.as_ref().unwrap();
                 for x in height_map {
                     for y in x {
@@ -76,7 +73,7 @@ impl ProtoCodec for SubChunkPacket {
                     }
                 }
             }
-            if (self.cache_enabled) {
+            if self.cache_enabled {
                 <u64 as ProtoCodecLE>::proto_serialize(&i.blob_id.as_ref().unwrap(), stream)?;
             }
         }
@@ -94,16 +91,16 @@ impl ProtoCodec for SubChunkPacket {
             for _ in 0..len {
                 let sub_chunk_pos_offset = SubChunkPosOffset::proto_deserialize(stream)?;
                 let sub_chunk_request_result = SubChunkRequestResult::proto_deserialize(stream)?;
-                let serialized_sub_chunk = match (sub_chunk_request_result
+                let serialized_sub_chunk = match sub_chunk_request_result
                     == SubChunkRequestResult::SuccessAllAir
-                    || cache_enabled)
+                    || cache_enabled
                 {
                     true => Some(String::proto_deserialize(stream)?),
                     false => None,
                 };
                 let height_map_data_type = HeightMapDataType::proto_deserialize(stream)?;
                 let sub_chunk_height_map =
-                    match (height_map_data_type == HeightMapDataType::HasData) {
+                    match height_map_data_type == HeightMapDataType::HasData {
                         true => {
                             let mut height_map: [[i8; 16]; 16] = [[0; 16]; 16];
                             for x in 0..16 {
@@ -152,8 +149,8 @@ impl ProtoCodec for SubChunkPacket {
                 .map(|i| {
                     i.sub_chunk_pos_offset.get_size_prediction()
                         + i.sub_chunk_request_result.get_size_prediction()
-                        + match (i.sub_chunk_request_result == SubChunkRequestResult::SuccessAllAir
-                            || self.cache_enabled)
+                        + match i.sub_chunk_request_result == SubChunkRequestResult::SuccessAllAir
+                            || self.cache_enabled
                         {
                             true => i
                                 .serialized_sub_chunk
@@ -163,14 +160,14 @@ impl ProtoCodec for SubChunkPacket {
                             false => 0,
                         }
                         + i.height_map_data_type.get_size_prediction()
-                        + match (i.height_map_data_type == HeightMapDataType::HasData) {
+                        + match i.height_map_data_type == HeightMapDataType::HasData {
                             true => {
                                 let height_map = i.sub_chunk_height_map.as_ref().unwrap();
                                 height_map.len() * height_map[0].len() * size_of::<i8>()
                             }
                             false => 0,
                         }
-                        + match (self.cache_enabled) {
+                        + match self.cache_enabled {
                             true => size_of::<u64>(),
                             false => 0,
                         }

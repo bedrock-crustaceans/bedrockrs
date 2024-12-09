@@ -1,6 +1,6 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct MissingBlobEntry {
     #[endianness(le)]
     pub blob_id: u64,
@@ -8,7 +8,7 @@ struct MissingBlobEntry {
 }
 
 #[gamepacket(id = 136)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct ClientCacheMissResponsePacket {
     #[vec_repr(u32)]
     #[vec_endianness(var)]

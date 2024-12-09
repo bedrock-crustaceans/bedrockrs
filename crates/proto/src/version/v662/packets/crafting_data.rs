@@ -2,7 +2,7 @@ use crate::version::v662::types::{ContainerMixDataEntry, CraftingDataEntry, Mate
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 52)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct CraftingDataPacket {
     #[vec_repr(u32)]
     #[vec_endianness(var)]

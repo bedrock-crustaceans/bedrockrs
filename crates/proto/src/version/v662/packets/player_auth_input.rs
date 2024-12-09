@@ -9,7 +9,7 @@ use crate::version::v662::types::{
 use bedrockrs_core::{Vec2, Vec3};
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 use bedrockrs_proto_core::error::ProtoCodecError;
-use bedrockrs_proto_core::{ProtoCodec, ProtoCodecBE, ProtoCodecLE, ProtoCodecVAR};
+use bedrockrs_proto_core::{ProtoCodec, ProtoCodecLE, ProtoCodecVAR};
 use std::io::Cursor;
 
 #[repr(u64)]
@@ -65,7 +65,7 @@ enum PlayerAuthInputFlags {
     PaddleRight = 1 << 48,
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct ActionsEntry {
     pub action_type: ItemStackRequestActionType,
     pub amount: i8,
@@ -73,7 +73,7 @@ struct ActionsEntry {
     pub destination: ItemStackRequestSlotInfo,
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct PerformItemStackRequestData {
     #[endianness(var)]
     pub client_request_id: u32,
@@ -86,7 +86,7 @@ struct PerformItemStackRequestData {
     pub strings_to_filter_origin: TextProcessingEventOrigin,
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct ClientPredictedVehicleData {
     #[endianness(le)]
     pub vehicle_rotation: Vec2<f32>,
@@ -95,30 +95,21 @@ struct ClientPredictedVehicleData {
 
 #[gamepacket(id = 144)]
 pub struct PlayerAuthInputPacket {
-    #[endianness(le)]
     pub player_rotation: Vec2<f32>,
-    #[endianness(le)]
     pub player_position: Vec3<f32>,
-    #[endianness(le)]
     pub move_vector: Vec3<f32>,
-    #[endianness(le)]
     pub player_head_rotation: f32,
-    #[endianness(var)]
     pub input_data: u64,
     pub input_mode: InputMode,
     pub play_mode: ClientPlayMode,
     pub new_interaction_model: NewInteractionModel,
-    #[endianness(le)]
     pub vr_gaze_direction: Option<Vec3<f32>>, // If play_mode == ClientPlayMode::Reality
-    #[endianness(var)]
     pub client_tick: u64,
-    #[endianness(le)]
     pub velocity: Vec3<f32>,
     pub item_use_transaction: Option<PackedItemUseLegacyInventoryTransaction>, // If input_data has PlayerAuthInputPacket::InputData::PerformItemInteraction set.
     pub item_stack_request: Option<PerformItemStackRequestData>, // If input data has PlayerAuthInputPacket::InputData::PerformItemStackRequest set.
     pub player_block_actions: Option<PlayerBlockActions>, // If input data has PlayerAuthInputPacket::InputData::PerformBlockActions set.
     pub client_predicted_vehicle: Option<ClientPredictedVehicleData>, // If input data has PlayerAuthInputPacket::InputData::IsInClientPredictedVehicle set.
-    #[endianness(le)]
     pub analog_move_vector: Vec2<f32>,
 }
 
@@ -143,25 +134,25 @@ impl ProtoCodec for PlayerAuthInputPacket {
         }
         <u64 as ProtoCodecVAR>::proto_serialize(&self.client_tick, stream)?;
         <Vec3<f32> as ProtoCodecLE>::proto_serialize(&self.velocity, stream)?;
-        if (&self.input_data & PlayerAuthInputFlags::PerformItemInteraction as u64 != 0) {
+        if &self.input_data & PlayerAuthInputFlags::PerformItemInteraction as u64 != 0 {
             <PackedItemUseLegacyInventoryTransaction as ProtoCodec>::proto_serialize(
                 &self.item_use_transaction.as_ref().unwrap(),
                 stream,
             )?;
         }
-        if (&self.input_data & PlayerAuthInputFlags::PerformItemStackRequest as u64 != 0) {
+        if &self.input_data & PlayerAuthInputFlags::PerformItemStackRequest as u64 != 0 {
             <PerformItemStackRequestData as ProtoCodec>::proto_serialize(
                 &self.item_stack_request.as_ref().unwrap(),
                 stream,
             )?;
         }
-        if (&self.input_data & PlayerAuthInputFlags::PerformBlockActions as u64 != 0) {
+        if &self.input_data & PlayerAuthInputFlags::PerformBlockActions as u64 != 0 {
             <PlayerBlockActions as ProtoCodec>::proto_serialize(
                 &self.player_block_actions.as_ref().unwrap(),
                 stream,
             )?;
         }
-        if (&self.input_data & PlayerAuthInputFlags::IsInClientPredictedVehicle as u64 != 0) {
+        if &self.input_data & PlayerAuthInputFlags::IsInClientPredictedVehicle as u64 != 0 {
             <ClientPredictedVehicleData as ProtoCodec>::proto_serialize(
                 &self.client_predicted_vehicle.as_ref().unwrap(),
                 stream,
@@ -189,32 +180,32 @@ impl ProtoCodec for PlayerAuthInputPacket {
         };
         let client_tick = <u64 as ProtoCodecVAR>::proto_deserialize(stream)?;
         let velocity = <Vec3<f32> as ProtoCodecLE>::proto_deserialize(stream)?;
-        let item_use_transaction = match (&input_data
+        let item_use_transaction = match &input_data
             & PlayerAuthInputFlags::PerformItemInteraction as u64
-            != 0)
+            != 0
         {
             true => Some(
                 <PackedItemUseLegacyInventoryTransaction as ProtoCodec>::proto_deserialize(stream)?,
             ),
             false => None,
         };
-        let item_stack_request = match (&input_data
+        let item_stack_request = match &input_data
             & PlayerAuthInputFlags::PerformItemStackRequest as u64
-            != 0)
+            != 0
         {
             true => Some(<PerformItemStackRequestData as ProtoCodec>::proto_deserialize(stream)?),
             false => None,
         };
         let player_block_actions =
-            match (&input_data & PlayerAuthInputFlags::PerformBlockActions as u64 != 0) {
+            match &input_data & PlayerAuthInputFlags::PerformBlockActions as u64 != 0 {
                 true => Some(<PlayerBlockActions as ProtoCodec>::proto_deserialize(
                     stream,
                 )?),
                 false => None,
             };
-        let client_predicted_vehicle = match (&input_data
+        let client_predicted_vehicle = match &input_data
             & PlayerAuthInputFlags::IsInClientPredictedVehicle as u64
-            != 0)
+            != 0
         {
             true => Some(<ClientPredictedVehicleData as ProtoCodec>::proto_deserialize(stream)?),
             false => None,
@@ -256,20 +247,20 @@ impl ProtoCodec for PlayerAuthInputPacket {
             }
             + ProtoCodecVAR::get_size_prediction(&self.client_tick)
             + ProtoCodecLE::get_size_prediction(&self.velocity)
-            + match (&self.input_data & PlayerAuthInputFlags::PerformItemInteraction as u64 != 0) {
+            + match &self.input_data & PlayerAuthInputFlags::PerformItemInteraction as u64 != 0 {
                 true => self.item_use_transaction.get_size_prediction(),
                 false => 0,
             }
-            + match (&self.input_data & PlayerAuthInputFlags::PerformItemStackRequest as u64 != 0) {
+            + match &self.input_data & PlayerAuthInputFlags::PerformItemStackRequest as u64 != 0 {
                 true => self.item_stack_request.get_size_prediction(),
                 false => 0,
             }
-            + match (&self.input_data & PlayerAuthInputFlags::PerformBlockActions as u64 != 0) {
+            + match &self.input_data & PlayerAuthInputFlags::PerformBlockActions as u64 != 0 {
                 true => self.player_block_actions.get_size_prediction(),
                 false => 0,
             }
-            + match (&self.input_data & PlayerAuthInputFlags::IsInClientPredictedVehicle as u64
-                != 0)
+            + match &self.input_data & PlayerAuthInputFlags::IsInClientPredictedVehicle as u64
+                != 0
             {
                 true => self.client_predicted_vehicle.get_size_prediction(),
                 false => 0,

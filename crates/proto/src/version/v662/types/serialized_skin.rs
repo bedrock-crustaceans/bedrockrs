@@ -1,7 +1,7 @@
 use crate::version::v662::enums::Persona;
 use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct SerializedSkinAnimationFrame {
     #[endianness(le)]
     pub image_width: u32,
@@ -14,7 +14,7 @@ struct SerializedSkinAnimationFrame {
     pub animation_expression: Persona::AnimationExpression,
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct PersonaPiecesEntry {
     pub piece_id: String,
     pub piece_type: String,
@@ -23,13 +23,13 @@ struct PersonaPiecesEntry {
     pub product_id: String,
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct PieceTintColorsEntry {
     pub piece_type: String,
     pub piece_tint_color: String,
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct SerializedSkin {
     pub skin_id: String,
     pub play_fab_id: String,

@@ -1,7 +1,7 @@
 use crate::version::v662::enums::{CommandPermissionLevel, PlayerPermissionLevel};
 use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(u16)]
 #[enum_endianness(le)]
 #[repr(u16)]
@@ -13,7 +13,7 @@ enum SerializedAbilitiesLayer {
     Editor = 4,
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct SerializedLayer {
     pub serialized_layer: SerializedAbilitiesLayer,
     #[endianness(le)]
@@ -26,7 +26,7 @@ pub struct SerializedLayer {
     pub walk_speed: f32,
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct SerializedAbilitiesData {
     #[endianness(le)]
     pub target_player_raw_id: i64,

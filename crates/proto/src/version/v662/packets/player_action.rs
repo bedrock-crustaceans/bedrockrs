@@ -3,7 +3,7 @@ use crate::version::v662::types::{ActorRuntimeID, NetworkBlockPosition};
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 36)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct PlayerActionPacket {
     pub player_runtime_id: ActorRuntimeID,
     pub action: PlayerActionType,

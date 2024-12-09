@@ -2,7 +2,7 @@ use crate::version::v662::enums::StructureTemplateResponseType;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 133)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct StructureDataResponsePacket {
     pub structure_name: String,
     #[nbt]

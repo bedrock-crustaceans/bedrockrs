@@ -2,7 +2,7 @@ use bedrockrs_core::Vec3;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 61)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct ChangeDimensionPacket {
     #[endianness(var)]
     pub dimension_id: i32,

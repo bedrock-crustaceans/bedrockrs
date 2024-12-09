@@ -5,15 +5,13 @@ use std::io::Cursor;
 use std::mem::size_of;
 use uuid::Uuid;
 
+#[derive(Clone, Debug)]
 pub struct ShapedRecipe {
     pub recipe_unique_id: String,
     pub ingredient_grid: Vec<Vec<RecipeIngredient>>,
-    #[vec_repr(u32)]
-    #[vec_endianness(var)]
     pub production_list: Vec<NetworkItemInstanceDescriptor>,
     pub recipe_id: Uuid,
     pub recipe_tag: String,
-    #[endianness(var)]
     pub priority: i32,
 }
 

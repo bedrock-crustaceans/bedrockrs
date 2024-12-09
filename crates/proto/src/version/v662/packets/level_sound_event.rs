@@ -3,7 +3,7 @@ use bedrockrs_core::Vec3;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 123)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct LevelSoundEventPacket {
     pub event_id: Puv::Legacy::LevelSoundEvent,
     #[endianness(le)]

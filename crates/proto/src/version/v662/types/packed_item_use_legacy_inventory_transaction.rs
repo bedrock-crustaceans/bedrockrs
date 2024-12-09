@@ -3,7 +3,7 @@ use crate::version::v662::types::{InventoryAction, NetworkBlockPosition, Network
 use bedrockrs_core::Vec3;
 use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct ContainerSlotEntry {
     pub container_enum_name: String,
     #[vec_repr(u32)]
@@ -11,7 +11,7 @@ struct ContainerSlotEntry {
     pub slots: Vec<i8>
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i8)]
 #[repr(i8)]
 pub enum PackedItemUseLegacyInventoryTransaction {

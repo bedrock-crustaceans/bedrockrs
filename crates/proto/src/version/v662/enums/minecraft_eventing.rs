@@ -1,7 +1,7 @@
 pub mod MinecraftEventing {
     use bedrockrs_macros::ProtoCodec;
 
-    #[derive(ProtoCodec)]
+    #[derive(ProtoCodec, Clone, Debug)]
     #[enum_repr(i32)]
     #[enum_endianness(var)]
     #[repr(i32)]
@@ -24,7 +24,7 @@ pub mod MinecraftEventing {
         Commanding = 16,
     }
     
-    #[derive(ProtoCodec)]
+    #[derive(ProtoCodec, Clone, Debug)]
     #[enum_repr(i32)]
     #[enum_endianness(var)]
     #[repr(i32)]
@@ -57,7 +57,7 @@ pub mod MinecraftEventing {
         DisenchantAndRepair = 25,
     }
     
-    #[derive(ProtoCodec)]
+    #[derive(ProtoCodec, Clone, Debug)]
     #[enum_repr(i32)]
     #[enum_endianness(le)]
     #[repr(i32)]

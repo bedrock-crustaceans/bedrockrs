@@ -2,7 +2,7 @@ use crate::version::v662::enums::PlayerPermissionLevel;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 185)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct RequestPermissionsPacket {
     #[endianness(le)]
     pub target_player_raw_id: i64,

@@ -1,7 +1,7 @@
 pub mod Tag {
     use bedrockrs_macros::ProtoCodec;
 
-    #[derive(ProtoCodec)]
+    #[derive(ProtoCodec, Clone, Debug)]
     pub enum Type {
         End = 0,
         Byte = 1,

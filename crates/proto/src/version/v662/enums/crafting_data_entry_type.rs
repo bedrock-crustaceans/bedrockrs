@@ -2,7 +2,7 @@ use crate::version::v662::types::{NetworkItemInstanceDescriptor, ShapedChemistry
 use bedrockrs_macros::ProtoCodec;
 use uuid::Uuid;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i32)]
 #[enum_endianness(var)]
 #[repr(i32)]

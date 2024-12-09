@@ -3,7 +3,7 @@ use crate::version::v662::types::NetworkBlockPosition;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 110)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct UpdateBlockSyncedPacket {
     pub block_position: NetworkBlockPosition,
     #[endianness(var)]

@@ -2,7 +2,7 @@ use crate::version::v662::enums::{ItemStackRequestActionType, TextProcessingEven
 use crate::version::v662::types::ItemStackRequestSlotInfo;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct ActionsEntry {
     pub action_type: ItemStackRequestActionType,
     pub amount: i8,
@@ -10,7 +10,7 @@ struct ActionsEntry {
     pub destination: ItemStackRequestSlotInfo,
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct RequestsEntry {
     #[endianness(var)]
     pub client_request_id: u32,
@@ -24,7 +24,7 @@ struct RequestsEntry {
 }
 
 #[gamepacket(id = 147)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct ItemStackRequestPacket {
     #[vec_repr(u32)]
     #[vec_endianness(var)]

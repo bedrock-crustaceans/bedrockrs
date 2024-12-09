@@ -2,11 +2,11 @@ use crate::version::v662::enums::{ActorDamageCause, ActorType, MinecraftEventing
 use crate::version::v662::types::ActorUniqueID;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 use bedrockrs_proto_core::error::ProtoCodecError;
-use bedrockrs_proto_core::{ProtoCodec, ProtoCodecVAR};
+use bedrockrs_proto_core::ProtoCodec;
 use std::io::{Cursor, Read};
 use varint_rs::{VarintReader, VarintWriter};
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i32)]
 #[enum_endianness(var)]
 #[repr(i32)]
@@ -17,7 +17,7 @@ enum AgentResult {
     QueryResultTrue = 3,
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i32)]
 #[enum_endianness(var)]
 #[repr(i32)]

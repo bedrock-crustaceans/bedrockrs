@@ -1,6 +1,6 @@
 use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i8)]
 pub enum MapDecorationType {
     MarkerWhite = 0,
@@ -38,7 +38,7 @@ impl MapDecorationType {
     const ITEM_FRAME: MapDecorationType = MapDecorationType::MarkerGreen;
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct MapDecoration {
     pub map_decoration_type: MapDecorationType,
     pub rotation: i8,

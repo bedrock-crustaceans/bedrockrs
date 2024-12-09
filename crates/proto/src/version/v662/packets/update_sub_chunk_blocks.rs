@@ -7,13 +7,11 @@ use std::io::Cursor;
 use std::mem::size_of;
 use varint_rs::{VarintReader, VarintWriter};
 
+#[derive(Clone, Debug)]
 struct BlocksChangedEntry {
     pub pos: NetworkBlockPosition,
-    #[endianness(var)]
     pub runtime_id: u32,
-    #[endianness(var)]
     pub update_flags: u32,
-    #[endianness(var)]
     pub sync_message_entity_unique_id: u64,
     pub sync_message: ActorBlockSyncMessage::MessageId, // This is sent as unsigned varint, needs to be varint64
 }
@@ -65,7 +63,7 @@ impl ProtoCodec for BlocksChangedEntry {
 }
 
 #[gamepacket(id = 172)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct UpdateSubChunkBlocksPacket {
     pub sub_chunk_block_position: NetworkBlockPosition,
     #[vec_repr(u32)]

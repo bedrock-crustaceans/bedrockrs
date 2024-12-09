@@ -1,13 +1,11 @@
 use crate::version::v662::types::ActorRuntimeID;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 use bedrockrs_proto_core::error::ProtoCodecError;
-use bedrockrs_proto_core::{ProtoCodec, ProtoCodecLE};
+use bedrockrs_proto_core::ProtoCodec;
 use byteorder::{ReadBytesExt, WriteBytesExt};
-use std::io::Cursor;
-use std::mem::size_of;
-use tokio::io::AsyncReadExt;
+use std::io::{Cursor, Read};
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i8)]
 #[repr(i8)]
 enum Action {
@@ -56,7 +54,7 @@ impl ProtoCodec for InteractPacket {
 
         action_stream.write_i8(stream.read_i8()?)?;
         let target_runtime_id = <ActorRuntimeID as ProtoCodec>::proto_deserialize(stream)?;
-        stream.read_to_end(action_stream)?;
+        stream.read_to_end(&mut action_stream)?;
 
         let mut action_cursor = Cursor::new(action_stream.as_slice());
         let action = <Action as ProtoCodec>::proto_deserialize(&mut action_cursor)?;

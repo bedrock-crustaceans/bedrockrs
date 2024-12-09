@@ -6,21 +6,16 @@ use bedrockrs_proto_core::{ProtoCodec, ProtoCodecLE, ProtoCodecVAR};
 use bedrockrs_shared::actor_runtime_id::ActorRuntimeID;
 use byteorder::{ReadBytesExt, WriteBytesExt};
 use std::io::{Cursor, Read};
-use tokio::io::AsyncReadExt;
 
 #[gamepacket(id = 19)]
 pub struct MovePlayerPacket {
     pub player_runtime_id: ActorRuntimeID,
-    #[endianness(le)]
     pub position: Vec3<f32>,
-    #[endianness(le)]
     pub rotation: Vec2<f32>,
-    #[endianness(le)]
     pub y_head_rotation: f32,
     pub position_mode: PlayerPositionModeComponent::PositionMode,
     pub on_ground: bool,
     pub riding_runtime_id: ActorRuntimeID,
-    #[endianness(var)]
     pub tick: u64,
 }
 
@@ -79,13 +74,13 @@ impl ProtoCodec for MovePlayerPacket {
 
     fn get_size_prediction(&self) -> usize {
         self.player_runtime_id.get_size_prediction()
-            + self.position.get_size_prediction()
-            + self.rotation.get_size_prediction()
-            + self.y_head_rotation.get_size_prediction()
+            + ProtoCodecLE::get_size_prediction(&self.position)
+            + ProtoCodecLE::get_size_prediction(&self.rotation)
+            + ProtoCodecLE::get_size_prediction(&self.y_head_rotation)
             + self.position_mode.get_size_prediction()
             + self.on_ground.get_size_prediction()
             + self.riding_runtime_id.get_size_prediction()
-            + self.tick.get_size_prediction()
+            + ProtoCodecVAR::get_size_prediction(&self.tick)
     }
 }
 

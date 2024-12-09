@@ -2,7 +2,7 @@ use crate::version::v662::enums::IdentityDefinition;
 use crate::version::v662::types::ScoreboardId;
 use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct ScorePacketInfoChangeEntry {
     pub id: ScoreboardId,
     pub objective_name: String,
@@ -10,7 +10,7 @@ struct ScorePacketInfoChangeEntry {
     pub score_value: i32,
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 struct ScorePacketInfoRemoveEntry {
     pub id: ScoreboardId,
     pub objective_name: String,
@@ -19,7 +19,7 @@ struct ScorePacketInfoRemoveEntry {
     pub identity_definition_type: IdentityDefinition::Type,
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i8)]
 #[repr(i8)]
 pub enum ScorePacketType {

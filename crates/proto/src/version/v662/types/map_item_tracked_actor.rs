@@ -2,7 +2,7 @@ pub mod MapItemTrackedActor {
     use crate::version::v662::types::{ActorUniqueID, NetworkBlockPosition};
     use bedrockrs_macros::ProtoCodec;
 
-    #[derive(ProtoCodec)]
+    #[derive(ProtoCodec, Clone, Debug)]
     #[enum_repr(i32)]
     #[enum_endianness(le)]
     #[repr(i32)]
@@ -12,7 +12,7 @@ pub mod MapItemTrackedActor {
         Other = 2,
     }
     
-    #[derive(ProtoCodec)]
+    #[derive(ProtoCodec, Clone, Debug)]
     pub struct UniqueId {
         pub unique_id_type: Type,
     }

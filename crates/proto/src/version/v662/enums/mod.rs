@@ -64,7 +64,6 @@ export!(item_use_inventory_transaction); // Mod
 export!(item_use_method);
 export!(item_use_on_actor_inventory_transaction); // Mod
 export!(lab_table_reaction_type);
-export!(legacy_telemetry_event_packet); // Mod
 export!(lesson_action);
 export!(level_event);
 export!(map_decoration); // Mod

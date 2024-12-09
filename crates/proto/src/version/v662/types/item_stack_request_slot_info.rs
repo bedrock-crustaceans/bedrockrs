@@ -1,6 +1,6 @@
 use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct ItemStackRequestSlotInfo {
     pub container_net_id: i8,
     pub slot: i8,

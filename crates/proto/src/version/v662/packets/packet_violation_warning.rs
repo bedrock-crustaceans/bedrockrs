@@ -2,7 +2,7 @@ use crate::version::v662::enums::{MinecraftPacketIds, PacketViolationSeverity, P
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 156)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct PacketViolationWarningPacket {
     pub violation_type: PacketViolationType,
     pub violation_severity: PacketViolationSeverity,

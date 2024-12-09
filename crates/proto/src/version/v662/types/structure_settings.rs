@@ -3,7 +3,7 @@ use crate::version::v662::types::{ActorUniqueID, NetworkBlockPosition};
 use bedrockrs_core::Vec3;
 use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct StructureSettings {
     pub structure_palette_name: String,
     pub ignore_entities: bool,

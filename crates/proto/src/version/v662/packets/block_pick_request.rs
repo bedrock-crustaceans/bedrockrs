@@ -2,7 +2,7 @@ use crate::version::v662::types::BlockPos;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 34)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct BlockPickRequestPacket {
     pub position: BlockPos,
     pub with_data: bool,

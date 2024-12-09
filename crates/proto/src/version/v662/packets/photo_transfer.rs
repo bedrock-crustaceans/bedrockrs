@@ -2,7 +2,7 @@ use crate::version::v662::enums::PhotoType;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 99)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct PhotoTransferPacket {
     pub photo_name: String,
     pub photo_data: String,

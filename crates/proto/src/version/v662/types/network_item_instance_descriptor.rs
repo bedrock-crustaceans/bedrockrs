@@ -2,14 +2,11 @@ use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::{ProtoCodec, ProtoCodecLE, ProtoCodecVAR};
 use std::io::Cursor;
 
+#[derive(Clone, Debug)]
 pub struct NetworkItemInstanceDescriptor {
-    #[endianness(var)]
     id: i32,
-    #[endianness(le)]
     stack_size: Option<u16>,
-    #[endianness(var)]
     aux_value: Option<u32>,
-    #[endianness(var)]
     block_runtime_id: Option<i32>,
     user_data_buffer: Option<String>,
 }
@@ -21,10 +18,10 @@ impl ProtoCodec for NetworkItemInstanceDescriptor {
         match &self.id {
             0 => {}
             _ => {
-                ProtoCodecLE::proto_serialize(&self.stack_size.as_ref().unwrap(), stream)?;
-                ProtoCodecVAR::proto_serialize(&self.aux_value.as_ref().unwrap(), stream)?;
-                ProtoCodecVAR::proto_serialize(&self.block_runtime_id.as_ref().unwrap(), stream)?;
-                ProtoCodec::proto_serialize(&self.user_data_buffer.as_ref().unwrap(), stream)?;
+                ProtoCodecLE::proto_serialize(self.stack_size.as_ref().unwrap(), stream)?;
+                ProtoCodecVAR::proto_serialize(self.aux_value.as_ref().unwrap(), stream)?;
+                ProtoCodecVAR::proto_serialize(self.block_runtime_id.as_ref().unwrap(), stream)?;
+                ProtoCodec::proto_serialize(self.user_data_buffer.as_ref().unwrap(), stream)?;
             }
         }
 
