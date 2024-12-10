@@ -1,10 +1,11 @@
+use bedrockrs_core::Vec3;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
-use crate::version::v662::types::Vec3;
 
 #[gamepacket(id = 66)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct SpawnExperienceOrbPacket {
-    pub position: Vec3,
+    #[endianness(le)]
+    pub position: Vec3<f32>,
     #[endianness(var)]
     pub xp_value: i32,
 }

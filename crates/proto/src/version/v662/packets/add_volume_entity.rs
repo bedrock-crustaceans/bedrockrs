@@ -1,11 +1,12 @@
+use crate::version::v662::types::{EntityNetID, NetworkBlockPosition};
 use bedrockrs_macros::{gamepacket, ProtoCodec};
-use crate::version::v662::types::{CompoundTag, EntityNetID, NetworkBlockPosition};
 
 #[gamepacket(id = 166)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct AddVolumeEntityPacket {
     pub entity_network_id: EntityNetID,
-    pub components: CompoundTag,
+    #[nbt]
+    pub components: nbtx::Value, // TODO: NBT Structure
     pub json_identifier: String,
     pub instance_name: String,
     pub min_bounds: NetworkBlockPosition,

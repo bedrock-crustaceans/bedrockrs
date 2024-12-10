@@ -1,10 +1,10 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i32)]
 #[enum_endianness(var)]
 #[repr(i32)]
-enum TitleType {
+pub enum TitleType {
     Clear = 0,
     Reset = 1,
     Title = 2,
@@ -17,7 +17,7 @@ enum TitleType {
 }
 
 #[gamepacket(id = 88)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct SetTitlePacket {
     pub title_type: TitleType,
     pub title_text: String,

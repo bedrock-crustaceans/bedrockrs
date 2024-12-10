@@ -1,8 +1,8 @@
-use std::mem::size_of;
 use crate::endian::{ProtoCodecBE, ProtoCodecLE, ProtoCodecVAR};
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 use std::io::Cursor;
+use std::mem::size_of;
 
 macro_rules! impl_proto_option {
     ($name:ident) => {

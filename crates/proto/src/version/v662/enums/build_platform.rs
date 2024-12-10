@@ -1,12 +1,12 @@
 use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i32)]
 #[enum_endianness(le)]
 #[repr(i32)]
 pub enum BuildPlatform {
     Google = 1,
-    iOS = 2,
+    IOS = 2,
     OSX = 3,
     Amazon = 4,
     GearVR = 5,

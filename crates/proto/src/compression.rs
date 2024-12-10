@@ -1,10 +1,10 @@
-use std::mem::size_of;
 use bedrockrs_proto_core::error::CompressionError;
 use byteorder::{ReadBytesExt, WriteBytesExt};
 use flate2::Compression as CompressionLevel;
 use flate2::{read::DeflateDecoder, write::DeflateEncoder};
 use snap::{read::FrameDecoder as SnapDecoder, write::FrameEncoder as SnapEncoder};
 use std::io::{Cursor, Read, Write};
+use std::mem::size_of;
 
 #[derive(Debug, Clone)]
 pub enum Compression {

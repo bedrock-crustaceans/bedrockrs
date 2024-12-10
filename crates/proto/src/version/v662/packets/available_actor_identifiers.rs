@@ -1,8 +1,8 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
-use crate::version::v662::types::CompoundTag;
 
 #[gamepacket(id = 119)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct AvailableActorIdentifiersPacket {
-    pub actor_info_list: CompoundTag,
+    #[nbt]
+    pub actor_info_list: nbtx::Value, // TODO: NBT Structure
 }

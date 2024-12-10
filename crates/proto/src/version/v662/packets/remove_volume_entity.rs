@@ -1,8 +1,8 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::types::EntityNetID;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 167)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct RemoveVolumeEntityPacket {
     pub entity_network_id: EntityNetID,
     #[endianness(var)]

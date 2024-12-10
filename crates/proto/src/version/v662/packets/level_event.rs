@@ -1,12 +1,13 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::LevelEvent;
-use crate::version::v662::types::Vec3;
+use bedrockrs_core::Vec3;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 25)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct LevelEventPacket {
     pub event_id: LevelEvent,
-    pub position: Vec3,
+    #[endianness(le)]
+    pub position: Vec3<f32>,
     #[endianness(var)]
     pub data: i32,
 }

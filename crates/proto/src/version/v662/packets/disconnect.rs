@@ -1,12 +1,13 @@
-use std::io::Cursor;
+use crate::version::v662::enums::ConnectionFailReason;
 use bedrockrs_macros::gamepacket;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
-use crate::version::v662::enums::Connection;
+use std::io::Cursor;
 
 #[gamepacket(id = 5)]
+#[derive(Clone, Debug)]
 pub struct DisconnectPacket {
-    pub reason: Connection::DisconnectFailReason,
+    pub reason: ConnectionFailReason,
     pub message: Option<String>
 }
 
@@ -27,7 +28,7 @@ impl ProtoCodec for DisconnectPacket {
     }
 
     fn proto_deserialize(stream: &mut Cursor<&[u8]>) -> Result<Self, ProtoCodecError> {
-        let reason = <Connection::DisconnectFailReason>::proto_deserialize(stream)?;
+        let reason = ConnectionFailReason::proto_deserialize(stream)?;
         
         let skip_message = bool::proto_deserialize(stream)?;
         

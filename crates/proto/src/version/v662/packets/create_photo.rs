@@ -1,7 +1,7 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 171)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct CreatePhotoPacket {
     #[endianness(le)]
     pub raw_id: u64,

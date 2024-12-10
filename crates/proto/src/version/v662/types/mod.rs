@@ -17,7 +17,6 @@ export!(camera_preset);
 export!(camera_presets);
 export!(chunk_pos);
 export!(command_origin_data);
-export!(compound_tag);
 export!(container_mix_data_entry);
 export!(crafting_data_entry);
 export!(data_item);
@@ -40,7 +39,7 @@ export!(item_stack_response_info);
 export!(item_stack_response_slot_info);
 export!(level_settings);
 export!(map_decoration);
-export!(map_item_tracked_actor); // Mod
+export!(map_item_tracked_actor_unique_id);
 export!(material_reducer_data_entry);
 export!(molang_variable_map);
 export!(move_actor_absolute_data);
@@ -69,9 +68,7 @@ export!(smithing_trim_recipe);
 export!(spawn_settings);
 export!(structure_editor_data);
 export!(structure_settings);
-export!(sub_chunk_packet); // Mod
 export!(sub_chunk_pos);
 export!(synced_player_movement_settings);
-export!(vec_2);
-export!(vec_3);
 export!(web_socket_packet_data);
+export!(sub_chunk_pos_offset);

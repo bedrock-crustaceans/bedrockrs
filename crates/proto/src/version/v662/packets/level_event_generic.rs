@@ -1,10 +1,10 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::LevelEvent;
-use crate::version::v662::types::CompoundTag;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 124)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct LevelEventGenericPacket {
     pub event_id: LevelEvent,
-    pub event_data: CompoundTag,
+    #[nbt]
+    pub event_data: nbtx::Value, // TODO: NBT Structure
 }

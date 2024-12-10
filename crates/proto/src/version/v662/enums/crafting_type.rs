@@ -1,6 +1,4 @@
-use bedrockrs_macros::ProtoCodec;
-
-#[derive(ProtoCodec)]
+#[deprecated]
 pub enum CraftingType {
     Inventory = 0,
     Crafting = 1,

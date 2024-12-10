@@ -1,7 +1,8 @@
-use std::io::Cursor;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
+use std::io::Cursor;
 
+#[derive(Clone, Debug)]
 pub struct BaseGameVersion(pub String);
 
 impl ProtoCodec for BaseGameVersion {

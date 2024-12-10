@@ -1,10 +1,10 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::types::ActorRuntimeID;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i8)]
 #[repr(i8)]
-enum RequestType {
+pub enum RequestType {
     SetActions = 0,
     ExecuteAction = 1,
     ExecuteClosingCommands = 2,
@@ -15,7 +15,7 @@ enum RequestType {
 }
 
 #[gamepacket(id = 98)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct NpcRequestPacket {
     pub npc_runtime_id: ActorRuntimeID,
     pub request_type: RequestType,

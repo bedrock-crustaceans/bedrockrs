@@ -1,10 +1,11 @@
+use bedrockrs_core::Vec2;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
-use crate::version::v662::types::Vec2;
 
 #[gamepacket(id = 57)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct PlayerInputPacket {
-    pub move_vector: Vec2,
+    #[endianness(le)]
+    pub move_vector: Vec2<f32>,
     pub jumping: bool,
     pub sneaking: bool,
 }

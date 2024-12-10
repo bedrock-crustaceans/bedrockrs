@@ -1,16 +1,17 @@
+use bedrockrs_core::Vec3;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
-use crate::version::v662::types::Vec3;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(u32)]
 #[enum_endianness(var)]
 #[repr(u32)]
-enum Type {
+pub enum Type {
     Invalid = 0,
     ClearDebugMarkers = 1,
     AddDebugMarkerCube {
         text: String,
-        position: Vec3,
+        #[endianness(le)]
+        position: Vec3<f32>,
         #[endianness(le)]
         r: f32,
         #[endianness(le)]
@@ -25,7 +26,7 @@ enum Type {
 }
 
 #[gamepacket(id = 163)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct ClientboundDebugRendererPacket {
     pub debug_marker_type: Type,
 }

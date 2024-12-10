@@ -1,7 +1,7 @@
-use bedrockrs_macros::ProtoCodec;
 use crate::version::v662::enums::ItemStackNetResult;
+use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct ItemStackResponseInfo {
     pub result: ItemStackNetResult,
     #[endianness(var)]
