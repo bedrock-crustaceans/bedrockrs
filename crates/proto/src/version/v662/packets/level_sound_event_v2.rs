@@ -1,4 +1,4 @@
-use crate::version::v662::enums::Puv;
+use crate::version::v662::enums::LevelSoundEventType;
 use bedrockrs_core::Vec3;
 use bedrockrs_macros::gamepacket;
 use bedrockrs_proto_core::error::ProtoCodecError;
@@ -11,7 +11,7 @@ use varint_rs::{VarintReader, VarintWriter};
 #[gamepacket(id = 120)]
 #[derive(Clone, Debug)]
 pub struct LevelSoundEventPacketV2 {
-    pub event_id: Puv::Legacy::LevelSoundEvent,
+    pub event_id: LevelSoundEventType,
     pub position: Vec3<f32>,
     pub data: i32,
     pub actor_identifier: String,
@@ -22,7 +22,7 @@ pub struct LevelSoundEventPacketV2 {
 impl ProtoCodec for LevelSoundEventPacketV2 {
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         let mut event_id_stream: Vec<u8> = Vec::new();
-        <Puv::Legacy::LevelSoundEvent as ProtoCodec>::proto_serialize(
+        LevelSoundEventType::proto_serialize(
             &self.event_id,
             &mut event_id_stream,
         )?;
@@ -44,7 +44,7 @@ impl ProtoCodec for LevelSoundEventPacketV2 {
         let mut event_id_cursor = Cursor::new(event_id_stream.as_slice());
 
         let event_id =
-            <Puv::Legacy::LevelSoundEvent as ProtoCodec>::proto_deserialize(&mut event_id_cursor)?;
+            LevelSoundEventType::proto_deserialize(&mut event_id_cursor)?;
         let position = <Vec3<f32> as ProtoCodecLE>::proto_deserialize(stream)?;
         let data = <i32 as ProtoCodecVAR>::proto_deserialize(stream)?;
         let actor_identifier = <String as ProtoCodec>::proto_deserialize(stream)?;

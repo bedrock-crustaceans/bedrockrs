@@ -1,5 +1,4 @@
-use crate::version::v662::types::SubChunkPacket::SubChunkPosOffset;
-use crate::version::v662::types::SubChunkPos;
+use crate::version::v662::types::{SubChunkPos, SubChunkPosOffset};
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::{ProtoCodec, ProtoCodecLE, ProtoCodecVAR};

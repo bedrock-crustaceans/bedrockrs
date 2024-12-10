@@ -1,4 +1,4 @@
-use crate::version::v662::enums::PlayerPositionModeComponent;
+use crate::version::v662::enums::PlayerPositionMode;
 use bedrockrs_core::{Vec2, Vec3};
 use bedrockrs_macros::gamepacket;
 use bedrockrs_proto_core::error::ProtoCodecError;
@@ -14,7 +14,7 @@ pub struct MovePlayerPacket {
     pub position: Vec3<f32>,
     pub rotation: Vec2<f32>,
     pub y_head_rotation: f32,
-    pub position_mode: PlayerPositionModeComponent::PositionMode,
+    pub position_mode: PlayerPositionMode,
     pub on_ground: bool,
     pub riding_runtime_id: ActorRuntimeID,
     pub tick: u64,
@@ -23,7 +23,7 @@ pub struct MovePlayerPacket {
 impl ProtoCodec for MovePlayerPacket {
     fn proto_serialize(&self, stream: &mut Vec<u8>) -> Result<(), ProtoCodecError> {
         let mut position_mode_stream: Vec<u8> = Vec::new();
-        <PlayerPositionModeComponent::PositionMode as ProtoCodec>::proto_serialize(
+        PlayerPositionMode::proto_serialize(
             &self.position_mode,
             &mut position_mode_stream,
         )?;
@@ -56,7 +56,7 @@ impl ProtoCodec for MovePlayerPacket {
 
         let mut sub_cursor = Cursor::new(sub_stream.as_slice());
         let position_mode =
-            <PlayerPositionModeComponent::PositionMode as ProtoCodec>::proto_deserialize(
+            PlayerPositionMode::proto_deserialize(
                 &mut sub_cursor,
             )?;
         let tick = <u64 as ProtoCodecVAR>::proto_deserialize(&mut sub_cursor)?;

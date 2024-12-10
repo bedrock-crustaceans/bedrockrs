@@ -6,7 +6,7 @@ macro_rules! export {
 }
 
 export!(abilities_index);
-export!(actor_block_sync_message); // Mod
+export!(actor_block_sync_message_id); // Mod
 export!(actor_damage_cause);
 export!(actor_data_ids);
 export!(actor_event);
@@ -24,14 +24,14 @@ export!(camera_shake_action);
 export!(camera_shake_type);
 export!(chat_restriction_level);
 export!(client_play_mode);
-export!(code_builder_storage_query_options); // Mod
+export!(code_builder_storage); // Mod
 export!(command_block_mode);
 export!(command_origin_type);
 export!(command_output_type);
 export!(command_parameter_option);
 export!(command_permission_level);
-export!(complex_inventory_transaction); // Mod
-export!(connection); // Mod
+export!(complex_inventory_transaction_type); // Mod
+export!(connection_fail_reason); // Mod
 export!(container_enum_name);
 export!(container_id);
 export!(container_type);
@@ -40,27 +40,27 @@ export!(crafting_type);
 export!(data_item_type);
 export!(difficulty);
 export!(easing_type);
-export!(editor); // Mod
+export!(editor_world_type); // Mod
 export!(education_edition_offer);
-export!(enchant); // Mod
+export!(enchant_type); // Mod
 export!(game_type);
 export!(generator_type);
 export!(hud_element);
 export!(hud_visibility);
-export!(identity_definition); // Mod
+export!(identity_definition_type); // Mod
 export!(input_mode);
 export!(inventory_layout);
 export!(inventory_left_tab_index);
 export!(inventory_right_tab_index);
-export!(inventory_source); // Mod
+export!(inventory_source_flags); // Mod
 export!(inventory_source_type);
-export!(item_descriptor); // Mod
-export!(item_release_inventory_transaction); // Mod
+export!(item_descriptor_internal_type); // Mod
+export!(item_release_inventory_transaction_type); // Mod
 export!(item_stack_net_result);
 export!(item_stack_request_action_type);
-export!(item_use_inventory_transaction); // Mod
+export!(item_use_inventory_transaction_type); // Mod
 export!(item_use_method);
-export!(item_use_on_actor_inventory_transaction); // Mod
+export!(item_use_on_actor_inventory_transaction_type); // Mod
 export!(lab_table_reaction_type);
 export!(lesson_action);
 export!(level_event);
@@ -82,9 +82,9 @@ export!(play_status);
 export!(player_action_type);
 export!(player_list_packet_type);
 export!(player_permission_level);
-export!(player_position_mode_component); // Mod
+export!(player_position_mode); // Mod
 export!(player_respawn_state);
-export!(puv); // Mod
+export!(level_sound_event_type); // Mod
 export!(resource_pack_response);
 export!(rotation);
 export!(score_packet_type);
@@ -92,7 +92,7 @@ export!(scoreboard_identity_packet_type);
 export!(server_auth_movement_mode);
 export!(show_store_offer_redirect_type);
 export!(simulation_type);
-export!(social); // Mod
+export!(game_publish_setting); // Mod
 export!(soft_enum_update_type);
 export!(spawn_biome_type);
 export!(spawn_position_type);

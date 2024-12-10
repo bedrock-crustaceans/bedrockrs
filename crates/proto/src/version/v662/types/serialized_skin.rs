@@ -1,4 +1,4 @@
-use crate::version::v662::enums::Persona;
+use crate::version::v662::enums::{AnimatedTextureType, AnimationExpression};
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Clone, Debug)]
@@ -8,10 +8,10 @@ struct SerializedSkinAnimationFrame {
     #[endianness(le)]
     pub image_height: u32,
     pub image_bytes: String,
-    pub animation_type: Persona::AnimatedTextureType,
+    pub animation_type: AnimatedTextureType,
     #[endianness(le)]
     pub frame_count: f32,
-    pub animation_expression: Persona::AnimationExpression,
+    pub animation_expression: AnimationExpression,
 }
 
 #[derive(ProtoCodec, Clone, Debug)]

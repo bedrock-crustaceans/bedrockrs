@@ -1,4 +1,4 @@
-use crate::version::v662::enums::IdentityDefinition;
+use crate::version::v662::enums::IdentityDefinitionType;
 use crate::version::v662::types::ScoreboardId;
 use bedrockrs_macros::ProtoCodec;
 
@@ -16,7 +16,7 @@ struct ScorePacketInfoRemoveEntry {
     pub objective_name: String,
     #[endianness(le)]
     pub score_value: i32,
-    pub identity_definition_type: IdentityDefinition::Type,
+    pub identity_definition_type: IdentityDefinitionType,
 }
 
 #[derive(ProtoCodec, Clone, Debug)]

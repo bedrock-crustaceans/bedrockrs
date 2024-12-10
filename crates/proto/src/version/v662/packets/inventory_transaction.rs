@@ -1,4 +1,4 @@
-use crate::version::v662::enums::ComplexInventoryTransaction;
+use crate::version::v662::enums::ComplexInventoryTransactionType;
 use crate::version::v662::types::InventoryTransaction;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
@@ -18,6 +18,6 @@ pub struct InventoryTransactionPacket {
     #[vec_repr(u32)]
     #[vec_endianness(var)]
     pub legacy_set_item_slots: Vec<LegacySetItemSlotsEntry>,
-    pub transaction_type: ComplexInventoryTransaction::Type,
+    pub transaction_type: ComplexInventoryTransactionType,
     pub transaction: InventoryTransaction,
 }

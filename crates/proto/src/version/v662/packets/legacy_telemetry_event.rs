@@ -1,4 +1,4 @@
-use crate::version::v662::enums::{ActorDamageCause, ActorType, MinecraftEventing};
+use crate::version::v662::enums::{ActorDamageCause, ActorType, InteractionType, POIBlockInteractionType};
 use crate::version::v662::types::ActorUniqueID;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 use bedrockrs_proto_core::error::ProtoCodecError;
@@ -27,7 +27,7 @@ enum Type {
         achievement_id: i32,
     } = 0,
     Interaction {
-        interaction_type: MinecraftEventing::InteractionType,
+        interaction_type: InteractionType,
         interaction_actor_type: ActorType,
         #[endianness(var)]
         interaction_actor_variant: i32,
@@ -106,12 +106,12 @@ enum Type {
     } = 13,
     PetDiedObsolete = 14,
     POICauldronUsed {
-        block_interaction_type: MinecraftEventing::POIBlockInteractionType,
+        block_interaction_type: POIBlockInteractionType,
         #[endianness(var)]
         item_id: i32,
     } = 15,
     ComposterUsed {
-        block_interaction_type: MinecraftEventing::POIBlockInteractionType,
+        block_interaction_type: POIBlockInteractionType,
         #[endianness(var)]
         item_id: i32,
     } = 16,

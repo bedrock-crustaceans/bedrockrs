@@ -1,4 +1,4 @@
-use crate::version::v662::enums::ActorBlockSyncMessage;
+use crate::version::v662::enums::ActorBlockSyncMessageID;
 use crate::version::v662::types::NetworkBlockPosition;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 use bedrockrs_proto_core::error::ProtoCodecError;
@@ -13,7 +13,7 @@ struct BlocksChangedEntry {
     pub runtime_id: u32,
     pub update_flags: u32,
     pub sync_message_entity_unique_id: u64,
-    pub sync_message: ActorBlockSyncMessage::MessageId, // This is sent as unsigned varint, needs to be varint64
+    pub sync_message: ActorBlockSyncMessageID, // This is sent as unsigned varint, needs to be varint64
 }
 
 impl ProtoCodec for BlocksChangedEntry {
@@ -42,7 +42,7 @@ impl ProtoCodec for BlocksChangedEntry {
         sync_message_stream.write_i64_varint(stream.read_u32_varint()? as i64)?;
         let mut sync_message_cursor = Cursor::new(sync_message_stream.as_slice());
         
-        let sync_message = ActorBlockSyncMessage::MessageId::proto_deserialize(&mut sync_message_cursor)?;
+        let sync_message = ActorBlockSyncMessageID::proto_deserialize(&mut sync_message_cursor)?;
         
         Ok(Self {
             pos,

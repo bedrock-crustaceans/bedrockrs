@@ -1,4 +1,4 @@
-use crate::version::v662::enums::ActorBlockSyncMessage;
+use crate::version::v662::enums::ActorBlockSyncMessageID;
 use crate::version::v662::types::NetworkBlockPosition;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
@@ -14,5 +14,5 @@ pub struct UpdateBlockSyncedPacket {
     pub later: u32,
     #[endianness(var)]
     pub unique_actor_id: i64,
-    pub actor_sync_message: ActorBlockSyncMessage::MessageId,
+    pub actor_sync_message: ActorBlockSyncMessageID,
 }

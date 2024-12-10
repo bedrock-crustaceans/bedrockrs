@@ -1,11 +1,11 @@
-use crate::version::v662::enums::Puv;
+use crate::version::v662::enums::LevelSoundEventType;
 use bedrockrs_core::Vec3;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 123)]
 #[derive(ProtoCodec, Clone, Debug)]
 pub struct LevelSoundEventPacket {
-    pub event_id: Puv::Legacy::LevelSoundEvent,
+    pub event_id: LevelSoundEventType,
     #[endianness(le)]
     pub position: Vec3<f32>,
     #[endianness(var)]

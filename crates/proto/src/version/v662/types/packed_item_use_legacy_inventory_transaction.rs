@@ -1,4 +1,4 @@
-use crate::version::v662::enums::ItemUseInventoryTransaction;
+use crate::version::v662::enums::ItemUseInventoryTransactionType;
 use crate::version::v662::types::{InventoryAction, NetworkBlockPosition, NetworkItemStackDescriptor};
 use bedrockrs_core::Vec3;
 use bedrockrs_macros::ProtoCodec;
@@ -21,7 +21,7 @@ pub enum PackedItemUseLegacyInventoryTransaction {
         #[vec_repr(u32)]
         #[vec_endianness(var)]
         actions: Vec<InventoryAction>,
-        action_type: ItemUseInventoryTransaction::ActionType,
+        action_type: ItemUseInventoryTransactionType,
         position: NetworkBlockPosition,
         #[endianness(var)]
         face: i32,
@@ -44,7 +44,7 @@ pub enum PackedItemUseLegacyInventoryTransaction {
         #[vec_repr(u32)]
         #[vec_endianness(var)]
         actions: Vec<InventoryAction>,
-        action_type: ItemUseInventoryTransaction::ActionType,
+        action_type: ItemUseInventoryTransactionType,
         position: NetworkBlockPosition,
         #[endianness(var)]
         face: i32,

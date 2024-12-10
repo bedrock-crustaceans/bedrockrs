@@ -1,4 +1,4 @@
-use crate::version::v662::types::{ActorUniqueID, BlockPos, MapDecoration, MapItemTrackedActor};
+use crate::version::v662::types::{ActorUniqueID, BlockPos, MapDecoration, MapItemTrackedActorUniqueID};
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
@@ -33,7 +33,7 @@ enum Type {
     DecorationUpdate {
         #[vec_repr(u32)]
         #[vec_endianness(var)]
-        actor_ids: Vec<MapItemTrackedActor::UniqueId>,
+        actor_ids: Vec<MapItemTrackedActorUniqueID>,
         #[vec_repr(u32)]
         #[vec_endianness(var)]
         decoration_list: Vec<MapDecoration>,
