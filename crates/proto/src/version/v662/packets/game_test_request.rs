@@ -1,9 +1,9 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::Rotation;
 use crate::version::v662::types::BlockPos;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 194)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct GameTestRequestPacket {
     #[endianness(var)]
     pub max_tests_per_batch: i32,

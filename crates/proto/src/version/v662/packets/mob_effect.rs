@@ -1,10 +1,10 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::types::ActorRuntimeID;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i8)]
 #[repr(i8)]
-enum Event {
+pub enum Event {
     Invalid = 0,
     Add = 1,
     Update = 2,
@@ -12,7 +12,7 @@ enum Event {
 }
 
 #[gamepacket(id = 28)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct MobEffectPacket {
     pub target_runtime_id: ActorRuntimeID,
     pub event_id: Event,

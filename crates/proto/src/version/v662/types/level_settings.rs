@@ -1,8 +1,8 @@
-use bedrockrs_macros::ProtoCodec;
-use crate::version::v662::enums::{Difficulty, GameType, GeneratorType, Editor, EducationEditionOffer, Social, PlayerPermissionLevel, ChatRestrictionLevel};
+use crate::version::v662::enums::{ChatRestrictionLevel, Difficulty, EditorWorldType, EducationEditionOffer, GamePublishSetting, GameType, GeneratorType, PlayerPermissionLevel};
 use crate::version::v662::types::{BaseGameVersion, EduSharedUriResource, Experiments, GameRulesChangedPacketData, NetworkBlockPosition, SpawnSettings};
+use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct LevelSettings {
     #[endianness(le)]
     pub seed: u64,
@@ -12,7 +12,7 @@ pub struct LevelSettings {
     pub game_difficulty: Difficulty,
     pub default_spawn_block_position: NetworkBlockPosition,
     pub achievements_disabled: bool,
-    pub editor_world_type: Editor::WorldType,
+    pub editor_world_type: EditorWorldType,
     pub is_created_in_editor: bool,
     pub is_exported_from_editor: bool,
     #[endianness(var)]
@@ -27,8 +27,8 @@ pub struct LevelSettings {
     pub has_confirmed_platform_locked_content: bool,
     pub multiplayer_enabled: bool,
     pub lan_broadcasting_enabled: bool,
-    pub xbox_live_broadcast_setting: Social::GamePublishSetting,
-    pub platform_broadcast_setting: Social::GamePublishSetting,
+    pub xbox_live_broadcast_setting: GamePublishSetting,
+    pub platform_broadcast_setting: GamePublishSetting,
     pub commands_enabled: bool,
     pub texture_packs_required: bool,
     pub rule_data: GameRulesChangedPacketData,

@@ -1,9 +1,9 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::{AttributeModifierOperation, AttributeOperands};
 use crate::version::v662::types::ActorRuntimeID;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
-#[derive(ProtoCodec)]
-struct AttributeModifier {
+#[derive(ProtoCodec, Clone, Debug)]
+pub struct AttributeModifier {
     pub id: String,
     pub name: String,
     #[endianness(le)]
@@ -13,8 +13,8 @@ struct AttributeModifier {
     pub is_serializable: bool,
 }
 
-#[derive(ProtoCodec)]
-struct AttributeData {
+#[derive(ProtoCodec, Clone, Debug)]
+pub struct AttributeData {
     #[endianness(le)]
     pub min_value: f32,
     #[endianness(le)]
@@ -30,7 +30,7 @@ struct AttributeData {
 }
 
 #[gamepacket(id = 29)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct UpdateAttributesPacket {
     pub target_runtime_id: ActorRuntimeID,
     #[vec_repr(u32)]

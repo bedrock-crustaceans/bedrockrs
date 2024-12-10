@@ -1,8 +1,8 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
-use crate::version::v662::types::CompoundTag;
 
 #[gamepacket(id = 165)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct SyncActorPropertyPacket {
-    pub property_data: CompoundTag,
+    #[nbt]
+    pub property_data: nbtx::Value, // TODO: NBT Structure
 }

@@ -1,16 +1,17 @@
+use crate::version::v662::enums::ItemUseInventoryTransactionType;
+use crate::version::v662::types::{InventoryAction, NetworkBlockPosition, NetworkItemStackDescriptor};
+use bedrockrs_core::Vec3;
 use bedrockrs_macros::ProtoCodec;
-use crate::version::v662::enums::ItemUseInventoryTransaction;
-use crate::version::v662::types::{InventoryAction, NetworkBlockPosition, NetworkItemStackDescriptor, Vec3};
 
-#[derive(ProtoCodec)]
-struct ContainerSlotEntry {
+#[derive(ProtoCodec, Clone, Debug)]
+pub struct ContainerSlotEntry {
     pub container_enum_name: String,
     #[vec_repr(u32)]
     #[vec_endianness(var)]
     pub slots: Vec<i8>
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i8)]
 #[repr(i8)]
 pub enum PackedItemUseLegacyInventoryTransaction {
@@ -20,15 +21,17 @@ pub enum PackedItemUseLegacyInventoryTransaction {
         #[vec_repr(u32)]
         #[vec_endianness(var)]
         actions: Vec<InventoryAction>,
-        action_type: ItemUseInventoryTransaction::ActionType,
+        action_type: ItemUseInventoryTransactionType,
         position: NetworkBlockPosition,
         #[endianness(var)]
         face: i32,
         #[endianness(var)]
         slot: i32,
         item: NetworkItemStackDescriptor,
-        from_position: Vec3,
-        click_position: Vec3,
+        #[endianness(le)]
+        from_position: Vec3<f32>,
+        #[endianness(le)]
+        click_position: Vec3<f32>,
         #[endianness(var)]
         target_block_id: u32,
     } = 0,
@@ -41,15 +44,17 @@ pub enum PackedItemUseLegacyInventoryTransaction {
         #[vec_repr(u32)]
         #[vec_endianness(var)]
         actions: Vec<InventoryAction>,
-        action_type: ItemUseInventoryTransaction::ActionType,
+        action_type: ItemUseInventoryTransactionType,
         position: NetworkBlockPosition,
         #[endianness(var)]
         face: i32,
         #[endianness(var)]
         slot: i32,
         item: NetworkItemStackDescriptor,
-        from_position: Vec3,
-        click_position: Vec3,
+        #[endianness(le)]
+        from_position: Vec3<f32>,
+        #[endianness(le)]
+        click_position: Vec3<f32>,
         #[endianness(var)]
         target_block_id: u32,
     } = 1

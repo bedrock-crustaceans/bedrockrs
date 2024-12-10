@@ -1,25 +1,25 @@
-use bedrockrs_macros::ProtoCodec;
-use crate::version::v662::enums::IdentityDefinition;
+use crate::version::v662::enums::IdentityDefinitionType;
 use crate::version::v662::types::ScoreboardId;
+use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec)]
-struct ScorePacketInfoChangeEntry {
+#[derive(ProtoCodec, Clone, Debug)]
+pub struct ScorePacketInfoChangeEntry {
     pub id: ScoreboardId,
     pub objective_name: String,
     #[endianness(le)]
     pub score_value: i32,
 }
 
-#[derive(ProtoCodec)]
-struct ScorePacketInfoRemoveEntry {
+#[derive(ProtoCodec, Clone, Debug)]
+pub struct ScorePacketInfoRemoveEntry {
     pub id: ScoreboardId,
     pub objective_name: String,
     #[endianness(le)]
     pub score_value: i32,
-    pub identity_definition_type: IdentityDefinition::Type,
+    pub identity_definition_type: IdentityDefinitionType,
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i8)]
 #[repr(i8)]
 pub enum ScorePacketType {

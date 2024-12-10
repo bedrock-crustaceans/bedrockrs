@@ -1,12 +1,12 @@
 use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct DimensionDefinitionGroupType {
     pub name: String,
     pub dimension_definition: DimensionDefinition
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct DimensionDefinition {
     #[endianness(var)]
     pub height_max: i32,
@@ -16,7 +16,7 @@ pub struct DimensionDefinition {
     pub generator_type: i32,
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct DimensionDefinitionGroup {
     #[vec_repr(u32)]
     #[vec_endianness(var)]

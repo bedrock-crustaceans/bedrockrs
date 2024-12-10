@@ -1,6 +1,3 @@
-use bedrockrs_macros::ProtoCodec;
-
-#[derive(ProtoCodec)]
 pub enum ActorFlags {
     Unknown = -1,
     OnFire = 0,

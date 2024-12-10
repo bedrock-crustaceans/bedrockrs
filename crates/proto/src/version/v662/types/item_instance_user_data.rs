@@ -1,12 +1,12 @@
 use bedrockrs_macros::ProtoCodec;
-use crate::version::v662::types::CompoundTag;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct ItemInstanceUserData {
     #[endianness(le)]
     pub serialization_marker: i16,
     pub serialization_version: i8,
-    pub tags: CompoundTag,
+    #[nbt]
+    pub tags: nbtx::Value, // TODO: NBT Structure
     #[vec_repr(u32)]
     #[vec_endianness(le)]
     pub can_place_on: Vec<String>,

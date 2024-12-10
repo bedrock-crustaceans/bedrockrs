@@ -1,16 +1,16 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::types::ActorRuntimeID;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i8)]
 #[repr(i8)]
-enum Flags {
-    ServerSide = 1 << 0,
-    MuteEmoteChat = 1 << 1,
+pub enum Flags {
+    ServerSide = 0x0,
+    MuteEmoteChat = 0x2,
 }
 
 #[gamepacket(id = 138)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct EmotePacket {
     pub actor_runtime_id: ActorRuntimeID,
     pub emote_id: String,

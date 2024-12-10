@@ -1,7 +1,7 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 195)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct GameTestResultsPacket {
     pub succeeded: bool,
     pub error: String,

@@ -1,13 +1,13 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
-#[derive(ProtoCodec)]
-struct FeaturesDataListEntry {
+#[derive(ProtoCodec, Clone, Debug)]
+pub struct FeaturesDataListEntry {
     pub feature_name: String,
     pub binary_json_output: String,
 }
 
 #[gamepacket(id = 191)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct FeatureRegistryPacket {
     #[vec_repr(u32)]
     #[vec_endianness(var)]

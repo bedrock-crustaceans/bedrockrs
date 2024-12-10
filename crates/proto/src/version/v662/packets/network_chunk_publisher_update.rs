@@ -1,8 +1,8 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::types::{BlockPos, ChunkPos};
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 121)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct NetworkChunkPublisherUpdatePacket {
     pub new_view_position: BlockPos,
     #[endianness(var)]

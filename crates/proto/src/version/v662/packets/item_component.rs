@@ -1,14 +1,14 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
-use crate::version::v662::types::CompoundTag;
 
-#[derive(ProtoCodec)]
-struct ItemsEntry {
+#[derive(ProtoCodec, Clone, Debug)]
+pub struct ItemsEntry {
     pub component_item_name: String,
-    pub component_data: CompoundTag,
+    #[nbt]
+    pub component_data: nbtx::Value, // TODO: NBT Structure
 }
 
 #[gamepacket(id = 162)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct ItemComponentPacket {
     #[vec_repr(u32)]
     #[vec_endianness(var)]

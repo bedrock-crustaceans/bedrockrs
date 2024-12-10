@@ -1,17 +1,17 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::{ItemStackRequestActionType, TextProcessingEventOrigin};
 use crate::version::v662::types::ItemStackRequestSlotInfo;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
-#[derive(ProtoCodec)]
-struct ActionsEntry {
+#[derive(ProtoCodec, Clone, Debug)]
+pub struct ActionsEntry {
     pub action_type: ItemStackRequestActionType,
     pub amount: i8,
     pub source: ItemStackRequestSlotInfo,
     pub destination: ItemStackRequestSlotInfo,
 }
 
-#[derive(ProtoCodec)]
-struct RequestsEntry {
+#[derive(ProtoCodec, Clone, Debug)]
+pub struct RequestsEntry {
     #[endianness(var)]
     pub client_request_id: u32,
     #[vec_repr(u32)]
@@ -24,7 +24,7 @@ struct RequestsEntry {
 }
 
 #[gamepacket(id = 147)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct ItemStackRequestPacket {
     #[vec_repr(u32)]
     #[vec_endianness(var)]

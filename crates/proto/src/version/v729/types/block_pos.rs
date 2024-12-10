@@ -1,7 +1,7 @@
-use std::mem::size_of;
 use bedrockrs_proto_core::error::ProtoCodecError;
 use bedrockrs_proto_core::ProtoCodec;
 use std::io::Cursor;
+use std::mem::size_of;
 use std::mem::transmute;
 use varint_rs::{VarintReader, VarintWriter};
 

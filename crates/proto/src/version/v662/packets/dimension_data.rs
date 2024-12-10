@@ -1,8 +1,8 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::types::DimensionDefinitionGroup;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 180)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct DimensionDataPacket {
     pub dimension_definition_group: DimensionDefinitionGroup,
 }

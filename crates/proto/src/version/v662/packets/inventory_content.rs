@@ -1,8 +1,8 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::types::NetworkItemStackDescriptor;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 49)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct InventoryContentPacket {
     #[endianness(var)]
     pub inventory_id: u32,

@@ -1,7 +1,14 @@
 use bedrockrs_macros::ProtoCodec;
-use crate::version::v662::enums::CameraPreset::AudioListener;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
+#[enum_repr(i8)]
+#[repr(i8)]
+pub enum AudioListener {
+    Camera = 0,
+    Player = 1,
+}
+
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct CameraPreset {
     pub name: String,
     pub inherit_from: String,

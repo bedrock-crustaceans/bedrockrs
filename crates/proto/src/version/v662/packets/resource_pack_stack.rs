@@ -1,15 +1,15 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::types::{BaseGameVersion, Experiments};
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
-#[derive(ProtoCodec)]
-struct PackEntry {
+#[derive(ProtoCodec, Clone, Debug)]
+pub struct PackEntry {
     pub id: String,
     pub version: String,
     pub sub_pack_name: String,
 }
 
 #[gamepacket(id = 7)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct ResourcePackStackPacket {
     pub texture_pack_required: bool,
     #[vec_repr(u32)]

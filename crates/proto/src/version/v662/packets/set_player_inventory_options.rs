@@ -1,8 +1,8 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::{InventoryLayout, InventoryLeftTabIndex, InventoryRightTabIndex};
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 307)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct SetPlayerInventoryOptionsPacket {
     pub left_inventory_tab: InventoryLeftTabIndex,
     pub right_inventory_tab: InventoryRightTabIndex,

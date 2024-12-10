@@ -1,13 +1,13 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::enums::StructureTemplateResponseType;
-use crate::version::v662::types::CompoundTag;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 133)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct StructureDataResponsePacket {
     pub structure_name: String,
-    pub structure_nbt: Option<CompoundTag>, 
+    #[nbt]
+    pub structure_nbt: Option<nbtx::Value>, // TODO: NBT Structure
     pub response_type: StructureTemplateResponseType,
 }
 
-// TODO: make sure this actually works
+// VERIFY: If this actually works

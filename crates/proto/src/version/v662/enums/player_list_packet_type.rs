@@ -1,10 +1,10 @@
-use uuid::Uuid;
-use bedrockrs_macros::ProtoCodec;
 use crate::version::v662::enums::BuildPlatform;
 use crate::version::v662::types::{ActorUniqueID, SerializedSkin};
+use bedrockrs_macros::ProtoCodec;
+use uuid::Uuid;
 
-#[derive(ProtoCodec)]
-struct AddPlayerListEntry {
+#[derive(ProtoCodec, Clone, Debug)]
+pub struct AddPlayerListEntry {
     pub uuid: Uuid,
     pub target_actor_id: ActorUniqueID,
     pub player_name: String,
@@ -18,7 +18,7 @@ struct AddPlayerListEntry {
     
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i8)]
 #[repr(i8)]
 pub enum PlayerListPacketType {

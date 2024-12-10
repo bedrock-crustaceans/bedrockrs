@@ -1,7 +1,7 @@
-use bedrockrs_macros::ProtoCodec;
 use crate::version::v662::types::ItemStackNetIdVariant;
+use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i8)]
 #[repr(i8)]
 pub enum NetworkItemStackDescriptor {
@@ -22,3 +22,5 @@ pub enum NetworkItemStackDescriptor {
         user_data_buffer: String
     } = 1
 }
+
+// TODO: impl ProtoCodec

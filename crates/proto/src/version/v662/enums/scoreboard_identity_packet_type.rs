@@ -1,14 +1,14 @@
-use bedrockrs_macros::ProtoCodec;
 use crate::version::v662::types::ScoreboardId;
+use bedrockrs_macros::ProtoCodec;
 
-#[derive(ProtoCodec)]
-struct IdentityInfoUpdateEntry {
+#[derive(ProtoCodec, Clone, Debug)]
+pub struct IdentityInfoUpdateEntry {
     pub scoreboard_id: ScoreboardId,
     #[endianness(var)]
     pub player_unique_id: i64,
 }
 
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i8)]
 #[repr(i8)]
 pub enum ScoreboardIdentityPacketType {

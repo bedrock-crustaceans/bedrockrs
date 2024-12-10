@@ -1,8 +1,8 @@
-use bedrockrs_macros::{gamepacket, ProtoCodec};
 use crate::version::v662::types::NetworkBlockPosition;
+use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[gamepacket(id = 86)]
-#[derive(ProtoCodec)]
+#[derive(ProtoCodec, Clone, Debug)]
 pub struct PlaySoundPacket {
     pub name: String,
     pub position: NetworkBlockPosition,

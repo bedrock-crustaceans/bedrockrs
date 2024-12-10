@@ -1,7 +1,7 @@
-use std::mem::size_of;
 use crate::error::ProtoCodecError;
 use crate::ProtoCodec;
 use std::io::Cursor;
+use std::mem::size_of;
 use xuid::Xuid;
 
 impl ProtoCodec for Xuid {
