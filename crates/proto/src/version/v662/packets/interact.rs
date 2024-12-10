@@ -8,7 +8,7 @@ use std::io::{Cursor, Read};
 #[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i8)]
 #[repr(i8)]
-enum Action {
+pub enum Action {
     Invalid = 0,
     StopRiding {
         #[endianness(le)]

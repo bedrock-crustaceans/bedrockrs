@@ -30,7 +30,7 @@ pub enum SubChunkRequestResult {
 }
 
 #[derive(Clone, Debug)]
-struct SubChunkDataEntry {
+pub struct SubChunkDataEntry {
     pub sub_chunk_pos_offset: SubChunkPosOffset,
     pub sub_chunk_request_result: SubChunkRequestResult,
     pub serialized_sub_chunk: Option<String>, // If sub_chunk_request_result == SuccessAllAir, or cache_enabled

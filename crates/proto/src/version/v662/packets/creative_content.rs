@@ -2,7 +2,7 @@ use crate::version::v662::types::NetworkItemInstanceDescriptor;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct WriteEntry {
+pub struct WriteEntry {
     #[endianness(var)]
     pub creative_net_id: u32,
     pub item_instance: NetworkItemInstanceDescriptor,

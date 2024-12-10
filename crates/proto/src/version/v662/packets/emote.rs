@@ -4,7 +4,7 @@ use bedrockrs_macros::{gamepacket, ProtoCodec};
 #[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i8)]
 #[repr(i8)]
-enum Flags {
+pub enum Flags {
     ServerSide = 0x0,
     MuteEmoteChat = 0x2,
 }

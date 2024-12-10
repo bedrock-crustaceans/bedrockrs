@@ -23,6 +23,6 @@ pub enum MolangVersion {
 }
 
 impl MolangVersion {
-    const LATEST: MolangVersion = MolangVersion::LeafSupportingInFirstSolidBlockBelow; // TODO: NumValidVersions - 1 (error)
-    const HARDCODED_MOLANG: MolangVersion = MolangVersion::LATEST;
+    pub const LATEST: MolangVersion = MolangVersion::LeafSupportingInFirstSolidBlockBelow; // TODO: NumValidVersions - 1 (error)
+    pub const HARDCODED_MOLANG: MolangVersion = MolangVersion::LATEST;
 }

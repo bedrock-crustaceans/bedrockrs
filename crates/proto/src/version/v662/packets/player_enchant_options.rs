@@ -2,7 +2,7 @@ use crate::version::v662::types::ItemEnchants;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct OptionsEntry {
+pub struct OptionsEntry {
     #[endianness(var)]
     pub cost: u32,
     pub enchants: ItemEnchants,

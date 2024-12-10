@@ -66,7 +66,7 @@ pub enum PlayerAuthInputFlags {
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct ActionsEntry {
+pub struct ActionsEntry {
     pub action_type: ItemStackRequestActionType,
     pub amount: i8,
     pub source: ItemStackRequestSlotInfo,
@@ -74,7 +74,7 @@ struct ActionsEntry {
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct PerformItemStackRequestData {
+pub struct PerformItemStackRequestData {
     #[endianness(var)]
     pub client_request_id: u32,
     #[vec_repr(u32)]
@@ -87,7 +87,7 @@ struct PerformItemStackRequestData {
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct ClientPredictedVehicleData {
+pub struct ClientPredictedVehicleData {
     #[endianness(le)]
     pub vehicle_rotation: Vec2<f32>,
     pub client_predicted_vehicle: ActorUniqueID,

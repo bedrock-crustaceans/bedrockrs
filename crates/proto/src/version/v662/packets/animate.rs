@@ -9,7 +9,7 @@ use varint_rs::{VarintReader, VarintWriter};
 #[enum_repr(i32)]
 #[enum_endianness(var)]
 #[repr(i32)]
-enum Action {
+pub enum Action {
     NoAction = 0,
     Swing = 1,
     WakeUp = 3,

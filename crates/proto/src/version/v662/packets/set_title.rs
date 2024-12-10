@@ -4,7 +4,7 @@ use bedrockrs_macros::{gamepacket, ProtoCodec};
 #[enum_repr(i32)]
 #[enum_endianness(var)]
 #[repr(i32)]
-enum TitleType {
+pub enum TitleType {
     Clear = 0,
     Reset = 1,
     Title = 2,

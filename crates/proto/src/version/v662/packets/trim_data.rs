@@ -1,13 +1,13 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct TrimPattern {
+pub struct TrimPattern {
     pub item_name: String,
     pub pattern_id: String,
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct TrimMaterial {
+pub struct TrimMaterial {
     pub material_id: String,
     pub color: String,
     pub item_name: String,

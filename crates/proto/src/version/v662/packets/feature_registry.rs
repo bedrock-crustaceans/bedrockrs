@@ -1,7 +1,7 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct FeaturesDataListEntry {
+pub struct FeaturesDataListEntry {
     pub feature_name: String,
     pub binary_json_output: String,
 }

@@ -31,11 +31,11 @@ pub enum MapDecorationType {
 }
 
 impl MapDecorationType {
-    const PLAYER: MapDecorationType = MapDecorationType::MarkerWhite;
-    const PLAYER_OFF_MAP: MapDecorationType = MapDecorationType::SquareWhite;
-    const PLAYER_OFF_LIMITS: MapDecorationType = MapDecorationType::SmallSquareWhite;
-    const PLAYER_HIDDEN: MapDecorationType = MapDecorationType::NoDraw;
-    const ITEM_FRAME: MapDecorationType = MapDecorationType::MarkerGreen;
+    pub const PLAYER: MapDecorationType = MapDecorationType::MarkerWhite;
+    pub const PLAYER_OFF_MAP: MapDecorationType = MapDecorationType::SquareWhite;
+    pub const PLAYER_OFF_LIMITS: MapDecorationType = MapDecorationType::SmallSquareWhite;
+    pub const PLAYER_HIDDEN: MapDecorationType = MapDecorationType::NoDraw;
+    pub const ITEM_FRAME: MapDecorationType = MapDecorationType::MarkerGreen;
 }
 
 #[derive(ProtoCodec, Clone, Debug)]

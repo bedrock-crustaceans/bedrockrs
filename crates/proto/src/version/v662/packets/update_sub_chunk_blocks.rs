@@ -8,7 +8,7 @@ use std::mem::size_of;
 use varint_rs::{VarintReader, VarintWriter};
 
 #[derive(Clone, Debug)]
-struct BlocksChangedEntry {
+pub struct BlocksChangedEntry {
     pub pos: NetworkBlockPosition,
     pub runtime_id: u32,
     pub update_flags: u32,

@@ -3,7 +3,7 @@ use crate::version::v662::types::ScoreboardId;
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct ScorePacketInfoChangeEntry {
+pub struct ScorePacketInfoChangeEntry {
     pub id: ScoreboardId,
     pub objective_name: String,
     #[endianness(le)]
@@ -11,7 +11,7 @@ struct ScorePacketInfoChangeEntry {
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct ScorePacketInfoRemoveEntry {
+pub struct ScorePacketInfoRemoveEntry {
     pub id: ScoreboardId,
     pub objective_name: String,
     #[endianness(le)]

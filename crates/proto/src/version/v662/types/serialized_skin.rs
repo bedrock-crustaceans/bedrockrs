@@ -2,7 +2,7 @@ use crate::version::v662::enums::{AnimatedTextureType, AnimationExpression};
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct SerializedSkinAnimationFrame {
+pub struct SerializedSkinAnimationFrame {
     #[endianness(le)]
     pub image_width: u32,
     #[endianness(le)]
@@ -15,7 +15,7 @@ struct SerializedSkinAnimationFrame {
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct PersonaPiecesEntry {
+pub struct PersonaPiecesEntry {
     pub piece_id: String,
     pub piece_type: String,
     pub pack_id: String,
@@ -24,7 +24,7 @@ struct PersonaPiecesEntry {
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct PieceTintColorsEntry {
+pub struct PieceTintColorsEntry {
     pub piece_type: String,
     pub piece_tint_color: String,
 }

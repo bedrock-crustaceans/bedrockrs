@@ -2,7 +2,7 @@ use crate::version::v662::types::ActorUniqueID;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct ClientPixelsListEntry {
+pub struct ClientPixelsListEntry {
     #[endianness(le)]
     pub pixel: u32,
     #[endianness(le)]

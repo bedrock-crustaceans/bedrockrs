@@ -5,7 +5,7 @@ use bedrockrs_macros::ProtoCodec;
 #[enum_repr(u16)]
 #[enum_endianness(le)]
 #[repr(u16)]
-enum SerializedAbilitiesLayer {
+pub enum SerializedAbilitiesLayer {
     CustomCache = 0,
     Base = 1,
     Spectator = 2,

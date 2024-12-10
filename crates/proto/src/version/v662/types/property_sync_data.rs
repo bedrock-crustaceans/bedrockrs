@@ -1,7 +1,7 @@
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct IntEntry {
+pub struct IntEntry {
     #[endianness(var)]
     pub property_index: u32,
     #[endianness(le)]
@@ -9,7 +9,7 @@ struct IntEntry {
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct FloatEntry {
+pub struct FloatEntry {
     #[endianness(var)]
     pub property_index: u32,
     #[endianness(var)]

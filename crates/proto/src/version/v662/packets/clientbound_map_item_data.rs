@@ -6,7 +6,7 @@ use std::io::{Cursor, Read};
 use varint_rs::{VarintReader, VarintWriter};
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct PixelsEntry {
+pub struct PixelsEntry {
     #[endianness(var)]
     pub pixel: u32,
 }
@@ -15,7 +15,7 @@ struct PixelsEntry {
 #[enum_repr(u32)]
 #[enum_endianness(var)]
 #[repr(u32)]
-enum Type {
+pub enum Type {
     Invalid = 0x0,
     TextureUpdate {
         #[endianness(var)]

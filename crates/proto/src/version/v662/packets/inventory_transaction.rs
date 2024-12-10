@@ -3,7 +3,7 @@ use crate::version::v662::types::InventoryTransaction;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct LegacySetItemSlotsEntry {
+pub struct LegacySetItemSlotsEntry {
     pub container_enum: i8, // TODO: find container enum?
     #[vec_repr(u32)]
     #[vec_endianness(var)]

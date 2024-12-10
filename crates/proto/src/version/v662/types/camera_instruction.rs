@@ -3,14 +3,14 @@ use bedrockrs_macros::ProtoCodec;
 use crate::version::v662::enums::EasingType;
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct EaseData {
+pub struct EaseData {
     pub ease_type: EasingType,
     #[endianness(le)]
     pub ease_time: f32,
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct SetInstruction {
+pub struct SetInstruction {
     #[endianness(le)]
     pub runtime_id: i32,
     pub ease_data: Option<EaseData>,
@@ -24,7 +24,7 @@ struct SetInstruction {
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct TimeData {
+pub struct TimeData {
     #[endianness(le)]
     pub fade_in_time: f32,
     #[endianness(le)]
@@ -34,7 +34,7 @@ struct TimeData {
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct Color {
+pub struct Color {
     #[endianness(le)]
     pub r: f32,
     #[endianness(le)]
@@ -44,7 +44,7 @@ struct Color {
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct FadeInstruction {
+pub struct FadeInstruction {
     pub time_data: Option<TimeData>,
     pub color: Option<Color>,
 }

@@ -2,7 +2,7 @@ use crate::version::v662::types::ScoreboardId;
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct IdentityInfoUpdateEntry {
+pub struct IdentityInfoUpdateEntry {
     pub scoreboard_id: ScoreboardId,
     #[endianness(var)]
     pub player_unique_id: i64,

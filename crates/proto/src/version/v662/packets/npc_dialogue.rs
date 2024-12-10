@@ -4,7 +4,7 @@ use bedrockrs_macros::{gamepacket, ProtoCodec};
 #[enum_repr(i32)]
 #[enum_endianness(var)]
 #[repr(i32)]
-enum NpcDialogueActionType {
+pub enum NpcDialogueActionType {
     Open = 0,
     Close = 1,
 }

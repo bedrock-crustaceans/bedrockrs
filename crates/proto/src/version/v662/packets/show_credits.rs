@@ -5,7 +5,7 @@ use bedrockrs_macros::{gamepacket, ProtoCodec};
 #[enum_repr(i32)]
 #[enum_endianness(var)]
 #[repr(i32)]
-enum CreditsState {
+pub enum CreditsState {
     Start = 0,
     Finished = 1,
 }

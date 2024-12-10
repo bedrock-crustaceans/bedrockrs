@@ -5,7 +5,7 @@ use bedrockrs_macros::{gamepacket, ProtoCodec};
 #[derive(ProtoCodec, Clone, Debug)]
 #[enum_repr(i8)]
 #[repr(i8)]
-enum Type {
+pub enum Type {
     StartCombine = 0,
     StartReaction = 1,
     Reset = 2,

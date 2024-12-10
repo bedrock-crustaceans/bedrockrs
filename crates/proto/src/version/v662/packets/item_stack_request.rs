@@ -3,7 +3,7 @@ use crate::version::v662::types::ItemStackRequestSlotInfo;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct ActionsEntry {
+pub struct ActionsEntry {
     pub action_type: ItemStackRequestActionType,
     pub amount: i8,
     pub source: ItemStackRequestSlotInfo,
@@ -11,7 +11,7 @@ struct ActionsEntry {
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct RequestsEntry {
+pub struct RequestsEntry {
     #[endianness(var)]
     pub client_request_id: u32,
     #[vec_repr(u32)]

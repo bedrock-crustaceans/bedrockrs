@@ -3,7 +3,7 @@ use bedrockrs_core::{Vec2, Vec3};
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct AttributeEntry {
+pub struct AttributeEntry {
     pub attribute_name: String,
     #[endianness(le)]
     pub min_value: f32,

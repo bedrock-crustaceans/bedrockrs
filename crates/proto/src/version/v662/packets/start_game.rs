@@ -5,7 +5,7 @@ use bedrockrs_macros::{gamepacket, ProtoCodec};
 use uuid::Uuid;
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct BlockProperty {
+pub struct BlockProperty {
     pub block_name: String,
     #[nbt]
     pub block_definition: nbtx::Value, // TODO: NBT Structure

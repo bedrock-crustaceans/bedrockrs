@@ -1,7 +1,7 @@
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct MaterialReducerDataEntryIdAndCount {
+pub struct MaterialReducerDataEntryIdAndCount {
     #[endianness(var)]
     pub id: i32,
     #[endianness(var)]

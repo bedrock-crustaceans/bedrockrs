@@ -10,7 +10,7 @@ use varint_rs::{VarintReader, VarintWriter};
 #[enum_repr(i32)]
 #[enum_endianness(var)]
 #[repr(i32)]
-enum AgentResult {
+pub enum AgentResult {
     ActionFail = 0,
     ActionSuccess = 1,
     QueryResultFalse = 2,
@@ -21,7 +21,7 @@ enum AgentResult {
 #[enum_repr(i32)]
 #[enum_endianness(var)]
 #[repr(i32)]
-enum Type {
+pub enum Type {
     Achievement {
         #[endianness(var)]
         achievement_id: i32,

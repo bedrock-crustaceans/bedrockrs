@@ -5,7 +5,7 @@ use bedrockrs_macros::{gamepacket, ProtoCodec};
 #[enum_repr(u32)]
 #[enum_endianness(var)]
 #[repr(u32)]
-enum Type {
+pub enum Type {
     Invalid = 0,
     ClearDebugMarkers = 1,
     AddDebugMarkerCube {

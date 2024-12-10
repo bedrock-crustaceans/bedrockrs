@@ -4,7 +4,7 @@ use bedrockrs_core::Vec3;
 use bedrockrs_macros::ProtoCodec;
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct ContainerSlotEntry {
+pub struct ContainerSlotEntry {
     pub container_enum_name: String,
     #[vec_repr(u32)]
     #[vec_endianness(var)]

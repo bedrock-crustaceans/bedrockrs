@@ -1,7 +1,7 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct BehaviourPackEntry {
+pub struct BehaviourPackEntry {
     pub id: String,
     pub version: String,
     #[endianness(le)]
@@ -13,7 +13,7 @@ struct BehaviourPackEntry {
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct ResourcePackEntry {
+pub struct ResourcePackEntry {
     pub id: String,
     pub version: String,
     #[endianness(le)]
@@ -26,7 +26,7 @@ struct ResourcePackEntry {
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct CDNUrl {
+pub struct CDNUrl {
     pub first: String,
     pub second: String,
 }

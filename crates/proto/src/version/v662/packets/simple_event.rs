@@ -4,7 +4,7 @@ use bedrockrs_macros::{gamepacket, ProtoCodec};
 #[enum_repr(u16)]
 #[enum_endianness(le)]
 #[repr(u16)]
-enum Subtype {
+pub enum Subtype {
     UninitializedSubtype = 0,
     EnableCommands = 1,
     DisableCommands = 2,

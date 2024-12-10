@@ -1,7 +1,7 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct ItemsEntry {
+pub struct ItemsEntry {
     pub component_item_name: String,
     #[nbt]
     pub component_data: nbtx::Value, // TODO: NBT Structure

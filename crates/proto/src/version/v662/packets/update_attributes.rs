@@ -3,7 +3,7 @@ use crate::version::v662::types::ActorRuntimeID;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct AttributeModifier {
+pub struct AttributeModifier {
     pub id: String,
     pub name: String,
     #[endianness(le)]
@@ -14,7 +14,7 @@ struct AttributeModifier {
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct AttributeData {
+pub struct AttributeData {
     #[endianness(le)]
     pub min_value: f32,
     #[endianness(le)]

@@ -6,7 +6,7 @@ use std::io::Cursor;
 use std::mem::size_of;
 
 #[derive(Clone, Debug)]
-struct EnumDataEntry {
+pub struct EnumDataEntry {
     name: String,
     values: Vec<u32>,
 }
@@ -46,7 +46,7 @@ impl ProtoCodec for EnumDataEntry {
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct SubCommandValues {
+pub struct SubCommandValues {
     #[endianness(le)]
     pub sub_command_first_value: u16,
     #[endianness(le)]
@@ -54,7 +54,7 @@ struct SubCommandValues {
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct ParameterDataEntry {
+pub struct ParameterDataEntry {
     pub name: String,
     #[endianness(le)]
     pub parse_symbol: u32,
@@ -63,7 +63,7 @@ struct ParameterDataEntry {
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct OverloadsEntry {
+pub struct OverloadsEntry {
     pub is_chaining: bool,
     #[vec_repr(u32)]
     #[vec_endianness(var)]
@@ -71,7 +71,7 @@ struct OverloadsEntry {
 }
 
 #[derive(Clone, Debug)]
-struct CommandsEntry {
+pub struct CommandsEntry {
     pub name: String,
     pub description: String,
     pub flags: u16,
@@ -155,7 +155,7 @@ impl ProtoCodec for CommandsEntry {
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct SoftEnumsEntry {
+pub struct SoftEnumsEntry {
     pub enum_name: String,
     #[vec_repr(u32)]
     #[vec_endianness(var)]
@@ -163,7 +163,7 @@ struct SoftEnumsEntry {
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct ConstraintsEntry {
+pub struct ConstraintsEntry {
     #[endianness(le)]
     pub enum_value_symbol: u32,
     #[endianness(le)]
@@ -174,7 +174,7 @@ struct ConstraintsEntry {
 }
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct ChainedSubCommandDataEntry {
+pub struct ChainedSubCommandDataEntry {
     pub sub_command_name: String,
     #[vec_repr(u32)]
     #[vec_endianness(var)]

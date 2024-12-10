@@ -1,7 +1,7 @@
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct MissingBlobEntry {
+pub struct MissingBlobEntry {
     #[endianness(le)]
     pub blob_id: u64,
     pub blob_data: String,

@@ -4,7 +4,7 @@ use bedrockrs_macros::ProtoCodec;
 use uuid::Uuid;
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct AddPlayerListEntry {
+pub struct AddPlayerListEntry {
     pub uuid: Uuid,
     pub target_actor_id: ActorUniqueID,
     pub player_name: String,

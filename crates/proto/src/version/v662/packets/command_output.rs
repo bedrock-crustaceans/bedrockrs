@@ -8,7 +8,7 @@ use std::mem::size_of;
 use byteorder::{ReadBytesExt, WriteBytesExt};
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct OutputMessagesEntry {
+pub struct OutputMessagesEntry {
     pub successful: bool,
     pub message_id: String,
     #[vec_repr(u32)]

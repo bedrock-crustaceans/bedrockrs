@@ -2,7 +2,7 @@ use crate::version::v662::types::ChunkPos;
 use bedrockrs_macros::{gamepacket, ProtoCodec};
 
 #[derive(ProtoCodec, Clone, Debug)]
-struct CacheBlobEntry {
+pub struct CacheBlobEntry {
     #[endianness(var)]
     blob: u64
 }
