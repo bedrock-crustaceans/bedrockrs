@@ -74,17 +74,22 @@ impl BinaryInterface for i8 {
     }
 }
 impl BinaryInterface for &[u8] {
+
     fn write<Writer: ByteOrder>(
         buff: &mut BinaryBuffer,
         value: Self,
     ) -> Result<(), BinaryInterfaceError> {
         let buffer = buff.poll_buff_ext(value.len());
+
         for idx in 0..value.len() {
             buffer[idx] = value[idx]
         }
+
         buff.rebase(value.len() as isize);
+        
         Ok(())
     }
+
     fn read<Reader: ByteOrder>(_: &mut BinaryBuffer) -> Option<Self> {
         unimplemented!()
     }

@@ -9,16 +9,15 @@ bedrockrs_shared = { path = "../shared" }
 
 nbtx = { git = "https://github.com/bedrock-crustaceans/nbtx" }
 
-thiserror = "1.0"
-byteorder = "1.5"
-uuid = { version = "1.10", features = ["v4"] }
-bytemuck = { version = "1.19.0", features = ["must_cast"] }
-len-trait = "0.6.1"
-anyhow = "1.0.93"
-concat-idents = "1.1.5"
-serde = "1.0.214"
-rusty-leveldb = "3.0.2"
-miniz_oxide = "0.8.0"
+thiserror = "1.x"
+byteorder = "1.x"
+uuid = { version = "1.x", features = ["v4"] }
+bytemuck = { version = "1.19.x", features = ["must_cast"] }
+len-trait = "0.6.x"
+concat-idents = "1.x.x"
+serde = "1.x.x"
+rusty-leveldb = "3.x.x"
+miniz_oxide = "0.x.x"
 
 [profile.release]
 debug = true
