@@ -35,7 +35,7 @@ pub mod default_impl {
 
     pub struct WorldBlock<UserState> {
         id: String,
-        states: HashMap<String, BlockStateValue>,
+        pub states: HashMap<String, BlockStateValue>,
         _state_marker: PhantomData<UserState>,
     }
 

@@ -2,14 +2,15 @@ use crate::level::db_interface::bedrock_key::ChunkKey;
 use crate::level::db_interface::db::LevelDBKey;
 use crate::level::db_interface::key_level::KeyTypeTag;
 use crate::level::file_interface::RawWorldTrait;
-use crate::types::buffer_slide::{BetterCursor, SlideBuffer};
 use bedrockrs_core::Vec2;
 use bedrockrs_shared::world::dimension::Dimension;
+use byteorder::{LittleEndian, ReadBytesExt};
 use miniz_oxide::deflate::{compress_to_vec, compress_to_vec_zlib, CompressionLevel};
 use miniz_oxide::inflate::{decompress_to_vec, decompress_to_vec_zlib};
 use rusty_leveldb::compressor::NoneCompressor;
 use rusty_leveldb::{Compressor, CompressorList, LdbIterator, Options, Status, WriteBatch, DB};
 use std::collections::HashSet;
+use std::io::Cursor;
 use std::marker::PhantomData;
 use std::rc::Rc;
 use thiserror::Error;
@@ -87,13 +88,21 @@ impl<UserState> RustyDBInterface<UserState> {
             .map(|ele| ele.estimate_size())
             .sum();
         data.resize(count, 0);
-        let mut buff = SlideBuffer::new(data);
+
+        let mut buff: Cursor<&mut [u8]> = Cursor::new(data);
+
         let mut batch = WriteBatch::default();
+
         for key in subchunk_batch_info {
-            let start = buff.pos();
+            let start = buff.position();
+
             key.write_key(&mut buff);
-            let end = buff.pos();
-            batch.put(&buff[start..end], &[]);
+
+            let end = buff.position();
+
+            let whole = buff.get_ref();
+
+            batch.put(&whole[start as usize..end as usize], &[]);
         }
         batch
     }
@@ -146,13 +155,18 @@ impl<UserState> RawWorldTrait for RustyDBInterface<UserState> {
                 .map(|(info, _)| info.estimate_size())
                 .sum()
         ];
-        let mut buff = SlideBuffer::new(&mut data);
+        let mut buff: Cursor<&mut [u8]> = Cursor::new(&mut data);
         let mut batch = WriteBatch::default();
-        for (key, raw) in &subchunk_batch_info {
-            let start = buff.pos();
+        for (key, _) in &subchunk_batch_info {
+            let start = buff.position();
+
             key.write_key(&mut buff);
-            let end = buff.pos();
-            batch.put(&buff[start..end], raw);
+
+            let end = buff.position();
+
+            let whole = buff.get_ref();
+
+            batch.put(&whole[start as usize..end as usize], &[]);
         }
         Ok(self.db.write(batch, false)?)
     }
@@ -177,7 +191,7 @@ impl<UserState> RawWorldTrait for RustyDBInterface<UserState> {
 
     fn build_key(key: &ChunkKey) -> Vec<u8> {
         let mut key_bytes: Vec<u8> = vec![0; key.estimate_size()];
-        let mut buff = SlideBuffer::new(&mut key_bytes);
+        let mut buff: Cursor<&mut [u8]> = Cursor::new(&mut key_bytes);
         key.write_key(&mut buff);
         key_bytes
     }
@@ -201,18 +215,33 @@ impl<UserState> RawWorldTrait for RustyDBInterface<UserState> {
         _: &mut Self::UserState,
     ) -> Result<HashSet<(Dimension, Vec2<i32>)>, Self::Err> {
         let mut out_set = HashSet::new();
+
         let mut iter = self.db.new_iter()?;
+
         loop {
-            let key = &mut Vec::new();
+            let mut key = Vec::new();
             let data = &mut Vec::new();
-            iter.current(key, data);
-            let mut cursor = BetterCursor::new(key);
-            if key.len() == 9 || key.len() == 13 {
-                if key.get(key.len() - 1) != Some(&KeyTypeTag::Version.to_byte()) {
-                    let x = cursor.read::<i32>().unwrap();
-                    let y = cursor.read::<i32>().unwrap();
-                    let dim = if key.len() == 13 {
-                        cursor.read::<i32>().unwrap().into()
+
+            iter.current(&mut key, data);
+            let len = key.len();
+            let mut cursor = Cursor::new(&mut key);
+
+            if len == 9 || len == 13 {
+                // Does a little hack to make sure it isn't reading a key that it doesn't want to
+                if cursor.get_ref().get(len - 1) == Some(&KeyTypeTag::Version.to_byte()) {
+                    let x = cursor
+                        .read_i32::<LittleEndian>()
+                        .expect("This should never fail");
+
+                    let y = cursor
+                        .read_i32::<LittleEndian>()
+                        .expect("This should never fail");
+
+                    let dim = if len == 13 {
+                        cursor
+                            .read_i32::<LittleEndian>()
+                            .expect("This should never fail")
+                            .into()
                     } else {
                         Dimension::Overworld
                     };

@@ -74,7 +74,6 @@ impl BinaryInterface for i8 {
     }
 }
 impl BinaryInterface for &[u8] {
-
     fn write<Writer: ByteOrder>(
         buff: &mut BinaryBuffer,
         value: Self,
@@ -86,7 +85,7 @@ impl BinaryInterface for &[u8] {
         }
 
         buff.rebase(value.len() as isize);
-        
+
         Ok(())
     }
 
@@ -201,12 +200,11 @@ impl From<Vec<u8>> for BinaryBuffer {
 
 #[cfg(test)]
 mod tests {
-    use crate::types::binary::BinaryBuffer;
-    use anyhow::anyhow;
+    use crate::types::binary::{BinaryBuffer, BinaryInterfaceError};
     use byteorder::{BigEndian, LittleEndian};
 
     #[test]
-    fn binary_buffer_test() -> Result<(), anyhow::Error> {
+    fn binary_buffer_test() -> Result<(), BinaryInterfaceError> {
         let mut buff: Vec<u8> = Vec::with_capacity(256);
         unsafe {
             buff.set_len(256);
@@ -215,14 +213,12 @@ mod tests {
         buff.write::<LittleEndian, i32>(2567)?.reset();
         assert_eq!(
             2567,
-            buff.read::<LittleEndian, i32>()
-                .ok_or(anyhow!("Read was empty"))?
+            buff.read::<LittleEndian, i32>().expect("Read was empty")
         );
         buff.write::<BigEndian, i32>(2567)?.reset();
         assert_eq!(
             2567_i32.to_be(),
-            buff.read::<BigEndian, i32>()
-                .ok_or(anyhow!("Read was empty"))?
+            buff.read::<BigEndian, i32>().expect("Read was empty")
         );
         buff.reset();
 
@@ -231,31 +227,28 @@ mod tests {
             .reset();
         assert_eq!(
             01234,
-            buff.read::<LittleEndian, i32>()
-                .ok_or(anyhow!("Read Empty"))?
+            buff.read::<LittleEndian, i32>().expect("Read was empty")
         );
         assert_eq!(
             56789,
-            buff.read::<LittleEndian, i32>()
-                .ok_or(anyhow!("Read Empty"))?
+            buff.read::<LittleEndian, i32>().expect("Read was empty")
         );
 
         Ok(())
     }
 
     #[test]
-    fn auto_allocation_test() -> Result<(), anyhow::Error> {
+    fn auto_allocation_test() -> Result<(), BinaryInterfaceError> {
         let mut buff: BinaryBuffer = Vec::new().into();
         buff.write::<LittleEndian, i32>(2567)?.reset();
         assert_eq!(
             2567,
-            buff.read::<LittleEndian, i32>()
-                .ok_or(anyhow!("Read was empty"))?
+            buff.read::<LittleEndian, i32>().expect("Read was empty")
         );
         let mut buff: BinaryBuffer = Vec::new().into();
         buff.write::<LittleEndian, &[u8]>(&[1, 2, 3, 4, 5])?.reset();
         for x in 1..=5 {
-            assert_eq!(x, buff.read::<LittleEndian, u8>().unwrap());
+            assert_eq!(x, buff.read::<LittleEndian, u8>().expect("Read was empty"));
         }
 
         Ok(())

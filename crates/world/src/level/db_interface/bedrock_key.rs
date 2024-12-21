@@ -1,9 +1,11 @@
 use crate::level::db_interface::db::LevelDBKey;
 use crate::level::db_interface::key_level::KeyTypeTag;
-use crate::types::buffer_slide::SlideBuffer;
 use bedrockrs_core::Vec2;
 use bedrockrs_shared::world::dimension::Dimension;
+use byteorder::{LittleEndian, WriteBytesExt};
+use std::io::Cursor;
 
+#[derive(Debug)]
 pub struct ChunkKey {
     xz: Vec2<i32>,
     dim: Dimension,
@@ -53,14 +55,23 @@ impl LevelDBKey for ChunkKey {
         size
     }
 
-    fn write_key(&self, buffer: &mut SlideBuffer<Vec<u8>>) {
-        buffer.write(self.xz.x).write(self.xz.y);
+    fn write_key(&self, buffer: &mut Cursor<&mut [u8]>) {
+        buffer
+            .write_i32::<LittleEndian>(self.xz.x)
+            .expect("This should never fail");
+        buffer
+            .write_i32::<LittleEndian>(self.xz.y)
+            .expect("This should never fail");
         if self.dim != Dimension::Overworld {
-            buffer.write(self.dim as i32);
+            buffer
+                .write_i32::<LittleEndian>(self.dim as i32)
+                .expect("This should never fail");
         }
-        buffer.write(self.key_type.to_byte());
+        buffer
+            .write_u8(self.key_type.to_byte())
+            .expect("This should never fail");
         if let Some(val) = self.y_index {
-            buffer.write(val);
+            buffer.write_i8(val).expect("This should never fail");
         }
     }
 }

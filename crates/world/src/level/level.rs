@@ -130,9 +130,8 @@ where
     }
 
     /// Must call before destruction
-    fn close(mut self) -> ClosedLevel {
+    pub fn close(mut self) {
         self.cull().unwrap();
-        ClosedLevel
     }
 
     /// Returns all chunks (in the form of its key) that exist in the world
@@ -375,20 +374,6 @@ where
     }
 }
 
-impl<
-        UserState,
-        UserWorldInterface: RawWorldTrait<UserState = UserState>,
-        UserBlockType: WorldBlockTrait<UserState = UserState>,
-        UserSubChunkType: SubChunkTrait<UserState = UserState, BlockType = UserBlockType>,
-        UserSubChunkDecoder: SubChunkDecoder<UserState = UserState, BlockType = UserBlockType>,
-    > Drop
-    for Level<UserState, UserWorldInterface, UserBlockType, UserSubChunkType, UserSubChunkDecoder>
-{
-    fn drop(&mut self) {
-        panic!("Undroppable Type! Please call close on this type");
-    }
-}
-
 pub trait LevelModificationProvider {
     type UserState;
     type UserWorldInterface;
@@ -486,4 +471,9 @@ pub mod default_impl {
         BedrockSubChunkDecoder,
     >;
     pub type BedrockChunk = LevelChunk<BedrockState, BedrockSubChunk, BedrockLevel>;
+    pub type BedrockLevelError<RawInterface, BedrockSubChunkDecoder, BedrockSubChunk> = LevelError<
+        <RawInterface as RawWorldTrait>::Err,
+        <BedrockSubChunkDecoder as SubChunkDecoder>::Err,
+        <BedrockSubChunk as SubChunkTrait>::Err,
+    >;
 }
