@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = [ "crates/*" ]
+members = ["crates/*"]
 
 [dependencies]
 bedrockrs_core = { path = "crates/core" }
@@ -18,20 +18,19 @@ bedrockrs_addon = { path = "crates/addon", optional = true }
 
 bedrockrs_form = { path = "crates/form" }
 
-bedrockrs_world = { path = "crates/world", optional = true }
-bedrockrs_paletted_storage = { path = "crates/paletted_storage", optional = true }
+bedrockrs_world = { path = "crates/world", optional = true, features = ["default-impl"] }
 uuid = { version = "1.11.0", features = ["v4"] }
+nbtx = { git = "https://github.com/bedrock-crustaceans/nbtx" }
 
 [dev-dependencies]
 tokio = { version = "1.40", features = ["full"] }
-nbtx = { git = "https://github.com/bedrock-crustaceans/nbtx" }
 
 [features]
 full = ["addon", "proto", "world"]
 
 addon = ["dep:bedrockrs_addon"]
 proto = ["dep:bedrockrs_proto", "dep:bedrockrs_proto_core", "dep:bedrockrs_macros"]
-world = ["dep:bedrockrs_world", "dep:bedrockrs_paletted_storage"]
+world = ["dep:bedrockrs_world"]
 
 [[example]]
 name = "proto_server"

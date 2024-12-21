@@ -6,11 +6,28 @@ edition = "2021"
 [dependencies]
 bedrockrs_core = { path = "../core" }
 bedrockrs_shared = { path = "../shared" }
-bedrockrs_paletted_storage = { path = "../paletted_storage" }
 
 nbtx = { git = "https://github.com/bedrock-crustaceans/nbtx" }
 
-mojang-leveldb = "0.6"
-thiserror = "1.0"
-byteorder = "1.5"
-uuid = { version = "1.10", features = ["v4"] }
+thiserror = "1.x"
+byteorder = "1.x"
+uuid = { version = "1.x", features = ["v4"] }
+bytemuck = { version = "1.19.x", features = ["must_cast"] }
+len-trait = "0.6.x"
+concat-idents = "1.x.x"
+serde = "1.x.x"
+rusty-leveldb = "3.x.x"
+miniz_oxide = "0.x.x"
+
+[dev-dependencies]
+rand = "0.8"
+
+[profile.release]
+debug = true
+
+[[test]]
+name = "api_test"
+required-features = ["default-impl"]
+
+[features]
+default-impl = []
