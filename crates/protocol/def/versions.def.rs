@@ -894,7 +894,7 @@ versions![
         ] in crate::version::v2168::enums,
     },
     (2169, "r/26_u4_hotfix5", "1.26.45"): {},
-    (2192, "r/26_u5", "1.26.50"): {
+    (2193, "r/26_u5", "1.26.50"): {
         packets: [
             + RecordStartedPacket: RecordStartedPacket^,
             + SetPlayerFurnaceOptionsPacket: SetPlayerFurnaceOptionsPacket,
@@ -906,7 +906,7 @@ versions![
             % ServerBoundDiagnosticsPacket: ServerBoundDiagnosticsPacket,
             % ServerBoundPackSettingChangePacket: ServerBoundPackSettingChangePacket,
             % SubChunkPacket: SubChunkPacket^,
-        ] in crate::version::v2192::packets,
+        ] in crate::version::v2193::packets,
         types: [
             % CameraPreset: CameraPreset^,
             % DebugShape: DebugShape^,
@@ -915,10 +915,10 @@ versions![
             % ItemStackResponseSlotInfo: ItemStackResponseSlotInfo^,
             % MoveActorDeltaData: MoveActorDeltaData^,
             % PackedItemUseLegacyInventoryTransaction: PackedItemUseLegacyInventoryTransaction^,
-        ] in crate::version::v2192::types,
+        ] in crate::version::v2193::types,
         enums: [
             % ConnectionFailReason: ConnectionFailReason,
             % PersonaPieceType: PersonaPieceType,
-        ] in crate::version::v2192::enums,
+        ] in crate::version::v2193::enums,
     }
 ];
